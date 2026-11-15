@@ -1,11 +1,9 @@
 //! Romanisation tables. Each table lists the canonical spelling used for output;
 //! `aliases` lists extra spellings accepted on input.
 
-/// Data for one Latin scheme.
 pub(crate) struct Table {
     /// (Latin, independent vowel, dependent sign). The sign is `None` for the inherent `a`.
     pub vowels: &'static [(&'static str, char, Option<char>)],
-    /// (Latin, consonant).
     pub consonants: &'static [(&'static str, char)],
     /// (Latin, consonant) for consonant + nukta pairs with their own letter, such as ಜ಼ = z.
     pub nukta_consonants: &'static [(&'static str, char)],
@@ -21,7 +19,6 @@ pub(crate) struct Table {
     pub nukta_suffix: Option<&'static str>,
     /// Spelling of ಹ used when a plain `h` would join the consonant before it.
     pub ha_breaker: Option<&'static str>,
-    /// Whether input is matched without regard to case.
     pub case_insensitive: bool,
 }
 
