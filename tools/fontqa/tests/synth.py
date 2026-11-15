@@ -23,6 +23,13 @@ feature rphf { script knd2; sub ra virama by reph; } rphf;
 feature blwf { script knd2; sub ka virama by ka.blwf; sub kha virama by kha.blwf; } blwf;
 """
 
+# ರ with a subscript ಕ, then a ligature that hides the ರ glyph: still no arkavattu.
+PRES_LIGATURE_FEA = """
+languagesystem knd2 dflt;
+feature blwf { script knd2; sub virama ka by ka.blwf; sub virama kha by kha.blwf; } blwf;
+feature pres { script knd2; sub ra ka.blwf by reph; } pres;
+"""
+
 NO_REPH_FEA = """
 languagesystem knd2 dflt;
 feature blwf { script knd2; sub virama ka by ka.blwf; sub virama kha by kha.blwf; } blwf;

@@ -1,4 +1,5 @@
-# Every open Kannada font fontqa tests, with where each file came from.
+# Every Kannada font fontqa tests, with where each file came from: open fonts, and the
+# macOS system fonts, which are read where macOS installs them.
 # Files are fetched into a cache outside the repository and are never committed.
 # license: what the font's own license file or name table says, as an SPDX id where one fits.
 # GitHub sources are pinned to a commit. fonts.lock.json holds the sha256 of every file.
@@ -252,13 +253,6 @@ name = "Cheluvi"
 source = "https://github.com/omshivaprakash/cheluvi"
 license = "unstated (a port of a Baraha ASCII font; listed as OFL by Sanchaya)"
 files = ["https://raw.githubusercontent.com/omshivaprakash/cheluvi/2028f9949810ee3383d3c486179dda33a2530dd7/Cheluvi.ttf"]
-
-[[font]]
-id = "devama"
-name = "Devama"
-source = "https://github.com/pavanaja/DevamaNew"
-license = "OFL-1.1"
-files = ["https://raw.githubusercontent.com/pavanaja/DevamaNew/f19822c694fb9ccc8c593cf136fdbe19f01055a0/Devama.otf"]
 
 [[font]]
 id = "bandipur-one"

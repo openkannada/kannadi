@@ -6,7 +6,9 @@ import fnmatch
 import hashlib
 import io
 import json
+import shutil
 import tarfile
+import tempfile
 import tomllib
 import urllib.parse
 import urllib.request
@@ -43,12 +45,16 @@ def load_lock(path: Path) -> dict[str, dict[str, str]]:
     return json.loads(path.read_text()) if path.exists() else {}
 
 
-def write_lock(path: Path, files: dict[str, list[Path]]) -> None:
-    lock = {
-        fid: {p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(paths)}
-        for fid, paths in sorted(files.items())
-    }
+def write_lock(path: Path, files: dict[str, list[Path]], known: set[str] | None = None) -> None:
+    """Record the files' hashes, keeping the entries of known fonts not fetched this time."""
+    lock = {k: v for k, v in load_lock(path).items() if known is None or k in known}
+    for fid, paths in files.items():
+        lock[fid] = {p.name: _digest(p.read_bytes()) for p in sorted(paths)}
     path.write_text(json.dumps(lock, indent=1, sort_keys=True) + "\n")
+
+
+def _digest(data: bytes) -> str:
+    return hashlib.sha256(data).hexdigest()
 
 
 def _download(url: str) -> bytes:
@@ -92,42 +98,60 @@ def _safe_name(name: str) -> str:
 
 
 def fetch(entry: Entry, cache: Path, lock: dict[str, dict[str, str]]) -> list[Path]:
-    """Return the entry's font files, downloading any that are not cached yet."""
+    """Return the entry's font files, downloading any that are not cached yet.
+
+    Every file, cached or new, must match its hash in the lock when the lock has one.
+    """
     if entry.local:
         return [Path(f) for f in entry.files if Path(f).exists()]
+    expected = lock.get(entry.id, {})
     target = cache / entry.id
     if entry.archive:
-        names = None
-        if target.exists():
-            names = sorted(p for p in target.iterdir() if p.is_file())
-        if names:
-            return names
-        members = _archive_members(entry.archive, _download(entry.archive))
-        chosen = {
-            n: b for n, b in members.items() if any(fnmatch.fnmatch(n, pat) for pat in entry.files)
-        }
-        if not chosen:
-            raise ValueError(f"{entry.id}: no archive member matches {entry.files}")
-        return [
-            _store(target, _safe_name(n), b, lock.get(entry.id, {}))
-            for n, b in sorted(chosen.items())
-        ]
-    out = []
-    for url in entry.files:
-        path = target / _safe_name(urllib.parse.urlparse(url).path)
-        out.append(
-            path
-            if path.exists()
-            else _store(target, path.name, _download(url), lock.get(entry.id, {}))
-        )
-    return out
+        if not target.exists():
+            _extract(entry, target, expected)
+        paths = sorted(p for p in target.iterdir() if p.is_file())
+    else:
+        paths = []
+        for url in entry.files:
+            path = target / _safe_name(urllib.parse.urlparse(url).path)
+            if not path.exists():
+                data = _download(url)
+                _check(path.name, data, expected)
+                target.mkdir(parents=True, exist_ok=True)
+                _write(path, data)
+            paths.append(path)
+    for path in paths:
+        _check(path.name, path.read_bytes(), expected)
+    return paths
 
 
-def _store(target: Path, name: str, data: bytes, expected: dict[str, str]) -> Path:
-    digest = hashlib.sha256(data).hexdigest()
+def _extract(entry: Entry, target: Path, expected: dict[str, str]) -> None:
+    """Unpack the chosen archive members into a temporary folder, then move it into place."""
+    members = _archive_members(entry.archive, _download(entry.archive))
+    chosen = {n: b for n, b in members.items() if any(fnmatch.fnmatch(n, p) for p in entry.files)}
+    if not chosen:
+        raise ValueError(f"{entry.id}: no archive member matches {entry.files}")
+    for name, data in chosen.items():
+        _check(_safe_name(name), data, expected)
+    target.parent.mkdir(parents=True, exist_ok=True)
+    tmp = Path(tempfile.mkdtemp(dir=target.parent, prefix=f".{target.name}-"))
+    try:
+        for name, data in chosen.items():
+            (tmp / _safe_name(name)).write_bytes(data)
+        tmp.rename(target)
+    except BaseException:
+        shutil.rmtree(tmp, ignore_errors=True)
+        raise
+
+
+def _check(name: str, data: bytes, expected: dict[str, str]) -> None:
+    digest = _digest(data)
     if name in expected and expected[name] != digest:
-        raise ValueError(f"{target.name}/{name}: sha256 {digest} does not match the lock file")
-    target.mkdir(parents=True, exist_ok=True)
-    path = target / name
-    path.write_bytes(data)
-    return path
+        raise ValueError(f"{name}: sha256 {digest} does not match the lock file")
+
+
+def _write(path: Path, data: bytes) -> None:
+    """Write through a temporary file so an interrupted run leaves no partial font."""
+    tmp = path.with_name(path.name + ".part")
+    tmp.write_bytes(data)
+    tmp.replace(path)

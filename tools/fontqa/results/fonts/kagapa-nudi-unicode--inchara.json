@@ -16,14 +16,14 @@
   "gsub_scripts": "knd2 knda",
   "kannada_codepoints": 87,
   "glyph_count": 425,
-  "cases": 1905,
-  "failing_cases": 23,
+  "cases": 2146,
+  "failing_cases": 36,
   "missing_glyph": 4,
   "notdef": 0,
   "dotted_circle": 0,
   "no_conjunct": 0,
   "no_arkavattu": 0,
-  "collision": 3,
+  "collision": 16,
   "indistinct": 16,
   "missing_codepoints": "U+0CDC U+0CDD U+0CF3"
  },
@@ -52,6 +52,7 @@
     "knda"
    ]
   },
+  "aat_morx": false,
   "kannada_codepoints": 87
  },
  "failures": [
@@ -227,6 +228,114 @@
    "detail": "same ink as ಭ್ಘ"
   },
   {
+   "case_id": "sig-0C95-0CCD-0C95-0CC8",
+   "group": "signed_cluster",
+   "text": "ಕ್ಕೈ",
+   "codepoints": "U+0C95 U+0CCD U+0C95 U+0CC8",
+   "failures": "collision",
+   "glyphs": "kaP matraE lvl1Ka1 lengthMarkAi",
+   "detail": "lvl1Ka1 x lengthMarkAi 25%"
+  },
+  {
+   "case_id": "sig-0CA8-0CCD-0CA8-0CC3",
+   "group": "signed_cluster",
+   "text": "ನ್ನೃ",
+   "codepoints": "U+0CA8 U+0CCD U+0CA8 U+0CC3",
+   "failures": "collision",
+   "glyphs": "na lvl1Na1 matraRi2",
+   "detail": "lvl1Na1 x matraRi2 29%"
+  },
+  {
+   "case_id": "sig-0CA8-0CCD-0CA8-0CC8",
+   "group": "signed_cluster",
+   "text": "ನ್ನೈ",
+   "codepoints": "U+0CA8 U+0CCD U+0CA8 U+0CC8",
+   "failures": "collision",
+   "glyphs": "naP matraE lvl1Na1 lengthMarkAi",
+   "detail": "lvl1Na1 x lengthMarkAi 17%"
+  },
+  {
+   "case_id": "sig-0CB2-0CCD-0CB2-0CC3",
+   "group": "signed_cluster",
+   "text": "ಲ್ಲೃ",
+   "codepoints": "U+0CB2 U+0CCD U+0CB2 U+0CC3",
+   "failures": "collision",
+   "glyphs": "la lvl1La1 matraRi2",
+   "detail": "lvl1La1 x matraRi2 23%"
+  },
+  {
+   "case_id": "sig-0CB2-0CCD-0CB2-0CC8",
+   "group": "signed_cluster",
+   "text": "ಲ್ಲೈ",
+   "codepoints": "U+0CB2 U+0CCD U+0CB2 U+0CC8",
+   "failures": "collision",
+   "glyphs": "laP matraE lvl1La1 lengthMarkAi",
+   "detail": "lvl1La1 x lengthMarkAi 15%"
+  },
+  {
+   "case_id": "sig-0CA4-0CCD-0CB0-0CC3",
+   "group": "signed_cluster",
+   "text": "ತ್ರೃ",
+   "codepoints": "U+0CA4 U+0CCD U+0CB0 U+0CC3",
+   "failures": "collision",
+   "glyphs": "ta lvl1Ra1 matraRi2",
+   "detail": "lvl1Ra1 x matraRi2 15%"
+  },
+  {
+   "case_id": "sig-0CA6-0CCD-0CAF-0CC3",
+   "group": "signed_cluster",
+   "text": "ದ್ಯೃ",
+   "codepoints": "U+0CA6 U+0CCD U+0CAF U+0CC3",
+   "failures": "collision",
+   "glyphs": "da lvl1Ya1 matraRi2",
+   "detail": "lvl1Ya1 x matraRi2 19%"
+  },
+  {
+   "case_id": "sig-0CA6-0CCD-0CAF-0CC8",
+   "group": "signed_cluster",
+   "text": "ದ್ಯೈ",
+   "codepoints": "U+0CA6 U+0CCD U+0CAF U+0CC8",
+   "failures": "collision",
+   "glyphs": "daP matraE lvl1Ya1 lengthMarkAi",
+   "detail": "lvl1Ya1 x lengthMarkAi 13%"
+  },
+  {
+   "case_id": "sig-0CB8-0CCD-0CB5-0CC3",
+   "group": "signed_cluster",
+   "text": "ಸ್ವೃ",
+   "codepoints": "U+0CB8 U+0CCD U+0CB5 U+0CC3",
+   "failures": "collision",
+   "glyphs": "sa lvl1Va1 matraRi2",
+   "detail": "lvl1Va1 x matraRi2 16%"
+  },
+  {
+   "case_id": "sig-0CB8-0CCD-0CB5-0CC8",
+   "group": "signed_cluster",
+   "text": "ಸ್ವೈ",
+   "codepoints": "U+0CB8 U+0CCD U+0CB5 U+0CC8",
+   "failures": "collision",
+   "glyphs": "saP matraE lvl1Va1 lengthMarkAi",
+   "detail": "lvl1Va1 x lengthMarkAi 13%"
+  },
+  {
+   "case_id": "sig-0CAA-0CCD-0CAA-0CC3",
+   "group": "signed_cluster",
+   "text": "ಪ್ಪೃ",
+   "codepoints": "U+0CAA U+0CCD U+0CAA U+0CC3",
+   "failures": "collision",
+   "glyphs": "pha lvl1Pa1 matraRi2",
+   "detail": "lvl1Pa1 x matraRi2 13%"
+  },
+  {
+   "case_id": "sig-0CAA-0CCD-0CAA-0CC8",
+   "group": "signed_cluster",
+   "text": "ಪ್ಪೈ",
+   "codepoints": "U+0CAA U+0CCD U+0CAA U+0CC8",
+   "failures": "collision",
+   "glyphs": "phaP matraE lvl1Pa1 lengthMarkAi",
+   "detail": "lvl1Pa1 x lengthMarkAi 13%"
+  },
+  {
    "case_id": "rare-0CDD",
    "group": "rare",
    "text": "ಅವನೝ",
@@ -261,6 +370,15 @@
    "failures": "missing_glyph",
    "glyphs": ".notdef ga nnaP matraE lengthMark sha",
    "detail": ""
+  },
+  {
+   "case_id": "rare-0CBD",
+   "group": "rare",
+   "text": "ಸೋಽಹಂ",
+   "codepoints": "U+0CB8 U+0CCB U+0CBD U+0CB9 U+0C82",
+   "failures": "collision",
+   "glyphs": "saP matraE matraUu lengthMark uni0CBA ha anuswar",
+   "detail": "lengthMark x uni0CBA 4%"
   }
  ]
 }

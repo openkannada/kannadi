@@ -16,14 +16,14 @@
   "gsub_scripts": "DFLT knd2 knda",
   "kannada_codepoints": 88,
   "glyph_count": 564,
-  "cases": 1905,
-  "failing_cases": 4,
+  "cases": 2146,
+  "failing_cases": 6,
   "missing_glyph": 4,
   "notdef": 0,
   "dotted_circle": 0,
   "no_conjunct": 0,
   "no_arkavattu": 0,
-  "collision": 0,
+  "collision": 2,
   "indistinct": 0,
   "missing_codepoints": "U+0CDC U+0CDD U+0CF3"
  },
@@ -54,9 +54,28 @@
     "knda"
    ]
   },
+  "aat_morx": true,
   "kannada_codepoints": 88
  },
  "failures": [
+  {
+   "case_id": "sig-0CA8-0CCD-0CA8-0CC3",
+   "group": "signed_cluster",
+   "text": "ನ್ನೃ",
+   "codepoints": "U+0CA8 U+0CCD U+0CA8 U+0CC3",
+   "failures": "collision",
+   "glyphs": "kn_na kn_matra_r kn_na.vattu",
+   "detail": "kn_matra_r x kn_na.vattu 29%"
+  },
+  {
+   "case_id": "sig-0CB2-0CCD-0CB2-0CC3",
+   "group": "signed_cluster",
+   "text": "ಲ್ಲೃ",
+   "codepoints": "U+0CB2 U+0CCD U+0CB2 U+0CC3",
+   "failures": "collision",
+   "glyphs": "kn_la kn_matra_r kn_la.vattu",
+   "detail": "kn_matra_r x kn_la.vattu 24%"
+  },
   {
    "case_id": "rare-0CDD",
    "group": "rare",

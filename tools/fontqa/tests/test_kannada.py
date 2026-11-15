@@ -1,14 +1,22 @@
 import unicodedata
+from collections import Counter
 
-from fontqa.kannada import CONSONANTS, VOWEL_SIGNS, all_cases, clusters, syllables
+from fontqa.kannada import CONSONANTS, SIGNS, VOWEL_SIGNS, VOWELS, all_cases, clusters, syllables
 
 
 def test_inventory_sizes():
     assert len(CONSONANTS) == 36
     assert len(VOWEL_SIGNS) == 16
-    assert len(syllables()) == 576
-    assert len(clusters()) == 1296
-    assert sum(c.group == "arkavattu" for c in clusters()) == 36
+    assert len(SIGNS) == 18
+    assert len(VOWELS) == 16
+    assert len(syllables()) == 648
+    groups = Counter(c.group for c in clusters())
+    assert groups == {"cluster": 33 * 34 + 1, "old_cluster": 36 * 36 - 34 * 34, "arkavattu": 33}
+
+
+def test_every_string_is_tested_once():
+    texts = [c.text for c in all_cases()]
+    assert len(texts) == len(set(texts))
 
 
 def test_every_character_is_assigned():

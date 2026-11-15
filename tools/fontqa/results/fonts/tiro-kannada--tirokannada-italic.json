@@ -16,7 +16,7 @@
   "gsub_scripts": "knd2 latn",
   "kannada_codepoints": 90,
   "glyph_count": 1240,
-  "cases": 1905,
+  "cases": 2146,
   "failing_cases": 3,
   "missing_glyph": 3,
   "notdef": 0,
@@ -52,6 +52,7 @@
     "latn"
    ]
   },
+  "aat_morx": false,
   "kannada_codepoints": 90
  },
  "failures": [

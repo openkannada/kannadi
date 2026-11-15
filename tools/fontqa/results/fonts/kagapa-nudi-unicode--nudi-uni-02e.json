@@ -16,14 +16,14 @@
   "gsub_scripts": "knd2 knda",
   "kannada_codepoints": 87,
   "glyph_count": 425,
-  "cases": 1905,
-  "failing_cases": 39,
+  "cases": 2146,
+  "failing_cases": 51,
   "missing_glyph": 4,
   "notdef": 0,
   "dotted_circle": 0,
   "no_conjunct": 0,
   "no_arkavattu": 0,
-  "collision": 3,
+  "collision": 15,
   "indistinct": 32,
   "missing_codepoints": "U+0CDC U+0CDD U+0CF3"
  },
@@ -52,6 +52,7 @@
     "knda"
    ]
   },
+  "aat_morx": false,
   "kannada_codepoints": 87
  },
  "failures": [
@@ -369,6 +370,114 @@
    "failures": "indistinct",
    "glyphs": "afii10108 afii10034",
    "detail": "same ink as ಭ್ಘ"
+  },
+  {
+   "case_id": "sig-0C95-0CCD-0C95-0CC8",
+   "group": "signed_cluster",
+   "text": "ಕ್ಕೈ",
+   "codepoints": "U+0C95 U+0CCD U+0C95 U+0CC8",
+   "failures": "collision",
+   "glyphs": "Aogonek quoteright Itilde daggerdbl",
+   "detail": "Itilde x daggerdbl 34%"
+  },
+  {
+   "case_id": "sig-0CA8-0CCD-0CA8-0CC3",
+   "group": "signed_cluster",
+   "text": "ನ್ನೃ",
+   "codepoints": "U+0CA8 U+0CCD U+0CA8 U+0CC3",
+   "failures": "collision",
+   "glyphs": "afii10104 Lcedilla thorn",
+   "detail": "Lcedilla x thorn 30%"
+  },
+  {
+   "case_id": "sig-0CA8-0CCD-0CA8-0CC8",
+   "group": "signed_cluster",
+   "text": "ನ್ನೈ",
+   "codepoints": "U+0CA8 U+0CCD U+0CA8 U+0CC8",
+   "failures": "collision",
+   "glyphs": "edot quoteright Lcedilla daggerdbl",
+   "detail": "Lcedilla x daggerdbl 32%"
+  },
+  {
+   "case_id": "sig-0CB2-0CCD-0CB2-0CC3",
+   "group": "signed_cluster",
+   "text": "ಲ್ಲೃ",
+   "codepoints": "U+0CB2 U+0CCD U+0CB2 U+0CC3",
+   "failures": "collision",
+   "glyphs": "afii10098 nacute thorn",
+   "detail": "nacute x thorn 26%"
+  },
+  {
+   "case_id": "sig-0CB2-0CCD-0CB2-0CC8",
+   "group": "signed_cluster",
+   "text": "ಲ್ಲೈ",
+   "codepoints": "U+0CB2 U+0CCD U+0CB2 U+0CC8",
+   "failures": "collision",
+   "glyphs": "Gdot quoteright nacute daggerdbl",
+   "detail": "nacute x daggerdbl 26%"
+  },
+  {
+   "case_id": "sig-0CA4-0CCD-0CB0-0CC3",
+   "group": "signed_cluster",
+   "text": "ತ್ರೃ",
+   "codepoints": "U+0CA4 U+0CCD U+0CB0 U+0CC3",
+   "failures": "collision",
+   "glyphs": "afii10100 lslash thorn",
+   "detail": "lslash x thorn 26%"
+  },
+  {
+   "case_id": "sig-0CA6-0CCD-0CAF-0CC3",
+   "group": "signed_cluster",
+   "text": "ದ್ಯೃ",
+   "codepoints": "U+0CA6 U+0CCD U+0CAF U+0CC3",
+   "failures": "collision",
+   "glyphs": "afii10102 Lslash thorn",
+   "detail": "Lslash x thorn 22%"
+  },
+  {
+   "case_id": "sig-0CA6-0CCD-0CAF-0CC8",
+   "group": "signed_cluster",
+   "text": "ದ್ಯೈ",
+   "codepoints": "U+0CA6 U+0CCD U+0CAF U+0CC8",
+   "failures": "collision",
+   "glyphs": "ebreve quoteright Lslash daggerdbl",
+   "detail": "Lslash x daggerdbl 23%"
+  },
+  {
+   "case_id": "sig-0CB8-0CCD-0CB5-0CC3",
+   "group": "signed_cluster",
+   "text": "ಸ್ವೃ",
+   "codepoints": "U+0CB8 U+0CCD U+0CB5 U+0CC3",
+   "failures": "collision",
+   "glyphs": "wacute ncedilla thorn",
+   "detail": "ncedilla x thorn 24%"
+  },
+  {
+   "case_id": "sig-0CB8-0CCD-0CB5-0CC8",
+   "group": "signed_cluster",
+   "text": "ಸ್ವೈ",
+   "codepoints": "U+0CB8 U+0CCD U+0CB5 U+0CC8",
+   "failures": "collision",
+   "glyphs": "hcircumflex quoteright ncedilla daggerdbl",
+   "detail": "ncedilla x daggerdbl 22%"
+  },
+  {
+   "case_id": "sig-0CAA-0CCD-0CAA-0CC3",
+   "group": "signed_cluster",
+   "text": "ಪ್ಪೃ",
+   "codepoints": "U+0CAA U+0CCD U+0CAA U+0CC3",
+   "failures": "collision",
+   "glyphs": "afii10105 lcedilla thorn",
+   "detail": "lcedilla x thorn 26%"
+  },
+  {
+   "case_id": "sig-0CAA-0CCD-0CAA-0CC8",
+   "group": "signed_cluster",
+   "text": "ಪ್ಪೈ",
+   "codepoints": "U+0CAA U+0CCD U+0CAA U+0CC8",
+   "failures": "collision",
+   "glyphs": "Eogonek quoteright lcedilla daggerdbl",
+   "detail": "lcedilla x daggerdbl 26%"
   },
   {
    "case_id": "rare-0CDD",

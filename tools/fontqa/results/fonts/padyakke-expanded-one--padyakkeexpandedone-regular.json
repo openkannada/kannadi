@@ -16,14 +16,14 @@
   "gsub_scripts": "DFLT knd2 knda latn",
   "kannada_codepoints": 87,
   "glyph_count": 996,
-  "cases": 1905,
-  "failing_cases": 4,
+  "cases": 2146,
+  "failing_cases": 6,
   "missing_glyph": 4,
   "notdef": 0,
   "dotted_circle": 0,
   "no_conjunct": 0,
   "no_arkavattu": 0,
-  "collision": 0,
+  "collision": 2,
   "indistinct": 0,
   "missing_codepoints": "U+0CDC U+0CDD U+0CF3"
  },
@@ -56,9 +56,28 @@
     "latn"
    ]
   },
+  "aat_morx": false,
   "kannada_codepoints": 87
  },
  "failures": [
+  {
+   "case_id": "sig-0CAA-0CCD-0CAA-0CC3",
+   "group": "signed_cluster",
+   "text": "ಪ್ಪೃ",
+   "codepoints": "U+0CAA U+0CCD U+0CAA U+0CC3",
+   "failures": "collision",
+   "glyphs": "uni0CAA uni0CCD0CAA uni0CC3.following",
+   "detail": "uni0CCD0CAA x uni0CC3.following 7%"
+  },
+  {
+   "case_id": "sig-0CAA-0CCD-0CAA-0CC8",
+   "group": "signed_cluster",
+   "text": "ಪ್ಪೈ",
+   "codepoints": "U+0CAA U+0CCD U+0CAA U+0CC8",
+   "failures": "collision",
+   "glyphs": "uni0CAA0CC6 uni0CCD0CAA uni0CD6.following",
+   "detail": "uni0CCD0CAA x uni0CD6.following 7%"
+  },
   {
    "case_id": "rare-0CDD",
    "group": "rare",

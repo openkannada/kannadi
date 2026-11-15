@@ -27,6 +27,10 @@ def add_new_order_blwf(font: TTFont, script: str = "knd2") -> int:
     those reached through contextual lookups. Returns how many ligatures the new lookup has.
     """
     gsub = font["GSUB"].table
+    if getattr(gsub, "FeatureVariations", None):
+        raise ValueError("fonts with FeatureVariations are not supported")
+    if not any(sr.ScriptTag == script for sr in gsub.ScriptList.ScriptRecord):
+        raise ValueError(f"the font has no {script} script")
     cmap = font.getBestCmap()
     virama = cmap.get(ord(VIRAMA))
     consonants = {cmap[ord(c)] for c in CONSONANTS if ord(c) in cmap}
@@ -44,7 +48,7 @@ def add_new_order_blwf(font: TTFont, script: str = "knd2") -> int:
     lookup = buildLookup([buildLigatureSubstSubtable({(virama, c): g for c, g in old.items()})])
     gsub.LookupList.Lookup.append(lookup)
     gsub.LookupList.LookupCount = len(gsub.LookupList.Lookup)
-    _set_feature(gsub, script, "blwf", [len(gsub.LookupList.Lookup) - 1])
+    _extend_feature(gsub, script, "blwf", len(gsub.LookupList.Lookup) - 1)
     return len(old)
 
 
@@ -86,32 +90,40 @@ def _subst_records(sub):
     return out
 
 
-def _set_feature(gsub, script: str, tag: str, lookups: list[int]) -> None:
-    """Point every language system of the script at a new feature record, in place of tag's."""
-    record = ot.FeatureRecord()
-    record.FeatureTag = tag
-    record.Feature = ot.Feature()
-    record.Feature.FeatureParams = None
-    record.Feature.LookupListIndex = lookups
-    record.Feature.LookupCount = len(lookups)
+def _extend_feature(gsub, script: str, tag: str, lookup: int) -> None:
+    """Add a lookup to the script's tag feature, after the lookups it already has.
+
+    Feature records can be shared with other scripts, so each language system gets a new
+    record holding its old lookups plus the new one.
+    """
     records = gsub.FeatureList.FeatureRecord
-    records.append(record)
-    new_index = len(records) - 1
+    made: dict[tuple[int, ...], int] = {}
     for sr in gsub.ScriptList.ScriptRecord:
         if sr.ScriptTag != script:
             continue
         systems = [sr.Script.DefaultLangSys] + [r.LangSys for r in sr.Script.LangSysRecord]
         for ls in filter(None, systems):
-            kept = [i for i in ls.FeatureIndex if records[i].FeatureTag != tag]
-            ls.FeatureIndex = kept + [new_index]
+            old = [i for i in ls.FeatureIndex if records[i].FeatureTag == tag]
+            lookups = tuple(
+                dict.fromkeys(x for i in old for x in records[i].Feature.LookupListIndex)
+            ) + (lookup,)
+            if lookups not in made:
+                record = ot.FeatureRecord()
+                record.FeatureTag = tag
+                record.Feature = ot.Feature()
+                record.Feature.FeatureParams = None
+                record.Feature.LookupListIndex = list(lookups)
+                record.Feature.LookupCount = len(lookups)
+                records.append(record)
+                made[lookups] = len(records) - 1
+            ls.FeatureIndex = [i for i in ls.FeatureIndex if i not in old] + [made[lookups]]
             ls.FeatureCount = len(ls.FeatureIndex)
+    gsub.FeatureList.FeatureCount = len(records)
     _sort_features(gsub)
 
 
 def _sort_features(gsub) -> None:
     """OpenType wants feature records sorted by tag; renumber every reference to them."""
-    if getattr(gsub, "FeatureVariations", None):
-        raise ValueError("fonts with FeatureVariations are not supported")
     records = gsub.FeatureList.FeatureRecord
     order = sorted(range(len(records)), key=lambda i: records[i].FeatureTag)
     remap = {old: new for new, old in enumerate(order)}

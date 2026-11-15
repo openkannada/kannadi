@@ -16,7 +16,7 @@
   "gsub_scripts": "DFLT armn beng bng2 cyrl dev2 ethi geor gjr2 grek gur2 hebr khmr knd2 lao  latn mlm2 ory2 sinh tel2 thai tml2",
   "kannada_codepoints": 89,
   "glyph_count": 7520,
-  "cases": 1905,
+  "cases": 2146,
   "failing_cases": 4,
   "missing_glyph": 4,
   "notdef": 0,
@@ -104,6 +104,7 @@
     "tml2"
    ]
   },
+  "aat_morx": false,
   "kannada_codepoints": 89
  },
  "failures": [

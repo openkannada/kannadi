@@ -21,6 +21,25 @@ VOWEL_SIGNS = tuple(
     ]
 )  # fmt: skip
 
+# Vowel signs, then anusvara ಂ U+0C82 and visarga ಃ U+0C83.
+SIGNS = (*VOWEL_SIGNS, "\u0c82", "\u0c83")
+
+# ಱ U+0CB1 and ೞ U+0CDE are Old Kannada letters; clusters with them are their own group.
+OLD = ("\u0cb1", "\u0cde")
+
+# U+0C85..U+0C94 without the unassigned U+0C8D and U+0C91, then ೠ U+0CE0 and ೡ U+0CE1.
+VOWELS = tuple(
+    chr(cp) for cp in [*range(0x0C85, 0x0C95), 0x0CE0, 0x0CE1] if cp not in (0x0C8D, 0x0C91)
+)
+
+# ೄ, ೢ and ೣ on a cluster do not occur in text, so they are left out of the signed clusters.
+CLUSTER_SIGNS = tuple(s for s in SIGNS if s not in ("\u0cc4", "\u0ce2", "\u0ce3"))
+
+# Common clusters that carry a vowel sign in running text, where marks meet subscripts.
+SIGNED_CLUSTERS = ("ಕ್ಕ", "ಸ್ತ", "ಕ್ಷ", "ನ್ನ", "ಲ್ಲ", "ತ್ರ", "ದ್ಯ", "ಸ್ವ", "ಪ್ಪ", "ಮ್ಮ")
+
+THREE_CONSONANTS = ("ಸ್ತ್ರ", "ಷ್ಟ್ರ", "ನ್ತ್ಯ", "ಕ್ಷ್ಮ")
+
 # Rare characters, each shown in a context where it is valid text.
 RARE = (
     ("0CDD", "ಅವನೝ", "NAKAARA POLLU ೝ after a word"),
@@ -29,14 +48,11 @@ RARE = (
     ("0CDC-word", "\u0cdcಗಣೇಶ", "ARCHAIC SHRII before a word"),
     ("0CF1", "ಅೱಕ", "JIHVAMULIYA ೱ"),
     ("0CF2", "ಅೲಪ", "UPADHMANIYA ೲ"),
-    ("0CE2", "ಕೢ", "VOWEL SIGN VOCALIC L ೢ"),
-    ("0CE3", "ಕೣ", "VOWEL SIGN VOCALIC LL ೣ"),
-    ("0C8C", "ಌ", "LETTER VOCALIC L ಌ"),
-    ("0CE1", "ೡ", "LETTER VOCALIC LL ೡ"),
-    ("0CC4", "ಕೄ", "VOWEL SIGN VOCALIC RR ೄ"),
-    ("0CE0", "ೠ", "LETTER VOCALIC RR ೠ"),
-    ("0CB1", "ಱಿ", "LETTER RRA ಱ with ಿ"),
+    ("0CB1", "ಱ", "LETTER RRA ಱ"),
     ("0CDE", "ಬಾೞ್", "LETTER LLLA ೞ in ಬಾೞ್"),
+    ("0CBC-ja", "ಜ಼", "NUKTA on ಜ, for z"),
+    ("0CBC-pha", "ಫ಼", "NUKTA on ಫ, for f"),
+    ("0CBD", "ಸೋಽಹಂ", "AVAGRAHA ಽ"),
 )
 
 
@@ -61,45 +77,48 @@ def _hex(text: str) -> str:
 
 
 def syllables() -> list[Case]:
-    return [Case(f"syl-{_hex(c + v)}", "syllable", c + v) for c in CONSONANTS for v in VOWEL_SIGNS]
+    return [Case(f"syl-{_hex(c + v)}", "syllable", c + v) for c in CONSONANTS for v in SIGNS]
+
+
+def vowels() -> list[Case]:
+    return [Case(f"vow-{_hex(v)}", "vowel", v) for v in VOWELS]
+
+
+def _joined(group: str, text: str, prefix: str = "clu") -> Case:
+    """A cluster that must shape differently from the same text with ZWNJ after its 1st virama."""
+    i = text.index(VIRAMA) + 1
+    return Case(f"{prefix}-{_hex(text)}", group, text, unjoined=text[:i] + ZWNJ + text[i:])
 
 
 def clusters() -> list[Case]:
-    """Every consonant + virama + consonant. A first ರ is an arkavattu, so it goes in that group."""
-    return [
-        Case(
-            f"clu-{_hex(a + VIRAMA + b)}",
-            "arkavattu" if a == RA else "cluster",
-            a + VIRAMA + b,
-            unjoined=a + VIRAMA + ZWNJ + b,
-        )
-        for a in CONSONANTS
-        for b in CONSONANTS
-    ]
+    """Every consonant + virama + consonant, grouped as arkavattu, old or modern.
+
+    ರ್ರ is a modern cluster: fonts draw it with a subscript ರ as often as with the arkavattu.
+    """
+    out = []
+    for a in CONSONANTS:
+        for b in CONSONANTS:
+            if {a, b} & set(OLD):
+                group = "old_cluster"
+            elif a == RA and b != RA:
+                group = "arkavattu"
+            else:
+                group = "cluster"
+            out.append(_joined(group, a + VIRAMA + b))
+    return out
+
+
+def signed_clusters() -> list[Case]:
+    """Common and 3-consonant clusters with each sign, where marks and subscripts meet."""
+    out = [_joined("signed_cluster", c + s, "sig") for c in SIGNED_CLUSTERS for s in CLUSTER_SIGNS]
+    return out + [_joined("signed_cluster", c, "sig") for c in THREE_CONSONANTS]
 
 
 def arkavattu_extra() -> list[Case]:
-    """Arkavattu with each vowel sign, and on 3-consonant clusters."""
+    """Arkavattu with each sign, and on 3-consonant clusters."""
     ka = "ಕ"
-    cases = [
-        Case(
-            f"ark-{_hex(RA + VIRAMA + ka + v)}",
-            "arkavattu",
-            RA + VIRAMA + ka + v,
-            unjoined=RA + VIRAMA + ZWNJ + ka + v,
-        )
-        for v in VOWEL_SIGNS
-    ]
-    for tail in ("ಕ್ಷ", "ತ್ಯ", "ಧ್ವ"):
-        cases.append(
-            Case(
-                f"ark-{_hex(RA + VIRAMA + tail)}",
-                "arkavattu",
-                RA + VIRAMA + tail,
-                unjoined=RA + VIRAMA + ZWNJ + tail,
-            )
-        )
-    return cases
+    tails = [ka + s for s in SIGNS] + ["ಕ್ಷ", "ತ್ಯ", "ಧ್ವ"]
+    return [_joined("arkavattu", RA + VIRAMA + t, "ark") for t in tails]
 
 
 def rare() -> list[Case]:
@@ -107,4 +126,4 @@ def rare() -> list[Case]:
 
 
 def all_cases() -> list[Case]:
-    return syllables() + clusters() + arkavattu_extra() + rare()
+    return syllables() + vowels() + clusters() + signed_clusters() + arkavattu_extra() + rare()

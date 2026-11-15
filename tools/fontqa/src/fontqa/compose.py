@@ -235,6 +235,9 @@ def _add_glyph(font: TTFont, name: str, cp: int, path: pathops.Path, advance: in
     """Add a TrueType glyph that copies cmap, GDEF class and mark positioning from like."""
     if "glyf" not in font or "gvar" in font:
         raise ComposeError("only static TrueType fonts are supported")
+    current = font.getBestCmap().get(cp)
+    if current and contours(font, current):
+        raise ComposeError(f"U+{cp:04X} already has a glyph with ink, {current}")
     if name in font.getGlyphOrder():
         name = f"{name}.composed"
     path.simplify(fix_winding=True, clockwise=True)
@@ -255,6 +258,12 @@ def _add_glyph(font: TTFont, name: str, cp: int, path: pathops.Path, advance: in
             classes[name] = classes[like]
     if "GPOS" in font:
         _copy_mark_records(font["GPOS"].table, like, name)
+    if "vmtx" in font:
+        font["vmtx"][name] = font["vmtx"][like]
+    # These hold 1 entry per glyph and fontTools keeps them as raw bytes, so they go stale.
+    for tag in ("hdmx", "LTSH"):
+        if tag in font:
+            del font[tag]
     font["maxp"].numGlyphs = len(font.getGlyphOrder())
     return name
 

@@ -7,7 +7,7 @@ from itertools import combinations
 
 import pathops
 
-from .kannada import RA, Case
+from .kannada import Case
 from .shaping import Face, Glyph, area
 
 IGNORED = {0x200C, 0x200D}
@@ -66,19 +66,15 @@ def run_case(face: Face, case: Case) -> Result:
     result.notdef = not result.missing and any(g.gid == 0 for g in glyphs)
     result.dotted_circle = any(g.gid == face.sentinel for g in glyphs)
     if case.unjoined and not result.missing:
-        reference = face.shape(case.unjoined, probe=True)
-        result.unjoined = [g.gid for g in glyphs] == [g.gid for g in reference]
-        if case.group == "arkavattu" and not result.unjoined:
-            result.unjoined = not _has_reph(face, case.text, glyphs)
+        ids = [g.gid for g in glyphs]
+        result.unjoined = ids == [g.gid for g in face.shape(case.unjoined, probe=True)]
+        # OpenType feature switches do not reach AAT tables, so rphf cannot be turned off there.
+        if case.group == "arkavattu" and not result.unjoined and not face.aat:
+            no_reph = face.shape(case.text, probe=True, features={"rphf": False})
+            result.unjoined = ids == [g.gid for g in no_reph]
     if not result.missing and not result.dotted_circle:
         result.collisions = collisions(face, glyphs)
     return result
-
-
-def _has_reph(face: Face, text: str, glyphs: list[Glyph]) -> bool:
-    """The leading ರ and virama became 1 glyph: fewer nominal ರ glyphs than ರ letters."""
-    ra = face.font.get_nominal_glyph(ord(RA))
-    return sum(g.gid == ra for g in glyphs) < text.count(RA)
 
 
 def has_ink(face: Face, char: str) -> bool:

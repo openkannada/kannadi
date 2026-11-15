@@ -2,7 +2,18 @@ from fontqa.checks import mark_indistinct, run_case
 from fontqa.kannada import Case
 from fontqa.shaping import Face
 
-from .synth import ANUSVARA, E_SIGN, KA, KHA, NO_REPH_FEA, OLD_ORDER_FEA, RA, VIRAMA, build
+from .synth import (
+    ANUSVARA,
+    E_SIGN,
+    KA,
+    KHA,
+    NO_REPH_FEA,
+    OLD_ORDER_FEA,
+    PRES_LIGATURE_FEA,
+    RA,
+    VIRAMA,
+    build,
+)
 
 ZWNJ = 0x200C
 
@@ -32,6 +43,18 @@ def test_a_font_without_reph_misses_the_arkavattu(tmp_path):
     face = Face(build(tmp_path / "noreph.ttf", fea=NO_REPH_FEA))
     result = run_case(face, case(RA, VIRAMA, KA, group="arkavattu"))
     assert result.failures == ["no_arkavattu"]
+
+
+def test_a_ligature_that_hides_ra_is_not_an_arkavattu(tmp_path):
+    face = Face(build(tmp_path / "pres.ttf", fea=PRES_LIGATURE_FEA))
+    result = run_case(face, case(RA, VIRAMA, KA, group="arkavattu"))
+    assert result.failures == ["no_arkavattu"]
+
+
+def test_aat_fonts_are_judged_by_the_zwnj_comparison_alone(tmp_path, monkeypatch):
+    monkeypatch.setattr(Face, "aat", True)
+    face = Face(build(tmp_path / "pres.ttf", fea=PRES_LIGATURE_FEA))
+    assert run_case(face, case(RA, VIRAMA, KA, group="arkavattu")).failures == []
 
 
 def test_unmapped_and_empty_characters_are_missing(tmp_path):

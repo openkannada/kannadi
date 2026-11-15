@@ -16,14 +16,14 @@
   "gsub_scripts": "DFLT knd2",
   "kannada_codepoints": 91,
   "glyph_count": 772,
-  "cases": 1905,
-  "failing_cases": 2,
+  "cases": 2146,
+  "failing_cases": 4,
   "missing_glyph": 2,
   "notdef": 0,
   "dotted_circle": 0,
   "no_conjunct": 0,
   "no_arkavattu": 0,
-  "collision": 0,
+  "collision": 2,
   "indistinct": 0,
   "missing_codepoints": "U+0CDC"
  },
@@ -52,9 +52,28 @@
     "knd2"
    ]
   },
+  "aat_morx": false,
   "kannada_codepoints": 91
  },
  "failures": [
+  {
+   "case_id": "sig-0CA4-0CCD-0CB0-0CC3",
+   "group": "signed_cluster",
+   "text": "ತ್ರೃ",
+   "codepoints": "U+0CA4 U+0CCD U+0CB0 U+0CC3",
+   "failures": "collision",
+   "glyphs": "uni0CA4 uni0CB0.below uni0CC3",
+   "detail": "uni0CB0.below x uni0CC3 8%"
+  },
+  {
+   "case_id": "sig-0CAA-0CCD-0CAA-0CC1",
+   "group": "signed_cluster",
+   "text": "ಪ್ಪು",
+   "codepoints": "U+0CAA U+0CCD U+0CAA U+0CC1",
+   "failures": "collision",
+   "glyphs": "uni0CAA uni0CC1.large uni0CAA.sub",
+   "detail": "uni0CC1.large x uni0CAA.sub 13%"
+  },
   {
    "case_id": "rare-0CDC",
    "group": "rare",

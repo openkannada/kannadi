@@ -153,3 +153,40 @@ def test_stem_of_a_bar_is_its_width():
                             ("lineTo", ((80, 1000),)), ("lineTo", ((80, 0),)),
                             ("closePath", ()))])  # fmt: skip
     assert compose.stem(bar) == pytest.approx(80, rel=0.1)
+
+
+MIXED_FEA = """
+languagesystem knd2 dflt;
+feature blwf { script knd2; sub virama ka by ka.blwf; sub kha virama by kha.blwf; } blwf;
+"""
+
+
+def test_existing_new_order_rules_are_kept(tmp_path):
+    before = Face(build(tmp_path / "before.ttf", fea=MIXED_FEA))
+    assert run_case(before, case(KHA, VIRAMA, KA)).failures == []
+    assert run_case(before, case(KA, VIRAMA, KHA)).failures == ["no_conjunct"]
+    _, after = _fixed(tmp_path / "after.ttf", MIXED_FEA)
+    assert run_case(after, case(KHA, VIRAMA, KA)).failures == []
+    assert run_case(after, case(KA, VIRAMA, KHA)).failures == []
+
+
+def test_a_font_without_knd2_is_refused(tmp_path):
+    fea = "languagesystem knda dflt;\nfeature blwf { script knda; sub ka virama by ka.blwf; } blwf;"
+    font = TTFont(str(build(tmp_path / "f.ttf", fea=fea)))
+    with pytest.raises(ValueError, match="no knd2"):
+        fixes.add_new_order_blwf(font)
+
+
+def test_composing_drops_per_glyph_device_tables(tmp_path):
+    font = _sign_font(tmp_path / "f.ttf", merged_tail=False)
+    font["hdmx"] = DefaultTable("hdmx")
+    font["hdmx"].data = b"\0" * 8
+    compose.compose_rr_sign(font)
+    assert "hdmx" not in font
+
+
+def test_a_sign_that_already_has_ink_is_left_alone(tmp_path):
+    font = _sign_font(tmp_path / "f.ttf", merged_tail=False)
+    compose.compose_rr_sign(font)
+    with pytest.raises(compose.ComposeError, match="already has a glyph"):
+        compose.compose_rr_sign(font)

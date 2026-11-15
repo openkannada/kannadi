@@ -16,16 +16,16 @@
   "gsub_scripts": "DFLT knd2 knda",
   "kannada_codepoints": 84,
   "glyph_count": 827,
-  "cases": 1905,
-  "failing_cases": 6,
-  "missing_glyph": 6,
+  "cases": 2146,
+  "failing_cases": 10,
+  "missing_glyph": 7,
   "notdef": 0,
   "dotted_circle": 0,
   "no_conjunct": 0,
   "no_arkavattu": 0,
-  "collision": 0,
+  "collision": 3,
   "indistinct": 0,
-  "missing_codepoints": "U+0CDC U+0CDD U+0CF1 U+0CF2 U+0CF3"
+  "missing_codepoints": "U+0CBD U+0CDC U+0CDD U+0CF1 U+0CF2 U+0CF3"
  },
  "font": {
   "family": "Hind Mysuru",
@@ -54,9 +54,37 @@
     "knda"
    ]
   },
+  "aat_morx": false,
   "kannada_codepoints": 84
  },
  "failures": [
+  {
+   "case_id": "sig-0C95-0CCD-0CB7-0CC3",
+   "group": "signed_cluster",
+   "text": "ಕ್ಷೃ",
+   "codepoints": "U+0C95 U+0CCD U+0CB7 U+0CC3",
+   "failures": "collision",
+   "glyphs": "gid311 gid785 gid352",
+   "detail": "gid785 x gid352 4%"
+  },
+  {
+   "case_id": "sig-0CB2-0CCD-0CB2-0CC3",
+   "group": "signed_cluster",
+   "text": "ಲ್ಲೃ",
+   "codepoints": "U+0CB2 U+0CCD U+0CB2 U+0CC3",
+   "failures": "collision",
+   "glyphs": "gid339 gid450 gid786",
+   "detail": "gid450 x gid786 10%"
+  },
+  {
+   "case_id": "sig-0CB2-0CCD-0CB2-0CC8",
+   "group": "signed_cluster",
+   "text": "ಲ್ಲೈ",
+   "codepoints": "U+0CB2 U+0CCD U+0CB2 U+0CC8",
+   "failures": "collision",
+   "glyphs": "gid632 gid450 gid788",
+   "detail": "gid450 x gid788 10%"
+  },
   {
    "case_id": "rare-0CDD",
    "group": "rare",
@@ -109,6 +137,15 @@
    "codepoints": "U+0C85 U+0CF2 U+0CAA",
    "failures": "missing_glyph",
    "glyphs": "gid297 gid0 gid331",
+   "detail": ""
+  },
+  {
+   "case_id": "rare-0CBD",
+   "group": "rare",
+   "text": "ಸೋಽಹಂ",
+   "codepoints": "U+0CB8 U+0CCB U+0CBD U+0CB9 U+0C82",
+   "failures": "missing_glyph",
+   "glyphs": "gid672 gid361 gid0 gid345 gid295",
    "detail": ""
   }
  ]

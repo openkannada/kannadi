@@ -1,5 +1,6 @@
 import io
 import json
+import tarfile
 import zipfile
 
 import pytest
@@ -52,3 +53,56 @@ def test_manifest_loads_and_ids_are_unique():
     entries = fetch.load_manifest(fetch.Path(__file__).parents[1] / "fonts.toml")
     assert len(entries) > 30
     assert all(e.license for e in entries)
+
+
+def _zip(**files: bytes) -> bytes:
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w") as z:
+        for name, data in files.items():
+            z.writestr(name, data)
+    return buf.getvalue()
+
+
+def test_a_bad_archive_member_leaves_nothing_cached(tmp_path, monkeypatch):
+    monkeypatch.setattr(fetch, "_download", lambda url: _zip(**{"A.ttf": b"a", "B.ttf": b"b"}))
+    entry = fetch.Entry("x", "X", "src", "OFL-1.1", ["*.ttf"], archive="https://h/x.zip")
+    lock = {"x": {"B.ttf": "0" * 64}}
+    with pytest.raises(ValueError, match="B.ttf"):
+        fetch.fetch(entry, tmp_path, lock)
+    assert not (tmp_path / "x").exists()
+
+
+def test_a_cached_file_is_checked_against_the_lock(tmp_path):
+    (tmp_path / "x").mkdir()
+    (tmp_path / "x" / "F.ttf").write_bytes(b"changed")
+    entry = fetch.Entry("x", "X", "src", "OFL-1.1", ["https://h/F.ttf"])
+    with pytest.raises(ValueError, match="does not match"):
+        fetch.fetch(entry, tmp_path, {"x": {"F.ttf": "0" * 64}})
+
+
+def test_writing_the_lock_keeps_other_fonts(tmp_path):
+    lock = tmp_path / "lock.json"
+    lock.write_text(json.dumps({"other": {"O.ttf": "1" * 64}}))
+    f = tmp_path / "F.ttf"
+    f.write_bytes(b"font")
+    fetch.write_lock(lock, {"x": [f]})
+    assert set(fetch.load_lock(lock)) == {"other", "x"}
+
+
+def test_deb_members_come_from_the_data_tarball():
+    tar = io.BytesIO()
+    with tarfile.open(fileobj=tar, mode="w:gz") as t:
+        info = tarfile.TarInfo("./usr/share/fonts/F.ttf")
+        info.size = 4
+        t.addfile(info, io.BytesIO(b"font"))
+    deb = _ar({"debian-binary": b"2.0\n", "data.tar.gz": tar.getvalue()})
+    assert fetch._archive_members("https://h/f.deb", deb) == {"usr/share/fonts/F.ttf": b"font"}
+
+
+def test_writing_the_lock_drops_fonts_no_longer_in_the_manifest(tmp_path):
+    lock = tmp_path / "lock.json"
+    lock.write_text(json.dumps({"gone": {"G.ttf": "1" * 64}}))
+    f = tmp_path / "F.ttf"
+    f.write_bytes(b"font")
+    fetch.write_lock(lock, {"x": [f]}, known={"x"})
+    assert set(fetch.load_lock(lock)) == {"x"}

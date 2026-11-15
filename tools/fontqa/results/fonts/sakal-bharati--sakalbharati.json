@@ -16,14 +16,14 @@
   "gsub_scripts": "arab beng dev2 deva gujr guru knda mlym mtei olck orya taml telu",
   "kannada_codepoints": 87,
   "glyph_count": 4426,
-  "cases": 1905,
-  "failing_cases": 5,
+  "cases": 2146,
+  "failing_cases": 8,
   "missing_glyph": 4,
   "notdef": 0,
   "dotted_circle": 0,
   "no_conjunct": 0,
   "no_arkavattu": 0,
-  "collision": 1,
+  "collision": 4,
   "indistinct": 0,
   "missing_codepoints": "U+0CDC U+0CDD U+0CF3"
  },
@@ -74,9 +74,37 @@
     "telu"
    ]
   },
+  "aat_morx": false,
   "kannada_codepoints": 87
  },
  "failures": [
+  {
+   "case_id": "sig-0C95-0CCD-0CB7-0CC3",
+   "group": "signed_cluster",
+   "text": "ಕ್ಷೃ",
+   "codepoints": "U+0C95 U+0CCD U+0CB7 U+0CC3",
+   "failures": "collision",
+   "glyphs": "knlka .notdef .notdef",
+   "detail": ".notdef x .notdef 6%"
+  },
+  {
+   "case_id": "sig-0C95-0CCD-0CB7-0CC8",
+   "group": "signed_cluster",
+   "text": "ಕ್ಷೈ",
+   "codepoints": "U+0C95 U+0CCD U+0CB7 U+0CC8",
+   "failures": "collision",
+   "glyphs": ".notdef knvse .notdef .notdef",
+   "detail": ".notdef x .notdef 6%"
+  },
+  {
+   "case_id": "sig-0C95-0CCD-0CB7-0CCD-0CAE",
+   "group": "signed_cluster",
+   "text": "ಕ್ಷ್ಮ",
+   "codepoints": "U+0C95 U+0CCD U+0CB7 U+0CCD U+0CAE",
+   "failures": "collision",
+   "glyphs": "knlka .notdef .notdef",
+   "detail": ".notdef x .notdef 8%"
+  },
   {
    "case_id": "rare-0CDD",
    "group": "rare",

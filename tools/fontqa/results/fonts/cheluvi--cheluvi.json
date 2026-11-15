@@ -16,16 +16,16 @@
   "gsub_scripts": "DFLT cyrl knda",
   "kannada_codepoints": 78,
   "glyph_count": 327,
-  "cases": 1905,
-  "failing_cases": 229,
-  "missing_glyph": 84,
+  "cases": 2146,
+  "failing_cases": 250,
+  "missing_glyph": 85,
   "notdef": 0,
   "dotted_circle": 0,
   "no_conjunct": 70,
   "no_arkavattu": 0,
-  "collision": 0,
-  "indistinct": 75,
-  "missing_codepoints": "U+0C8C U+0CDC U+0CDD U+0CE1 U+0CE2 U+0CE3 U+0CF1 U+0CF2 U+0CF3"
+  "collision": 21,
+  "indistinct": 74,
+  "missing_codepoints": "U+0C8C U+0CBC U+0CBD U+0CDC U+0CDD U+0CE1 U+0CE2 U+0CE3 U+0CF1 U+0CF2 U+0CF3"
  },
  "font": {
   "family": "Cheluvi",
@@ -54,6 +54,7 @@
     "knda"
    ]
   },
+  "aat_morx": false,
   "kannada_codepoints": 78
  },
  "failures": [
@@ -1354,8 +1355,26 @@
    "detail": ""
   },
   {
+   "case_id": "vow-0C8C",
+   "group": "vowel",
+   "text": "ಌ",
+   "codepoints": "U+0C8C",
+   "failures": "missing_glyph",
+   "glyphs": ".notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "vow-0CE1",
+   "group": "vowel",
+   "text": "ೡ",
+   "codepoints": "U+0CE1",
+   "failures": "missing_glyph",
+   "glyphs": ".notdef",
+   "detail": ""
+  },
+  {
    "case_id": "clu-0C95-0CCD-0CB1",
-   "group": "cluster",
+   "group": "old_cluster",
    "text": "ಕ್ಱ",
    "codepoints": "U+0C95 U+0CCD U+0CB1",
    "failures": "no_conjunct",
@@ -1364,7 +1383,7 @@
   },
   {
    "case_id": "clu-0C95-0CCD-0CDE",
-   "group": "cluster",
+   "group": "old_cluster",
    "text": "ಕ್ೞ",
    "codepoints": "U+0C95 U+0CCD U+0CDE",
    "failures": "no_conjunct",
@@ -1373,7 +1392,7 @@
   },
   {
    "case_id": "clu-0C96-0CCD-0CB1",
-   "group": "cluster",
+   "group": "old_cluster",
    "text": "ಖ್ಱ",
    "codepoints": "U+0C96 U+0CCD U+0CB1",
    "failures": "no_conjunct",
@@ -1382,7 +1401,7 @@
   },
   {
    "case_id": "clu-0C96-0CCD-0CDE",
-   "group": "cluster",
+   "group": "old_cluster",
    "text": "ಖ್ೞ",
    "codepoints": "U+0C96 U+0CCD U+0CDE",
    "failures": "no_conjunct",
@@ -1391,7 +1410,7 @@
   },
   {
    "case_id": "clu-0C97-0CCD-0CB1",
-   "group": "cluster",
+   "group": "old_cluster",
    "text": "ಗ್ಱ",
    "codepoints": "U+0C97 U+0CCD U+0CB1",
    "failures": "no_conjunct",
@@ -1400,7 +1419,7 @@
   },
   {
    "case_id": "clu-0C97-0CCD-0CDE",
-   "group": "cluster",
+   "group": "old_cluster",
    "text": "ಗ್ೞ",
    "codepoints": "U+0C97 U+0CCD U+0CDE",
    "failures": "no_conjunct",
@@ -1409,7 +1428,7 @@
   },
   {
    "case_id": "clu-0C98-0CCD-0CB1",
-   "group": "cluster",
+   "group": "old_cluster",
    "text": "ಘ್ಱ",
    "codepoints": "U+0C98 U+0CCD U+0CB1",
    "failures": "no_conjunct",
@@ -1418,7 +1437,7 @@
   },
   {
    "case_id": "clu-0C98-0CCD-0CDE",
-   "group": "cluster",
+   "group": "old_cluster",
    "text": "ಘ್ೞ",
    "codepoints": "U+0C98 U+0CCD U+0CDE",
    "failures": "no_conjunct",
@@ -1427,7 +1446,7 @@
   },
   {
    "case_id": "clu-0C99-0CCD-0CB1",
-   "group": "cluster",
+   "group": "old_cluster",
    "text": "ಙ್ಱ",
    "codepoints": "U+0C99 U+0CCD U+0CB1",
    "failures": "no_conjunct",
@@ -1436,7 +1455,7 @@
   },
   {
    "case_id": "clu-0C99-0CCD-0CDE",
-   "group": "cluster",
+   "group": "old_cluster",
    "text": "ಙ್ೞ",
    "codepoints": "U+0C99 U+0CCD U+0CDE",
    "failures": "no_conjunct",
@@ -1445,7 +1464,7 @@
   },
   {
    "case_id": "clu-0C9A-0CCD-0CB1",
-   "group": "cluster",
+   "group": "old_cluster",
    "text": "ಚ್ಱ",
    "codepoints": "U+0C9A U+0CCD U+0CB1",
    "failures": "no_conjunct",
@@ -1454,7 +1473,7 @@
   },
   {
    "case_id": "clu-0C9A-0CCD-0CDE",
-   "group": "cluster",
+   "group": "old_cluster",
    "text": "ಚ್ೞ",
    "codepoints": "U+0C9A U+0CCD U+0CDE",
    "failures": "no_conjunct",
@@ -1463,7 +1482,7 @@
   },
   {
    "case_id": "clu-0C9B-0CCD-0CB1",
-   "group": "cluster",
+   "group": "old_cluster",
    "text": "ಛ್ಱ",
    "codepoints": "U+0C9B U+0CCD U+0CB1",
    "failures": "no_conjunct",
@@ -1472,7 +1491,7 @@
   },
   {
    "case_id": "clu-0C9B-0CCD-0CDE",
-   "group": "cluster",
+   "group": "old_cluster",
    "text": "ಛ್ೞ",
    "codepoints": "U+0C9B U+0CCD U+0CDE",
    "failures": "no_conjunct",
@@ -1481,7 +1500,7 @@
   },
   {
    "case_id": "clu-0C9C-0CCD-0CB1",
-   "group": "cluster",
+   "group": "old_cluster",
    "text": "ಜ್ಱ",
    "codepoints": "U+0C9C U+0CCD U+0CB1",
    "failures": "no_conjunct",
@@ -1490,7 +1509,7 @@
   },
   {
    "case_id": "clu-0C9C-0CCD-0CDE",
-   "group": "cluster",
+   "group": "old_cluster",
    "text": "ಜ್ೞ",
    "codepoints": "U+0C9C U+0CCD U+0CDE",
    "failures": "no_conjunct",
@@ -1499,7 +1518,7 @@
   },
   {
    "case_id": "clu-0C9D-0CCD-0CB1",
-   "group": "cluster",
+   "group": "old_cluster",
    "text": "ಝ್ಱ",
    "codepoints": "U+0C9D U+0CCD U+0CB1",
    "failures": "no_conjunct",
@@ -1508,7 +1527,7 @@
   },
   {
    "case_id": "clu-0C9D-0CCD-0CDE",
-   "group": "cluster",
+   "group": "old_cluster",
    "text": "ಝ್ೞ",
    "codepoints": "U+0C9D U+0CCD U+0CDE",
    "failures": "no_conjunct",
@@ -1517,7 +1536,7 @@
   },
   {
    "case_id": "clu-0C9E-0CCD-0CB1",
-   "group": "cluster",
+   "group": "old_cluster",
    "text": "ಞ್ಱ",
    "codepoints": "U+0C9E U+0CCD U+0CB1",
    "failures": "no_conjunct",
@@ -1526,7 +1545,7 @@
   },
   {
    "case_id": "clu-0C9E-0CCD-0CDE",
-   "group": "cluster",
+   "group": "old_cluster",
    "text": "ಞ್ೞ",
    "codepoints": "U+0C9E U+0CCD U+0CDE",
    "failures": "no_conjunct",
@@ -1535,7 +1554,7 @@
   },
   {
    "case_id": "clu-0C9F-0CCD-0CB1",
-   "group": "cluster",
+   "group": "old_cluster",
    "text": "ಟ್ಱ",
    "codepoints": "U+0C9F U+0CCD U+0CB1",
    "failures": "no_conjunct",
@@ -1544,7 +1563,7 @@
   },
   {
    "case_id": "clu-0C9F-0CCD-0CDE",
-   "group": "cluster",
+   "group": "old_cluster",
    "text": "ಟ್ೞ",
    "codepoints": "U+0C9F U+0CCD U+0CDE",
    "failures": "no_conjunct",
@@ -1553,7 +1572,7 @@
   },
   {
    "case_id": "clu-0CA0-0CCD-0CB1",
-   "group": "cluster",
+   "group": "old_cluster",
    "text": "ಠ್ಱ",
    "codepoints": "U+0CA0 U+0CCD U+0CB1",
    "failures": "no_conjunct",
@@ -1562,7 +1581,7 @@
   },
   {
    "case_id": "clu-0CA0-0CCD-0CDE",
-   "group": "cluster",
+   "group": "old_cluster",
    "text": "ಠ್ೞ",
    "codepoints": "U+0CA0 U+0CCD U+0CDE",
    "failures": "no_conjunct",
@@ -1571,7 +1590,7 @@
   },
   {
    "case_id": "clu-0CA1-0CCD-0CB1",
-   "group": "cluster",
+   "group": "old_cluster",
    "text": "ಡ್ಱ",
    "codepoints": "U+0CA1 U+0CCD U+0CB1",
    "failures": "no_conjunct",
@@ -1580,7 +1599,7 @@
   },
   {
    "case_id": "clu-0CA1-0CCD-0CDE",
-   "group": "cluster",
+   "group": "old_cluster",
    "text": "ಡ್ೞ",
    "codepoints": "U+0CA1 U+0CCD U+0CDE",
    "failures": "no_conjunct",
@@ -1589,7 +1608,7 @@
   },
   {
    "case_id": "clu-0CA2-0CCD-0CB1",
-   "group": "cluster",
+   "group": "old_cluster",
    "text": "ಢ್ಱ",
    "codepoints": "U+0CA2 U+0CCD U+0CB1",
    "failures": "no_conjunct",
@@ -1598,7 +1617,7 @@
   },
   {
    "case_id": "clu-0CA2-0CCD-0CDE",
-   "group": "cluster",
+   "group": "old_cluster",
    "text": "ಢ್ೞ",
    "codepoints": "U+0CA2 U+0CCD U+0CDE",
    "failures": "no_conjunct",
@@ -1607,7 +1626,7 @@
   },
   {
    "case_id": "clu-0CA3-0CCD-0CB1",
-   "group": "cluster",
+   "group": "old_cluster",
    "text": "ಣ್ಱ",
    "codepoints": "U+0CA3 U+0CCD U+0CB1",
    "failures": "no_conjunct",
@@ -1616,7 +1635,7 @@
   },
   {
    "case_id": "clu-0CA3-0CCD-0CDE",
-   "group": "cluster",
+   "group": "old_cluster",
    "text": "ಣ್ೞ",
    "codepoints": "U+0CA3 U+0CCD U+0CDE",
    "failures": "no_conjunct",
@@ -1625,7 +1644,7 @@
   },
   {
    "case_id": "clu-0CA4-0CCD-0CB1",
-   "group": "cluster",
+   "group": "old_cluster",
    "text": "ತ್ಱ",
    "codepoints": "U+0CA4 U+0CCD U+0CB1",
    "failures": "no_conjunct",
@@ -1634,7 +1653,7 @@
   },
   {
    "case_id": "clu-0CA4-0CCD-0CDE",
-   "group": "cluster",
+   "group": "old_cluster",
    "text": "ತ್ೞ",
    "codepoints": "U+0CA4 U+0CCD U+0CDE",
    "failures": "no_conjunct",
@@ -1643,7 +1662,7 @@
   },
   {
    "case_id": "clu-0CA5-0CCD-0CB1",
-   "group": "cluster",
+   "group": "old_cluster",
    "text": "ಥ್ಱ",
    "codepoints": "U+0CA5 U+0CCD U+0CB1",
    "failures": "no_conjunct",
@@ -1652,7 +1671,7 @@
   },
   {
    "case_id": "clu-0CA5-0CCD-0CDE",
-   "group": "cluster",
+   "group": "old_cluster",
    "text": "ಥ್ೞ",
    "codepoints": "U+0CA5 U+0CCD U+0CDE",
    "failures": "no_conjunct",
@@ -1661,7 +1680,7 @@
   },
   {
    "case_id": "clu-0CA6-0CCD-0CB1",
-   "group": "cluster",
+   "group": "old_cluster",
    "text": "ದ್ಱ",
    "codepoints": "U+0CA6 U+0CCD U+0CB1",
    "failures": "no_conjunct",
@@ -1670,7 +1689,7 @@
   },
   {
    "case_id": "clu-0CA6-0CCD-0CDE",
-   "group": "cluster",
+   "group": "old_cluster",
    "text": "ದ್ೞ",
    "codepoints": "U+0CA6 U+0CCD U+0CDE",
    "failures": "no_conjunct",
@@ -1679,7 +1698,7 @@
   },
   {
    "case_id": "clu-0CA7-0CCD-0CB1",
-   "group": "cluster",
+   "group": "old_cluster",
    "text": "ಧ್ಱ",
    "codepoints": "U+0CA7 U+0CCD U+0CB1",
    "failures": "no_conjunct",
@@ -1688,7 +1707,7 @@
   },
   {
    "case_id": "clu-0CA7-0CCD-0CDE",
-   "group": "cluster",
+   "group": "old_cluster",
    "text": "ಧ್ೞ",
    "codepoints": "U+0CA7 U+0CCD U+0CDE",
    "failures": "no_conjunct",
@@ -1697,7 +1716,7 @@
   },
   {
    "case_id": "clu-0CA8-0CCD-0CB1",
-   "group": "cluster",
+   "group": "old_cluster",
    "text": "ನ್ಱ",
    "codepoints": "U+0CA8 U+0CCD U+0CB1",
    "failures": "no_conjunct",
@@ -1706,7 +1725,7 @@
   },
   {
    "case_id": "clu-0CA8-0CCD-0CDE",
-   "group": "cluster",
+   "group": "old_cluster",
    "text": "ನ್ೞ",
    "codepoints": "U+0CA8 U+0CCD U+0CDE",
    "failures": "no_conjunct",
@@ -1715,7 +1734,7 @@
   },
   {
    "case_id": "clu-0CAA-0CCD-0CB1",
-   "group": "cluster",
+   "group": "old_cluster",
    "text": "ಪ್ಱ",
    "codepoints": "U+0CAA U+0CCD U+0CB1",
    "failures": "no_conjunct",
@@ -1724,7 +1743,7 @@
   },
   {
    "case_id": "clu-0CAA-0CCD-0CDE",
-   "group": "cluster",
+   "group": "old_cluster",
    "text": "ಪ್ೞ",
    "codepoints": "U+0CAA U+0CCD U+0CDE",
    "failures": "no_conjunct",
@@ -1733,7 +1752,7 @@
   },
   {
    "case_id": "clu-0CAB-0CCD-0CB1",
-   "group": "cluster",
+   "group": "old_cluster",
    "text": "ಫ್ಱ",
    "codepoints": "U+0CAB U+0CCD U+0CB1",
    "failures": "no_conjunct",
@@ -1742,7 +1761,7 @@
   },
   {
    "case_id": "clu-0CAB-0CCD-0CDE",
-   "group": "cluster",
+   "group": "old_cluster",
    "text": "ಫ್ೞ",
    "codepoints": "U+0CAB U+0CCD U+0CDE",
    "failures": "no_conjunct",
@@ -1751,7 +1770,7 @@
   },
   {
    "case_id": "clu-0CAC-0CCD-0CB1",
-   "group": "cluster",
+   "group": "old_cluster",
    "text": "ಬ್ಱ",
    "codepoints": "U+0CAC U+0CCD U+0CB1",
    "failures": "no_conjunct",
@@ -1760,7 +1779,7 @@
   },
   {
    "case_id": "clu-0CAC-0CCD-0CDE",
-   "group": "cluster",
+   "group": "old_cluster",
    "text": "ಬ್ೞ",
    "codepoints": "U+0CAC U+0CCD U+0CDE",
    "failures": "no_conjunct",
@@ -1769,7 +1788,7 @@
   },
   {
    "case_id": "clu-0CAD-0CCD-0CB1",
-   "group": "cluster",
+   "group": "old_cluster",
    "text": "ಭ್ಱ",
    "codepoints": "U+0CAD U+0CCD U+0CB1",
    "failures": "no_conjunct",
@@ -1778,7 +1797,7 @@
   },
   {
    "case_id": "clu-0CAD-0CCD-0CDE",
-   "group": "cluster",
+   "group": "old_cluster",
    "text": "ಭ್ೞ",
    "codepoints": "U+0CAD U+0CCD U+0CDE",
    "failures": "no_conjunct",
@@ -1787,7 +1806,7 @@
   },
   {
    "case_id": "clu-0CAE-0CCD-0CB1",
-   "group": "cluster",
+   "group": "old_cluster",
    "text": "ಮ್ಱ",
    "codepoints": "U+0CAE U+0CCD U+0CB1",
    "failures": "no_conjunct",
@@ -1796,7 +1815,7 @@
   },
   {
    "case_id": "clu-0CAE-0CCD-0CDE",
-   "group": "cluster",
+   "group": "old_cluster",
    "text": "ಮ್ೞ",
    "codepoints": "U+0CAE U+0CCD U+0CDE",
    "failures": "no_conjunct",
@@ -1805,7 +1824,7 @@
   },
   {
    "case_id": "clu-0CAF-0CCD-0CB1",
-   "group": "cluster",
+   "group": "old_cluster",
    "text": "ಯ್ಱ",
    "codepoints": "U+0CAF U+0CCD U+0CB1",
    "failures": "no_conjunct",
@@ -1814,7 +1833,7 @@
   },
   {
    "case_id": "clu-0CAF-0CCD-0CDE",
-   "group": "cluster",
+   "group": "old_cluster",
    "text": "ಯ್ೞ",
    "codepoints": "U+0CAF U+0CCD U+0CDE",
    "failures": "no_conjunct",
@@ -1823,7 +1842,7 @@
   },
   {
    "case_id": "clu-0CB1-0CCD-0CB1",
-   "group": "cluster",
+   "group": "old_cluster",
    "text": "ಱ್ಱ",
    "codepoints": "U+0CB1 U+0CCD U+0CB1",
    "failures": "no_conjunct",
@@ -1832,7 +1851,7 @@
   },
   {
    "case_id": "clu-0CB1-0CCD-0CDE",
-   "group": "cluster",
+   "group": "old_cluster",
    "text": "ಱ್ೞ",
    "codepoints": "U+0CB1 U+0CCD U+0CDE",
    "failures": "no_conjunct",
@@ -1841,7 +1860,7 @@
   },
   {
    "case_id": "clu-0CB2-0CCD-0CB1",
-   "group": "cluster",
+   "group": "old_cluster",
    "text": "ಲ್ಱ",
    "codepoints": "U+0CB2 U+0CCD U+0CB1",
    "failures": "no_conjunct",
@@ -1850,7 +1869,7 @@
   },
   {
    "case_id": "clu-0CB2-0CCD-0CDE",
-   "group": "cluster",
+   "group": "old_cluster",
    "text": "ಲ್ೞ",
    "codepoints": "U+0CB2 U+0CCD U+0CDE",
    "failures": "no_conjunct",
@@ -1859,7 +1878,7 @@
   },
   {
    "case_id": "clu-0CB3-0CCD-0CB1",
-   "group": "cluster",
+   "group": "old_cluster",
    "text": "ಳ್ಱ",
    "codepoints": "U+0CB3 U+0CCD U+0CB1",
    "failures": "no_conjunct",
@@ -1868,7 +1887,7 @@
   },
   {
    "case_id": "clu-0CB3-0CCD-0CDE",
-   "group": "cluster",
+   "group": "old_cluster",
    "text": "ಳ್ೞ",
    "codepoints": "U+0CB3 U+0CCD U+0CDE",
    "failures": "no_conjunct",
@@ -1877,7 +1896,7 @@
   },
   {
    "case_id": "clu-0CB5-0CCD-0CB1",
-   "group": "cluster",
+   "group": "old_cluster",
    "text": "ವ್ಱ",
    "codepoints": "U+0CB5 U+0CCD U+0CB1",
    "failures": "no_conjunct",
@@ -1886,7 +1905,7 @@
   },
   {
    "case_id": "clu-0CB5-0CCD-0CDE",
-   "group": "cluster",
+   "group": "old_cluster",
    "text": "ವ್ೞ",
    "codepoints": "U+0CB5 U+0CCD U+0CDE",
    "failures": "no_conjunct",
@@ -1895,7 +1914,7 @@
   },
   {
    "case_id": "clu-0CB6-0CCD-0CB1",
-   "group": "cluster",
+   "group": "old_cluster",
    "text": "ಶ್ಱ",
    "codepoints": "U+0CB6 U+0CCD U+0CB1",
    "failures": "no_conjunct",
@@ -1904,7 +1923,7 @@
   },
   {
    "case_id": "clu-0CB6-0CCD-0CDE",
-   "group": "cluster",
+   "group": "old_cluster",
    "text": "ಶ್ೞ",
    "codepoints": "U+0CB6 U+0CCD U+0CDE",
    "failures": "no_conjunct",
@@ -1913,7 +1932,7 @@
   },
   {
    "case_id": "clu-0CB7-0CCD-0CB1",
-   "group": "cluster",
+   "group": "old_cluster",
    "text": "ಷ್ಱ",
    "codepoints": "U+0CB7 U+0CCD U+0CB1",
    "failures": "no_conjunct",
@@ -1922,7 +1941,7 @@
   },
   {
    "case_id": "clu-0CB7-0CCD-0CDE",
-   "group": "cluster",
+   "group": "old_cluster",
    "text": "ಷ್ೞ",
    "codepoints": "U+0CB7 U+0CCD U+0CDE",
    "failures": "no_conjunct",
@@ -1931,7 +1950,7 @@
   },
   {
    "case_id": "clu-0CB8-0CCD-0CB1",
-   "group": "cluster",
+   "group": "old_cluster",
    "text": "ಸ್ಱ",
    "codepoints": "U+0CB8 U+0CCD U+0CB1",
    "failures": "no_conjunct",
@@ -1940,7 +1959,7 @@
   },
   {
    "case_id": "clu-0CB8-0CCD-0CDE",
-   "group": "cluster",
+   "group": "old_cluster",
    "text": "ಸ್ೞ",
    "codepoints": "U+0CB8 U+0CCD U+0CDE",
    "failures": "no_conjunct",
@@ -1949,7 +1968,7 @@
   },
   {
    "case_id": "clu-0CB9-0CCD-0CB1",
-   "group": "cluster",
+   "group": "old_cluster",
    "text": "ಹ್ಱ",
    "codepoints": "U+0CB9 U+0CCD U+0CB1",
    "failures": "no_conjunct",
@@ -1958,7 +1977,7 @@
   },
   {
    "case_id": "clu-0CB9-0CCD-0CDE",
-   "group": "cluster",
+   "group": "old_cluster",
    "text": "ಹ್ೞ",
    "codepoints": "U+0CB9 U+0CCD U+0CDE",
    "failures": "no_conjunct",
@@ -1967,7 +1986,7 @@
   },
   {
    "case_id": "clu-0CDE-0CCD-0CB1",
-   "group": "cluster",
+   "group": "old_cluster",
    "text": "ೞ್ಱ",
    "codepoints": "U+0CDE U+0CCD U+0CB1",
    "failures": "no_conjunct",
@@ -1976,12 +1995,201 @@
   },
   {
    "case_id": "clu-0CDE-0CCD-0CDE",
-   "group": "cluster",
+   "group": "old_cluster",
    "text": "ೞ್ೞ",
    "codepoints": "U+0CDE U+0CCD U+0CDE",
    "failures": "no_conjunct",
    "glyphs": "uni0CDE uni0CCD uni0CDE",
    "detail": ""
+  },
+  {
+   "case_id": "sig-0C95-0CCD-0C95-0CC3",
+   "group": "signed_cluster",
+   "text": "ಕ್ಕೃ",
+   "codepoints": "U+0C95 U+0CCD U+0C95 U+0CC3",
+   "failures": "collision",
+   "glyphs": "uni0C95 ka_ottu uni0CC3",
+   "detail": "ka_ottu x uni0CC3 17%"
+  },
+  {
+   "case_id": "sig-0C95-0CCD-0C95-0CC8",
+   "group": "signed_cluster",
+   "text": "ಕ್ಕೈ",
+   "codepoints": "U+0C95 U+0CCD U+0C95 U+0CC8",
+   "failures": "collision",
+   "glyphs": "ardha_ka uni0CC6 ka_ottu uni0CD6",
+   "detail": "ka_ottu x uni0CD6 12%"
+  },
+  {
+   "case_id": "sig-0CB8-0CCD-0CA4-0CC3",
+   "group": "signed_cluster",
+   "text": "ಸ್ತೃ",
+   "codepoints": "U+0CB8 U+0CCD U+0CA4 U+0CC3",
+   "failures": "collision",
+   "glyphs": "uni0CB8 ta_ottu uni0CC3",
+   "detail": "ta_ottu x uni0CC3 11%"
+  },
+  {
+   "case_id": "sig-0CB8-0CCD-0CA4-0CC8",
+   "group": "signed_cluster",
+   "text": "ಸ್ತೈ",
+   "codepoints": "U+0CB8 U+0CCD U+0CA4 U+0CC8",
+   "failures": "collision",
+   "glyphs": "ardha_sa uni0CC6 ta_ottu uni0CD6",
+   "detail": "ta_ottu x uni0CD6 11%"
+  },
+  {
+   "case_id": "sig-0CA8-0CCD-0CA8-0CC3",
+   "group": "signed_cluster",
+   "text": "ನ್ನೃ",
+   "codepoints": "U+0CA8 U+0CCD U+0CA8 U+0CC3",
+   "failures": "collision",
+   "glyphs": "uni0CA8 na_ottu uni0CC3",
+   "detail": "na_ottu x uni0CC3 12%"
+  },
+  {
+   "case_id": "sig-0CA8-0CCD-0CA8-0CC8",
+   "group": "signed_cluster",
+   "text": "ನ್ನೈ",
+   "codepoints": "U+0CA8 U+0CCD U+0CA8 U+0CC8",
+   "failures": "collision",
+   "glyphs": "ardha_na uni0CC6 na_ottu uni0CD6",
+   "detail": "na_ottu x uni0CD6 23%"
+  },
+  {
+   "case_id": "sig-0CB2-0CCD-0CB2-0CC3",
+   "group": "signed_cluster",
+   "text": "ಲ್ಲೃ",
+   "codepoints": "U+0CB2 U+0CCD U+0CB2 U+0CC3",
+   "failures": "collision",
+   "glyphs": "uni0CB2 la_ottu uni0CC3",
+   "detail": "la_ottu x uni0CC3 9%"
+  },
+  {
+   "case_id": "sig-0CB2-0CCD-0CB2-0CC8",
+   "group": "signed_cluster",
+   "text": "ಲ್ಲೈ",
+   "codepoints": "U+0CB2 U+0CCD U+0CB2 U+0CC8",
+   "failures": "collision",
+   "glyphs": "ardha_la uni0CC6 la_ottu uni0CD6",
+   "detail": "la_ottu x uni0CD6 11%"
+  },
+  {
+   "case_id": "sig-0CA4-0CCD-0CB0-0CC3",
+   "group": "signed_cluster",
+   "text": "ತ್ರೃ",
+   "codepoints": "U+0CA4 U+0CCD U+0CB0 U+0CC3",
+   "failures": "collision",
+   "glyphs": "uni0CA4 ra_ottu uni0CC3",
+   "detail": "ra_ottu x uni0CC3 5%"
+  },
+  {
+   "case_id": "sig-0CA4-0CCD-0CB0-0CC8",
+   "group": "signed_cluster",
+   "text": "ತ್ರೈ",
+   "codepoints": "U+0CA4 U+0CCD U+0CB0 U+0CC8",
+   "failures": "collision",
+   "glyphs": "ardha_ta uni0CC6 ra_ottu uni0CD6",
+   "detail": "ra_ottu x uni0CD6 6%"
+  },
+  {
+   "case_id": "sig-0CA6-0CCD-0CAF-0CC3",
+   "group": "signed_cluster",
+   "text": "ದ್ಯೃ",
+   "codepoints": "U+0CA6 U+0CCD U+0CAF U+0CC3",
+   "failures": "collision",
+   "glyphs": "uni0CA6 ya_ottu uni0CC3",
+   "detail": "ya_ottu x uni0CC3 10%"
+  },
+  {
+   "case_id": "sig-0CA6-0CCD-0CAF-0CC8",
+   "group": "signed_cluster",
+   "text": "ದ್ಯೈ",
+   "codepoints": "U+0CA6 U+0CCD U+0CAF U+0CC8",
+   "failures": "collision",
+   "glyphs": "ardha_da uni0CC6 ya_ottu uni0CD6",
+   "detail": "ya_ottu x uni0CD6 10%"
+  },
+  {
+   "case_id": "sig-0CB8-0CCD-0CB5-0CC3",
+   "group": "signed_cluster",
+   "text": "ಸ್ವೃ",
+   "codepoints": "U+0CB8 U+0CCD U+0CB5 U+0CC3",
+   "failures": "collision",
+   "glyphs": "uni0CB8 va_ottu uni0CC3",
+   "detail": "va_ottu x uni0CC3 6%"
+  },
+  {
+   "case_id": "sig-0CB8-0CCD-0CB5-0CC8",
+   "group": "signed_cluster",
+   "text": "ಸ್ವೈ",
+   "codepoints": "U+0CB8 U+0CCD U+0CB5 U+0CC8",
+   "failures": "collision",
+   "glyphs": "ardha_sa uni0CC6 va_ottu uni0CD6",
+   "detail": "va_ottu x uni0CD6 9%"
+  },
+  {
+   "case_id": "sig-0CAA-0CCD-0CAA-0CC1",
+   "group": "signed_cluster",
+   "text": "ಪ್ಪು",
+   "codepoints": "U+0CAA U+0CCD U+0CAA U+0CC1",
+   "failures": "collision",
+   "glyphs": "uni0CAA madhya_koMbu pa_ottu",
+   "detail": "madhya_koMbu x pa_ottu 11%"
+  },
+  {
+   "case_id": "sig-0CAA-0CCD-0CAA-0CC3",
+   "group": "signed_cluster",
+   "text": "ಪ್ಪೃ",
+   "codepoints": "U+0CAA U+0CCD U+0CAA U+0CC3",
+   "failures": "collision",
+   "glyphs": "uni0CAA pa_ottu uni0CC3",
+   "detail": "pa_ottu x uni0CC3 13%"
+  },
+  {
+   "case_id": "sig-0CAA-0CCD-0CAA-0CC8",
+   "group": "signed_cluster",
+   "text": "ಪ್ಪೈ",
+   "codepoints": "U+0CAA U+0CCD U+0CAA U+0CC8",
+   "failures": "collision",
+   "glyphs": "glyph_pe pa_ottu uni0CD6",
+   "detail": "pa_ottu x uni0CD6 11%"
+  },
+  {
+   "case_id": "sig-0CAE-0CCD-0CAE-0CC3",
+   "group": "signed_cluster",
+   "text": "ಮ್ಮೃ",
+   "codepoints": "U+0CAE U+0CCD U+0CAE U+0CC3",
+   "failures": "collision",
+   "glyphs": "uni0CAE ma_ottu uni0CC3",
+   "detail": "ma_ottu x uni0CC3 4%"
+  },
+  {
+   "case_id": "sig-0CAE-0CCD-0CAE-0CC8",
+   "group": "signed_cluster",
+   "text": "ಮ್ಮೈ",
+   "codepoints": "U+0CAE U+0CCD U+0CAE U+0CC8",
+   "failures": "collision",
+   "glyphs": "glyph_me ma_ottu uni0CD6",
+   "detail": "ma_ottu x uni0CD6 5%"
+  },
+  {
+   "case_id": "sig-0CB8-0CCD-0CA4-0CCD-0CB0",
+   "group": "signed_cluster",
+   "text": "ಸ್ತ್ರ",
+   "codepoints": "U+0CB8 U+0CCD U+0CA4 U+0CCD U+0CB0",
+   "failures": "collision",
+   "glyphs": "uni0CB8 ta_ottu saNNa_ra_ottu",
+   "detail": "ta_ottu x saNNa_ra_ottu 4%"
+  },
+  {
+   "case_id": "sig-0CB7-0CCD-0C9F-0CCD-0CB0",
+   "group": "signed_cluster",
+   "text": "ಷ್ಟ್ರ",
+   "codepoints": "U+0CB7 U+0CCD U+0C9F U+0CCD U+0CB0",
+   "failures": "collision",
+   "glyphs": "uni0CB7 Ta_ottu saNNa_ra_ottu",
+   "detail": "Ta_ottu x saNNa_ra_ottu 6%"
   },
   {
    "case_id": "ark-0CB0-0CCD-0C95-0CC3",
@@ -2074,49 +2282,31 @@
    "detail": ""
   },
   {
-   "case_id": "rare-0CE2",
+   "case_id": "rare-0CBC-ja",
    "group": "rare",
-   "text": "ಕೢ",
-   "codepoints": "U+0C95 U+0CE2",
+   "text": "ಜ಼",
+   "codepoints": "U+0C9C U+0CBC",
    "failures": "missing_glyph",
-   "glyphs": "uni0C95 .notdef",
+   "glyphs": "uni0C9C .notdef",
    "detail": ""
   },
   {
-   "case_id": "rare-0CE3",
+   "case_id": "rare-0CBC-pha",
    "group": "rare",
-   "text": "ಕೣ",
-   "codepoints": "U+0C95 U+0CE3",
+   "text": "ಫ಼",
+   "codepoints": "U+0CAB U+0CBC",
    "failures": "missing_glyph",
-   "glyphs": "uni0C95 .notdef",
+   "glyphs": "uni0CAB .notdef",
    "detail": ""
   },
   {
-   "case_id": "rare-0C8C",
+   "case_id": "rare-0CBD",
    "group": "rare",
-   "text": "ಌ",
-   "codepoints": "U+0C8C",
+   "text": "ಸೋಽಹಂ",
+   "codepoints": "U+0CB8 U+0CCB U+0CBD U+0CB9 U+0C82",
    "failures": "missing_glyph",
-   "glyphs": ".notdef",
+   "glyphs": "ardha_sa uni0CC6 uni0CC2 uni0CD5 .notdef uni0CB9 uni0C82",
    "detail": ""
-  },
-  {
-   "case_id": "rare-0CE1",
-   "group": "rare",
-   "text": "ೡ",
-   "codepoints": "U+0CE1",
-   "failures": "missing_glyph",
-   "glyphs": ".notdef",
-   "detail": ""
-  },
-  {
-   "case_id": "rare-0CC4",
-   "group": "rare",
-   "text": "ಕೄ",
-   "codepoints": "U+0C95 U+0CC4",
-   "failures": "indistinct",
-   "glyphs": "uni0C95 uni0CC4",
-   "detail": "same ink as ಕೃ"
   }
  ]
 }

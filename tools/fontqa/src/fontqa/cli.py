@@ -96,7 +96,8 @@ def cmd_fetch(args) -> int:
     for fid, (_, paths) in got.items():
         print(f"{fid}: {len(paths)} files")
     if args.write_lock:
-        fetching.write_lock(args.lock, {k: v for k, (e, v) in got.items() if not e.local})
+        known = {e.id for e in fetching.load_manifest(args.manifest)}
+        fetching.write_lock(args.lock, {k: v for k, (e, v) in got.items() if not e.local}, known)
     return 0
 
 
@@ -122,6 +123,7 @@ def cmd_run(args) -> int:
                 continue
             for face in faces:
                 if face.info["kannada_codepoints"] < MIN_KANNADA:
+                    print(f"{entry.id}/{path.name}#{face.index}: not a Kannada face, skipped")
                     continue
                 fid = face_id(entry, face)
                 key = (face.sha256, face.index)
@@ -149,8 +151,8 @@ def cmd_check(args) -> int:
     if args.proofs:
         try:
             reference = _reference(args)
-        except Exception:  # noqa: BLE001
-            reference = None
+        except (OSError, ValueError) as e:
+            print(f"no reference font for the proof sheets: {e}", file=sys.stderr)
     bad = 0
     for path in args.fonts:
         for face in faces_in(path):

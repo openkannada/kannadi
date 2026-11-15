@@ -16,7 +16,7 @@
   "gsub_scripts": "DFLT knd2",
   "kannada_codepoints": 90,
   "glyph_count": 602,
-  "cases": 1905,
+  "cases": 2146,
   "failing_cases": 3,
   "missing_glyph": 3,
   "notdef": 0,
@@ -55,6 +55,7 @@
     "knd2"
    ]
   },
+  "aat_morx": false,
   "kannada_codepoints": 90
  },
  "failures": [

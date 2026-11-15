@@ -69,6 +69,11 @@ class Face:
         return {ids[n] for n, c in classes.items() if c == 3 and n in ids}
 
     @cached_property
+    def aat(self) -> bool:
+        """HarfBuzz shapes with the AAT morx table when a font has one, in place of GSUB."""
+        return "morx" in self.tt or "mort" in self.tt
+
+    @cached_property
     def sha256(self) -> str:
         return hashlib.sha256(self.path.read_bytes()).hexdigest()
 
@@ -101,16 +106,17 @@ class Face:
             "axes": [a.axisTag for a in tt["fvar"].axes] if "fvar" in tt else [],
             "outlines": "CFF" if ("CFF " in tt or "CFF2" in tt) else "TrueType",
             "script_tags": scripts,
+            "aat_morx": self.aat,
             "kannada_codepoints": sum(1 for cp in self.cmap if 0x0C80 <= cp <= 0x0CFF),
         }
 
-    def shape(self, text: str, probe: bool = False) -> list[Glyph]:
+    def shape(self, text: str, probe: bool = False, features: dict | None = None) -> list[Glyph]:
         buf = hb.Buffer()
         buf.add_str(text)
         buf.guess_segment_properties()
         buf.flags = hb.BufferFlags.REMOVE_DEFAULT_IGNORABLES
         font = self._probe if probe else self.font
-        hb.shape(font, buf)
+        hb.shape(font, buf, features)
         out, x = [], 0
         for info, pos in zip(buf.glyph_infos, buf.glyph_positions, strict=True):
             gid = info.codepoint
