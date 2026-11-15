@@ -21,7 +21,7 @@ Version 0.1, in development.
 | Nudi and Baraha to Unicode | Done, waiting on a native reader's check of 100 sample lines |
 | Unicode to Nudi and Baraha | Done |
 | Verified test corpus | Planned: [docs/corpus-plan.md](docs/corpus-plan.md) |
-| Converter page that runs in the browser, with no upload | Built, not deployed: [web/](web/) |
+| Editor page that runs in the browser, with no upload | Built, not deployed: [web/](web/) |
 | Command-line tool for TXT, HTML and DOCX | Planned |
 | Shaping tests for Kannada fonts, with results for 41 fonts | Done: [tools/fontqa](tools/fontqa) |
 
@@ -89,9 +89,15 @@ assert!(encoded.is_clean());
 - **Round trip.** For well-formed Kannada, converting to Nudi and back gives the same text. A property test checks this.
 - **Unencodable characters.** Characters the layout has no glyph for, such as ಌ, ೄ, ೝ, the nukta, ZWJ, ZWNJ, Latin letters and spaces with no Windows-1252 byte, are kept in the output and listed in `unencodable` with their byte offsets. Aksharas that are not well formed, such as 2 vowel signs on 1 consonant, are listed in `malformed`. Kannada digits are written as ASCII digits; set the text in a `k` font to show Kannada digits.
 
-## Converter page
+## Editor page
 
-[web/](web/) is a static page that converts Nudi and Baraha text to Unicode in the browser. The crate runs as WebAssembly through the bindings in [crates/kannadi-wasm](crates/kannadi-wasm), so text never leaves the device. Paste text or open a TXT file, then copy or download the result. The page lists unknown glyphs and malformed syllables, and selecting one highlights it.
+[web/](web/) is a static Kannada editor that runs in the browser. The crate runs as WebAssembly through the bindings in [crates/kannadi-wasm](crates/kannadi-wasm), so text never leaves the device.
+
+- Paste text, or open a TXT, DOCX or HTML file. Nudi and Baraha text is converted to Unicode. In DOCX and HTML files, only text set in a Nudi or Baraha font is converted.
+- Unknown glyphs and malformed syllables are marked in the text and listed beside it. Selecting one offers checked fixes, or a replacement typed in Baraha letters.
+- Type Kannada with Baraha or ISO 15919 letters.
+- Normalize, modernize Old Kannada letters, and count aksharas and words.
+- Save as DOCX, TXT or HTML. The last document is kept in the browser's local storage.
 
 Build and run it locally. It needs the `wasm32-unknown-unknown` target and the `wasm-bindgen` command at the version in `Cargo.lock`:
 
@@ -99,10 +105,10 @@ Build and run it locally. It needs the `wasm32-unknown-unknown` target and the `
 rustup target add wasm32-unknown-unknown
 cargo install wasm-bindgen-cli --version 0.2.130 --locked
 web/build.sh
-python3 -m http.server -d web/dist 8000
+python3 web/serve.py 8000
 ```
 
-`web/dist` is a plain folder of static files that any static host can serve. `node web/test/smoke.mjs` checks the built package.
+`web/dist` is a plain folder of static files that any static host can serve. `web/serve.py` is only for local testing: the standard `python3 -m http.server` drops some of the page's parallel requests. `node --test web/test/units.mjs` tests the page modules, and `node web/test/smoke.mjs` checks the built package.
 
 ## Segmentation
 
@@ -177,7 +183,7 @@ Scheme spellings and legacy glyph layouts are data tables read by 1 engine each.
 cargo test
 PROPTEST_CASES=50000 cargo test --release --test props
 cargo clippy --all-targets
-web/build.sh && node web/test/smoke.mjs
+web/build.sh && node web/test/smoke.mjs && node --test web/test/units.mjs
 ```
 
 The minimum supported Rust version is 1.75.

@@ -1,10 +1,12 @@
-//! WebAssembly bindings for [`kannadi`], used by the converter page in `web/`.
+//! WebAssembly bindings for [`kannadi`], used by the editor page in `web/`.
 //!
 //! Offsets and ranges are in UTF-16 code units, the unit JavaScript strings use,
 //! so they work with `String.prototype.slice` and `setSelectionRange` as given.
 
 #![forbid(unsafe_code)]
 #![warn(missing_docs)]
+
+mod fix;
 
 use kannadi::legacy;
 use kannadi::Scheme;
@@ -62,6 +64,7 @@ impl From<NudiOptions> for legacy::Options {
 pub struct Conversion {
     text: String,
     unknown: Vec<u32>,
+    unknown_in_text: Vec<u32>,
     malformed: Vec<u32>,
 }
 
@@ -77,6 +80,13 @@ impl Conversion {
     #[wasm_bindgen(getter)]
     pub fn unknown(&self) -> Vec<u32> {
         self.unknown.clone()
+    }
+
+    /// Offsets in the output text of the same glyphs, which the converter keeps
+    /// as they were. Same order as [`Conversion::unknown`].
+    #[wasm_bindgen(getter, js_name = unknownInText)]
+    pub fn unknown_in_text(&self) -> Vec<u32> {
+        self.unknown_in_text.clone()
     }
 
     /// Ranges of the output text that are not valid syllables, as
@@ -107,6 +117,18 @@ pub fn nudi_to_unicode(text: &str, options: &NudiOptions) -> Conversion {
         .collect();
 
     let mut output = Utf16Cursor::new(&converted.text);
+    let mut from = 0;
+    let unknown_in_text = converted
+        .unknown
+        .iter()
+        .filter_map(|u| {
+            let at = from + converted.text[from..].find(u.glyph)?;
+            from = at + u.glyph.len_utf8();
+            Some(output.at(at))
+        })
+        .collect();
+
+    let mut output = Utf16Cursor::new(&converted.text);
     let malformed = converted
         .malformed
         .iter()
@@ -116,8 +138,106 @@ pub fn nudi_to_unicode(text: &str, options: &NudiOptions) -> Conversion {
     Conversion {
         text: converted.text,
         unknown,
+        unknown_in_text,
         malformed,
     }
+}
+
+/// Ranges of `text` that are not well-formed aksharas, as
+/// `[start0, end0, start1, end1, ...]`, ascending. See
+/// [`kannadi::Akshara::is_well_formed`].
+#[wasm_bindgen]
+pub fn malformed(text: &str) -> Vec<u32> {
+    let mut cursor = Utf16Cursor::new(text);
+    let mut out = Vec::new();
+    let mut pos = 0;
+    for a in kannadi::aksharas(text) {
+        if !a.is_well_formed() {
+            out.push(cursor.at(pos));
+            out.push(cursor.at(pos + a.text.len()));
+        }
+        pos += a.text.len();
+    }
+    out
+}
+
+/// A repair for a malformed akshara: replace `start..end` with `replacement`.
+#[wasm_bindgen]
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct Fix {
+    /// First code unit to replace.
+    pub start: u32,
+    /// Code unit after the last one to replace.
+    pub end: u32,
+    replacement: String,
+    kind: &'static str,
+}
+
+#[wasm_bindgen]
+impl Fix {
+    /// The text to put in place of the range.
+    #[wasm_bindgen(getter)]
+    pub fn replacement(&self) -> String {
+        self.replacement.clone()
+    }
+
+    /// `normalize`, `join`, `remove`, `keep-first` or `keep-last`.
+    #[wasm_bindgen(getter)]
+    pub fn kind(&self) -> String {
+        self.kind.to_string()
+    }
+}
+
+/// Up to 4 checked repairs for the malformed akshara at `start..end`, most
+/// likely first. Empty when the range is not exactly 1 malformed akshara.
+#[wasm_bindgen]
+pub fn fixes(text: &str, start: u32, end: u32) -> Vec<Fix> {
+    let (Some(start), Some(end)) = (byte_offset(text, start), byte_offset(text, end)) else {
+        return Vec::new();
+    };
+    if start > end {
+        return Vec::new();
+    }
+    fix::fixes(text, start..end)
+        .into_iter()
+        .map(|f| {
+            let mut cursor = Utf16Cursor::new(text);
+            Fix {
+                start: cursor.at(f.range.start),
+                end: cursor.at(f.range.end),
+                replacement: f.replacement,
+                kind: f.kind.name(),
+            }
+        })
+        .collect()
+}
+
+/// Counts vowel and consonant aksharas. See [`kannadi::count_aksharas`].
+#[wasm_bindgen(js_name = countAksharas)]
+pub fn count_aksharas(text: &str) -> u32 {
+    u32::try_from(kannadi::count_aksharas(text)).unwrap_or(u32::MAX)
+}
+
+/// Maps Old Kannada letters to modern ones. See [`kannadi::modernize()`].
+#[wasm_bindgen]
+pub fn modernize(text: &str) -> String {
+    kannadi::modernize(text)
+}
+
+/// The byte offset of UTF-16 offset `unit`, if it falls on a char boundary.
+fn byte_offset(text: &str, unit: u32) -> Option<usize> {
+    let unit = usize::try_from(unit).ok()?;
+    let mut units = 0;
+    for (byte, c) in text.char_indices() {
+        if units == unit {
+            return Some(byte);
+        }
+        if units > unit {
+            return None;
+        }
+        units += c.len_utf16();
+    }
+    (units == unit).then_some(text.len())
 }
 
 /// Decodes the bytes of a legacy text file. See [`legacy::decode_windows_1252`].
@@ -237,6 +357,59 @@ mod tests {
         let rust = legacy::nudi_to_unicode("PÀ ÁA", &legacy::Options::default());
         assert_eq!(bad, rust.text[rust.malformed[0].clone()]);
         assert!(m[0] > 0);
+    }
+
+    #[test]
+    fn unknown_glyphs_are_found_in_the_output() {
+        let c = nudi_to_unicode("PÀ£ÀßqÀ õ ¥Àæ õ", &NudiOptions::new());
+        let units: Vec<u16> = c.text().encode_utf16().collect();
+        assert_eq!(c.unknown_in_text().len(), 2);
+        for at in c.unknown_in_text() {
+            assert_eq!(units[at as usize], 'õ' as u16);
+        }
+        assert!(c.unknown_in_text()[0] < c.unknown_in_text()[1]);
+    }
+
+    #[test]
+    fn malformed_ranges_are_utf16() {
+        let text = "𝔸 ಕನ್ನಡ ಅಾ ಮನ ೆ";
+        let m = malformed(text);
+        let units: Vec<u16> = text.encode_utf16().collect();
+        let parts: Vec<String> = m
+            .chunks(2)
+            .map(|r| String::from_utf16(&units[r[0] as usize..r[1] as usize]).unwrap())
+            .collect();
+        assert_eq!(parts, ["ಅಾ", " ೆ"]);
+    }
+
+    #[test]
+    fn unicode_check_agrees_with_the_converter_on_real_text() {
+        // RDPR page, 2002: both checks flag the virama after the unknown õ.
+        // https://web.archive.org/web/20021218215751/http://www.kar.nic.in:80/rdpr/kan-www/aboutrdpr.html
+        let c = nudi_to_unicode("gÁdQÃAiÀÄ ¥ÀæYõï ¨É¼É¸ÀÄªÀ", &NudiOptions::new());
+        let (glyphs, unicode) = (c.malformed(), malformed(&c.text()));
+        assert_eq!((glyphs.len(), unicode.len()), (2, 2));
+        assert!(unicode[0] <= glyphs[0] && glyphs[1] <= unicode[1]);
+    }
+
+    #[test]
+    fn fixes_use_utf16_offsets() {
+        let text = "𝔸 ಮನ ೆ";
+        let m = malformed(text);
+        let f = fixes(text, m[0], m[1]);
+        assert_eq!(f[0].kind(), "join");
+        let mut units: Vec<u16> = text.encode_utf16().collect();
+        let replacement: Vec<u16> = f[0].replacement().encode_utf16().collect();
+        units.splice(f[0].start as usize..f[0].end as usize, replacement);
+        assert_eq!(String::from_utf16(&units).unwrap(), "𝔸 ಮನೆ");
+        assert!(fixes(text, 1, 2).is_empty(), "inside a surrogate pair");
+        assert!(fixes(text, 99, 100).is_empty());
+    }
+
+    #[test]
+    fn counts_and_modernizes() {
+        assert_eq!(count_aksharas("ಕನ್ನಡ ನಾಡು, 2026"), 5);
+        assert_eq!(modernize("ಬಾೞ್"), "ಬಾಳ್");
     }
 
     #[test]

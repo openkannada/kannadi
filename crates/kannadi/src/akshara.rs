@@ -15,6 +15,8 @@
 //! a vowel sign in a chart). Concatenating the segments always gives back the
 //! input exactly.
 
+use unicode_normalization::UnicodeNormalization;
+
 use crate::chars::{class, Class, NAKAARA_POLLU};
 
 /// What kind of segment an [`Akshara`] is.
@@ -41,6 +43,34 @@ impl Akshara<'_> {
     /// True for vowel and consonant aksharas.
     pub fn is_syllable(&self) -> bool {
         self.kind != AksharaKind::Other
+    }
+
+    /// True unless the segment holds a mark that cannot attach where it is:
+    /// a sign after a space, digit or Latin letter, a vowel sign or nukta on a
+    /// vowel letter, or 2 vowel signs on 1 consonant. A vowel sign typed in its
+    /// canonical parts, such as ೆ + ೕ for ೇ, counts as 1.
+    ///
+    /// ```
+    /// use kannadi::aksharas;
+    /// let ok = |s| aksharas(s).all(|a| a.is_well_formed());
+    /// assert!(ok("ಕನ್ನಡ ಕೆ\u{0CD5}ರಿ ಬಾೞ್"));
+    /// assert!(!ok(" ಾ"));     // a vowel sign after a space
+    /// assert!(!ok("ಅಾ"));     // a vowel sign on a vowel letter
+    /// assert!(!ok("ಕಾೀ"));    // 2 vowel signs
+    /// ```
+    pub fn is_well_formed(&self) -> bool {
+        let marks = || self.text.chars().filter(|&c| class(c).is_mark());
+        match self.kind {
+            AksharaKind::Other => marks().next().is_none(),
+            AksharaKind::Vowel => marks().all(|c| class(c) == Class::Modifier),
+            AksharaKind::Consonant => {
+                self.text
+                    .nfc()
+                    .filter(|&c| class(c) == Class::VowelSign)
+                    .count()
+                    <= 1
+            }
+        }
     }
 }
 
@@ -243,5 +273,49 @@ mod tests {
         );
         assert_eq!(count_aksharas(""), 0);
         assert_eq!(count_aksharas("ಸ್ತ್ರೀಯರು"), 3);
+    }
+
+    fn well_formed(text: &str) -> Vec<bool> {
+        aksharas(text).map(|a| a.is_well_formed()).collect()
+    }
+
+    #[test]
+    fn well_formed_syllables() {
+        for text in [
+            "ಕನ್ನಡ",
+            "ಸ್ತ್ರೀಯರಂ",
+            "ಅಂಗ ಓಃ",
+            "ಬಾೞ್ ಮಾಡ್",
+            "ಡ್\u{200C}ಗೆ",
+            "ರ್\u{200D}ಕ",
+            "ಜ಼ಾ",
+            "ಕೊ ಕೆ\u{0CC2} ಕೆ\u{0CD5} ಕೆ\u{0CD6} ಕಿ\u{0CD5}",
+            "೧೯೫೬, kannada!",
+        ] {
+            assert!(well_formed(text).iter().all(|&ok| ok), "{text:?}");
+        }
+    }
+
+    #[test]
+    fn stray_marks_are_not_well_formed() {
+        assert_eq!(well_formed("ಕ ಾ"), [true, false]);
+        assert_eq!(well_formed("ಾ"), [false]);
+        assert_eq!(well_formed("aಂ"), [false]);
+        assert_eq!(well_formed("೧್"), [false]);
+        assert_eq!(well_formed("ಕ್ಂ"), [true, false]);
+    }
+
+    #[test]
+    fn signs_on_vowel_letters_are_not_well_formed() {
+        assert_eq!(well_formed("ಅಾ"), [false]);
+        assert_eq!(well_formed("ಉ಼"), [false]);
+        assert_eq!(well_formed("ಅಂ"), [true]);
+    }
+
+    #[test]
+    fn two_vowel_signs_are_not_well_formed() {
+        assert_eq!(well_formed("ಕಾೀ"), [false]);
+        assert_eq!(well_formed("ಕೆೆ"), [false]);
+        assert_eq!(well_formed("ಕೋ"), [true]);
     }
 }
