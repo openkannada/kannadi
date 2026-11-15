@@ -12,8 +12,8 @@ keywords = ["kannada", "transliteration", "unicode", "indic", "akshara"]
 categories = ["text-processing", "internationalization"]
 
 [dependencies]
-unicode-normalization = "0.1.24"
+unicode-normalization = "0.1.26"
 
 [dev-dependencies]
-proptest = "1.5"
+proptest = "1.12"
 vidyut-lipi = "0.2.0"
