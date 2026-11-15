@@ -1,0 +1,152 @@
+{
+ "summary": {
+  "face_id": "hind-mysuru--hindmysuru-medium",
+  "font_id": "hind-mysuru",
+  "family": "Hind Mysuru",
+  "style": "Medium",
+  "version": "Version 0.703;PS 1.0;hotconv 1.0.86;makeotf.lib2.5.63406",
+  "license": "OFL-1.1",
+  "license_in_font": "This Font Software is licensed under the SIL Open Font License, Version 1.1. This license is available with a FAQ at: http://scripts.sil.org/OFL",
+  "source": "Google Fonts",
+  "file": "HindMysuru-Medium.ttf",
+  "face_index": 0,
+  "sha256": "cef72258d349131d78ca9d5de286d4d54199d27e506287ad08345b01626c3240",
+  "variable": false,
+  "outlines": "TrueType",
+  "gsub_scripts": "DFLT knd2 knda",
+  "kannada_codepoints": 84,
+  "glyph_count": 827,
+  "cases": 2146,
+  "failing_cases": 10,
+  "missing_glyph": 7,
+  "notdef": 0,
+  "dotted_circle": 0,
+  "no_conjunct": 0,
+  "no_arkavattu": 0,
+  "collision": 3,
+  "indistinct": 0,
+  "missing_codepoints": "U+0CBD U+0CDC U+0CDD U+0CF1 U+0CF2 U+0CF3"
+ },
+ "font": {
+  "family": "Hind Mysuru",
+  "style": "Medium",
+  "full_name": "Hind Mysuru Medium",
+  "version": "Version 0.703;PS 1.0;hotconv 1.0.86;makeotf.lib2.5.63406",
+  "license_name": "This Font Software is licensed under the SIL Open Font License, Version 1.1. This license is available with a FAQ at: http://scripts.sil.org/OFL",
+  "license_url": "http://scripts.sil.org/OFL",
+  "copyright": "Copyright (c) 2015 Indian Type Foundry (info@indiantypefoundry.com)",
+  "designer": "Manushi Parikh, Hitesh Malaviya",
+  "vendor": "ITFO",
+  "glyph_count": 827,
+  "units_per_em": 1000,
+  "variable": false,
+  "axes": [],
+  "outlines": "TrueType",
+  "script_tags": {
+   "GSUB": [
+    "DFLT",
+    "knd2",
+    "knda"
+   ],
+   "GPOS": [
+    "DFLT",
+    "knd2",
+    "knda"
+   ]
+  },
+  "aat_morx": false,
+  "kannada_codepoints": 84
+ },
+ "failures": [
+  {
+   "case_id": "sig-0C95-0CCD-0CB7-0CC3",
+   "group": "signed_cluster",
+   "text": "ಕ್ಷೃ",
+   "codepoints": "U+0C95 U+0CCD U+0CB7 U+0CC3",
+   "failures": "collision",
+   "glyphs": "gid311 gid785 gid352",
+   "detail": "gid785 x gid352 4%"
+  },
+  {
+   "case_id": "sig-0CB2-0CCD-0CB2-0CC3",
+   "group": "signed_cluster",
+   "text": "ಲ್ಲೃ",
+   "codepoints": "U+0CB2 U+0CCD U+0CB2 U+0CC3",
+   "failures": "collision",
+   "glyphs": "gid339 gid450 gid786",
+   "detail": "gid450 x gid786 10%"
+  },
+  {
+   "case_id": "sig-0CB2-0CCD-0CB2-0CC8",
+   "group": "signed_cluster",
+   "text": "ಲ್ಲೈ",
+   "codepoints": "U+0CB2 U+0CCD U+0CB2 U+0CC8",
+   "failures": "collision",
+   "glyphs": "gid632 gid450 gid788",
+   "detail": "gid450 x gid788 10%"
+  },
+  {
+   "case_id": "rare-0CDD",
+   "group": "rare",
+   "text": "ಅವನೝ",
+   "codepoints": "U+0C85 U+0CB5 U+0CA8 U+0CDD",
+   "failures": "missing_glyph",
+   "glyphs": "gid297 gid341 gid330 gid0",
+   "detail": ""
+  },
+  {
+   "case_id": "rare-0CF3",
+   "group": "rare",
+   "text": "ಕೳ",
+   "codepoints": "U+0C95 U+0CF3",
+   "failures": "missing_glyph",
+   "glyphs": "gid311 gid0",
+   "detail": ""
+  },
+  {
+   "case_id": "rare-0CDC",
+   "group": "rare",
+   "text": "೜",
+   "codepoints": "U+0CDC",
+   "failures": "missing_glyph",
+   "glyphs": "gid0",
+   "detail": ""
+  },
+  {
+   "case_id": "rare-0CDC-word",
+   "group": "rare",
+   "text": "೜ಗಣೇಶ",
+   "codepoints": "U+0CDC U+0C97 U+0CA3 U+0CC7 U+0CB6",
+   "failures": "missing_glyph",
+   "glyphs": "gid0 gid313 gid619 gid361 gid342",
+   "detail": ""
+  },
+  {
+   "case_id": "rare-0CF1",
+   "group": "rare",
+   "text": "ಅೱಕ",
+   "codepoints": "U+0C85 U+0CF1 U+0C95",
+   "failures": "missing_glyph",
+   "glyphs": "gid297 gid0 gid311",
+   "detail": ""
+  },
+  {
+   "case_id": "rare-0CF2",
+   "group": "rare",
+   "text": "ಅೲಪ",
+   "codepoints": "U+0C85 U+0CF2 U+0CAA",
+   "failures": "missing_glyph",
+   "glyphs": "gid297 gid0 gid331",
+   "detail": ""
+  },
+  {
+   "case_id": "rare-0CBD",
+   "group": "rare",
+   "text": "ಸೋಽಹಂ",
+   "codepoints": "U+0CB8 U+0CCB U+0CBD U+0CB9 U+0C82",
+   "failures": "missing_glyph",
+   "glyphs": "gid672 gid361 gid0 gid345 gid295",
+   "detail": ""
+  }
+ ]
+}

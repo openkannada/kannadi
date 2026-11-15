@@ -23,6 +23,7 @@ Version 0.1, in development.
 | Verified test corpus | Planned: [docs/corpus-plan.md](docs/corpus-plan.md) |
 | Converter page that runs in the browser, with no upload | Built, not deployed: [web/](web/) |
 | Command-line tool for TXT, HTML and DOCX | Planned |
+| Shaping tests for Kannada fonts, with results for 41 fonts | Done: [tools/fontqa](tools/fontqa) |
 
 ## Example
 
