@@ -106,3 +106,15 @@ def test_writing_the_lock_drops_fonts_no_longer_in_the_manifest(tmp_path):
     f.write_bytes(b"font")
     fetch.write_lock(lock, {"x": [f]}, known={"x"})
     assert set(fetch.load_lock(lock)) == {"x"}
+
+
+@pytest.mark.parametrize("cached", [[], ["A.ttf"]], ids=["empty", "partial"])
+def test_an_incomplete_archive_cache_is_unpacked_again(tmp_path, monkeypatch, cached):
+    data = {"A.ttf": b"a", "B.ttf": b"b"}
+    monkeypatch.setattr(fetch, "_download", lambda url: _zip(**data))
+    (tmp_path / "x").mkdir()
+    for name in cached:
+        (tmp_path / "x" / name).write_bytes(data[name])
+    entry = fetch.Entry("x", "X", "src", "OFL-1.1", ["*.ttf"], archive="https://h/x.zip")
+    lock = {"x": {n: fetch._digest(b) for n, b in data.items()}}
+    assert [p.name for p in fetch.fetch(entry, tmp_path, lock)] == ["A.ttf", "B.ttf"]

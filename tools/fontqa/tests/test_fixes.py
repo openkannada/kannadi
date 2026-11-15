@@ -190,3 +190,26 @@ def test_a_sign_that_already_has_ink_is_left_alone(tmp_path):
     compose.compose_rr_sign(font)
     with pytest.raises(compose.ComposeError, match="already has a glyph"):
         compose.compose_rr_sign(font)
+
+
+SHARED_FEA = """
+languagesystem knda dflt;
+languagesystem knd2 dflt;
+feature blwf { sub ka virama by ka.blwf; sub kha virama by kha.blwf; } blwf;
+"""
+
+
+def test_a_feature_record_shared_with_knda_is_left_alone(tmp_path):
+    font = TTFont(str(build(tmp_path / "f.ttf", fea=SHARED_FEA)))
+    gsub = font["GSUB"].table
+
+    def blwf_lookups(script):
+        (sr,) = [r for r in gsub.ScriptList.ScriptRecord if r.ScriptTag == script]
+        records = gsub.FeatureList.FeatureRecord
+        ids = sr.Script.DefaultLangSys.FeatureIndex
+        return [records[i].Feature.LookupListIndex for i in ids if records[i].FeatureTag == "blwf"]
+
+    before = blwf_lookups("knda")
+    fixes.add_new_order_blwf(font)
+    assert blwf_lookups("knda") == before
+    assert len(blwf_lookups("knd2")[0]) == len(before[0]) + 1

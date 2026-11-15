@@ -107,7 +107,9 @@ def fetch(entry: Entry, cache: Path, lock: dict[str, dict[str, str]]) -> list[Pa
     expected = lock.get(entry.id, {})
     target = cache / entry.id
     if entry.archive:
-        if not target.exists():
+        cached = {p.name for p in target.iterdir() if p.is_file()} if target.exists() else set()
+        if not cached or not set(expected) <= cached:
+            shutil.rmtree(target, ignore_errors=True)
             _extract(entry, target, expected)
         paths = sorted(p for p in target.iterdir() if p.is_file())
     else:

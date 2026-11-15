@@ -11,7 +11,7 @@ Shaping tests for Kannada fonts. fontqa shapes 2,146 Kannada strings with HarfBu
 | cluster | 1,123: consonant + virama + consonant, without ಱ and ೞ, and not starting with ರ (ರ್ರ is the exception) | Draws the second consonant as a subscript (ottu) |
 | old_cluster | 140: clusters with ಱ or ೞ | The same, for Old Kannada letters |
 | signed_cluster | 154: 10 common clusters with 15 signs, and 4 clusters of 3 consonants | The same, with a vowel sign, where marks meet subscripts |
-| arkavattu | 54: ರ + virama + each modern consonant, ರ್ಕ with each sign, and 3 longer clusters | Draws ರ + virama as the arkavattu |
+| arkavattu | 54: ರ + virama + the 33 other modern consonants, ರ್ಕ with each of the 18 signs, and 3 clusters of 3 consonants | Draws ರ + virama as the arkavattu |
 | rare | 11 | Draws ೝ, ೳ, U+0CDC, ೱ, ೲ, ಱ, ೞ, the nukta and the avagraha in context |
 
 The 36 consonants are U+0C95 to U+0CB9 and ೞ U+0CDE. The 18 signs are the 13 dependent vowel signs, ೢ U+0CE2, ೣ U+0CE3, the virama, ಂ and ಃ. Signed clusters leave out ೄ, ೢ and ೣ, which do not occur on clusters in text. ೝ U+0CDD is a dead consonant, so it takes no vowel sign and is tested in the rare group. Each string is tested once. `fontqa cases` prints them all.
@@ -67,8 +67,8 @@ The composed signs are drafts. A Kannada reader checks the proof sheet before th
 
 - `gate_strokes`: vertical stem, horizontal stroke and their ratio within 15% of the font's own glyphs, measured on scanlines;
 - `gate_vertical`: the bottom and top ink edges within 20 units of theirs;
-- `gate_contours`: closed contours with no tiny contours or short segments, the font's contour direction, and the expected number of counters with no slivers after overlap removal;
-- `gate_compatible`: the same contours and points in every master of a variable font;
-- `gate_shaping`: no test string fails that passed before.
+- `gate_contours`: closed contours with no tiny contours or short segments, the font's contour direction (`outer_sign` gives it: clockwise for TrueType, counter-clockwise for CFF), and the expected number of counters with no slivers after overlap removal;
+- `gate_compatible`: the same contours, points and contour directions in every master of a variable font;
+- `gate_shaping`: no test string fails that passed before, `indistinct` included.
 
 Passing the gates means a draft is well formed and in proportion. It does not mean the shape is right; a reader decides that.

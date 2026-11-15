@@ -9,8 +9,9 @@ from dataclasses import dataclass
 import pathops
 from fontTools.pens.areaPen import AreaPen
 from fontTools.pens.recordingPen import RecordingPen, replayRecording
+from fontTools.ttLib import TTFont
 
-from .checks import run_case
+from .checks import mark_indistinct, run_case
 from .kannada import Case
 from .outline import polygons, split_contours, to_path
 from .shaping import Face
@@ -52,7 +53,14 @@ def ink_runs(path: pathops.Path, axis: str, at: float) -> list[tuple[float, floa
                 t = (at - a[i]) / (b[i] - a[i])
                 hits.append(a[j] + t * (b[j] - a[j]))
     hits.sort()
-    return list(zip(hits[0::2], hits[1::2], strict=False))
+    runs: list[tuple[float, float]] = []
+    for a, b in zip(hits[0::2], hits[1::2], strict=False):
+        # A line through a vertex where 2 edges meet gives 2 hits at 1 point; that is no gap.
+        if runs and a - runs[-1][1] < 1e-6:
+            runs[-1] = (runs[-1][0], b)
+        else:
+            runs.append((a, b))
+    return runs
 
 
 def strokes(path: pathops.Path, lines: int = 21) -> Strokes:
@@ -66,14 +74,22 @@ def strokes(path: pathops.Path, lines: int = 21) -> Strokes:
         runs = ink_runs(path, "x", x)
         h += [b - a for a, b in runs]
         if runs:
-            bottoms.append(round(runs[0][0], -1))
-            tops.append(round(runs[-1][1], -1))
+            bottoms.append(runs[0][0])
+            tops.append(runs[-1][1])
     return Strokes(
         vstem=statistics.median(v) if v else 0.0,
         hstem=statistics.median(h) if h else 0.0,
-        bottom=Counter(bottoms).most_common(1)[0][0] if bottoms else 0.0,
-        top=Counter(tops).most_common(1)[0][0] if tops else 0.0,
+        bottom=_common_edge(bottoms),
+        top=_common_edge(tops),
     )
+
+
+def _common_edge(values: list[float]) -> float:
+    """The median of the edges in the most common 10-unit band: the flat edge, not the curves."""
+    if not values:
+        return 0.0
+    band = Counter(round(v, -1) for v in values).most_common(1)[0][0]
+    return statistics.median(v for v in values if round(v, -1) == band)
 
 
 def reference(paths: list[pathops.Path]) -> Strokes:
@@ -121,16 +137,22 @@ def _area(contour: list) -> float:
     return pen.value
 
 
+def outer_sign(font: TTFont) -> int:
+    """The area sign of outer contours: TrueType draws them clockwise, CFF counter-clockwise."""
+    return -1 if "glyf" in font else 1
+
+
 def gate_contours(
     recording: list,
-    outer_sign: int = 1,
+    *,
+    outer_sign: int,
     expected_holes: int | None = None,
     min_area: float = 200.0,
     min_segment: float = 2.0,
 ) -> GateResult:
     """Contours are closed, not degenerate, drawn in the font's direction, and union cleanly.
 
-    outer_sign is the sign of the largest contour's area in the font's own glyphs.
+    outer_sign is the sign of an outer contour's area in the font: see outer_sign().
     """
     contours = split_contours(recording)
     problems: list[str] = []
@@ -170,13 +192,14 @@ def _record(path: pathops.Path) -> list:
 
 
 def gate_compatible(masters: dict[str, list]) -> GateResult:
-    """Every master has the same contours, segment types and point counts as the first."""
+    """Every master has the same contours, segment types, point counts and directions."""
     names = list(masters)
     if not names:
         return GateResult("compatible", False, "no masters")
 
     def shape(rec):
-        return [(op, len(args)) for op, args in rec]
+        ops = [(op, len(args)) for op, args in rec]
+        return ops, [_area(c) > 0 for c in split_contours(rec)]
 
     first = shape(masters[names[0]])
     bad = [n for n in names[1:] if shape(masters[n]) != first]
@@ -189,6 +212,8 @@ def gate_compatible(masters: dict[str, list]) -> GateResult:
 def gate_shaping(face: Face, cases: list[Case], allowed: set[str] | None = None) -> GateResult:
     """No case fails, apart from case ids listed in allowed (failures the font had before)."""
     allowed = allowed or set()
-    failing = [c.id for c in cases if run_case(face, c).failures and c.id not in allowed]
+    results = [run_case(face, c) for c in cases]
+    mark_indistinct(face, results)
+    failing = [r.case.id for r in results if r.failures and r.case.id not in allowed]
     detail = f"{len(cases)} cases" + (f"; failing: {', '.join(failing[:10])}" if failing else "")
     return GateResult("shaping", not failing, detail)

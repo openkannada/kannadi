@@ -34,7 +34,7 @@ The `license` column is what the font's own license file or name table says. Mos
 - `collision` flags ink overlap above 3% of the smaller glyph. Some fonts join strokes on purpose, so a collision needs a reader's check.
 - `indistinct` flags identical ink. It cannot tell a deliberate merge from a mistake. Nishchaya Hosabaraha merges aspirated and unaspirated consonants on purpose, following the Hosa Baraha spelling reform.
 - Spacing, kerning, legibility and design quality are not measured.
-- The test set covers 2-consonant clusters, 10 common clusters with vowel signs, and 4 clusters of 3 consonants. Longer clusters and real running text are not covered.
+- The test set covers 2-consonant clusters, 10 common clusters with vowel signs, 4 clusters of 3 consonants, and 3 arkavattu clusters of 3 consonants. Longer clusters and real running text are not covered.
 - Clusters with ಱ or ೞ are their own group, `old_cluster`. Most older fonts fail only these, and they matter for Old Kannada text alone.
 - For fonts shaped through an AAT `morx` table, such as Apple's Kannada MN, the arkavattu test is the ZWNJ comparison alone.
 

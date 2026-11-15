@@ -1,9 +1,13 @@
+from fontTools.ttLib import TTFont
+
 from fontqa.gates import (
     gate_compatible,
     gate_contours,
     gate_shaping,
     gate_strokes,
     gate_vertical,
+    ink_runs,
+    outer_sign,
     reference,
     strokes,
     to_path,
@@ -11,7 +15,7 @@ from fontqa.gates import (
 from fontqa.kannada import ZWNJ, Case
 from fontqa.shaping import Face
 
-from .synth import KA, KHA, OLD_ORDER_FEA, VIRAMA, build
+from .synth import ANUSVARA, E_SIGN, KA, KHA, OLD_ORDER_FEA, VIRAMA, build
 
 
 def box(x0, y0, x1, y1, ccw=True):
@@ -65,22 +69,22 @@ def test_contour_gate_catches_a_reversed_outline():
 
 
 def test_contour_gate_catches_tiny_and_open_contours():
-    assert "area" in gate_contours(ring() + box(500, 0, 505, 5)).detail
+    assert "area" in gate_contours(ring() + box(500, 0, 505, 5), outer_sign=1).detail
     open_contour = box(0, 0, 400, 500)[:-1] + [("endPath", ())]
-    assert "open contour" in gate_contours(open_contour).detail
+    assert "open contour" in gate_contours(open_contour, outer_sign=1).detail
 
 
 def test_contour_gate_catches_short_segments():
     rec = box(0, 0, 400, 500)
     rec.insert(2, ("lineTo", ((400.5, 0.5),)))
-    assert "shorter" in gate_contours(rec).detail
+    assert "shorter" in gate_contours(rec, outer_sign=1).detail
 
 
 def test_contour_gate_counts_counters_after_overlap_removal():
-    # 2 overlapping bars make a frame with 1 counter; asking for 0 must fail.
+    # 4 overlapping bars make a frame with 1 counter; asking for 0 must fail.
     frame = box(0, 0, 400, 60) + box(0, 440, 400, 500) + box(0, 0, 60, 500) + box(340, 0, 400, 500)
-    assert gate_contours(frame, expected_holes=1).passed
-    wrong = gate_contours(frame, expected_holes=0)
+    assert gate_contours(frame, outer_sign=1, expected_holes=1).passed
+    wrong = gate_contours(frame, outer_sign=1, expected_holes=0)
     assert not wrong.passed
     assert "expected 0" in wrong.detail
 
@@ -88,7 +92,7 @@ def test_contour_gate_counts_counters_after_overlap_removal():
 def test_contour_gate_catches_slivers_after_overlap_removal():
     # 2 boxes that nearly abut leave a 1-unit gap: the union keeps a sliver of ink apart.
     rec = box(0, 0, 400, 500) + box(401, 0, 402, 500) + box(403, 0, 800, 500)
-    assert "slivers" in gate_contours(rec, min_area=600).detail
+    assert "slivers" in gate_contours(rec, outer_sign=1, min_area=600).detail
 
 
 def test_compatible_gate():
@@ -112,3 +116,40 @@ def test_shaping_gate(tmp_path):
     assert gate_shaping(good, [case]).passed
     assert not gate_shaping(old, [case]).passed
     assert gate_shaping(old, [case], allowed={"c"}).passed
+
+
+def test_outer_sign_follows_the_outline_format(tmp_path):
+    font = TTFont(str(build(tmp_path / "f.ttf")))
+    assert outer_sign(font) == -1
+    clockwise = box(0, 0, 400, 500, ccw=False) + box(60, 50, 340, 450)
+    assert gate_contours(clockwise, outer_sign=-1, expected_holes=1).passed
+
+
+def test_a_scanline_through_a_vertex_keeps_the_run_whole():
+    diamond = [
+        ("moveTo", ((200, 60),)),
+        ("lineTo", ((100, 220),)),
+        ("lineTo", ((200, 380),)),
+        ("lineTo", ((300, 220),)),
+        ("closePath", ()),
+    ]
+    assert ink_runs(to_path(box(0, 0, 400, 440) + diamond), "y", 60) == [(0, 400)]
+
+
+def test_compatible_gate_catches_a_reversed_contour():
+    flipped = box(0, 0, 400, 500, ccw=False) + box(60, 50, 340, 450, ccw=False)
+    assert not gate_compatible({"Light": ring(), "Bold": flipped}).passed
+
+
+def test_shaping_gate_catches_a_sign_drawn_like_another(tmp_path):
+    twin = Face(build(tmp_path / "twin.ttf", anusvara_like_esign=True))
+    cases = [
+        Case("e", "syllable", chr(KA) + chr(E_SIGN)),
+        Case("m", "syllable", chr(KA) + chr(ANUSVARA)),
+    ]
+    assert not gate_shaping(twin, cases).passed
+
+
+def test_vertical_gate_measures_edges_before_rounding():
+    ref = reference([to_path(ring())])
+    assert not gate_vertical(to_path(ring(y=25)), ref).passed

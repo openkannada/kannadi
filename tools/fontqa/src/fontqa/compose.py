@@ -231,7 +231,7 @@ def _add_glyph(font: TTFont, name: str, cp: int, path: pathops.Path, advance: in
         _copy_mark_records(font["GPOS"].table, like, name)
     if "vmtx" in font:
         font["vmtx"][name] = font["vmtx"][like]
-    # These hold 1 entry per glyph and fontTools keeps them as raw bytes, so they go stale.
+    # These hold 1 entry per glyph, and fontTools cannot save them with a glyph they lack.
     for tag in ("hdmx", "LTSH"):
         if tag in font:
             del font[tag]
