@@ -17,6 +17,7 @@ RUSTDOCFLAGS="-D warnings" cargo doc --no-deps
 cargo +1.75 check -p kannadi --lib                      # minimum supported Rust
 web/build.sh && node web/test/smoke.mjs                 # WebAssembly build and converter page
 cargo run --example nudi -- file.txt                    # convert a legacy text file
+cd tools/fontqa && uv run pytest && uv run ruff check . # font shaping tests (Python)
 ```
 
 CI runs these with `--locked`, apart from the example. A change is ready when they pass. `web/build.sh` needs the `wasm32-unknown-unknown` target and `wasm-bindgen-cli` at the `wasm-bindgen` version in `Cargo.lock`.
@@ -45,6 +46,8 @@ web/
   build.sh            builds the WebAssembly package and the page into web/dist
   wasm-bindgen-version.sh  the wasm-bindgen version in Cargo.lock, for build.sh and CI
   test/smoke.mjs      checks the built package in Node
+tools/fontqa/         Python: HarfBuzz shaping tests for Kannada fonts, results,
+                      and fixes for font tables; see its README
 docs/                 design notes, corpus plan, prior art
 ```
 
