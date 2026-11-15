@@ -140,7 +140,6 @@ pub fn from_latin(text: &str, scheme: Scheme) -> String {
     transliterate(text, scheme, Scheme::Kannada)
 }
 
-/// What a Latin token stands for.
 #[derive(Clone, Copy, Debug)]
 enum Tok {
     Vowel { letter: char, sign: Option<char> },
@@ -399,19 +398,18 @@ impl Compiled {
         out
     }
 
-    /// Characters that `romanise` writes after a backslash. A backslash before anything else is literal.
+    /// A backslash before any other character is literal text.
     fn is_escapable(&self, c: char) -> bool {
         self.escaped.contains(&c) || self.table.separator.starts_with(c)
     }
 
-    /// True if `input` begins with a token other than a separator, or a raw nukta, so a
-    /// separator before it is meaningful.
+    /// A separator only counts before a token or a raw nukta.
     fn starts_token(&self, input: &[char], buf: &mut String) -> bool {
         input.first() == Some(&NUKTA)
             || matches!(self.longest_match(input, buf), Some((tok, _)) if !matches!(tok, Tok::Separator))
     }
 
-    /// Finds the longest token at the start of `input`, returning it and its length in chars.
+    /// Returns the longest token at the start of `input` and its length in chars.
     fn longest_match(&self, input: &[char], buf: &mut String) -> Option<(Tok, usize)> {
         let max = self.longest_token.min(input.len());
         for len in (1..=max).rev() {
@@ -505,7 +503,7 @@ impl Emitter<'_> {
         self.last_is_token = true;
     }
 
-    /// Writes a character with no spelling in the scheme. `next` is the following input character.
+    /// Writes a character the scheme has no spelling for; `next` is the following input character.
     fn push_char(&mut self, c: char, next: Option<char>) {
         if c == NUKTA && self.last == Piece::DeadConsonant {
             self.out.push_str(self.scheme.table.separator);
