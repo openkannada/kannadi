@@ -162,17 +162,39 @@ async function open(file) {
   }
 }
 
+/** The document in Nudi glyph codes, and a sentence on what could not be written. */
+function nudi() {
+  const encoded = kannadi.toNudi(editor.text);
+  const lost = encoded.unencodable.length;
+  const broken = encoded.malformed.length / 2;
+  const notes = [
+    lost ? `${plural(lost, "character has", "characters have")} no Nudi glyph and stayed as typed.` : "",
+    broken ? `${plural(broken, "syllable is", "syllables are")} malformed and may not read back the same.` : "",
+  ].join(" ").trim();
+  return { text: encoded.text, notes };
+}
+
 async function exportAs(format) {
   issues.flush();
-  const blob = await exportBlob(editor.text, format, fileName);
+  let blob;
+  let name = `${fileName}.${format}`;
+  let notes = "";
+  if (format === "nudi") {
+    const encoded = nudi();
+    blob = new Blob([kannadi.encodeWindows1252(encoded.text)], { type: "text/plain;charset=windows-1252" });
+    name = `${fileName}-nudi.txt`;
+    notes = ` Set it in a Nudi or BRH font to read it. ${encoded.notes}`;
+  } else {
+    blob = await exportBlob(editor.text, format, fileName);
+  }
   const link = document.createElement("a");
   link.href = URL.createObjectURL(blob);
-  link.download = `${fileName}.${format}`;
+  link.download = name;
   link.click();
   setTimeout(() => URL.revokeObjectURL(link.href), 1000);
   settings.lastFormat = format;
   saveSettings();
-  say(`Saved ${link.download} to your downloads.`);
+  say(`Saved ${link.download} to your downloads.${notes}`.trim());
   $("export-menu").open = false;
 }
 
@@ -332,6 +354,17 @@ function wire() {
       say("Could not copy. Select the text and copy it by hand.");
     }
   });
+  $("copy-nudi").addEventListener("click", async () => {
+    issues.flush();
+    const encoded = nudi();
+    try {
+      await navigator.clipboard.writeText(encoded.text);
+      say(`Copied as Nudi. Paste it into Word and set a Nudi or BRH font. ${encoded.notes}`.trim());
+    } catch {
+      say("Could not copy. Save as Nudi text instead.");
+    }
+    $("export-menu").open = false;
+  });
   for (const b of document.querySelectorAll("[data-export]")) {
     b.addEventListener("click", () => exportAs(b.dataset.export));
   }
@@ -391,7 +424,8 @@ function restore() {
   ui.autoConvert.checked = settings.autoConvert;
   ui.zero.checked = settings.zero;
   ui.digits.checked = settings.digits;
-  setMode(settings.mode);
+  // Typing pages open ready to type in English letters.
+  setMode(document.documentElement.dataset.defaultMode ?? settings.mode);
   setFont(settings.font);
   setTheme(settings.theme);
   if (saved?.text) {

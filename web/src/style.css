@@ -297,7 +297,7 @@ kbd {
 }
 .menu-list button:hover { background: var(--ground); }
 .menu-list small { color: var(--ink-2); }
-.menu-list #copy { border-top: 1px solid var(--rule); border-radius: 0 0 6px 6px; margin-top: 0.25rem; }
+.menu-list #copy { border-top: 1px solid var(--rule); margin-top: 0.25rem; }
 
 /* The route strip */
 .routebar {
@@ -556,9 +556,48 @@ body.dragging .sheet { outline: 3px dashed var(--board); outline-offset: 4px; }
 .prose ol { padding-left: 1.25rem; }
 .prose li { margin: 0.5rem 0; }
 .prose li::marker { color: var(--line); font-weight: 700; }
-.prose a { color: var(--board); font-weight: 600; }
-:root[data-theme="dark"] .prose a { color: var(--disc); }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .prose a { color: var(--disc); } }
+.prose p a { color: var(--line); font-weight: 600; }
+:root[data-theme="dark"] .prose p a { color: var(--disc); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .prose p a { color: var(--disc); } }
+
+/* Typing chart: each letter is a small route plate with its spellings. */
+.chart {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(5.5rem, 1fr));
+  gap: 0.5rem;
+  margin: 0.5rem 0 1.5rem;
+  padding: 0;
+  list-style: none;
+}
+.chart li {
+  display: grid;
+  justify-items: center;
+  gap: 0.2rem;
+  padding: 0.6rem 0.4rem 0.5rem;
+  background: var(--sheet);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+}
+.chart-kn { font-size: 1.6rem; line-height: 1.3; }
+.chart-iso { font-size: 0.8125rem; color: var(--ink-2); }
+.words { width: 100%; margin: 0.5rem 0 1rem; border-collapse: collapse; }
+.words th, .words td { padding: 0.45rem 0.6rem; border-bottom: 1px solid var(--rule); text-align: left; }
+.words th { font-size: 0.875rem; color: var(--ink-2); font-weight: 600; }
+.words td:first-child { font-size: 1.2rem; }
+.more ul { display: flex; flex-wrap: wrap; gap: 0.5rem; padding: 0; list-style: none; }
+.more a {
+  display: inline-flex;
+  min-height: 2.5rem;
+  align-items: center;
+  padding: 0.3rem 0.9rem;
+  border: 1px solid var(--rule-strong);
+  border-radius: 999px;
+  background: var(--sheet);
+  color: var(--ink);
+  font-weight: 600;
+  text-decoration: none;
+}
+.more a:hover { border-color: var(--line); }
 
 .credit {
   max-width: 84rem;

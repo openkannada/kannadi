@@ -17,6 +17,7 @@ const wasm = await import(pathToFileURL(join(dist, "pkg", "kannadi_wasm.js")).hr
 wasm.initSync({ module: readFileSync(join(dist, "pkg", "kannadi_wasm_bg.wasm")) });
 
 const template = readFileSync(join(dist, "index.html"), "utf8");
+const DEFAULT_LEAD = "Paste Nudi or Baraha text, open a TXT, Word or HTML file, or start typing.";
 
 const escape = (s) => s.replace(/[<>&"]/g, (c) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;" })[c]);
 const plain = (html) =>
@@ -148,6 +149,7 @@ for (const page of PAGES) {
   let html = rebase(template, root);
   html = fill(html, "head", head(page, root));
   html = fill(html, "intro", `<h1>${escape(page.h1)}</h1>\n<p>${page.intro}</p>`);
+  html = fill(html, "lead", `<p class="empty-lead">${page.lead ?? DEFAULT_LEAD}</p>`);
   html = fill(html, "prose", prose(page, root));
   html = html.replace(/<html lang="en"[^>]*>/, `<html lang="en"${page.mode !== "kannada" ? ` data-default-mode="${page.mode}"` : ""}>`);
   mkdirSync(join(dist, page.path), { recursive: true });

@@ -1,7 +1,9 @@
 // Checks the built page package: node web/test/smoke.mjs [dist directory]
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
-import { join, resolve } from "node:path";
+import { execFileSync } from "node:child_process";
+import { cpSync, existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { dirname, join, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 const dist = resolve(process.argv[2] ?? fileURLToPath(new URL("../dist", import.meta.url)));
@@ -47,6 +49,14 @@ assert.equal(kannadi.transliterate("kannaDa", "baraha", "kannada"), "ಕನ್�
 assert.throws(() => kannadi.transliterate("x", "klingon", "kannada"), /unknown scheme/);
 assert.equal(kannadi.decodeWindows1252(new Uint8Array([0x50, 0xc0, 0x86])), "PÀ†");
 
+// Unicode to Nudi, and the bytes of a Nudi text file.
+const nudi = kannadi.toNudi(UNICODE);
+assert.equal(nudi.text, NUDI);
+assert.deepEqual([nudi.unencodable, nudi.malformed], [[], []]);
+const mixed = kannadi.toNudi("ಕ A");
+assert.deepEqual(mixed.unencodable.map((o) => "ಕ A"[o]), ["A"]);
+assert.equal(kannadi.decodeWindows1252(kannadi.encodeWindows1252(NUDI)), NUDI);
+
 // Opening files end to end, with the real converter.
 const io = { convert: (t) => kannadi.convertLegacy(t), decodeWindows1252: kannadi.decodeWindows1252 };
 const bytes = new Uint8Array([...NUDI].map((c) => c.charCodeAt(0) < 256 ? c.charCodeAt(0) : 0x3f));
@@ -67,12 +77,46 @@ const opened = await openFile(new File([docx], "report.docx"), io);
 assert.equal(opened.text, `Report: ${UNICODE} õ`);
 assert.deepEqual(opened.unknown, [opened.text.indexOf("õ")]);
 
-// The page references only files the build produced.
-const html = readFileSync(join(dist, "index.html"), "utf8");
-for (const [, ref] of html.matchAll(/(?:href|src)="([^":#]+)"/g)) readFileSync(join(dist, ref.endsWith("/") ? `${ref}index.html` : ref));
+// Every page references only files the build produced, from its own folder.
+const { PAGES } = await import(pathToFileURL(resolve(dirname(fileURLToPath(import.meta.url)), "../site/pages.mjs")).href);
 const css = readFileSync(join(dist, "style.css"), "utf8");
 for (const [, ref] of css.matchAll(/url\(([^)]+)\)/g)) readFileSync(join(dist, ref));
-assert.match(html, /<h1>Kannada editor and Nudi to Unicode converter<\/h1>/);
+const pageHtml = (path) => readFileSync(join(dist, path, "index.html"), "utf8");
+for (const page of PAGES) {
+  const html = pageHtml(page.path);
+  for (const [, ref] of html.matchAll(/(?:href|src)="([^":#]+)"/g)) {
+    readFileSync(join(dist, page.path, ref.endsWith("/") ? `${ref}index.html` : ref));
+  }
+  assert.ok(html.includes(`<h1>${page.h1}</h1>`), page.path);
+  const blocks = [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)].map((m) => JSON.parse(m[1]));
+  const faq = blocks.find((b) => b["@type"] === "FAQPage");
+  assert.equal(faq.mainEntity.length, page.faq.length, page.path);
+  const visible = html.slice(html.indexOf('id="faq-heading"')).match(/<h3>/g).length;
+  assert.equal(visible, page.faq.length, page.path);
+  assert.ok(blocks.some((b) => b["@type"] === "SoftwareApplication"), page.path);
+  assert.equal(html.includes('data-default-mode="baraha"'), page.mode === "baraha", page.path);
+  assert.ok(!html.includes('rel="canonical"'), "no canonical link without a site URL");
+  assert.ok(existsSync(join(dist, "og", `${page.path ? page.path.slice(0, -1) : "home"}.png`)), page.path);
+}
+assert.match(pageHtml("kannada-typing/"), /<kbd>kannaDa<\/kbd>/, "the typing chart is computed by the transliterator");
+assert.ok(readFileSync(join(dist, "llms.txt"), "utf8").includes("Unicode to Nudi converter"));
+assert.ok(!existsSync(join(dist, "sitemap.xml")));
+
+// With a site URL, pages get canonical links and the site gets a sitemap.
+const copy = mkdtempSync(join(tmpdir(), "kannadi-site-"));
+try {
+  cpSync(dist, copy, { recursive: true });
+  const site = fileURLToPath(new URL("../site/build.mjs", import.meta.url));
+  execFileSync(process.execPath, [site, copy, "https://kannadi.example/tools/"], { stdio: "ignore" });
+  const sitemap = readFileSync(join(copy, "sitemap.xml"), "utf8");
+  for (const page of PAGES) assert.ok(sitemap.includes(`<loc>https://kannadi.example/tools/${page.path}</loc>`), page.path);
+  assert.match(readFileSync(join(copy, "robots.txt"), "utf8"), /Sitemap: https:\/\/kannadi\.example\/tools\/sitemap\.xml/);
+  const typing = readFileSync(join(copy, "kannada-typing", "index.html"), "utf8");
+  assert.ok(typing.includes('<link rel="canonical" href="https://kannadi.example/tools/kannada-typing/">'));
+  assert.ok(typing.includes('content="https://kannadi.example/tools/og/kannada-typing.png"'));
+} finally {
+  rmSync(copy, { recursive: true, force: true });
+}
 
 // Dark mode is defined twice, for the system setting and for the theme
 // toggle; both must set the same tokens to the same values.

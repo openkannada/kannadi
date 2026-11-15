@@ -4,7 +4,7 @@
 
 const UNICODE_TO_NUDI = {
   q: "Can it convert Unicode to Nudi?",
-  a: "Not yet. A Unicode to Nudi converter is coming.",
+  a: 'Yes. Choose <b>Save</b>, then <b>Nudi text</b> or <b>Copy as Nudi</b>, and set the result in a Nudi or BRH font. See <a href="../unicode-to-nudi/">Unicode to Nudi converter</a>.',
 };
 const UPLOAD = {
   q: "Is my text uploaded?",
@@ -81,7 +81,7 @@ export const PAGES = [
     // "nudi to unicode" 27,100; "nudi to unicode converter" 12,100; "nudi converter" 3,600
     title: "Nudi to Unicode converter: convert Nudi Kannada files online",
     description:
-      "Convert Nudi Kannada text and Word files to Unicode in your browser. Every glyph that could not be converted is marked with a fix. Nothing is uploaded. Unicode to Nudi is coming.",
+      "Convert Nudi Kannada text and Word files to Unicode in your browser. Every glyph that could not be converted is marked with a fix. Nothing is uploaded. Unicode to Nudi works too.",
     h1: "Nudi to Unicode converter",
     intro:
       "A Nudi to Unicode converter turns Kannada typed in the Nudi fonts, which store Latin letters such as <code>PÀ£ÀßqÀ</code>, into Unicode Kannada such as <span lang=\"kn\">ಕನ್ನಡ</span>. Paste the text or open the file below. Only the text set in Nudi or Baraha fonts is converted.",
@@ -108,6 +108,44 @@ export const PAGES = [
       },
       UPLOAD,
       ACCURACY,
+    ],
+  },
+  {
+    path: "unicode-to-nudi/",
+    lead: "Paste or type Unicode Kannada, then choose <b>Save</b> and <b>Copy as Nudi</b>.",
+    og: { from: "ಕನ್ನಡ", to: "PÀ£ÀßqÀ" },
+    // "unicode to nudi" 14,800; "unicode to nudi converter" 8,100
+    title: "Unicode to Nudi converter: Kannada Unicode to Nudi and Baraha",
+    description:
+      "Convert Unicode Kannada to Nudi and Baraha ANSI font codes in your browser, for forms and printers that still need Nudi. Characters with no Nudi glyph are listed. Nothing is uploaded.",
+    h1: "Unicode to Nudi converter",
+    intro:
+      'A Unicode to Nudi converter turns Unicode Kannada such as <span lang="kn">ಕನ್ನಡ</span> into the glyph codes the Nudi and Baraha ANSI fonts use, such as <code>PÀ£ÀßqÀ</code>. Use it when a form, a printer template or an older office system still expects Nudi. Paste or type the Kannada below, then choose <b>Save</b>.',
+    mode: "kannada",
+    howTitle: "How to convert Unicode to Nudi",
+    steps: [
+      "Paste Unicode Kannada into the sheet, open a file, or type it with <b>Baraha letters</b>.",
+      "Choose <b>Save</b>, then <b>Copy as Nudi</b> to paste into Word, or <b>Nudi text</b> for a file.",
+      "In Word, select the pasted text and choose a Nudi font, such as Nudi 01 e, or a Baraha font, such as BRH Kannada.",
+    ],
+    faq: [
+      {
+        q: "Which fonts can show the result?",
+        a: "Nudi fonts up to version 5, and Baraha ANSI fonts such as BRH Kannada. They share 1 glyph layout. Without one of these fonts, the text shows as Latin letters and symbols.",
+      },
+      {
+        q: "What happens to characters Nudi cannot show?",
+        a: 'Characters with no glyph in the layout, such as English letters and some Old Kannada signs, are kept as they were, and the message says how many. In a Nudi font, English letters draw as Kannada shapes, so set English text in another font.',
+      },
+      {
+        q: "Will the Nudi text convert back the same?",
+        a: 'Yes, for well-formed Kannada. Converting to Nudi and back gives the same text. On 9,047 words from 35 Karnataka government pages from 2002, 9,029 encode to the exact bytes that were typed.',
+      },
+      {
+        q: "How do I get Kannada digits?",
+        a: "Digits are written as 0 to 9. The Nudi fonts whose names end in k draw them as Kannada digits.",
+      },
+      UPLOAD,
     ],
   },
   {
@@ -142,6 +180,7 @@ export const PAGES = [
   },
   {
     path: "kannada-typing/",
+    lead: 'Start typing. With <b>Baraha letters</b> chosen, <kbd>kannaDa</kbd> becomes <span lang="kn">ಕನ್ನಡ</span> as you type.',
     og: { from: "kannaDa", to: "ಕನ್ನಡ" },
     // "kannada typing" 40,500; "type in kannada" 40,500; "kannada typing online" 9,900
     title: "Kannada typing online: type Kannada with an English keyboard",
@@ -176,6 +215,7 @@ export const PAGES = [
   },
   {
     path: "english-to-kannada-typing/",
+    lead: 'Start typing. With <b>Baraha letters</b> chosen, <kbd>kannaDa</kbd> becomes <span lang="kn">ಕನ್ನಡ</span> as you type.',
     og: { from: "namaskAra", to: "ನಮಸ್ಕಾರ" },
     // "english to kannada typing" 49,500; "kannada transliteration" 135,000;
     // "english to kannada transliteration" 1,220,000
