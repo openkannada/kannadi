@@ -5,6 +5,7 @@
 //! - [`modernize()`]: map Old Kannada letters (ೞ, ಱ, ೝ) to modern ones.
 //! - [`transliterate()`]: Kannada to and from ISO 15919, IAST and Baraha phonetic.
 //! - [`numerals`]: Kannada digits.
+//! - [`legacy`]: Nudi and Baraha ANSI text to Unicode.
 //!
 //! ```
 //! use kannadi::{transliterate, Scheme};
@@ -19,6 +20,7 @@
 
 pub mod akshara;
 pub mod chars;
+pub mod legacy;
 pub mod normalize;
 pub mod numerals;
 pub mod translit;

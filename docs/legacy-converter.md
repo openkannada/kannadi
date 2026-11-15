@@ -1,6 +1,6 @@
 # Legacy converter design
 
-Status: design. Covers Nudi and Baraha to Unicode and back. Shree-Lipi follows once there are samples.
+Status: Nudi and Baraha to Unicode is implemented in `crates/kannadi/src/legacy.rs`, with the table in `crates/kannadi/data/nudi.tsv`. Unicode to legacy, DOCX and HTML input, and Shree-Lipi are still design.
 
 ## The problem
 
