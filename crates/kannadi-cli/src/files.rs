@@ -1,6 +1,7 @@
 //! Finds the files to convert and where each one is written.
 
-use std::path::{Path, PathBuf};
+use std::collections::{HashMap, HashSet};
+use std::path::{Component, Path, PathBuf};
 
 use anyhow::{bail, Context, Result};
 
@@ -30,22 +31,24 @@ pub struct Job {
 /// their format is not supported.
 ///
 /// A file goes to `out/<file name>`. A folder goes to `out/<folder name>/`, with
-/// its subfolders kept. Files already under `out` are left out.
+/// its subfolders kept. Files already under `out` are left out. It is an error for
+/// an output to be an input, or for 2 inputs to share an output, comparing paths
+/// with symbolic links and `..` resolved, and ignoring case.
 pub fn jobs(inputs: &[PathBuf], out: &Path) -> Result<(Vec<Job>, usize)> {
-    let out_abs = absolute(out);
+    let out_abs = resolve(out);
     let mut jobs = Vec::new();
     let mut skipped = 0;
     for input in inputs {
         let meta = std::fs::metadata(input).with_context(|| format!("{}", input.display()))?;
         if meta.is_dir() {
-            let name = absolute(input)
+            let name = resolve(input)
                 .file_name()
                 .map(PathBuf::from)
                 .unwrap_or_default();
             let mut files = Vec::new();
             walk(input, &mut files)?;
             for file in files {
-                if absolute(&file).starts_with(&out_abs) {
+                if resolve(&file).starts_with(&out_abs) {
                     continue;
                 }
                 let Some(format) = Format::of(&file) else {
@@ -71,12 +74,29 @@ pub fn jobs(inputs: &[PathBuf], out: &Path) -> Result<(Vec<Job>, usize)> {
             });
         }
     }
-    for job in &jobs {
-        if absolute(&job.output) == absolute(&job.input) {
-            bail!("{}: output would overwrite the input", job.input.display());
+    check_outputs(&jobs)?;
+    Ok((jobs, skipped))
+}
+
+fn check_outputs(jobs: &[Job]) -> Result<()> {
+    let key = |p: &Path| resolve(p).to_string_lossy().to_lowercase();
+    let inputs: HashSet<String> = jobs.iter().map(|j| key(&j.input)).collect();
+    let mut outputs: HashMap<String, &Path> = HashMap::new();
+    for job in jobs {
+        let output = key(&job.output);
+        if inputs.contains(&output) {
+            bail!("{}: output would overwrite an input", job.output.display());
+        }
+        if let Some(other) = outputs.insert(output, &job.input) {
+            bail!(
+                "{} and {} would both be written to {}",
+                other.display(),
+                job.input.display(),
+                job.output.display()
+            );
         }
     }
-    Ok((jobs, skipped))
+    Ok(())
 }
 
 fn walk(dir: &Path, files: &mut Vec<PathBuf>) -> Result<()> {
@@ -93,17 +113,43 @@ fn walk(dir: &Path, files: &mut Vec<PathBuf>) -> Result<()> {
         if hidden {
             continue;
         }
-        if path.is_dir() {
+        let kind = std::fs::symlink_metadata(&path)?.file_type();
+        if kind.is_dir() {
             walk(&path, files)?;
-        } else {
+        } else if !kind.is_symlink() || path.is_file() {
             files.push(path);
         }
     }
     Ok(())
 }
 
-fn absolute(path: &Path) -> PathBuf {
-    std::path::absolute(path).unwrap_or_else(|_| path.to_path_buf())
+/// `path` made absolute, with symbolic links and `..` resolved as far as the
+/// path exists.
+fn resolve(path: &Path) -> PathBuf {
+    let absolute = std::path::absolute(path).unwrap_or_else(|_| path.to_path_buf());
+    let mut existing = absolute.as_path();
+    let mut rest = Vec::new();
+    loop {
+        if let Ok(real) = existing.canonicalize() {
+            let mut out = real;
+            for part in rest.iter().rev() {
+                match part {
+                    Component::ParentDir => {
+                        out.pop();
+                    }
+                    Component::CurDir => {}
+                    other => out.push(other),
+                }
+            }
+            return out;
+        }
+        let (Some(parent), Some(last)) = (existing.parent(), existing.components().next_back())
+        else {
+            return absolute;
+        };
+        rest.push(last);
+        existing = parent;
+    }
 }
 
 #[cfg(test)]
@@ -136,6 +182,55 @@ mod tests {
         std::fs::write(tmp.path().join("a.txt"), "").unwrap();
         std::fs::write(tmp.path().join("out/x/a.txt"), "").unwrap();
         let (jobs, _) = jobs(&[tmp.path().to_path_buf()], &tmp.path().join("out")).unwrap();
+        assert_eq!(jobs.len(), 1);
+    }
+
+    #[test]
+    fn aliases_of_an_input_are_caught() {
+        let tmp = tempfile::tempdir().unwrap();
+        let docs = tmp.path().join("docs");
+        std::fs::create_dir(&docs).unwrap();
+        std::fs::write(docs.join("a.txt"), "").unwrap();
+        let err = jobs(&[docs.join("a.txt")], &docs.join("x/..")).unwrap_err();
+        assert!(err.to_string().contains("overwrite"), "{err}");
+        #[cfg(unix)]
+        {
+            std::os::unix::fs::symlink(&docs, tmp.path().join("link")).unwrap();
+            assert!(jobs(&[docs.join("a.txt")], &tmp.path().join("link")).is_err());
+        }
+    }
+
+    #[test]
+    fn outputs_must_not_collide_or_overwrite_other_inputs() {
+        let tmp = tempfile::tempdir().unwrap();
+        for dir in ["first", "second", "out/docs", "docs"] {
+            std::fs::create_dir_all(tmp.path().join(dir)).unwrap();
+        }
+        for file in [
+            "first/a.txt",
+            "second/a.txt",
+            "docs/a.txt",
+            "out/docs/a.txt",
+        ] {
+            std::fs::write(tmp.path().join(file), "").unwrap();
+        }
+        let out = tmp.path().join("out");
+        let p = |s: &str| tmp.path().join(s);
+        let err = jobs(&[p("first/a.txt"), p("second/a.txt")], &out).unwrap_err();
+        assert!(err.to_string().contains("both"), "{err}");
+        let err = jobs(&[p("docs"), p("out/docs/a.txt")], &out).unwrap_err();
+        assert!(err.to_string().contains("overwrite"), "{err}");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn symbolic_link_loops_are_not_followed() {
+        let tmp = tempfile::tempdir().unwrap();
+        let docs = tmp.path().join("docs");
+        std::fs::create_dir(&docs).unwrap();
+        std::fs::write(docs.join("a.txt"), "").unwrap();
+        std::os::unix::fs::symlink(&docs, docs.join("loop")).unwrap();
+        let (jobs, _) = jobs(&[docs], &tmp.path().join("out")).unwrap();
         assert_eq!(jobs.len(), 1);
     }
 
