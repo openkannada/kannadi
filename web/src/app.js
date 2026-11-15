@@ -18,6 +18,7 @@ const $ = (id) => document.getElementById(id);
 const input = $("input");
 const output = $("output");
 const status = $("status");
+const counts = $("counts");
 const zero = $("zero");
 const digits = $("digits");
 const copyButton = $("copy");
@@ -29,49 +30,46 @@ const reportMore = $("report-more");
 
 let fileName = null;
 let pending = 0;
-
-function setStatus(message, clean = false) {
-  status.textContent = message;
-  status.classList.toggle("clean", clean);
-}
+let fileRead = 0;
 
 function plural(n, one, many) {
   return `${n.toLocaleString("en-IN")} ${n === 1 ? one : many}`;
 }
 
+// The live region changes only when the result changes in kind, so a screen
+// reader is not interrupted after every pause in typing.
+function setStatus(message, clean = false) {
+  if (status.textContent !== message) status.textContent = message;
+  status.classList.toggle("clean", clean);
+}
+
 function convert() {
   clearTimeout(pending);
+  pending = 0;
   const text = input.value;
   const options = new NudiOptions();
   options.zeroAsAnusvara = zero.checked;
   options.kannadaDigits = digits.checked;
   const result = nudiToUnicode(text, options);
   options.free();
-  const unknown = result.unknown.map((u) => {
-    const item = { offset: u.offset, glyph: u.glyph };
-    u.free();
-    return item;
-  });
-  const malformed = result.malformed.map((s) => {
-    const item = { start: s.start, end: s.end };
-    s.free();
-    return item;
-  });
+  const unknown = result.unknown;
+  const malformed = result.malformed;
   output.value = result.text;
   result.free();
 
   const hasText = text.length > 0;
   copyButton.disabled = !hasText;
   downloadButton.disabled = !hasText;
+  counts.textContent = hasText ? `${plural(text.length, "character", "characters")} converted.` : "";
+  const problems = unknown.length + malformed.length / 2;
   if (!hasText) {
     setStatus("Paste text or open a file to convert it.");
-  } else if (unknown.length === 0 && malformed.length === 0) {
-    setStatus(`Converted ${plural(text.length, "character", "characters")}. No problems found.`, true);
+  } else if (problems === 0) {
+    setStatus("No problems found.", true);
   } else {
     setStatus(
-      `Converted ${plural(text.length, "character", "characters")}. ` +
-        `${plural(unknown.length, "unknown glyph", "unknown glyphs")} and ` +
-        `${plural(malformed.length, "malformed syllable", "malformed syllables")}. See the report.`,
+      `${plural(unknown.length, "unknown glyph", "unknown glyphs")} and ` +
+        `${plural(malformed.length / 2, "malformed syllable", "malformed syllables")}. See the report.`,
     );
   }
   showReport(text, output.value, unknown, malformed);
@@ -79,7 +77,12 @@ function convert() {
 
 function scheduleConvert() {
   clearTimeout(pending);
-  pending = setTimeout(convert, 120);
+  // About 1 ms per 2,500 characters: wait longer on large text so typing stays smooth.
+  pending = setTimeout(convert, Math.min(1000, 120 + input.value.length / 2500));
+}
+
+function flush() {
+  if (pending) convert();
 }
 
 function lineStarts(text) {
@@ -103,7 +106,13 @@ function codePoints(text) {
   return Array.from(text, (c) => "U+" + c.codePointAt(0).toString(16).toUpperCase().padStart(4, "0")).join(" ");
 }
 
+function isLowSurrogate(text, i) {
+  const unit = text.charCodeAt(i);
+  return unit >= 0xdc00 && unit <= 0xdfff;
+}
+
 function select(textarea, start, end) {
+  flush();
   // Blurring first makes the browser scroll the selection into view on focus.
   textarea.blur();
   textarea.setSelectionRange(start, end);
@@ -111,15 +120,17 @@ function select(textarea, start, end) {
 }
 
 function contextNode(text, start, end) {
+  let from = Math.max(0, start - CONTEXT);
+  if (isLowSurrogate(text, from)) from -= 1;
+  let to = Math.min(text.length, end + CONTEXT);
+  if (isLowSurrogate(text, to)) to += 1;
+  const flat = (s) => s.replace(/\s+/g, " ");
   const span = document.createElement("span");
   span.className = "context";
   span.lang = "kn";
-  const flat = (s) => s.replace(/\s+/g, " ");
-  const before = flat(text.slice(Math.max(0, start - CONTEXT), start));
-  const after = flat(text.slice(end, end + CONTEXT));
   const mark = document.createElement("mark");
   mark.textContent = text.slice(start, end);
-  span.append(`“${before}`, mark, `${after}”`);
+  span.append(`“${flat(text.slice(from, start))}`, mark, `${flat(text.slice(end, to))}”`);
   return span;
 }
 
@@ -134,9 +145,10 @@ function reportItem(line, label, onSelect, context) {
   return li;
 }
 
+// Merges both reports in line order and builds at most REPORT_LIMIT items.
 function showReport(text, converted, unknown, malformed) {
   const looksUnicode = KANNADA.test(text);
-  const total = unknown.length + malformed.length;
+  const total = unknown.length + malformed.length / 2;
   report.hidden = total === 0 && !looksUnicode;
   if (report.hidden) return;
 
@@ -147,33 +159,39 @@ function showReport(text, converted, unknown, malformed) {
   const inputLines = lineStarts(text);
   const outputLines = lineStarts(converted);
   const items = [];
-  for (const u of unknown) {
-    if (items.length >= REPORT_LIMIT) break;
-    const end = u.offset + u.glyph.length;
-    items.push(
-      reportItem(
-        lineOf(inputLines, u.offset),
-        `unknown glyph ${u.glyph} (${codePoints(u.glyph)})`,
-        () => select(input, u.offset, end),
-      ),
-    );
-  }
-  for (const m of malformed) {
-    if (items.length >= REPORT_LIMIT) break;
-    items.push(
-      reportItem(
-        lineOf(outputLines, m.start),
-        `malformed syllable (${codePoints(converted.slice(m.start, m.end))})`,
-        () => select(output, m.start, m.end),
-        contextNode(converted, m.start, m.end),
-      ),
-    );
+  let u = 0;
+  let m = 0;
+  while (items.length < REPORT_LIMIT && (u < unknown.length || m < malformed.length)) {
+    const uLine = u < unknown.length ? lineOf(inputLines, unknown[u]) : Infinity;
+    const mLine = m < malformed.length ? lineOf(outputLines, malformed[m]) : Infinity;
+    if (uLine <= mLine) {
+      const offset = unknown[u++];
+      const glyph = String.fromCodePoint(text.codePointAt(offset));
+      items.push(
+        reportItem(uLine, `unknown glyph ${glyph} (${codePoints(glyph)})`, () =>
+          select(input, offset, offset + glyph.length),
+        ),
+      );
+    } else {
+      const start = malformed[m++];
+      const end = malformed[m++];
+      items.push(
+        reportItem(
+          mLine,
+          `malformed syllable (${codePoints(converted.slice(start, end))})`,
+          () => select(output, start, end),
+          contextNode(converted, start, end),
+        ),
+      );
+    }
   }
   reportList.replaceChildren(...items);
   reportMore.hidden = total <= REPORT_LIMIT;
   reportMore.textContent = `Showing the first ${REPORT_LIMIT} of ${total.toLocaleString("en-IN")} items.`;
 }
 
+// Legacy files are Windows-1252. A short one whose high bytes happen to form
+// valid UTF-8 would be misread; real Nudi text almost never does.
 function decodeFile(bytes) {
   if (bytes[0] === 0xff && bytes[1] === 0xfe) return new TextDecoder("utf-16le").decode(bytes);
   if (bytes[0] === 0xfe && bytes[1] === 0xff) return new TextDecoder("utf-16be").decode(bytes);
@@ -186,27 +204,40 @@ function decodeFile(bytes) {
 
 async function openFile(file) {
   if (!file) return;
+  const read = ++fileRead;
   try {
     const bytes = new Uint8Array(await file.arrayBuffer());
+    if (read !== fileRead) return;
     input.value = decodeFile(bytes);
     fileName = file.name;
     convert();
   } catch {
-    setStatus(`Could not read ${file.name}.`);
+    if (read === fileRead) setStatus(`Could not read ${file.name}.`);
   }
+}
+
+function replaceInput(text) {
+  fileRead++;
+  input.value = text;
+  fileName = null;
+  convert();
 }
 
 async function copyResult() {
+  flush();
+  let copied = false;
   try {
     await navigator.clipboard.writeText(output.value);
+    copied = true;
   } catch {
     output.select();
-    document.execCommand("copy");
+    copied = document.execCommand("copy");
   }
-  setStatus("Copied the Unicode text.", true);
+  counts.textContent = copied ? "Copied the Unicode text." : "Could not copy. Select the result and copy it by hand.";
 }
 
 function downloadResult() {
+  flush();
   const base = fileName ? fileName.replace(/\.[^.]*$/, "") : "kannada";
   // The byte order mark lets older Windows editors detect UTF-8.
   const blob = new Blob(["﻿", output.value], { type: "text/plain;charset=utf-8" });
@@ -219,6 +250,7 @@ function downloadResult() {
 
 function wire() {
   input.addEventListener("input", () => {
+    fileRead++;
     fileName = null;
     scheduleConvert();
   });
@@ -230,18 +262,19 @@ function wire() {
     openFile(event.target.files[0]);
     event.target.value = "";
   });
-  $("sample").addEventListener("click", () => {
-    input.value = SAMPLE;
-    fileName = null;
-    convert();
-  });
-  input.addEventListener("dragover", (event) => {
+  $("sample").addEventListener("click", () => replaceInput(SAMPLE));
+
+  // A file dropped anywhere on the page opens in the converter, so the browser
+  // never navigates away to show it.
+  document.addEventListener("dragover", (event) => {
     if (!event.dataTransfer.types.includes("Files")) return;
     event.preventDefault();
     input.classList.add("dragging");
   });
-  input.addEventListener("dragleave", () => input.classList.remove("dragging"));
-  input.addEventListener("drop", (event) => {
+  document.addEventListener("dragleave", (event) => {
+    if (event.relatedTarget === null) input.classList.remove("dragging");
+  });
+  document.addEventListener("drop", (event) => {
     input.classList.remove("dragging");
     if (event.dataTransfer.files.length === 0) return;
     event.preventDefault();

@@ -55,33 +55,14 @@ impl From<NudiOptions> for legacy::Options {
     }
 }
 
-/// A glyph the converter could not place.
-#[wasm_bindgen]
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub struct UnknownGlyph {
-    /// Offset of the glyph in the input.
-    pub offset: u32,
-    /// The glyph, as it appears in the input.
-    pub glyph: char,
-}
-
-/// A range of text, from `start` up to but not including `end`.
-#[wasm_bindgen]
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub struct Span {
-    /// First code unit of the range.
-    pub start: u32,
-    /// Code unit after the end of the range.
-    pub end: u32,
-}
-
-/// The result of [`nudi_to_unicode`].
+/// The result of [`nudi_to_unicode`]. The reports are flat arrays, so a large
+/// input crosses into JavaScript as 2 typed arrays.
 #[wasm_bindgen]
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Conversion {
     text: String,
-    unknown: Vec<UnknownGlyph>,
-    malformed: Vec<Span>,
+    unknown: Vec<u32>,
+    malformed: Vec<u32>,
 }
 
 #[wasm_bindgen]
@@ -92,15 +73,16 @@ impl Conversion {
         self.text.clone()
     }
 
-    /// Glyphs the converter could not place, with offsets in the input.
+    /// Offsets in the input of glyphs the converter could not place, ascending.
     #[wasm_bindgen(getter)]
-    pub fn unknown(&self) -> Vec<UnknownGlyph> {
+    pub fn unknown(&self) -> Vec<u32> {
         self.unknown.clone()
     }
 
-    /// Ranges of the output text that are not valid syllables.
+    /// Ranges of the output text that are not valid syllables, as
+    /// `[start0, end0, start1, end1, ...]`, ascending.
     #[wasm_bindgen(getter)]
-    pub fn malformed(&self) -> Vec<Span> {
+    pub fn malformed(&self) -> Vec<u32> {
         self.malformed.clone()
     }
 
@@ -121,20 +103,14 @@ pub fn nudi_to_unicode(text: &str, options: &NudiOptions) -> Conversion {
     let unknown = converted
         .unknown
         .iter()
-        .map(|u| UnknownGlyph {
-            offset: input.at(u.offset),
-            glyph: u.glyph,
-        })
+        .map(|u| input.at(u.offset))
         .collect();
 
     let mut output = Utf16Cursor::new(&converted.text);
     let malformed = converted
         .malformed
         .iter()
-        .map(|r| Span {
-            start: output.at(r.start),
-            end: output.at(r.end),
-        })
+        .flat_map(|r| [output.at(r.start), output.at(r.end)])
         .collect();
 
     Conversion {
@@ -246,9 +222,7 @@ mod tests {
         let c = nudi_to_unicode(input, &NudiOptions::new());
         let units: Vec<u16> = input.encode_utf16().collect();
         assert_eq!(c.unknown().len(), 1);
-        let u = c.unknown()[0];
-        assert_eq!(u.glyph, 'õ');
-        assert_eq!(units[u.offset as usize], 'õ' as u16);
+        assert_eq!(units[c.unknown()[0] as usize], 'õ' as u16);
         assert!(c.malformed().is_empty());
     }
 
@@ -256,13 +230,13 @@ mod tests {
     fn malformed_spans_select_the_bad_text() {
         // A vowel sign with no consonant before it, after 1 good syllable.
         let c = nudi_to_unicode("PÀ ÁA", &NudiOptions::new());
-        assert!(!c.malformed().is_empty(), "{c:?}");
+        let m = c.malformed();
+        assert!(m.len() >= 2 && m.len().is_multiple_of(2), "{c:?}");
         let units: Vec<u16> = c.text().encode_utf16().collect();
-        let first = c.malformed()[0];
-        let bad = String::from_utf16(&units[first.start as usize..first.end as usize]).unwrap();
+        let bad = String::from_utf16(&units[m[0] as usize..m[1] as usize]).unwrap();
         let rust = legacy::nudi_to_unicode("PÀ ÁA", &legacy::Options::default());
         assert_eq!(bad, rust.text[rust.malformed[0].clone()]);
-        assert!(first.start > 0);
+        assert!(m[0] > 0);
     }
 
     #[test]

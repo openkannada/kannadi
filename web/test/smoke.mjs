@@ -2,9 +2,10 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
-const dist = resolve(process.argv[2] ?? new URL("../dist", import.meta.url).pathname);
-const wasm = await import(join(dist, "pkg", "kannadi_wasm.js"));
+const dist = resolve(process.argv[2] ?? fileURLToPath(new URL("../dist", import.meta.url)));
+const wasm = await import(pathToFileURL(join(dist, "pkg", "kannadi_wasm.js")).href);
 wasm.initSync({ module: readFileSync(join(dist, "pkg", "kannadi_wasm_bg.wasm")) });
 const { NudiOptions, nudiToUnicode, decodeWindows1252, transliterate, normalize, aksharas } = wasm;
 
@@ -12,11 +13,12 @@ function convert(text, set = () => {}) {
   const options = new NudiOptions();
   set(options);
   const result = nudiToUnicode(text, options);
+  assert.ok(result.unknown instanceof Uint32Array && result.malformed instanceof Uint32Array);
   const out = {
     text: result.text,
     clean: result.isClean,
-    unknown: result.unknown.map((u) => ({ offset: u.offset, glyph: u.glyph })),
-    malformed: result.malformed.map((s) => [s.start, s.end]),
+    unknown: Array.from(result.unknown),
+    malformed: Array.from(result.malformed),
   };
   options.free();
   result.free();
@@ -32,13 +34,11 @@ assert.ok(clean.clean);
 // Offsets are UTF-16 code units: they index JavaScript strings directly.
 const input = "PÀ£ÀßqÀ õ ¥Àæ";
 const withUnknown = convert(input);
-assert.equal(withUnknown.unknown.length, 1);
-assert.equal(input[withUnknown.unknown[0].offset], "õ");
-assert.equal(withUnknown.unknown[0].glyph, "õ");
+assert.deepEqual(withUnknown.unknown, [input.indexOf("õ")]);
 
 const bad = convert("PÀ ÁA");
-assert.ok(bad.malformed.length > 0);
-const [start, end] = bad.malformed[0];
+assert.ok(bad.malformed.length >= 2 && bad.malformed.length % 2 === 0);
+const [start, end] = bad.malformed;
 assert.ok(start > 0 && end > start && end <= bad.text.length);
 
 assert.equal(convert("1956", (o) => (o.kannadaDigits = true)).text, "೧೯೫೬");

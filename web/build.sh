@@ -5,7 +5,12 @@ set -eu
 root=$(cd "$(dirname "$0")/.." && pwd)
 out=${1:-"$root/web/dist"}
 
-want=$(awk '/^name = "wasm-bindgen"$/ { getline; gsub(/version = |"/, ""); print }' "$root/Cargo.lock")
+if [ -e "$out" ] && [ ! -d "$out/pkg" ] && [ -n "$(ls -A "$out")" ]; then
+  echo "$out is not empty and is not a previous build; choose another directory." >&2
+  exit 1
+fi
+
+want=$("$root/web/wasm-bindgen-version.sh")
 have=$(wasm-bindgen --version 2>/dev/null | awk '{ print $2 }' || true)
 if [ "$have" != "$want" ]; then
   echo "wasm-bindgen $want is needed (found '${have:-none}')." >&2
@@ -20,9 +25,5 @@ rm -rf "$out"
 mkdir -p "$out"
 wasm-bindgen --target web --no-typescript --out-dir "$out/pkg" \
   "${CARGO_TARGET_DIR:-$root/target}/wasm32-unknown-unknown/wasm/kannadi_wasm.wasm"
-if command -v wasm-opt >/dev/null 2>&1; then
-  wasm-opt -Os --enable-bulk-memory --enable-nontrapping-float-to-int \
-    -o "$out/pkg/kannadi_wasm_bg.wasm" "$out/pkg/kannadi_wasm_bg.wasm"
-fi
 cp "$root"/web/src/* "$out/"
 echo "Built $out ($(wc -c < "$out/pkg/kannadi_wasm_bg.wasm" | tr -d ' ') bytes of wasm)"

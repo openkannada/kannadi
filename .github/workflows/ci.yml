@@ -67,7 +67,7 @@ jobs:
       - uses: Swatinem/rust-cache@v2
       - run: cargo clippy -p kannadi-wasm --locked --target wasm32-unknown-unknown
       - id: wasm-bindgen
-        run: echo "version=$(awk '/^name = "wasm-bindgen"$/ { getline; gsub(/version = |"/, ""); print }' Cargo.lock)" >> "$GITHUB_OUTPUT"
+        run: echo "version=$(web/wasm-bindgen-version.sh)" >> "$GITHUB_OUTPUT"
       - uses: taiki-e/install-action@v2
         with:
           tool: wasm-bindgen@${{ steps.wasm-bindgen.outputs.version }}
