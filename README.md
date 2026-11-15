@@ -22,7 +22,7 @@ Version 0.1, in development.
 | Unicode to Nudi and Baraha | Done |
 | Verified test corpus | Planned: [docs/corpus-plan.md](docs/corpus-plan.md) |
 | Converter page that runs in the browser, with no upload | Built, not deployed: [web/](web/) |
-| Command-line tool for TXT, HTML and DOCX | Planned |
+| Command-line tool for TXT, HTML and DOCX | TXT done; HTML and DOCX next |
 
 ## Example
 
@@ -102,6 +102,22 @@ python3 -m http.server -d web/dist 8000
 ```
 
 `web/dist` is a plain folder of static files that any static host can serve. `node web/test/smoke.mjs` checks the built package.
+
+## Command-line tool
+
+The `kannadi` binary in `crates/kannadi-cli` converts files and folders in both directions:
+
+```sh
+cargo install --path crates/kannadi-cli
+kannadi to-unicode old-orders/ --out converted/
+kannadi to-nudi letter.txt --out for-printing/ --strict
+```
+
+- A file goes to `OUT/<file name>`. A folder goes to `OUT/<folder name>/`, with its subfolders kept. Inputs are never overwritten.
+- Legacy text files are read as UTF-8 when they are valid UTF-8, and as Windows-1252 otherwise. Unicode output is UTF-8; Nudi output is Windows-1252.
+- When a file has unknown glyphs, malformed syllables or unencodable characters, the tool writes `FILE.report.tsv` next to the output, with the line, the problem and the line's Unicode text. A clean run removes an old report.
+- `--strict` exits with status 1 if any file has a problem. Errors such as an unreadable file exit with status 2.
+- `to-unicode` takes `--kannada-digits` and `--keep-zeros`, the same settings as `legacy::Options`.
 
 ## Segmentation
 

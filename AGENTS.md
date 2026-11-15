@@ -17,6 +17,7 @@ RUSTDOCFLAGS="-D warnings" cargo doc --no-deps
 cargo +1.75 check -p kannadi --lib                      # minimum supported Rust
 web/build.sh && node web/test/smoke.mjs                 # WebAssembly build and converter page
 cargo run --example nudi -- file.txt                    # convert a legacy text file
+cargo run -p kannadi-cli -- to-unicode docs/ --out out/ # batch convert
 ```
 
 CI runs these with `--locked`, apart from the example. A change is ready when they pass. `web/build.sh` needs the `wasm32-unknown-unknown` target and `wasm-bindgen-cli` at the `wasm-bindgen` version in `Cargo.lock`.
@@ -42,6 +43,11 @@ crates/kannadi/
   data/nudi.tsv       the legacy glyph table, as data
   tests/              golden fixtures, property tests, differential test
   examples/           demo, and a command-line converter for legacy files
+crates/kannadi-cli/   the `kannadi` binary: batch conversion of files and folders
+  src/files.rs        which files to convert and where each one goes
+  src/convert.rs      1 piece of text in either direction, with its issues
+  src/report.rs       the per-file report
+  src/txt.rs          plain text files
 crates/kannadi-wasm/  wasm-bindgen bindings for the page; offsets in UTF-16 code units
 web/
   src/                the static converter page: HTML, CSS, 1 JavaScript module
