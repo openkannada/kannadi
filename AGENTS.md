@@ -4,7 +4,7 @@ Instructions for anyone changing this repository, human or AI agent. Read this b
 
 ## What this is
 
-A Rust library for Kannada text: akshara segmentation, normalisation, transliteration, numerals, and conversion of legacy Nudi and Baraha font text to Unicode. The main goal is converting legacy documents correctly, with measured accuracy.
+A Rust library for Kannada text: akshara segmentation, normalization, transliteration, numerals, and conversion of legacy Nudi and Baraha font text to Unicode. The main goal is converting legacy documents correctly, with measured accuracy.
 
 ## Commands
 
@@ -28,11 +28,11 @@ crates/kannadi/
   src/chars.rs        character classes for the Kannada block
   src/lookup.rs       longest-prefix lookup shared by the scheme and glyph tables
   src/akshara.rs      segmentation into aksharas (uses chars)
-  src/normalize.rs    NFC plus Kannada fixes; Old Kannada modernisation
+  src/normalize.rs    NFC plus Kannada fixes; Old Kannada modernization
   src/numerals.rs     Kannada digits
   src/translit/       Kannada to and from ISO 15919, IAST, Baraha
     schemes.rs        the scheme tables, as data
-    mod.rs            1 engine for all schemes: romanise and parse
+    mod.rs            1 engine for all schemes: romanize and parse
   src/legacy.rs       Nudi and Baraha ANSI to Unicode: a Writer builds the output
                       and the reports; a Syllable decides what it can accept
   data/nudi.tsv       the legacy glyph table, as data
@@ -42,9 +42,9 @@ docs/                 design notes, corpus plan, prior art
 
 Principles:
 
-- **Tables are data and engines are generic.** A new scheme or font layout is a new table, with no new engine code. Keep scheme-specific behaviour as fields on the table.
+- **Tables are data and engines are generic.** A new scheme or font layout is a new table, with no new engine code. Keep scheme-specific behavior as fields on the table.
 - **Lossless by default.** Transliteration round-trips Kannada text exactly. When the converter cannot place a glyph, it reports it. Nothing is dropped silently.
-- **Small modules with 1 job each.** Shared behaviour goes in 1 place; do not copy code between modules.
+- **Small modules with 1 job each.** Shared behavior goes in 1 place; do not copy code between modules.
 - **No abstraction before it earns its place.** Add a trait when a second implementation exists.
 
 ## Code rules
@@ -57,7 +57,7 @@ Principles:
 
 ## Tests
 
-- Every behaviour change gets a test.
+- Every behavior change gets a test.
 - For each new rule, remove the rule, confirm a test fails, then restore it.
 - Use property tests for round trips and invariants. Add a golden fixture for real text.
 - Fixtures from public documents are short excerpts. Record the source URL with each.

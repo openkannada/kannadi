@@ -1,6 +1,6 @@
 [package]
 name = "kannadi"
-description = "Kannada text tools: akshara segmentation, normalisation, transliteration (ISO 15919, IAST, Baraha) and numerals, with Old Kannada support"
+description = "Kannada text tools: akshara segmentation, normalization, transliteration (ISO 15919, IAST, Baraha) and numerals, with Old Kannada support"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true

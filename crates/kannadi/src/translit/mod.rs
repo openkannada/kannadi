@@ -29,7 +29,7 @@ use unicode_normalization::UnicodeNormalization;
 
 use crate::chars::{class, is_kannada, Class, NUKTA, VIRAMA, ZWJ, ZWNJ};
 
-/// Marks the next character as literal text in romanised output.
+/// Marks the next character as literal text in romanized output.
 const ESCAPE: char = '\\';
 use crate::numerals::to_ascii_digit;
 use schemes::Table;
@@ -39,9 +39,9 @@ use schemes::Table;
 pub enum Scheme {
     /// Kannada script (Unicode).
     Kannada,
-    /// ISO 15919 romanisation.
+    /// ISO 15919 romanization.
     Iso15919,
-    /// IAST romanisation, extended for Kannada.
+    /// IAST romanization, extended for Kannada.
     Iast,
     /// Baraha phonetic input scheme.
     Baraha,
@@ -85,7 +85,7 @@ impl fmt::Display for Scheme {
     }
 }
 
-/// Error returned when a scheme name is not recognised.
+/// Error returned when a scheme name is not recognized.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct UnknownScheme(pub String);
 
@@ -126,18 +126,18 @@ impl FromStr for Scheme {
 pub fn transliterate(text: &str, from: Scheme, to: Scheme) -> String {
     match (from.table(), to.table()) {
         (None, None) => text.to_string(),
-        (None, Some(t)) => t.romanise(text),
+        (None, Some(t)) => t.romanize(text),
         (Some(f), None) => f.parse(text),
-        (Some(f), Some(t)) => t.romanise(&f.parse(text)),
+        (Some(f), Some(t)) => t.romanize(&f.parse(text)),
     }
 }
 
-/// Romanises Kannada text. Shorthand for `transliterate(text, Scheme::Kannada, scheme)`.
+/// Romanizes Kannada text. Shorthand for `transliterate(text, Scheme::Kannada, scheme)`.
 pub fn to_latin(text: &str, scheme: Scheme) -> String {
     transliterate(text, Scheme::Kannada, scheme)
 }
 
-/// Converts romanised text to Kannada. Shorthand for `transliterate(text, scheme, Scheme::Kannada)`.
+/// Converts romanized text to Kannada. Shorthand for `transliterate(text, scheme, Scheme::Kannada)`.
 pub fn from_latin(text: &str, scheme: Scheme) -> String {
     transliterate(text, scheme, Scheme::Kannada)
 }
@@ -247,7 +247,7 @@ impl Compiled {
         }
     }
 
-    fn romanise(&self, text: &str) -> String {
+    fn romanize(&self, text: &str) -> String {
         let mut out = Emitter {
             scheme: self,
             out: String::with_capacity(text.len()),

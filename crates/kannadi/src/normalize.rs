@@ -1,10 +1,10 @@
-//! Normalisation and modernisation.
+//! Normalization and modernization.
 
 use unicode_normalization::UnicodeNormalization;
 
 use crate::chars::{class, is_consonant, Class, LLLA, NAKAARA_POLLU, RRA, VIRAMA, ZWNJ};
 
-/// Normalises Kannada text so that equal-looking text compares equal.
+/// Normalizes Kannada text so that equal-looking text compares equal.
 ///
 /// Steps, in order:
 ///
