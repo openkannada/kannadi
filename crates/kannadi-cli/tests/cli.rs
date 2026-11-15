@@ -31,7 +31,7 @@ fn converts_a_folder_and_reports_problems() {
     assert!(!out.join("clean.txt.report.tsv").exists());
     let report = std::fs::read_to_string(out.join("broken.txt.report.tsv")).unwrap();
     assert!(
-        report.contains("line 1\tunknown glyph\tbyte F1"),
+        report.contains("line 1\tunknown glyph\tglyph F1"),
         "{report}"
     );
     assert!(String::from_utf8_lossy(&run.stderr).contains("1 with issues"));
@@ -83,4 +83,42 @@ fn a_clean_rerun_removes_the_old_report() {
     std::fs::write(&file, [0x50, 0xC0]).unwrap();
     kannadi(&["to-unicode", "a.txt", "--out", "out"], tmp.path());
     assert!(!report.exists());
+}
+
+#[cfg(unix)]
+#[test]
+fn an_unreadable_file_fails_the_run_but_not_the_others() {
+    use std::os::unix::fs::PermissionsExt;
+    let tmp = tempfile::tempdir().unwrap();
+    let docs = tmp.path().join("docs");
+    std::fs::create_dir(&docs).unwrap();
+    std::fs::write(docs.join("a.txt"), [0x50, 0xC0]).unwrap();
+    std::fs::write(docs.join("b.txt"), [0x50, 0xC0]).unwrap();
+    std::fs::set_permissions(docs.join("b.txt"), std::fs::Permissions::from_mode(0o000)).unwrap();
+    let run = kannadi(
+        &["to-unicode", "docs", "--out", "out", "--strict"],
+        tmp.path(),
+    );
+    std::fs::set_permissions(docs.join("b.txt"), std::fs::Permissions::from_mode(0o644)).unwrap();
+    assert_eq!(run.status.code(), Some(2), "{run:?}");
+    let stderr = String::from_utf8_lossy(&run.stderr);
+    assert!(
+        stderr.contains("converted 1 file, 0 with issues, 1 failed"),
+        "{stderr}"
+    );
+    assert!(tmp.path().join("out/docs/a.txt").exists());
+}
+
+#[test]
+fn a_long_line_full_of_problems_gives_short_rows() {
+    let tmp = tempfile::tempdir().unwrap();
+    std::fs::write(tmp.path().join("u.txt"), "ಕನ್ನಡ ".repeat(5_000)).unwrap();
+    let run = kannadi(&["to-unicode", "u.txt", "--out", "out"], tmp.path());
+    assert_eq!(run.status.code(), Some(0), "{run:?}");
+    let report = std::fs::read_to_string(tmp.path().join("out/u.txt.report.tsv")).unwrap();
+    assert!(report.lines().count() > 5_000);
+    assert!(
+        report.lines().all(|l| l.chars().count() < 120),
+        "a row is too long"
+    );
 }

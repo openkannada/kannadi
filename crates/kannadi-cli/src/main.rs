@@ -33,7 +33,8 @@ enum Command {
     ToUnicode {
         #[command(flatten)]
         common: Common,
-        /// Write digits as Kannada digits, for text set in the `k` Nudi fonts.
+        /// Write digits as Kannada digits, for text set in the k variants of the
+        /// Nudi fonts.
         #[arg(long)]
         kannada_digits: bool,
         /// Keep a zero typed between letters as a digit. By default it becomes ಂ.
@@ -63,7 +64,7 @@ struct Common {
 
 fn main() -> ExitCode {
     let cli = Cli::parse();
-    let (common, settings) = match cli.command {
+    let (common, direction) = match cli.command {
         Command::ToUnicode {
             common,
             kannada_digits,
@@ -73,10 +74,11 @@ fn main() -> ExitCode {
                 kannada_digits,
                 zero_as_anusvara: !keep_zeros,
             };
-            (common, settings(Direction::ToUnicode, options))
+            (common, Direction::ToUnicode(options))
         }
-        Command::ToNudi { common } => (common, settings(Direction::ToNudi, Options::default())),
+        Command::ToNudi { common } => (common, Direction::ToNudi),
     };
+    let settings = Settings { direction };
     match run(&common, &settings) {
         Ok(Outcome { failed: true, .. }) => ExitCode::from(2),
         Ok(Outcome { issues: true, .. }) if common.strict => ExitCode::from(1),
@@ -88,41 +90,42 @@ fn main() -> ExitCode {
     }
 }
 
-fn settings(direction: Direction, options: Options) -> Settings {
-    Settings { direction, options }
-}
-
 struct Outcome {
     issues: bool,
     failed: bool,
 }
 
 fn run(common: &Common, settings: &Settings) -> Result<Outcome> {
-    let (jobs, skipped) = files::jobs(&common.inputs, &common.out)?;
-    let mut outcome = Outcome {
-        issues: false,
-        failed: false,
-    };
-    let mut with_issues = 0;
-    for job in &jobs {
+    let plan = files::plan(&common.inputs, &common.out)?;
+    for (path, e) in &plan.unreadable {
+        eprintln!("error: {}: {e}", path.display());
+    }
+    let (mut converted, mut with_issues, mut failed) = (0, 0, plan.unreadable.len());
+    for job in &plan.jobs {
         match convert_job(job, settings) {
-            Ok(report) if report.is_empty() => {}
             Ok(report) => {
-                with_issues += 1;
-                eprintln!("{}: {}", job.input.display(), report.summary());
+                converted += 1;
+                if !report.is_empty() {
+                    with_issues += 1;
+                    eprintln!("{}: {}", job.input.display(), report.summary());
+                }
             }
             Err(e) => {
-                outcome.failed = true;
+                failed += 1;
                 eprintln!("error: {}: {e:#}", job.input.display());
             }
         }
     }
-    outcome.issues = with_issues > 0;
+    let files = |n: usize| if n == 1 { "file" } else { "files" };
     eprintln!(
-        "converted {} files, {with_issues} with issues, {skipped} skipped",
-        jobs.len()
+        "converted {converted} {}, {with_issues} with issues, {failed} failed, {} skipped",
+        files(converted),
+        plan.skipped
     );
-    Ok(outcome)
+    Ok(Outcome {
+        issues: with_issues > 0,
+        failed: failed > 0,
+    })
 }
 
 /// Converts 1 file and writes it with its report.

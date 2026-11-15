@@ -27,13 +27,13 @@ impl Report {
         self.rows.iter().filter(|r| r.kind == kind).count()
     }
 
-    /// Counts by kind, such as "2 unknown glyph, 1 malformed syllable".
+    /// Counts by kind, such as "2 unknown glyphs, 1 malformed syllable".
     pub fn summary(&self) -> String {
         [Kind::UnknownGlyph, Kind::Malformed, Kind::Unencodable]
             .into_iter()
             .map(|k| (k, self.count(k)))
             .filter(|&(_, n)| n > 0)
-            .map(|(k, n)| format!("{n} {}", k.label()))
+            .map(|(k, n)| format!("{n} {}", if n == 1 { k.label() } else { k.plural() }))
             .collect::<Vec<_>>()
             .join(", ")
     }
@@ -61,17 +61,11 @@ pub fn path_for(output: &Path) -> PathBuf {
     output.with_file_name(name)
 }
 
-/// Keeps every field on 1 line of the TSV.
+/// Keeps every field on 1 line of the TSV, with no control characters.
 fn clean(field: &str) -> String {
     field
         .chars()
-        .map(|c| {
-            if c == '\t' || c == '\n' || c == '\r' {
-                ' '
-            } else {
-                c
-            }
-        })
+        .map(|c| if c.is_control() { ' ' } else { c })
         .collect()
 }
 
@@ -86,12 +80,12 @@ mod tests {
                 location: "line 2".into(),
                 kind: Kind::Malformed,
                 detail: "ಾ".into(),
-                context: "a\tb\nc".into(),
+                context: "a\tb\nc\0".into(),
             }],
         };
         assert_eq!(
             report.to_tsv(),
-            "location\tkind\tdetail\tcontext\nline 2\tmalformed syllable\tಾ\ta b c\n"
+            "location\tkind\tdetail\tcontext\nline 2\tmalformed syllable\tಾ\ta b c \n"
         );
         assert_eq!(report.summary(), "1 malformed syllable");
     }

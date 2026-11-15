@@ -27,17 +27,25 @@ pub struct Job {
     pub format: Format,
 }
 
-/// The jobs for `inputs`, and the number of files skipped in folders because
-/// their format is not supported.
+/// What to convert.
+#[derive(Debug, Default)]
+pub struct Plan {
+    pub jobs: Vec<Job>,
+    /// Files in folders that are hidden or not in a supported format.
+    pub skipped: usize,
+    /// Folders that could not be read, with the reason.
+    pub unreadable: Vec<(PathBuf, std::io::Error)>,
+}
+
+/// The plan for `inputs`.
 ///
 /// A file goes to `out/<file name>`. A folder goes to `out/<folder name>/`, with
 /// its subfolders kept. Files already under `out` are left out. It is an error for
 /// an output to be an input, or for 2 inputs to share an output, comparing paths
 /// with symbolic links and `..` resolved, and ignoring case.
-pub fn jobs(inputs: &[PathBuf], out: &Path) -> Result<(Vec<Job>, usize)> {
+pub fn plan(inputs: &[PathBuf], out: &Path) -> Result<Plan> {
     let out_abs = resolve(out);
-    let mut jobs = Vec::new();
-    let mut skipped = 0;
+    let mut plan = Plan::default();
     for input in inputs {
         let meta = std::fs::metadata(input).with_context(|| format!("{}", input.display()))?;
         if meta.is_dir() {
@@ -46,17 +54,17 @@ pub fn jobs(inputs: &[PathBuf], out: &Path) -> Result<(Vec<Job>, usize)> {
                 .map(PathBuf::from)
                 .unwrap_or_default();
             let mut files = Vec::new();
-            walk(input, &mut files)?;
+            walk(input, &mut files, &mut plan)?;
             for file in files {
                 if resolve(&file).starts_with(&out_abs) {
                     continue;
                 }
                 let Some(format) = Format::of(&file) else {
-                    skipped += 1;
+                    plan.skipped += 1;
                     continue;
                 };
                 let relative = file.strip_prefix(input).unwrap_or(&file);
-                jobs.push(Job {
+                plan.jobs.push(Job {
                     output: out.join(&name).join(relative),
                     input: file,
                     format,
@@ -67,15 +75,15 @@ pub fn jobs(inputs: &[PathBuf], out: &Path) -> Result<(Vec<Job>, usize)> {
                 bail!("{}: unsupported file type", input.display());
             };
             let name = input.file_name().unwrap_or_default();
-            jobs.push(Job {
+            plan.jobs.push(Job {
                 input: input.clone(),
                 output: out.join(name),
                 format,
             });
         }
     }
-    check_outputs(&jobs)?;
-    Ok((jobs, skipped))
+    check_outputs(&plan.jobs)?;
+    Ok(plan)
 }
 
 fn check_outputs(jobs: &[Job]) -> Result<()> {
@@ -99,11 +107,17 @@ fn check_outputs(jobs: &[Job]) -> Result<()> {
     Ok(())
 }
 
-fn walk(dir: &Path, files: &mut Vec<PathBuf>) -> Result<()> {
-    let mut entries: Vec<PathBuf> = std::fs::read_dir(dir)
-        .with_context(|| format!("{}", dir.display()))?
-        .map(|e| e.map(|e| e.path()))
-        .collect::<std::io::Result<_>>()?;
+/// Collects the files under `dir`, without following symbolic links to folders.
+/// Hidden files and folders count as skipped; unreadable folders are recorded.
+fn walk(dir: &Path, files: &mut Vec<PathBuf>, plan: &mut Plan) -> Result<()> {
+    let entries = std::fs::read_dir(dir).and_then(|d| d.map(|e| e.map(|e| e.path())).collect());
+    let mut entries: Vec<PathBuf> = match entries {
+        Ok(entries) => entries,
+        Err(e) => {
+            plan.unreadable.push((dir.to_path_buf(), e));
+            return Ok(());
+        }
+    };
     entries.sort();
     for path in entries {
         let hidden = path
@@ -111,13 +125,22 @@ fn walk(dir: &Path, files: &mut Vec<PathBuf>) -> Result<()> {
             .and_then(|n| n.to_str())
             .is_some_and(|n| n.starts_with('.'));
         if hidden {
+            plan.skipped += 1;
             continue;
         }
-        let kind = std::fs::symlink_metadata(&path)?.file_type();
+        let kind = match std::fs::symlink_metadata(&path) {
+            Ok(meta) => meta.file_type(),
+            Err(e) => {
+                plan.unreadable.push((path, e));
+                continue;
+            }
+        };
         if kind.is_dir() {
-            walk(&path, files)?;
+            walk(&path, files, plan)?;
         } else if !kind.is_symlink() || path.is_file() {
             files.push(path);
+        } else {
+            plan.skipped += 1;
         }
     }
     Ok(())
@@ -166,13 +189,13 @@ mod tests {
         std::fs::write(docs.join("c.pdf"), "").unwrap();
         std::fs::write(docs.join(".hidden.txt"), "").unwrap();
         let out = tmp.path().join("out");
-        let (jobs, skipped) = jobs(&[docs], &out).unwrap();
-        let outputs: Vec<PathBuf> = jobs.iter().map(|j| j.output.clone()).collect();
+        let plan = plan(&[docs], &out).unwrap();
+        let outputs: Vec<PathBuf> = plan.jobs.iter().map(|j| j.output.clone()).collect();
         assert_eq!(
             outputs,
             [out.join("docs/a.txt"), out.join("docs/sub/B.TXT")]
         );
-        assert_eq!(skipped, 1);
+        assert_eq!(plan.skipped, 2);
     }
 
     #[test]
@@ -181,8 +204,8 @@ mod tests {
         std::fs::create_dir_all(tmp.path().join("out/x")).unwrap();
         std::fs::write(tmp.path().join("a.txt"), "").unwrap();
         std::fs::write(tmp.path().join("out/x/a.txt"), "").unwrap();
-        let (jobs, _) = jobs(&[tmp.path().to_path_buf()], &tmp.path().join("out")).unwrap();
-        assert_eq!(jobs.len(), 1);
+        let plan = plan(&[tmp.path().to_path_buf()], &tmp.path().join("out")).unwrap();
+        assert_eq!(plan.jobs.len(), 1);
     }
 
     #[test]
@@ -191,12 +214,12 @@ mod tests {
         let docs = tmp.path().join("docs");
         std::fs::create_dir(&docs).unwrap();
         std::fs::write(docs.join("a.txt"), "").unwrap();
-        let err = jobs(&[docs.join("a.txt")], &docs.join("x/..")).unwrap_err();
+        let err = plan(&[docs.join("a.txt")], &docs.join("x/..")).unwrap_err();
         assert!(err.to_string().contains("overwrite"), "{err}");
         #[cfg(unix)]
         {
             std::os::unix::fs::symlink(&docs, tmp.path().join("link")).unwrap();
-            assert!(jobs(&[docs.join("a.txt")], &tmp.path().join("link")).is_err());
+            assert!(plan(&[docs.join("a.txt")], &tmp.path().join("link")).is_err());
         }
     }
 
@@ -216,9 +239,9 @@ mod tests {
         }
         let out = tmp.path().join("out");
         let p = |s: &str| tmp.path().join(s);
-        let err = jobs(&[p("first/a.txt"), p("second/a.txt")], &out).unwrap_err();
+        let err = plan(&[p("first/a.txt"), p("second/a.txt")], &out).unwrap_err();
         assert!(err.to_string().contains("both"), "{err}");
-        let err = jobs(&[p("docs"), p("out/docs/a.txt")], &out).unwrap_err();
+        let err = plan(&[p("docs"), p("out/docs/a.txt")], &out).unwrap_err();
         assert!(err.to_string().contains("overwrite"), "{err}");
     }
 
@@ -230,8 +253,9 @@ mod tests {
         std::fs::create_dir(&docs).unwrap();
         std::fs::write(docs.join("a.txt"), "").unwrap();
         std::os::unix::fs::symlink(&docs, docs.join("loop")).unwrap();
-        let (jobs, _) = jobs(&[docs], &tmp.path().join("out")).unwrap();
-        assert_eq!(jobs.len(), 1);
+        let plan = plan(&[docs], &tmp.path().join("out")).unwrap();
+        assert_eq!(plan.jobs.len(), 1);
+        assert_eq!(plan.skipped, 1);
     }
 
     #[test]
@@ -239,9 +263,9 @@ mod tests {
         let tmp = tempfile::tempdir().unwrap();
         let file = tmp.path().join("a.txt");
         std::fs::write(&file, "").unwrap();
-        assert!(jobs(std::slice::from_ref(&file), tmp.path()).is_err());
+        assert!(plan(std::slice::from_ref(&file), tmp.path()).is_err());
         let pdf = tmp.path().join("a.pdf");
         std::fs::write(&pdf, "").unwrap();
-        assert!(jobs(&[pdf], &tmp.path().join("out")).is_err());
+        assert!(plan(&[pdf], &tmp.path().join("out")).is_err());
     }
 }
