@@ -10,8 +10,10 @@ use vidyut_lipi::{Lipika, Scheme as VScheme};
 fn word() -> impl Strategy<Value = String> {
     let consonants: Vec<char> = "ಕಖಗಘಙಚಛಜಝಞಟಠಡಢಣತಥದಧನಪಫಬಭಮಯರಱಲಳೞವಶಷಸಹ".chars().collect();
     let signs: Vec<char> = "ಾಿೀುೂೃೄೢೣೆೇೈೊೋೌ".chars().collect();
+    // Consonants that take a virama exclude ಱ: see `known_difference`.
+    let heads: Vec<char> = consonants.iter().copied().filter(|&c| c != 'ಱ').collect();
     let syllable = (
-        prop::collection::vec(prop::sample::select(consonants.clone()), 0..3),
+        prop::collection::vec(prop::sample::select(heads), 0..3),
         prop::sample::select(consonants),
         prop::option::of(prop::sample::select(signs)),
         prop::option::of(prop::sample::select(vec!['ಂ', 'ಃ'])),
@@ -66,7 +68,7 @@ proptest! {
     #[test]
     fn agrees_with_vidyut_lipi_on_iso_15919(s in word()) {
         let ours = to_latin(&s, Scheme::Iso15919);
-        prop_assume!(!known_difference(&s));
+        prop_assert!(!known_difference(&s), "generator produced dead ಱ: {}", s);
         let mut lipika = Lipika::new();
         let theirs = lipika.transliterate(&s, VScheme::Kannada, VScheme::Iso15919);
         prop_assert_eq!(ours, theirs, "{}", s);
