@@ -11,3 +11,4 @@
 - Kannada numerals: digit conversion, formatting and parsing.
 - Golden fixtures, property tests, and a differential test against vidyut-lipi.
 - Design for the Nudi and Baraha legacy converter, and the test corpus plan.
+- MIT licence and `CITATION.cff`.

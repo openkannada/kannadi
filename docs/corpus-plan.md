@@ -36,7 +36,7 @@ The script covers:
 - every ottu form, under consonants with and without vowel signs;
 - arkavattu with and without vowel signs and ottus (ಅರ್ಕ, ಕಾರ್ಯ, ಸೂರ್ಯ, ಕಾರ್ತಿಕ);
 - the special conjuncts ಜ್ಞ, ಕ್ಷ, ಶ್ರೀ and 3-consonant clusters (ಸ್ತ್ರೀ, ರಾಷ್ಟ್ರ);
-- the known failures from ascii2unicode's ChangeLog: ವಿಜ್ಞಾನ, ಪುಸ್ತಕ, ಮೊ, ಮೋ, ZWJ in ಗ್ರಿಡ್‍ಗೆ, ottu at the end of a word;
+- known hard cases: ವಿಜ್ಞಾನ, ಪುಸ್ತಕ, ಮೊ, ಮೋ, ZWJ in ಗ್ರಿಡ್‍ಗೆ, ottu at the end of a word;
 - digits, punctuation, and English words in the same paragraph.
 
 Effort: about 2 hours of typing per encoding by someone with Nudi and Baraha installed, plus a check. Bar: zero differences.
@@ -58,12 +58,11 @@ Copyright: Official Gazette material may be reproduced under section 52(1)(q) of
 
 ### Tier 3: archives with permission
 
-Newspaper and publisher archives (the ascii2unicode tests include a Kannada Prabha sample, which shows such text exists) are the largest real-world use. Approach publishers once the converter passes tiers 1 and 2, and add documents only with written permission.
+Newspaper and publisher archives are the largest real-world use, and many are in Shree-Lipi. Approach publishers once the converter passes tiers 1 and 2, and add documents only with written permission.
 
 ## Help that would speed this up
 
-- **Aravinda VK's test files** (`tests/` in ascii2unicode) are an obvious starting point, but they are GPL 3.0. Use them only if he agrees to share them under a permissive licence. See the collaboration note.
-- **Kannada readers** to verify tier 2. A short guide and a side-by-side review page would let volunteers help.
+**Kannada readers** to verify tier 2. A short guide and a side-by-side review page would let volunteers help.
 
 ## Order of work
 

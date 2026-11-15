@@ -26,13 +26,15 @@ vidyut-lipi is used as a **test oracle**: a property test generates 5,000 random
 
 ## Baraha phonetic scheme
 
-The Baraha tables follow Baraha's own Kannada keyboard help page (`baraha.com/help/Keyboards/kan-phonetic.htm`). Where it differs from older Baraha spellings found elsewhere, the help page wins: `~ru` for ಋ (not `Ru`), `rx` or `R` for ಱ, `Lx` for ೞ, `@av` for avagraha, `^` and `^^` for ZWJ and ZWNJ. Baraha's documented way to stop ಹ joining a consonant is `~h` (`bakkiMg~hAm`). Baraha documents no general separator; this crate uses `_`, as vidyut-lipi does.
+The Baraha tables follow Baraha's own Kannada keyboard help page (`baraha.com/help/Keyboards/kan-phonetic.htm`). Where it differs from older Baraha spellings found elsewhere, the help page wins. It uses `~ru` for ಋ (older lists use `Ru`), `rx` or `R` for ಱ, `Lx` for ೞ, `@av` for avagraha, `^` and `^^` for ZWJ and ZWNJ. Baraha's documented way to stop ಹ joining a consonant is `~h` (`bakkiMg~hAm`). Baraha documents no general separator, so this crate uses `_`, as vidyut-lipi does.
 
 ## Legacy converters
 
-| Project | Licence | Language | State |
+| Project | Licence | Language | Last activity |
 |---|---|---|---|
-| [aravindavk/ascii2unicode](https://github.com/aravindavk/ascii2unicode) | GPL 3.0 or later (in `COPYING`; GitHub shows "Other" because it does not detect it) | Python CLI, JavaScript web page | Last push 8 August 2023. Linux only for the CLI. One mapping table for Nudi and Baraha. |
-| Google Docs add-ons and web pages | Closed | | |
+| [aravindavk/ascii2unicode](https://github.com/aravindavk/ascii2unicode) | GPL 3.0 or later, stated in `COPYING` | Python CLI for Linux, JavaScript web page | August 2023 |
+| [kagapa-blr/KannadaAsciiUnicodeSDK](https://github.com/kagapa-blr/KannadaAsciiUnicodeSDK) | No licence file | C# | August 2026 |
+| [kannada-ascii-unicode](https://pypi.org/project/kannada-ascii-unicode/) | MIT | Python | July 2026 |
+| Google Docs add-ons, Baraha's converter, web pages | Closed | | |
 
-ascii2unicode is the reference. Its code is not copied here: GPL code cannot go into an MIT or Apache crate without the author's permission. The design in [legacy-converter.md](legacy-converter.md) is written from the problem, the fonts and test documents. A message proposing collaboration has been drafted for its author.
+None of them publishes a verified test set or accuracy figures. This crate derives its own tables from the font files and real documents, as described in [legacy-converter.md](legacy-converter.md). No code or tables from these projects are used.
