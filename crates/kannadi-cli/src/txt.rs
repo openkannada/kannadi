@@ -78,15 +78,11 @@ mod tests {
     use kannadi::legacy::Options;
 
     fn to_unicode() -> Settings {
-        Settings {
-            direction: Direction::ToUnicode(Options::default()),
-        }
+        Settings::new(Direction::ToUnicode(Options::default()))
     }
 
     fn to_nudi() -> Settings {
-        Settings {
-            direction: Direction::ToNudi,
-        }
+        Settings::new(Direction::ToNudi)
     }
 
     #[test]

@@ -2,6 +2,8 @@
 
 mod convert;
 mod files;
+mod fonts;
+mod html;
 mod report;
 mod txt;
 
@@ -50,7 +52,8 @@ enum Command {
 
 #[derive(Args)]
 struct Common {
-    /// Files and folders to convert. Folders are searched for .txt files.
+    /// Files and folders to convert. Folders are searched for .txt, .htm and
+    /// .html files.
     #[arg(required = true)]
     inputs: Vec<PathBuf>,
     /// Folder to write the converted files to.
@@ -60,6 +63,13 @@ struct Common {
     /// unencodable characters.
     #[arg(long)]
     strict: bool,
+    /// Font for converted text in HTML: Noto Sans Kannada by default for
+    /// to-unicode, Nudi 01 e for to-nudi.
+    #[arg(long, value_name = "NAME")]
+    font: Option<String>,
+    /// Also treat this font as a Nudi or Baraha ANSI font. Repeat for more.
+    #[arg(long, value_name = "NAME")]
+    legacy_font: Vec<String>,
 }
 
 fn main() -> ExitCode {
@@ -78,7 +88,14 @@ fn main() -> ExitCode {
         }
         Command::ToNudi { common } => (common, Direction::ToNudi),
     };
-    let settings = Settings { direction };
+    let mut settings = Settings::new(direction);
+    if let Some(font) = &common.font {
+        match direction {
+            Direction::ToUnicode(_) => settings.fonts.unicode.clone_from(font),
+            Direction::ToNudi => settings.fonts.legacy.clone_from(font),
+        }
+    }
+    settings.fonts.extra_legacy.clone_from(&common.legacy_font);
     match run(&common, &settings) {
         Ok(Outcome { failed: true, .. }) => ExitCode::from(2),
         Ok(Outcome { issues: true, .. }) if common.strict => ExitCode::from(1),
@@ -133,6 +150,7 @@ fn convert_job(job: &Job, settings: &Settings) -> Result<Report> {
     let bytes = std::fs::read(&job.input).context("reading")?;
     let (out, report) = match job.format {
         Format::Txt => txt::convert_file(&bytes, settings)?,
+        Format::Html => html::convert_file(&bytes, settings)?,
     };
     if let Some(dir) = job.output.parent() {
         std::fs::create_dir_all(dir).with_context(|| format!("creating {}", dir.display()))?;

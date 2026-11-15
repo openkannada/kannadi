@@ -122,3 +122,35 @@ fn a_long_line_full_of_problems_gives_short_rows() {
         "a row is too long"
     );
 }
+
+#[test]
+fn html_round_trips_through_nudi() {
+    let tmp = tempfile::tempdir().unwrap();
+    let page = "<html><head><title>t</title></head><body><p>ಕನ್ನಡ ನಾಡು, 2026</p></body></html>";
+    std::fs::write(tmp.path().join("p.html"), page).unwrap();
+    let run = kannadi(
+        &["to-nudi", "p.html", "--out", "nudi", "--strict"],
+        tmp.path(),
+    );
+    assert_eq!(run.status.code(), Some(0), "{run:?}");
+    let nudi = std::fs::read_to_string(tmp.path().join("nudi/p.html")).unwrap();
+    assert!(nudi.contains("font-family:'Nudi 01 e'"), "{nudi}");
+    let back = kannadi(
+        &[
+            "to-unicode",
+            "nudi/p.html",
+            "--out",
+            "back",
+            "--font",
+            "Tunga",
+            "--strict",
+        ],
+        tmp.path(),
+    );
+    assert_eq!(back.status.code(), Some(0), "{back:?}");
+    let html = std::fs::read_to_string(tmp.path().join("back/p.html")).unwrap();
+    assert!(
+        html.contains("<span style=\"font-family:'Tunga'\">ಕನ್ನಡ ನಾಡು</span>, 2026"),
+        "{html}"
+    );
+}
