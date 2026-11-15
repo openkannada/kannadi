@@ -57,10 +57,10 @@ fn utf16(bytes: &[u8]) -> Option<Result<String>> {
     if payload.len() % 2 == 1 {
         return Some(Err(anyhow::anyhow!("UTF-16 file ends in half a character")));
     }
-    let units: Vec<u16> = payload
-        .chunks_exact(2)
-        .map(|c| {
-            let pair = [c[0], c[1]];
+    let units: Vec<u16> = (0..payload.len())
+        .step_by(2)
+        .map(|i| {
+            let pair = [payload[i], payload[i + 1]];
             if little {
                 u16::from_le_bytes(pair)
             } else {
