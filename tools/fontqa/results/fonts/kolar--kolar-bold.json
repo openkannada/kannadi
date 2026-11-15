@@ -1,0 +1,113 @@
+{
+ "summary": {
+  "face_id": "kolar--kolar-bold",
+  "font_id": "kolar",
+  "family": "Kolar",
+  "style": "Bold",
+  "version": "Version 1.001;PS 1.000;hotconv 1.0.88;makeotf.lib2.5.647800",
+  "license": "OFL-1.1",
+  "license_in_font": "This Font Software is licensed under the SIL Open Font License, Version 1.1. This license is available with a FAQ at: http://scripts.sil.org/OFL",
+  "source": "https://github.com/itfoundry/kolar",
+  "file": "Kolar-Bold.ttf",
+  "face_index": 0,
+  "sha256": "9876c9b9003cb97faaa23c838f9ece2dc9d71edfce173efd6d70b00b041d9b42",
+  "variable": false,
+  "outlines": "TrueType",
+  "gsub_scripts": "DFLT knd2 knda",
+  "kannada_codepoints": 85,
+  "glyph_count": 924,
+  "cases": 1905,
+  "failing_cases": 6,
+  "missing_glyph": 6,
+  "notdef": 0,
+  "dotted_circle": 0,
+  "no_conjunct": 0,
+  "no_arkavattu": 0,
+  "collision": 0,
+  "indistinct": 0,
+  "missing_codepoints": "U+0CDC U+0CDD U+0CF1 U+0CF2 U+0CF3"
+ },
+ "font": {
+  "family": "Kolar",
+  "style": "Bold",
+  "full_name": "Kolar Bold",
+  "version": "Version 1.001;PS 1.000;hotconv 1.0.88;makeotf.lib2.5.647800",
+  "license_name": "This Font Software is licensed under the SIL Open Font License, Version 1.1. This license is available with a FAQ at: http://scripts.sil.org/OFL",
+  "license_url": "http://scripts.sil.org/OFL",
+  "copyright": "Copyright (c) 2016 Indian Type Foundry (info@indiantypefoundry.com)",
+  "designer": "Ramakrishna Saiteja (Kannada); Shiva Nallaperumal (Latin)",
+  "vendor": "ITFO",
+  "glyph_count": 924,
+  "units_per_em": 1000,
+  "variable": false,
+  "axes": [],
+  "outlines": "TrueType",
+  "script_tags": {
+   "GSUB": [
+    "DFLT",
+    "knd2",
+    "knda"
+   ],
+   "GPOS": [
+    "DFLT"
+   ]
+  },
+  "kannada_codepoints": 85
+ },
+ "failures": [
+  {
+   "case_id": "rare-0CDD",
+   "group": "rare",
+   "text": "ಅವನೝ",
+   "codepoints": "U+0C85 U+0CB5 U+0CA8 U+0CDD",
+   "failures": "missing_glyph",
+   "glyphs": "knA knVA knNA .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "rare-0CF3",
+   "group": "rare",
+   "text": "ಕೳ",
+   "codepoints": "U+0C95 U+0CF3",
+   "failures": "missing_glyph",
+   "glyphs": "knKA .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "rare-0CDC",
+   "group": "rare",
+   "text": "೜",
+   "codepoints": "U+0CDC",
+   "failures": "missing_glyph",
+   "glyphs": ".notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "rare-0CDC-word",
+   "group": "rare",
+   "text": "೜ಗಣೇಶ",
+   "codepoints": "U+0CDC U+0C97 U+0CA3 U+0CC7 U+0CB6",
+   "failures": "missing_glyph",
+   "glyphs": ".notdef knGA knNNE knLengthmark knSHA",
+   "detail": ""
+  },
+  {
+   "case_id": "rare-0CF1",
+   "group": "rare",
+   "text": "ಅೱಕ",
+   "codepoints": "U+0C85 U+0CF1 U+0C95",
+   "failures": "missing_glyph",
+   "glyphs": "knA .notdef knKA",
+   "detail": ""
+  },
+  {
+   "case_id": "rare-0CF2",
+   "group": "rare",
+   "text": "ಅೲಪ",
+   "codepoints": "U+0C85 U+0CF2 U+0CAA",
+   "failures": "missing_glyph",
+   "glyphs": "knA .notdef knPA",
+   "detail": ""
+  }
+ ]
+}

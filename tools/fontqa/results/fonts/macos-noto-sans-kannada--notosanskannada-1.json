@@ -1,0 +1,95 @@
+{
+ "summary": {
+  "face_id": "macos-noto-sans-kannada--notosanskannada-1",
+  "font_id": "macos-noto-sans-kannada",
+  "family": "Noto Sans Kannada",
+  "style": "ExtraLight",
+  "version": "22.0d3e1",
+  "license": "OFL-1.1",
+  "license_in_font": "This Font Software is licensed under the SIL Open Font License, Version 1.1. This Font Software is distributed on an \"AS IS\" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or impl",
+  "source": "macOS",
+  "file": "NotoSansKannada.ttc",
+  "face_index": 1,
+  "sha256": "aab64aab40f235225ad73e7ea5e3183f4c23cdd93ee9a2b0e2e544182abdcca5",
+  "variable": false,
+  "outlines": "TrueType",
+  "gsub_scripts": "knd2 knda",
+  "kannada_codepoints": 88,
+  "glyph_count": 476,
+  "cases": 1905,
+  "failing_cases": 4,
+  "missing_glyph": 4,
+  "notdef": 0,
+  "dotted_circle": 0,
+  "no_conjunct": 0,
+  "no_arkavattu": 0,
+  "collision": 0,
+  "indistinct": 0,
+  "missing_codepoints": "U+0CDC U+0CDD U+0CF3"
+ },
+ "font": {
+  "family": "Noto Sans Kannada",
+  "style": "ExtraLight",
+  "full_name": "Noto Sans Kannada ExtraLight",
+  "version": "22.0d3e1",
+  "license_name": "This Font Software is licensed under the SIL Open Font License, Version 1.1. This Font Software is distributed on an \"AS IS\" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the SIL Open Font License for the specific language, permissions and limitations governing your use of this Font Software.",
+  "license_url": "http://scripts.sil.org/OFL",
+  "copyright": "Copyright 2018 Google Inc. All Rights Reserved.",
+  "designer": "Jelle Bosma - Monotype Design Team",
+  "vendor": "GOOG",
+  "glyph_count": 476,
+  "units_per_em": 1000,
+  "variable": false,
+  "axes": [],
+  "outlines": "TrueType",
+  "script_tags": {
+   "GSUB": [
+    "knd2",
+    "knda"
+   ],
+   "GPOS": [
+    "knd2",
+    "knda"
+   ]
+  },
+  "kannada_codepoints": 88
+ },
+ "failures": [
+  {
+   "case_id": "rare-0CDD",
+   "group": "rare",
+   "text": "ಅವನೝ",
+   "codepoints": "U+0C85 U+0CB5 U+0CA8 U+0CDD",
+   "failures": "missing_glyph",
+   "glyphs": "aknda vaknda naknda .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "rare-0CF3",
+   "group": "rare",
+   "text": "ಕೳ",
+   "codepoints": "U+0C95 U+0CF3",
+   "failures": "missing_glyph",
+   "glyphs": "kaknda .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "rare-0CDC",
+   "group": "rare",
+   "text": "೜",
+   "codepoints": "U+0CDC",
+   "failures": "missing_glyph",
+   "glyphs": ".notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "rare-0CDC-word",
+   "group": "rare",
+   "text": "೜ಗಣೇಶ",
+   "codepoints": "U+0CDC U+0C97 U+0CA3 U+0CC7 U+0CB6",
+   "failures": "missing_glyph",
+   "glyphs": ".notdef gaknda nnevowelknda lengthmarkknda shaknda",
+   "detail": ""
+  }
+ ]
+}

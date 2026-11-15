@@ -1,0 +1,347 @@
+# Every open Kannada font fontqa tests, with where each file came from.
+# Files are fetched into a cache outside the repository and are never committed.
+# license: what the font's own license file or name table says, as an SPDX id where one fits.
+# GitHub sources are pinned to a commit. fonts.lock.json holds the sha256 of every file.
+
+[[font]]
+id = "akaya-kanadaka"
+name = "Akaya Kanadaka"
+source = "Google Fonts"
+license = "OFL-1.1"
+files = ["https://raw.githubusercontent.com/google/fonts/cc39c4c2c304bc368c9b7c311ea2bcc6013299fe/ofl/akayakanadaka/AkayaKanadaka-Regular.ttf"]
+
+[[font]]
+id = "anek-kannada"
+name = "Anek Kannada"
+source = "Google Fonts"
+license = "OFL-1.1"
+files = ["https://raw.githubusercontent.com/google/fonts/cc39c4c2c304bc368c9b7c311ea2bcc6013299fe/ofl/anekkannada/AnekKannada%5Bwdth,wght%5D.ttf"]
+
+[[font]]
+id = "baloo-tamma-2"
+name = "Baloo Tamma 2"
+source = "Google Fonts"
+license = "OFL-1.1"
+files = ["https://raw.githubusercontent.com/google/fonts/cc39c4c2c304bc368c9b7c311ea2bcc6013299fe/ofl/balootamma2/BalooTamma2%5Bwght%5D.ttf"]
+
+[[font]]
+id = "benne"
+name = "Benne"
+source = "Google Fonts"
+license = "OFL-1.1"
+files = ["https://raw.githubusercontent.com/google/fonts/cc39c4c2c304bc368c9b7c311ea2bcc6013299fe/ofl/benne/Benne-Regular.ttf"]
+
+[[font]]
+id = "google-sans"
+name = "Google Sans"
+source = "Google Fonts"
+license = "OFL-1.1"
+files = [
+    "https://raw.githubusercontent.com/google/fonts/cc39c4c2c304bc368c9b7c311ea2bcc6013299fe/ofl/googlesans/GoogleSans%5BGRAD,opsz,wght%5D.ttf",
+    "https://raw.githubusercontent.com/google/fonts/cc39c4c2c304bc368c9b7c311ea2bcc6013299fe/ofl/googlesans/GoogleSans-Italic%5BGRAD,opsz,wght%5D.ttf",
+]
+
+[[font]]
+id = "hind-mysuru"
+name = "Hind Mysuru"
+source = "Google Fonts"
+license = "OFL-1.1"
+files = [
+    "https://raw.githubusercontent.com/google/fonts/cc39c4c2c304bc368c9b7c311ea2bcc6013299fe/ofl/hindmysuru/HindMysuru-Light.ttf",
+    "https://raw.githubusercontent.com/google/fonts/cc39c4c2c304bc368c9b7c311ea2bcc6013299fe/ofl/hindmysuru/HindMysuru-Regular.ttf",
+    "https://raw.githubusercontent.com/google/fonts/cc39c4c2c304bc368c9b7c311ea2bcc6013299fe/ofl/hindmysuru/HindMysuru-Medium.ttf",
+    "https://raw.githubusercontent.com/google/fonts/cc39c4c2c304bc368c9b7c311ea2bcc6013299fe/ofl/hindmysuru/HindMysuru-SemiBold.ttf",
+    "https://raw.githubusercontent.com/google/fonts/cc39c4c2c304bc368c9b7c311ea2bcc6013299fe/ofl/hindmysuru/HindMysuru-Bold.ttf",
+]
+
+[[font]]
+id = "hubballi"
+name = "Hubballi"
+source = "Google Fonts"
+license = "OFL-1.1"
+files = ["https://raw.githubusercontent.com/google/fonts/cc39c4c2c304bc368c9b7c311ea2bcc6013299fe/ofl/hubballi/Hubballi-Regular.ttf"]
+
+[[font]]
+id = "noto-sans-kannada"
+name = "Noto Sans Kannada"
+source = "Google Fonts"
+license = "OFL-1.1"
+files = ["https://raw.githubusercontent.com/google/fonts/cc39c4c2c304bc368c9b7c311ea2bcc6013299fe/ofl/notosanskannada/NotoSansKannada%5Bwdth,wght%5D.ttf"]
+
+[[font]]
+id = "noto-serif-kannada"
+name = "Noto Serif Kannada"
+source = "Google Fonts"
+license = "OFL-1.1"
+files = ["https://raw.githubusercontent.com/google/fonts/cc39c4c2c304bc368c9b7c311ea2bcc6013299fe/ofl/notoserifkannada/NotoSerifKannada%5Bwght%5D.ttf"]
+
+[[font]]
+id = "padyakke-expanded-one"
+name = "Padyakke Expanded One"
+source = "Google Fonts"
+license = "OFL-1.1"
+files = ["https://raw.githubusercontent.com/google/fonts/cc39c4c2c304bc368c9b7c311ea2bcc6013299fe/ofl/padyakkeexpandedone/PadyakkeExpandedOne-Regular.ttf"]
+
+[[font]]
+id = "tiro-kannada"
+name = "Tiro Kannada"
+source = "Google Fonts"
+license = "OFL-1.1"
+files = [
+    "https://raw.githubusercontent.com/google/fonts/cc39c4c2c304bc368c9b7c311ea2bcc6013299fe/ofl/tirokannada/TiroKannada-Regular.ttf",
+    "https://raw.githubusercontent.com/google/fonts/cc39c4c2c304bc368c9b7c311ea2bcc6013299fe/ofl/tirokannada/TiroKannada-Italic.ttf",
+]
+
+[[font]]
+id = "gubbi"
+name = "Gubbi"
+source = "https://github.com/aravindavk/Gubbi"
+license = "GPL-3.0-or-later WITH Font-exception-2.0"
+files = ["https://raw.githubusercontent.com/aravindavk/Gubbi/899fcf4fa8a5395f298a3d45f9a062a5d8187138/Gubbi.ttf"]
+
+[[font]]
+id = "navilu"
+name = "Navilu"
+source = "https://github.com/aravindavk/Navilu"
+license = "GPL-3.0-or-later WITH Font-exception-2.0"
+files = ["https://raw.githubusercontent.com/aravindavk/Navilu/e1b315f9a6b33d0bdf1157f9075f2d6cd54fac4e/Navilu.ttf"]
+
+[[font]]
+id = "lohit-kannada"
+name = "Lohit Kannada"
+source = "Debian package fonts-lohit-knda 2.5.4-4"
+license = "OFL-1.1"
+archive = "http://deb.debian.org/debian/pool/main/f/fonts-lohit-knda/fonts-lohit-knda_2.5.4-4_all.deb"
+files = ["usr/share/fonts/truetype/lohit-kannada/Lohit-Kannada.ttf"]
+
+[[font]]
+id = "kedage"
+name = "Kedage"
+source = "https://sourceforge.net/projects/brahmi/ (Indian Institute of Science)"
+license = "GPL-2.0"
+archive = "https://downloads.sourceforge.net/project/brahmi/Brahmi%20OpenType%20Fonts/OpenType%20font%20for%20Kannada%20-%20Kedgae%20and%20Mallige%20Ver%201.0/kanotf.zip"
+files = ["kanotf/fonts/Kedage-*.TTF"]
+
+[[font]]
+id = "mallige"
+name = "Mallige"
+source = "https://sourceforge.net/projects/brahmi/ (Indian Institute of Science)"
+license = "GPL-2.0"
+archive = "https://downloads.sourceforge.net/project/brahmi/Brahmi%20OpenType%20Fonts/OpenType%20font%20for%20Kannada%20-%20Kedgae%20and%20Mallige%20Ver%201.0/kanotf.zip"
+files = ["kanotf/fonts/Malige-*.TTF"]
+
+[[font]]
+id = "mallige-2012"
+name = "Mallige (2012 fix)"
+source = "https://sourceforge.net/projects/brahmi/ (Indian Institute of Science)"
+license = "GPL-2.0"
+files = [
+    "https://downloads.sourceforge.net/project/brahmi/Brahmi%20OpenType%20Fonts/20120322_mallige_fix/MalligeNormal.ttf",
+    "https://downloads.sourceforge.net/project/brahmi/Brahmi%20OpenType%20Fonts/20120322_mallige_fix/MalligeNormalItalic.ttf",
+]
+
+[[font]]
+id = "sampige"
+name = "Sampige"
+source = "https://sourceforge.net/projects/brahmi/ (Indian Institute of Science)"
+license = "unstated (copyright IISc, all rights reserved in the name table)"
+files = ["https://downloads.sourceforge.net/project/brahmi/Brahmi%20OpenType%20Fonts/OpenType%20font%20for%20Kannada%20-%20Sampige%20Ver%201.0/Sampige.ttf"]
+
+[[font]]
+id = "ambarisha"
+name = "Ambarisha"
+source = "https://github.com/appajid/Ambarisha"
+license = "OFL-1.1"
+# fonts/Ambarisha-Regular.ttf is a 0-byte file at this commit.
+files = ["https://raw.githubusercontent.com/appajid/Ambarisha/367c9eaa2f6cafcf15c3a345b04b1463e1f9f44c/fonts/Ambarisha2.ttf"]
+
+[[font]]
+id = "badami"
+name = "Badami"
+source = "https://github.com/nlci/knda-font-badami (NLCI, SIL tooling)"
+license = "OFL-1.1"
+archive = "https://github.com/nlci/knda-font-badami/releases/download/v0.603/nlci-knda-badami-0.603.zip"
+files = ["nlci-knda-badami-0.603/Badami-*.ttf"]
+
+[[font]]
+id = "kaveri"
+name = "Kaveri"
+source = "https://github.com/nlci/knda-font-badami (NLCI, SIL tooling)"
+license = "OFL-1.1"
+archive = "https://github.com/nlci/knda-font-badami/releases/download/v0.603/nlci-knda-kaveri-0.603.zip"
+files = ["nlci-knda-kaveri-0.603/Kaveri-*.ttf"]
+
+[[font]]
+id = "kagapa-nudi-unicode"
+name = "Nudi Unicode fonts (KaGaPa)"
+source = "http://www.kagapa.in/downloads/Nudi%20files/Fonts.zip"
+license = "unstated (free download from Kannada Ganaka Parishat)"
+archive = "http://www.kagapa.in/downloads/Nudi%20files/Fonts.zip"
+files = ["Nudi_fonts/NudiUni*.ttf", "Nudi_fonts/NUDI UNI *.ttf", "Nudi_fonts/NudiParijatha*.ttf", "Nudi_fonts/inchara.ttf"]
+
+[[font]]
+id = "karnata-bandipur"
+name = "Karnata Bandipur"
+source = "https://github.com/sanchaya/karnata-bandipur"
+license = "OFL-1.1"
+files = ["https://raw.githubusercontent.com/sanchaya/karnata-bandipur/9d829a9116d92acdf6e73be8746175f966328701/fonts/ttf/KarnataBandipur.ttf"]
+
+[[font]]
+id = "karnata-gtn"
+name = "Karnata GTN"
+source = "https://github.com/sanchaya/karnata-gtn-typeface"
+license = "OFL-1.1"
+files = ["https://raw.githubusercontent.com/sanchaya/karnata-gtn-typeface/ac685acf247c720557527b13d9bada03ac9539e9/fonts/KarnataGTN%5Bwght%5D.ttf"]
+
+[[font]]
+id = "karnata-f-kittel"
+name = "Karnata F Kittel"
+source = "https://github.com/sanchaya/karnata-f-kittel-font"
+license = "OFL-1.1"
+# The OTF at the repository root is the published file; the TTF is the newer development build.
+files = [
+    "https://raw.githubusercontent.com/sanchaya/karnata-f-kittel-font/7ec060679647df0a3db07b82dd8f72a38698d221/Karnata%20F%20Kittel.otf",
+    "https://raw.githubusercontent.com/sanchaya/karnata-f-kittel-font/7ec060679647df0a3db07b82dd8f72a38698d221/development%201.0/OpenType-TT/KarnataFKittel.ttf",
+]
+
+[[font]]
+id = "karnata-wesleyan-mission-press"
+name = "Karnata Wesleyan Mission Press"
+source = "https://github.com/sanchaya/karnata-wesleyan-mission-press-typeface"
+license = "OFL-1.1"
+files = ["https://raw.githubusercontent.com/sanchaya/karnata-wesleyan-mission-press-typeface/d5981328ebac66fcd2dfc578451716b1f9c94428/fonts/ttf/KarnataWesleyanMissionPress.ttf"]
+
+[[font]]
+id = "karnata-german-mission-press"
+name = "Karnata German Mission Press"
+source = "https://github.com/sanchaya/karnata-german-mission-press-typeface"
+license = "OFL-1.1"
+files = ["https://raw.githubusercontent.com/sanchaya/karnata-german-mission-press-typeface/c63c05d8580d55c77bfc253dedddc07fe891b59d/Fonts/ttf/KarnataGermanMissionPressTypeface.ttf"]
+
+[[font]]
+id = "sriraju"
+name = "Sriraju"
+source = "https://github.com/sanchaya/Sri-Raju-Fonts"
+license = "OFL-1.1"
+files = [
+    "https://raw.githubusercontent.com/sanchaya/Sri-Raju-Fonts/712eddebeb3e9d7a765f11fc90e41fa50a0bd3a9/fonts/SRIRAJUR.ttf",
+    "https://raw.githubusercontent.com/sanchaya/Sri-Raju-Fonts/712eddebeb3e9d7a765f11fc90e41fa50a0bd3a9/fonts/SRIRAJUI.ttf",
+    "https://raw.githubusercontent.com/sanchaya/Sri-Raju-Fonts/712eddebeb3e9d7a765f11fc90e41fa50a0bd3a9/fonts/SRIRAJUB.ttf",
+    "https://raw.githubusercontent.com/sanchaya/Sri-Raju-Fonts/712eddebeb3e9d7a765f11fc90e41fa50a0bd3a9/fonts/SRIRAJBI.ttf",
+    "https://raw.githubusercontent.com/sanchaya/Sri-Raju-Fonts/712eddebeb3e9d7a765f11fc90e41fa50a0bd3a9/fonts/SRIRAJUO.ttf",
+    "https://raw.githubusercontent.com/sanchaya/Sri-Raju-Fonts/712eddebeb3e9d7a765f11fc90e41fa50a0bd3a9/fonts/SRIRAUOI.ttf",
+]
+
+[[font]]
+id = "nanni"
+name = "Nanni"
+source = "https://github.com/suniljayaprakash/nanni-indic-font"
+license = "OFL-1.1"
+files = ["https://raw.githubusercontent.com/suniljayaprakash/nanni-indic-font/d866cf33f312779a5eb6fcdb2849724fdad20e53/docs/builds/Nanni-Regular.ttf"]
+
+[[font]]
+id = "anchu"
+name = "Anchu"
+source = "https://github.com/imarunck/Anchu"
+license = "OFL-1.1"
+files = ["https://raw.githubusercontent.com/imarunck/Anchu/bd6fafc5d49c6294200ecddb6ccb4555f45a321c/fonts/ttf/Anchu-Kannada-Regular.ttf.ttf"]
+
+[[font]]
+id = "cheluvi"
+name = "Cheluvi"
+source = "https://github.com/omshivaprakash/cheluvi"
+license = "unstated (a port of a Baraha ASCII font; listed as OFL by Sanchaya)"
+files = ["https://raw.githubusercontent.com/omshivaprakash/cheluvi/2028f9949810ee3383d3c486179dda33a2530dd7/Cheluvi.ttf"]
+
+[[font]]
+id = "devama"
+name = "Devama"
+source = "https://github.com/pavanaja/DevamaNew"
+license = "OFL-1.1"
+files = ["https://raw.githubusercontent.com/pavanaja/DevamaNew/f19822c694fb9ccc8c593cf136fdbe19f01055a0/Devama.otf"]
+
+[[font]]
+id = "bandipur-one"
+name = "Bandipur One"
+source = "https://github.com/VanillaandCream/Bandipur"
+license = "OFL-1.1"
+files = ["https://raw.githubusercontent.com/VanillaandCream/Bandipur/e67b6045b7ddc6b2bd88df45a7b7e03e879e5d93/Bandipur/Unhinted/BandipurOne.ttf"]
+
+[[font]]
+id = "kolar"
+name = "Kolar"
+source = "https://github.com/itfoundry/kolar"
+license = "OFL-1.1"
+files = [
+    "https://raw.githubusercontent.com/itfoundry/kolar/0da459bfb28a89423ab4c6232912054349855093/products/Kolar-Light.ttf",
+    "https://raw.githubusercontent.com/itfoundry/kolar/0da459bfb28a89423ab4c6232912054349855093/products/Kolar-Regular.ttf",
+    "https://raw.githubusercontent.com/itfoundry/kolar/0da459bfb28a89423ab4c6232912054349855093/products/Kolar-Medium.ttf",
+    "https://raw.githubusercontent.com/itfoundry/kolar/0da459bfb28a89423ab4c6232912054349855093/products/Kolar-SemiBold.ttf",
+    "https://raw.githubusercontent.com/itfoundry/kolar/0da459bfb28a89423ab4c6232912054349855093/products/Kolar-Bold.ttf",
+    "https://raw.githubusercontent.com/itfoundry/kolar/0da459bfb28a89423ab4c6232912054349855093/products/Kolar-ExtraBold.ttf",
+]
+
+# These 4 have no binary at their own source, so the copy comes from Sanchaya's font showcase.
+[[font]]
+id = "kanishka"
+name = "Kanishka"
+source = "https://github.com/kishorechan/Kanishka (binary from sanchaya/fonts)"
+license = "OFL-1.1"
+files = ["https://raw.githubusercontent.com/sanchaya/fonts/700474b4cca0891c17a5cded0eccf6cca78fe291/static/Fonts/Kanishka/Kanishka.ttf"]
+
+[[font]]
+id = "nishchaya"
+name = "Nishchaya"
+source = "https://github.com/kishorechan/Nishchaya (binary from sanchaya/fonts)"
+license = "OFL-1.1"
+files = [
+    "https://raw.githubusercontent.com/sanchaya/fonts/700474b4cca0891c17a5cded0eccf6cca78fe291/static/Fonts/Nishchaya/Nishchaya.ttf",
+    "https://raw.githubusercontent.com/sanchaya/fonts/700474b4cca0891c17a5cded0eccf6cca78fe291/static/Fonts/Nishchaya/Nishchaya_Hosabaraha.ttf",
+]
+
+[[font]]
+id = "kannada-pixel"
+name = "Kannada Pixel"
+source = "https://github.com/shankarsivarajan/KannadaPixel (binary from sanchaya/fonts)"
+license = "OFL-1.1"
+files = ["https://raw.githubusercontent.com/sanchaya/fonts/700474b4cca0891c17a5cded0eccf6cca78fe291/static/Fonts/KannadaPixel/KannadaPixel.ttf"]
+
+[[font]]
+id = "sakal-bharati"
+name = "Sakal Bharati"
+source = "C-DAC GIST (binary from sanchaya/fonts)"
+license = "OFL-1.1"
+files = ["https://raw.githubusercontent.com/sanchaya/fonts/700474b4cca0891c17a5cded0eccf6cca78fe291/static/Fonts/SakalBharati/SakalBharati.ttf"]
+
+# macOS system fonts. Tested where they are installed; never copied or redistributed.
+[[font]]
+id = "macos-kannada-mn"
+name = "Kannada MN (macOS)"
+source = "macOS"
+license = "proprietary (Apple)"
+local = true
+files = ["/System/Library/Fonts/Supplemental/Kannada MN.ttc"]
+
+[[font]]
+id = "macos-kannada-sangam-mn"
+name = "Kannada Sangam MN (macOS)"
+source = "macOS"
+license = "proprietary (Apple)"
+local = true
+files = ["/System/Library/Fonts/Supplemental/Kannada Sangam MN.ttc"]
+
+[[font]]
+id = "macos-noto-sans-kannada"
+name = "Noto Sans Kannada (macOS build)"
+source = "macOS"
+license = "OFL-1.1"
+local = true
+files = ["/System/Library/Fonts/NotoSansKannada.ttc"]
+
+[[font]]
+id = "macos-sf-kannada"
+name = "SF Kannada (macOS)"
+source = "macOS"
+license = "proprietary (Apple)"
+local = true
+files = ["/System/Library/Fonts/SFIndia.ttc"]

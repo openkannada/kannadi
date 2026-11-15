@@ -1,0 +1,102 @@
+{
+ "summary": {
+  "face_id": "anek-kannada--anekkannada-wdth-wght",
+  "font_id": "anek-kannada",
+  "family": "Anek Kannada",
+  "style": "Medium",
+  "version": "Version 1.003",
+  "license": "OFL-1.1",
+  "license_in_font": "This Font Software is licensed under the SIL Open Font License, Version 1.1. This license is available with a FAQ at: https://scripts.sil.org/OFL",
+  "source": "Google Fonts",
+  "file": "AnekKannada[wdth,wght].ttf",
+  "face_index": 0,
+  "sha256": "6808783ecb95edd948c928ff394953256eed78bdb71dd1fd96eccaa4da05a330",
+  "variable": true,
+  "outlines": "TrueType",
+  "gsub_scripts": "DFLT knd2 knda latn",
+  "kannada_codepoints": 89,
+  "glyph_count": 835,
+  "cases": 1905,
+  "failing_cases": 4,
+  "missing_glyph": 4,
+  "notdef": 0,
+  "dotted_circle": 0,
+  "no_conjunct": 0,
+  "no_arkavattu": 0,
+  "collision": 0,
+  "indistinct": 0,
+  "missing_codepoints": "U+0CDC U+0CDD U+0CF3"
+ },
+ "font": {
+  "family": "Anek Kannada",
+  "style": "Medium",
+  "full_name": "Anek Kannada Medium",
+  "version": "Version 1.003",
+  "license_name": "This Font Software is licensed under the SIL Open Font License, Version 1.1. This license is available with a FAQ at: https://scripts.sil.org/OFL",
+  "license_url": "https://scripts.sil.org/OFL",
+  "copyright": "Copyright 2021 The Anek Project Authors (https://github.com/EkType/Anek)",
+  "designer": "Vaishnavi Murthy, Maithili Shingre (Kannada) & Yesha Goshar (Latin)",
+  "vendor": "EKTF",
+  "glyph_count": 835,
+  "units_per_em": 2000,
+  "variable": true,
+  "axes": [
+   "wght",
+   "wdth"
+  ],
+  "outlines": "TrueType",
+  "script_tags": {
+   "GSUB": [
+    "DFLT",
+    "knd2",
+    "knda",
+    "latn"
+   ],
+   "GPOS": [
+    "DFLT",
+    "knd2",
+    "knda",
+    "latn"
+   ]
+  },
+  "kannada_codepoints": 89
+ },
+ "failures": [
+  {
+   "case_id": "rare-0CDD",
+   "group": "rare",
+   "text": "ಅವನೝ",
+   "codepoints": "U+0C85 U+0CB5 U+0CA8 U+0CDD",
+   "failures": "missing_glyph",
+   "glyphs": "vowelA.kn Va.kn Na.kn .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "rare-0CF3",
+   "group": "rare",
+   "text": "ಕೳ",
+   "codepoints": "U+0C95 U+0CF3",
+   "failures": "missing_glyph",
+   "glyphs": "Ka.kn .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "rare-0CDC",
+   "group": "rare",
+   "text": "೜",
+   "codepoints": "U+0CDC",
+   "failures": "missing_glyph",
+   "glyphs": ".notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "rare-0CDC-word",
+   "group": "rare",
+   "text": "೜ಗಣೇಶ",
+   "codepoints": "U+0CDC U+0C97 U+0CA3 U+0CC7 U+0CB6",
+   "failures": "missing_glyph",
+   "glyphs": ".notdef Ga.kn NnamatraE.kn Lengthmark.kn Sha.kn",
+   "detail": ""
+  }
+ ]
+}

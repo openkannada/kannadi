@@ -1,0 +1,211 @@
+{
+ "akaya-kanadaka": {
+  "AkayaKanadaka-Regular.ttf": "7891840f8c14326220aafd73f599f592bf44c60e4f8882bcf7c57426d62e9427"
+ },
+ "ambarisha": {
+  "Ambarisha2.ttf": "289a93a0bfb38a09af3ed634ca977f97d202c2c33e59f5e14f0b12dd31419bcd"
+ },
+ "anchu": {
+  "Anchu-Kannada-Regular.ttf.ttf": "e43488d2bebdb2ec364491ae08104b5c74d3d5d70d4bbfbdbc35fe660ac5012f"
+ },
+ "anek-kannada": {
+  "AnekKannada[wdth,wght].ttf": "6808783ecb95edd948c928ff394953256eed78bdb71dd1fd96eccaa4da05a330"
+ },
+ "badami": {
+  "Badami-Bold.ttf": "9d7679284af83e5adc2344b92a7319bb2a91b9ca19e4dca5c8614762cd2f3c35",
+  "Badami-BoldItalic.ttf": "d4f9b47c14ef387d521d9ae1fde1f6a577c3928f23b607340106d445e8674201",
+  "Badami-Italic.ttf": "4783094e747a17b325f96af91e7a0433ea7ca8ac38e51f69fe7005ba096c5ef6",
+  "Badami-Regular.ttf": "08117ed2b0628c8176a04d27500908169f4afa22cc35ae2bf0caae67583b586e"
+ },
+ "baloo-tamma-2": {
+  "BalooTamma2[wght].ttf": "364e7b33fafe3f94eb121b4db36423e1b0fbef278af0b1a8d3643c65567b9d3c"
+ },
+ "bandipur-one": {
+  "BandipurOne.ttf": "f35bb61f81d9a0cef49cf4e6febe21be12e1d4117665ef68108f2f176a4d1a03"
+ },
+ "benne": {
+  "Benne-Regular.ttf": "681a3aadbde40f411b34bf6fb555971b1d6c1e979adf7eea5793f9bdd5ec7f3d"
+ },
+ "cheluvi": {
+  "Cheluvi.ttf": "f87526817ab08a5c3f746ca17ddb3150632fc53ba0541cd147a16868a4cf1552"
+ },
+ "devama": {
+  "Devama.otf": "3537dab854952ca42f0b0ebffa216376c26d61882578702fbc4c0f04e3cf4b27"
+ },
+ "google-sans": {
+  "GoogleSans-Italic[GRAD,opsz,wght].ttf": "b6662abd2131cad1b248750149a7f2b644f871ebcc9af7fe4cd1135cd290b6d1",
+  "GoogleSans[GRAD,opsz,wght].ttf": "d0a87d835a944b8b40d0e82a5651bb59ab97b936a2aeed5946eb57e7b2a3a90a"
+ },
+ "gubbi": {
+  "Gubbi.ttf": "354c9b1872fe9cf88f96ec029cf192004ec9cc705e04a0b8b65d097e6d9bbcfa"
+ },
+ "hind-mysuru": {
+  "HindMysuru-Bold.ttf": "37e0493369db44f74d42ef36c2dda9a1977f9a724e5ac51a2ca7edd38189aa28",
+  "HindMysuru-Light.ttf": "40634c5beb3700c0f1b556c8ddf4dda27e6a20fb1b90da7a5cae85c536284887",
+  "HindMysuru-Medium.ttf": "cef72258d349131d78ca9d5de286d4d54199d27e506287ad08345b01626c3240",
+  "HindMysuru-Regular.ttf": "a38a33806d9f008fbdf204d2f684e80b23cecfc42ee0c2aed81c7b3a8333e7f2",
+  "HindMysuru-SemiBold.ttf": "7a9eed3f486affb0e469acf75e60562743a1993737f79635bed740aaa8c82a84"
+ },
+ "hubballi": {
+  "Hubballi-Regular.ttf": "e51ad77d40b5adccd6c6ca537863ef4e364bd374c56593e007fbf5402a9a1cdd"
+ },
+ "kagapa-nudi-unicode": {
+  "NUDI UNI 01E BOLD.ttf": "4b59aeacdb830097216870ccc3ee97119f1d87a867763b5625348bae341ef0c5",
+  "NUDI UNI 01E.ttf": "9249bc897bd8345906be00e9ae764368789332f7fde6a58cb32603d7538e1c59",
+  "NUDI UNI 01K.ttf": "be33059cd42761debc2f40c0da2b2495f617e0952c7603f939d7fde034db46fd",
+  "NUDI UNI 02E.ttf": "5909bb9cff6875d98d5d9e084499bcd58c2075bb6c5149a1af42af072a78af75",
+  "NUDI UNI 02K.ttf": "eff4efde62150f22bd3bb2ce7b52e0c321281aef388fcc3e05f1f0012156eb0c",
+  "NUDI UNI 03E.ttf": "108a4188f59af1055d124b051aeef4568a11302c6fa62414e582139618379ed2",
+  "NUDI UNI 03K.ttf": "463eee910348cec9f4a87b116243c932e06237c23c0c1b9015ae473050cca0a8",
+  "NUDI UNI 04E.ttf": "43647c788226eff2eae921f1f7c7426c2a1070ad97d011f373c48864887818fc",
+  "NUDI UNI 04K.ttf": "f2a1506cce709bc507d7a552b3f5e3275e2a33f661f905f54778abe3a6ce22bd",
+  "NUDI UNI 06E.ttf": "16824f2d06ad93a3db57d20c37d740e28072b2e50fcf419b054c8ffc3a85a4fd",
+  "NUDI UNI 06K.ttf": "f93f377c36649f912407e77b02c0e49b99082335c62e70898195e5b25f6ce4ad",
+  "NUDI UNI 07E.ttf": "0d7cfd0c5fd0a1917bd571e44fea196d2dcb9ea4be237aa70b2af29e7b02c295",
+  "NUDI UNI 07K.ttf": "565312930feb975230047fd4ed3b1fe08c453c032b99f09589e6a6b842dd757c",
+  "NUDI UNI 08E.ttf": "441fdfe4dc1556138395d73820efc9d917dd9a933a620a1964a91e38c1aac91d",
+  "NUDI UNI 08K.ttf": "9357a64198c2109a3703594c959f5980bc8eb3865bc67d016f2e1493f48ead46",
+  "NUDI UNI 09E.ttf": "3857a516483420ccc8df8b63df91a8385297a33166ed5582e8a551f66905618f",
+  "NUDI UNI 09K.ttf": "b3cb31d35d0c9e90c7acc7dafec0f01317f8ef8cabb1bcc629ff9d2d88a58fc8",
+  "NUDI UNI 10E.ttf": "372b280150b892319a93f74dd40dd837474ee47a8a93997c16dd1357b8a8866d",
+  "NUDI UNI 10K.ttf": "3811ea04387648f4b3e3daaab236622f4c0d800d99f5ae69bd846a386cd0ed97",
+  "NUDI UNI 11E.ttf": "d9ce50c71f2fec1a296bdbb45cb0740f38bd31f08ee0af96dd34e04ee90c11c5",
+  "NUDI UNI 11K.ttf": "9fca40ac8c88ccb7566e8c00bb800bff1c5f22f95154620354c449547d382f2e",
+  "NUDI UNI 12E.ttf": "265cd1f640e4507980a8b74c933d8aa27717b3d04c43788a54c1aa834bbb4d74",
+  "NUDI UNI 12K.ttf": "c5eaebf925c430031adceb6f6c04d55d2244515bf66e13851a4b6f4c709a95c9",
+  "NUDI UNI 13E.ttf": "949c03a31545bf7f01eddf6bd275ab3d7bbdb2e6b7914480d6a11b6662cee766",
+  "NUDI UNI 13K.ttf": "715a4242699e0bd1ffec239a0fe965f906ef069ccc9d855be787889d499deee2",
+  "NUDI UNI 14E.ttf": "ccd2d9a9b196fe5ed1adf8698fc60faa2591b8bca4ea7c3d53f51c333cda5e66",
+  "NUDI UNI 14K.ttf": "d128c756d4e091e93c66f96c4754c291d18d2e3862e77e4f51b4c8d768d2020c",
+  "NUDI UNI 15E.ttf": "142b49631cffe4512a06b6e6b299c0b6037bde2abfd9babc7d7f7a9daa157db9",
+  "NUDI UNI 15K.ttf": "8da23f87379143b6324af93592e0b3cde8af2800b6311f258e153844344c4efa",
+  "NUDI UNI 16E.ttf": "ee15cabded9ee816468e96e940175b1aef21a67da8125a7798844bd918053e1e",
+  "NUDI UNI 16K.ttf": "b8df1020d594f7bb31402d6e5ceee25f16e226c56fd91409855d962ada2d88e5",
+  "NUDI UNI 17E.ttf": "b7727de1ab24c47397a4b9dff580462cff608874cf1c3cd07f346d7e947bc3a8",
+  "NUDI UNI 17K.ttf": "201270b33389358cdbf46a6bbc11550d626f087fc1b3e8a081dd40b43f653cc4",
+  "NUDI UNI 18E.ttf": "e5236f31c901ec4a5504482c1d26500b45b9639370df574bdade210703d1e46b",
+  "NUDI UNI 18K.ttf": "dfe080dd6ad964a3fce65be2ce10a6e75939577b7b1a97c0261d340992ccd7d4",
+  "NUDI UNI 19E.ttf": "035ff23fe34767311c1a79f3bd88f331c1815f82db410716b34d4474e590d912",
+  "NUDI UNI 19K.ttf": "51e2d96294e980eac022e899d11ab7b4896fbac5b6a4cc3c1bd553c24927b312",
+  "NUDI UNI 20E.ttf": "f1c509e845b7e869fc79156c446237fd4857319c6a89b965d69f556ba8c2daab",
+  "NUDI UNI 20K.ttf": "1000e68cebd67b10dca8b51d8507c3db872c0260b5b839a2ee8fd40c8cdde8f4",
+  "NUDI UNI ananth 05E.ttf": "e15b76b9c1c96a4293dd4ec934ad8e678bead6c85e4a036c92d006b088b348b3",
+  "NUDI UNI ananth 05K.ttf": "92bdf1a9e8bdc3b55f36902108c3ee90b768ea4c77383b1f315e375f0e1f7a19",
+  "NudiParijatha.ttf": "39a1b02af9acd0659680afb0ec084c3f220703ba2f4931f4c51d5f85094a28bc",
+  "NudiParijatha_Bold.ttf": "112d530d2aa55be478cdcb023461366984cc447ca4cf645c5148e89787770ab9",
+  "NudiUni01e.ttf": "59de964cf2b662c4a41cdf7f4211a66bccbd96999d41a24ffd2379331914d65f",
+  "NudiUni01ebold.ttf": "fe47b3672bae31e0345f3dfcd85e815a275c4ba57cbe84fa25243fff9da8466b",
+  "NudiUni01k.ttf": "6b5b045a745c39b756d93e96a12c9a2b40e16af670d245cc02eea23e5d8e8a81",
+  "NudiUni02e.ttf": "bf41a1777878ac255696cc3a92018b7176f170114d00499b79a304269e990b11",
+  "NudiUni02k.ttf": "8029431d3d0ce85e3a2d4895b803355de4fd5f0eb190410a9cf3048e06eeb166",
+  "NudiUni03e.ttf": "14d8e9dc79507fe9db2e81ee59248956a533b722ce874a0a762eb6c4209d4fe8",
+  "NudiUni03k.ttf": "c4dcb69ccedc240d7b328f25d6d335be0e052c8fdd9fe6053dd35c244b01677c",
+  "NudiUni04e.ttf": "50646c7101cf28d8fb9e61414f22980bd01a0c73d9ddef6bd747a93e04cec92c",
+  "NudiUni04k.ttf": "9851dcebc81a4d6aa5cfa3188bf870fcea3818b33a9f8c160cf44c5fc327f272",
+  "NudiUni05e.ttf": "6ee59ecfff15768b369945268c4872a018c0e572875cca9c17d2e98303bb563c",
+  "NudiUni05k.ttf": "2506f50e35e6875cd38f3ac42b6854c201e0fa57193b9d71399cada094e0d164",
+  "NudiUni06e.ttf": "aeebf9e3b8b5656149a5854e959cbc4dde0fedc737da44c7ed7e7468dc45e7ac",
+  "NudiUni06k.ttf": "98713cd2f79a842dd4c29c610aa77094fe199dc81e9764763162a21f5a4a056b",
+  "NudiUni07e.ttf": "624c3f2bd3b4d81929b5ea9b013e701b100608dde70781941136f839612fea56",
+  "NudiUni07k.ttf": "e89bafb04dd4d52b4215125fa98a2d4d56d297a0b6b75a183eda4df02382bba0",
+  "NudiUni08e.ttf": "23a7bbb19704ea36d43b7adda56944c8507a98f85b331a603097b207cc3d838a",
+  "NudiUni08k.ttf": "de28d7494ca1f378f9c66ad3a7678d9ba8573c1c9706d9bb6d451f0c81d47539",
+  "NudiUni09e.ttf": "b62221f1b4841de328d5f229aca09b40e77a2dd8c68b4e01eb0fe8a40180f626",
+  "NudiUni09k.ttf": "b06ff63a198323ab5d8cb8e72a5a673055b5b3b5a39a98c77c05e1d78ee0a71f",
+  "NudiUni10e.ttf": "53ab7dc8950ec339fefe3b52bd524047a9dda226e1094dc1d1ebb76bc62510c2",
+  "NudiUni10k.ttf": "3ce825db3df66bad681c580e8c48bc6e8be7fd5e0e8d0bded9de9ae6ab1430b1",
+  "inchara.ttf": "484785460af9fb9dab045f7fd684ef9db252427118f4f86eb563434eb3652d63"
+ },
+ "kanishka": {
+  "Kanishka.ttf": "1b54d822fe83811e4c125b80868dfdfcc998d4fdef14abcef54a8c13799eaf08"
+ },
+ "kannada-pixel": {
+  "KannadaPixel.ttf": "54358d04278023ea6e281be309fcd3eb2015d4fec48c92dce2920aaed6cd0c30"
+ },
+ "karnata-bandipur": {
+  "KarnataBandipur.ttf": "064ecb9f517db740096082fd613e4391c0ce1a7dd38ebaecbc1390afa8941e38"
+ },
+ "karnata-f-kittel": {
+  "Karnata F Kittel.otf": "d8916b14d47f4516a37a91ca899e4f114435a243807d5db6ba3fef6ded419d48",
+  "KarnataFKittel.ttf": "7f8546433cca86ef382099e3ecdbc1079b8c19cfeecc4b93d0633b791e5297aa"
+ },
+ "karnata-german-mission-press": {
+  "KarnataGermanMissionPressTypeface.ttf": "0a145d14c48d954bf27cbb88388591904f13df2341928551914717f9fd026825"
+ },
+ "karnata-gtn": {
+  "KarnataGTN[wght].ttf": "c6bd938c10ffc71c55d4b2ac5071adc80f8971e4783fc66b356ff1dda91d9660"
+ },
+ "karnata-wesleyan-mission-press": {
+  "KarnataWesleyanMissionPress.ttf": "ff4625ea23019c1eb5434e5fb9521dfb9d1669b6828af201baf9fc63e80e11bc"
+ },
+ "kaveri": {
+  "Kaveri-Bold.ttf": "188b82ca75a97a69684fde70470407e442e5cb69e219179889c9654b37b988e1",
+  "Kaveri-BoldItalic.ttf": "3788fae699daa0ac50c21722c3de9d1b761c738bbaebd1d7e3b19c4437433c6e",
+  "Kaveri-Italic.ttf": "9f80b0144b6de474ab862d0da4cfa0f73507607f110102c685c60c25cc41618c",
+  "Kaveri-Regular.ttf": "b742c0494a0d21b7e531c921ac744beaaa1d5be26e626fdd43ef88c16586ac18"
+ },
+ "kedage": {
+  "Kedage-b.TTF": "92b040763d02de2547f48f36a5affa1ce94e948ed48a41b24b58b28231a432cb",
+  "Kedage-i.TTF": "6dbb06cf2999f272e3b7eb7cef2f3918fc00e10dbe4269217efe9d2a415b3fe6",
+  "Kedage-n.TTF": "9ac4c694374e9bdd49c74e5852a990eaf1256d92de859e6f2cbc42272102c1a5",
+  "Kedage-t.TTF": "40e3dca05535bc7b1a0d66a0141fe12a1e1e076aed1c7374c6171bce112429f8"
+ },
+ "kolar": {
+  "Kolar-Bold.ttf": "9876c9b9003cb97faaa23c838f9ece2dc9d71edfce173efd6d70b00b041d9b42",
+  "Kolar-ExtraBold.ttf": "ba29db6d20abaa9bfc0fbb84857ad5620f80a3a996e2d693fbf9d27bc5c76b0a",
+  "Kolar-Light.ttf": "2ad83a2bf90b5c3ed8832e989db71143a78ec7683584d68c253fca4cdbe52db3",
+  "Kolar-Medium.ttf": "bd92860136cb7e14251ecbef75a855b531e9ff2bb53b4aa9880bda5cbb5121d7",
+  "Kolar-Regular.ttf": "0804ba4b8c63311e5fa829712babeb53564bafbc49bcc2f759d03780f2a1da18",
+  "Kolar-SemiBold.ttf": "576714cfb745ad3dc12fd4dc3d34f511d8b8fc85d6f9cd314866c3868a817f79"
+ },
+ "lohit-kannada": {
+  "Lohit-Kannada.ttf": "e02e30efbad48248d007344c67dc6022b9e3d44bf0dc2e53847c01b49e6b5983"
+ },
+ "mallige": {
+  "Malige-b.TTF": "8b1ffa5bc3284d6d2c0b19badf9b4dd26eb92cbf70ef8fb0aae62d99a9716601",
+  "Malige-i.TTF": "e7780f60ac5dca785bfa3dfe0468bc588de43de828912b0d3bf1f42ee5b17fcb",
+  "Malige-n.TTF": "73f02a0f3c5ba45b2acaed8aaab541ca98d8ef6dd83709332e9df890aa769065",
+  "Malige-t.TTF": "89ccca1c439b38b4f3cab52daf732c536177acfaebfea405fd361243bea12030"
+ },
+ "mallige-2012": {
+  "MalligeNormal.ttf": "135795069e2dbc5211d55aaa87d3a01368c7563121c36e786ad137508039bf40",
+  "MalligeNormalItalic.ttf": "565f327cf3dff478a5fbd9ff3eaad87223b1db5c984e07f1064df75655d61a2b"
+ },
+ "nanni": {
+  "Nanni-Regular.ttf": "c81facb01b89f39ed7e34b78e454187fadd0dbc9e5c1f1afa4385426d08e0876"
+ },
+ "navilu": {
+  "Navilu.ttf": "3fe44701a62e25a732689dff811c84dba396edd84b433812b4efa12971567281"
+ },
+ "nishchaya": {
+  "Nishchaya.ttf": "ea5301a11995cd722a8d07fec5167e2c5da979ac548d0a9c61064b460db51eee",
+  "Nishchaya_Hosabaraha.ttf": "4305d8fce05ee5cab1c248ea6625e9a71121f0878668677a4362a2f2fc8ff039"
+ },
+ "noto-sans-kannada": {
+  "NotoSansKannada[wdth,wght].ttf": "cca4f3b3a8cb12fb261f1b43baf5d2f7f59d90fe123d41f0065ed3a183997ec9"
+ },
+ "noto-serif-kannada": {
+  "NotoSerifKannada[wght].ttf": "3d97c98dd59251a85fcc6e95edf9be02b60147e92486927390247f1cd4d5eb37"
+ },
+ "padyakke-expanded-one": {
+  "PadyakkeExpandedOne-Regular.ttf": "fcdc6cb3fc277895c98fc120acaf12d421c911bba768eba2891049b5df225032"
+ },
+ "sakal-bharati": {
+  "SakalBharati.ttf": "f27cf39cfae18b05929792fc2610f5be55d27e31afeeca2a7d6d6040733b0805"
+ },
+ "sampige": {
+  "Sampige.ttf": "c53873750ed4b56cf6b290f94bf05d45cc4f24f771c2d2c0731e59a0b3ca493b"
+ },
+ "sriraju": {
+  "SRIRAJBI.ttf": "e069b45ca35a5d03c3d2fa68b100d31c8ff5075c089335629673d47ce654dc79",
+  "SRIRAJUB.ttf": "49ab6347ca2da8afa1cc6eede60b55ff26b1ebba735d4280418709ce4cff18c2",
+  "SRIRAJUI.ttf": "254b3a45364cdbed2c38435e88a8cc5684d7c9d23a77d38f1dc085e72bc40498",
+  "SRIRAJUO.ttf": "12f5f64a5d26c8e06630bd254f272c90e5614a928e10deff09f9f8780f4676ff",
+  "SRIRAJUR.ttf": "c9b576127405f896cb2b859ac5bc3413efac43f1c2eb7949e9a6900d6eea7297",
+  "SRIRAUOI.ttf": "3e04350df714676d683c97df9a611d503c8151d7785096ce83924615db33afef"
+ },
+ "tiro-kannada": {
+  "TiroKannada-Italic.ttf": "e22b96140842bcdb7c453d68bd18f96aec535182f8b59e5071c8279c6be73c26",
+  "TiroKannada-Regular.ttf": "5543779e9eaecf5fcafc2275b37cddd70eddb7352af35da028ab8228b4593050"
+ }
+}

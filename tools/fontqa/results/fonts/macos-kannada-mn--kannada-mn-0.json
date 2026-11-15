@@ -1,0 +1,97 @@
+{
+ "summary": {
+  "face_id": "macos-kannada-mn--kannada-mn-0",
+  "font_id": "macos-kannada-mn",
+  "family": "Kannada MN",
+  "style": "Regular",
+  "version": "22.0d2e1",
+  "license": "proprietary (Apple)",
+  "license_in_font": "",
+  "source": "macOS",
+  "file": "Kannada MN.ttc",
+  "face_index": 0,
+  "sha256": "fdc0e5cc98498bb91350a331ca5d44a7027c760f44477706cad47bcc433735b9",
+  "variable": false,
+  "outlines": "TrueType",
+  "gsub_scripts": "DFLT knd2 knda",
+  "kannada_codepoints": 88,
+  "glyph_count": 565,
+  "cases": 1905,
+  "failing_cases": 4,
+  "missing_glyph": 4,
+  "notdef": 0,
+  "dotted_circle": 0,
+  "no_conjunct": 0,
+  "no_arkavattu": 0,
+  "collision": 0,
+  "indistinct": 0,
+  "missing_codepoints": "U+0CDC U+0CDD U+0CF3"
+ },
+ "font": {
+  "family": "Kannada MN",
+  "style": "Regular",
+  "full_name": "Kannada MN",
+  "version": "22.0d2e1",
+  "license_name": "",
+  "license_url": "",
+  "copyright": "Copyright (c) 2009 by Murasu Systems Sdn. Bhd. Malaysia. All rights reserved.",
+  "designer": "Muthu Nedumaran",
+  "vendor": "UKWN",
+  "glyph_count": 565,
+  "units_per_em": 2048,
+  "variable": false,
+  "axes": [],
+  "outlines": "TrueType",
+  "script_tags": {
+   "GSUB": [
+    "DFLT",
+    "knd2",
+    "knda"
+   ],
+   "GPOS": [
+    "DFLT",
+    "knd2",
+    "knda"
+   ]
+  },
+  "kannada_codepoints": 88
+ },
+ "failures": [
+  {
+   "case_id": "rare-0CDD",
+   "group": "rare",
+   "text": "ಅವನೝ",
+   "codepoints": "U+0C85 U+0CB5 U+0CA8 U+0CDD",
+   "failures": "missing_glyph",
+   "glyphs": "kn_a kn_va kn_na .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "rare-0CF3",
+   "group": "rare",
+   "text": "ಕೳ",
+   "codepoints": "U+0C95 U+0CF3",
+   "failures": "missing_glyph",
+   "glyphs": "kn_ka .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "rare-0CDC",
+   "group": "rare",
+   "text": "೜",
+   "codepoints": "U+0CDC",
+   "failures": "missing_glyph",
+   "glyphs": ".notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "rare-0CDC-word",
+   "group": "rare",
+   "text": "೜ಗಣೇಶ",
+   "codepoints": "U+0CDC U+0C97 U+0CA3 U+0CC7 U+0CB6",
+   "failures": "missing_glyph",
+   "glyphs": ".notdef kn_ga kn_nna.e _blank kn_length_mark kn_sha",
+   "detail": ""
+  }
+ ]
+}

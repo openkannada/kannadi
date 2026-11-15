@@ -65,3 +65,16 @@ jobs:
           targets: wasm32-unknown-unknown
       - uses: Swatinem/rust-cache@v2
       - run: cargo build -p kannadi --lib --release --locked --target wasm32-unknown-unknown
+
+  fontqa:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: tools/fontqa
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10.3.3
+      - run: uv sync --locked
+      - run: uv run ruff check .
+      - run: uv run ruff format --check .
+      - run: uv run pytest -q

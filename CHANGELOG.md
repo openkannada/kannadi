@@ -14,3 +14,4 @@
 - `chars::Class::is_mark`.
 - MIT license and `CITATION.cff`.
 - Nudi and Baraha ANSI to Unicode (`legacy::nudi_to_unicode`), with a glyph table derived from the font files, reports of unknown glyphs and malformed syllables, and fixtures from Karnataka government pages.
+- `tools/fontqa`: HarfBuzz shaping tests for Kannada fonts, results for 41 open fonts (146 faces) with a data card, proof sheets, and fixes for broken `knd2` tables, broken `morx` tables and missing ೄ, ೢ and ೣ.

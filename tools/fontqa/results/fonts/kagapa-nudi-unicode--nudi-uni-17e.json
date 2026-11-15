@@ -1,0 +1,446 @@
+{
+ "summary": {
+  "face_id": "kagapa-nudi-unicode--nudi-uni-17e",
+  "font_id": "kagapa-nudi-unicode",
+  "family": "NudiUni17e",
+  "style": "Regular",
+  "version": "Kannada Ganaka Parihsat v1.0",
+  "license": "unstated (free download from Kannada Ganaka Parishat)",
+  "license_in_font": "",
+  "source": "http://www.kagapa.in/downloads/Nudi%20files/Fonts.zip",
+  "file": "NUDI UNI 17E.ttf",
+  "face_index": 0,
+  "sha256": "b7727de1ab24c47397a4b9dff580462cff608874cf1c3cd07f346d7e947bc3a8",
+  "variable": false,
+  "outlines": "TrueType",
+  "gsub_scripts": "knd2 knda",
+  "kannada_codepoints": 87,
+  "glyph_count": 425,
+  "cases": 1905,
+  "failing_cases": 43,
+  "missing_glyph": 4,
+  "notdef": 0,
+  "dotted_circle": 0,
+  "no_conjunct": 0,
+  "no_arkavattu": 0,
+  "collision": 7,
+  "indistinct": 32,
+  "missing_codepoints": "U+0CDC U+0CDD U+0CF3"
+ },
+ "font": {
+  "family": "NudiUni17e",
+  "style": "Regular",
+  "full_name": "NudiUni17e",
+  "version": "Kannada Ganaka Parihsat v1.0",
+  "license_name": "",
+  "license_url": "",
+  "copyright": "Copyright (c) 2012 by Kannada Ganaka Parihsat. All rights reserved.",
+  "designer": "",
+  "vendor": "MACR",
+  "glyph_count": 425,
+  "units_per_em": 1000,
+  "variable": false,
+  "axes": [],
+  "outlines": "TrueType",
+  "script_tags": {
+   "GSUB": [
+    "knd2",
+    "knda"
+   ],
+   "GPOS": [
+    "knd2",
+    "knda"
+   ]
+  },
+  "kannada_codepoints": 87
+ },
+ "failures": [
+  {
+   "case_id": "syl-0C99-0CCA",
+   "group": "syllable",
+   "text": "ಙೊ",
+   "codepoints": "U+0C99 U+0CCA",
+   "failures": "collision",
+   "glyphs": "Ccircumflex Amacron ucircumflex",
+   "detail": "Amacron x ucircumflex 4%"
+  },
+  {
+   "case_id": "syl-0C99-0CCB",
+   "group": "syllable",
+   "text": "ಙೋ",
+   "codepoints": "U+0C99 U+0CCB",
+   "failures": "collision",
+   "glyphs": "Ccircumflex Amacron ucircumflex dagger",
+   "detail": "Amacron x ucircumflex 4%"
+  },
+  {
+   "case_id": "syl-0C9E-0CCA",
+   "group": "syllable",
+   "text": "ಞೊ",
+   "codepoints": "U+0C9E U+0CCA",
+   "failures": "collision",
+   "glyphs": "ccaron Amacron ucircumflex",
+   "detail": "Amacron x ucircumflex 8%"
+  },
+  {
+   "case_id": "syl-0C9E-0CCB",
+   "group": "syllable",
+   "text": "ಞೋ",
+   "codepoints": "U+0C9E U+0CCB",
+   "failures": "collision",
+   "glyphs": "ccaron Amacron ucircumflex dagger",
+   "detail": "Amacron x ucircumflex 8%"
+  },
+  {
+   "case_id": "syl-0CB1-0CBE",
+   "group": "syllable",
+   "text": "ಱಾ",
+   "codepoints": "U+0CB1 U+0CBE",
+   "failures": "collision",
+   "glyphs": "gbreve odieresis ygrave",
+   "detail": "odieresis x ygrave 13%"
+  },
+  {
+   "case_id": "syl-0CB1-0CCC",
+   "group": "syllable",
+   "text": "ಱೌ",
+   "codepoints": "U+0CB1 U+0CCC",
+   "failures": "collision",
+   "glyphs": "gbreve odieresis quotedblbase",
+   "detail": "odieresis x quotedblbase 12%"
+  },
+  {
+   "case_id": "syl-0CDE-0CBE",
+   "group": "syllable",
+   "text": "ೞಾ",
+   "codepoints": "U+0CDE U+0CBE",
+   "failures": "collision",
+   "glyphs": "bullet odieresis ygrave",
+   "detail": "odieresis x ygrave 13%"
+  },
+  {
+   "case_id": "clu-0C98-0CCD-0C98",
+   "group": "cluster",
+   "text": "ಘ್ಘ",
+   "codepoints": "U+0C98 U+0CCD U+0C98",
+   "failures": "indistinct",
+   "glyphs": "afii10088 imacron",
+   "detail": "same ink as ಘ್ಷ"
+  },
+  {
+   "case_id": "clu-0C98-0CCD-0C9B",
+   "group": "cluster",
+   "text": "ಘ್ಛ",
+   "codepoints": "U+0C98 U+0CCD U+0C9B",
+   "failures": "indistinct",
+   "glyphs": "afii10088 afii10019",
+   "detail": "same ink as ಘ್ಪ"
+  },
+  {
+   "case_id": "clu-0C98-0CCD-0CAA",
+   "group": "cluster",
+   "text": "ಘ್ಪ",
+   "codepoints": "U+0C98 U+0CCD U+0CAA",
+   "failures": "indistinct",
+   "glyphs": "afii10088 lcedilla",
+   "detail": "same ink as ಘ್ಛ"
+  },
+  {
+   "case_id": "clu-0C98-0CCD-0CB7",
+   "group": "cluster",
+   "text": "ಘ್ಷ",
+   "codepoints": "U+0C98 U+0CCD U+0CB7",
+   "failures": "indistinct",
+   "glyphs": "afii10088 afii10034",
+   "detail": "same ink as ಘ್ಘ"
+  },
+  {
+   "case_id": "clu-0C9B-0CCD-0C98",
+   "group": "cluster",
+   "text": "ಛ್ಘ",
+   "codepoints": "U+0C9B U+0CCD U+0C98",
+   "failures": "indistinct",
+   "glyphs": "afii10091 imacron",
+   "detail": "same ink as ಛ್ಷ"
+  },
+  {
+   "case_id": "clu-0C9B-0CCD-0C9B",
+   "group": "cluster",
+   "text": "ಛ್ಛ",
+   "codepoints": "U+0C9B U+0CCD U+0C9B",
+   "failures": "indistinct",
+   "glyphs": "afii10091 afii10019",
+   "detail": "same ink as ಛ್ಪ"
+  },
+  {
+   "case_id": "clu-0C9B-0CCD-0CAA",
+   "group": "cluster",
+   "text": "ಛ್ಪ",
+   "codepoints": "U+0C9B U+0CCD U+0CAA",
+   "failures": "indistinct",
+   "glyphs": "afii10091 lcedilla",
+   "detail": "same ink as ಛ್ಛ"
+  },
+  {
+   "case_id": "clu-0C9B-0CCD-0CB7",
+   "group": "cluster",
+   "text": "ಛ್ಷ",
+   "codepoints": "U+0C9B U+0CCD U+0CB7",
+   "failures": "indistinct",
+   "glyphs": "afii10091 afii10034",
+   "detail": "same ink as ಛ್ಘ"
+  },
+  {
+   "case_id": "clu-0C9D-0CCD-0C98",
+   "group": "cluster",
+   "text": "ಝ್ಘ",
+   "codepoints": "U+0C9D U+0CCD U+0C98",
+   "failures": "indistinct",
+   "glyphs": "afii10093 imacron",
+   "detail": "same ink as ಝ್ಷ"
+  },
+  {
+   "case_id": "clu-0C9D-0CCD-0C9B",
+   "group": "cluster",
+   "text": "ಝ್ಛ",
+   "codepoints": "U+0C9D U+0CCD U+0C9B",
+   "failures": "indistinct",
+   "glyphs": "afii10093 afii10019",
+   "detail": "same ink as ಝ್ಪ"
+  },
+  {
+   "case_id": "clu-0C9D-0CCD-0CAA",
+   "group": "cluster",
+   "text": "ಝ್ಪ",
+   "codepoints": "U+0C9D U+0CCD U+0CAA",
+   "failures": "indistinct",
+   "glyphs": "afii10093 lcedilla",
+   "detail": "same ink as ಝ್ಛ"
+  },
+  {
+   "case_id": "clu-0C9D-0CCD-0CB7",
+   "group": "cluster",
+   "text": "ಝ್ಷ",
+   "codepoints": "U+0C9D U+0CCD U+0CB7",
+   "failures": "indistinct",
+   "glyphs": "afii10093 afii10034",
+   "detail": "same ink as ಝ್ಘ"
+  },
+  {
+   "case_id": "clu-0CA2-0CCD-0C98",
+   "group": "cluster",
+   "text": "ಢ್ಘ",
+   "codepoints": "U+0CA2 U+0CCD U+0C98",
+   "failures": "indistinct",
+   "glyphs": "afii10071 imacron",
+   "detail": "same ink as ಢ್ಷ"
+  },
+  {
+   "case_id": "clu-0CA2-0CCD-0C9B",
+   "group": "cluster",
+   "text": "ಢ್ಛ",
+   "codepoints": "U+0CA2 U+0CCD U+0C9B",
+   "failures": "indistinct",
+   "glyphs": "afii10071 afii10019",
+   "detail": "same ink as ಢ್ಪ"
+  },
+  {
+   "case_id": "clu-0CA2-0CCD-0CAA",
+   "group": "cluster",
+   "text": "ಢ್ಪ",
+   "codepoints": "U+0CA2 U+0CCD U+0CAA",
+   "failures": "indistinct",
+   "glyphs": "afii10071 lcedilla",
+   "detail": "same ink as ಢ್ಛ"
+  },
+  {
+   "case_id": "clu-0CA2-0CCD-0CB7",
+   "group": "cluster",
+   "text": "ಢ್ಷ",
+   "codepoints": "U+0CA2 U+0CCD U+0CB7",
+   "failures": "indistinct",
+   "glyphs": "afii10071 afii10034",
+   "detail": "same ink as ಢ್ಘ"
+  },
+  {
+   "case_id": "clu-0CA5-0CCD-0C98",
+   "group": "cluster",
+   "text": "ಥ್ಘ",
+   "codepoints": "U+0CA5 U+0CCD U+0C98",
+   "failures": "indistinct",
+   "glyphs": "afii10101 imacron",
+   "detail": "same ink as ಥ್ಷ"
+  },
+  {
+   "case_id": "clu-0CA5-0CCD-0C9B",
+   "group": "cluster",
+   "text": "ಥ್ಛ",
+   "codepoints": "U+0CA5 U+0CCD U+0C9B",
+   "failures": "indistinct",
+   "glyphs": "afii10101 afii10019",
+   "detail": "same ink as ಥ್ಪ"
+  },
+  {
+   "case_id": "clu-0CA5-0CCD-0CAA",
+   "group": "cluster",
+   "text": "ಥ್ಪ",
+   "codepoints": "U+0CA5 U+0CCD U+0CAA",
+   "failures": "indistinct",
+   "glyphs": "afii10101 lcedilla",
+   "detail": "same ink as ಥ್ಛ"
+  },
+  {
+   "case_id": "clu-0CA5-0CCD-0CB7",
+   "group": "cluster",
+   "text": "ಥ್ಷ",
+   "codepoints": "U+0CA5 U+0CCD U+0CB7",
+   "failures": "indistinct",
+   "glyphs": "afii10101 afii10034",
+   "detail": "same ink as ಥ್ಘ"
+  },
+  {
+   "case_id": "clu-0CA7-0CCD-0C98",
+   "group": "cluster",
+   "text": "ಧ್ಘ",
+   "codepoints": "U+0CA7 U+0CCD U+0C98",
+   "failures": "indistinct",
+   "glyphs": "afii10103 imacron",
+   "detail": "same ink as ಧ್ಷ"
+  },
+  {
+   "case_id": "clu-0CA7-0CCD-0C9B",
+   "group": "cluster",
+   "text": "ಧ್ಛ",
+   "codepoints": "U+0CA7 U+0CCD U+0C9B",
+   "failures": "indistinct",
+   "glyphs": "afii10103 afii10019",
+   "detail": "same ink as ಧ್ಪ"
+  },
+  {
+   "case_id": "clu-0CA7-0CCD-0CAA",
+   "group": "cluster",
+   "text": "ಧ್ಪ",
+   "codepoints": "U+0CA7 U+0CCD U+0CAA",
+   "failures": "indistinct",
+   "glyphs": "afii10103 lcedilla",
+   "detail": "same ink as ಧ್ಛ"
+  },
+  {
+   "case_id": "clu-0CA7-0CCD-0CB7",
+   "group": "cluster",
+   "text": "ಧ್ಷ",
+   "codepoints": "U+0CA7 U+0CCD U+0CB7",
+   "failures": "indistinct",
+   "glyphs": "afii10103 afii10034",
+   "detail": "same ink as ಧ್ಘ"
+  },
+  {
+   "case_id": "clu-0CAA-0CCD-0C98",
+   "group": "cluster",
+   "text": "ಪ್ಘ",
+   "codepoints": "U+0CAA U+0CCD U+0C98",
+   "failures": "indistinct",
+   "glyphs": "afii10105 imacron",
+   "detail": "same ink as ಪ್ಷ"
+  },
+  {
+   "case_id": "clu-0CAA-0CCD-0C9B",
+   "group": "cluster",
+   "text": "ಪ್ಛ",
+   "codepoints": "U+0CAA U+0CCD U+0C9B",
+   "failures": "indistinct",
+   "glyphs": "afii10105 afii10019",
+   "detail": "same ink as ಪ್ಪ"
+  },
+  {
+   "case_id": "clu-0CAA-0CCD-0CAA",
+   "group": "cluster",
+   "text": "ಪ್ಪ",
+   "codepoints": "U+0CAA U+0CCD U+0CAA",
+   "failures": "indistinct",
+   "glyphs": "afii10105 lcedilla",
+   "detail": "same ink as ಪ್ಛ"
+  },
+  {
+   "case_id": "clu-0CAA-0CCD-0CB7",
+   "group": "cluster",
+   "text": "ಪ್ಷ",
+   "codepoints": "U+0CAA U+0CCD U+0CB7",
+   "failures": "indistinct",
+   "glyphs": "afii10105 afii10034",
+   "detail": "same ink as ಪ್ಘ"
+  },
+  {
+   "case_id": "clu-0CAD-0CCD-0C98",
+   "group": "cluster",
+   "text": "ಭ್ಘ",
+   "codepoints": "U+0CAD U+0CCD U+0C98",
+   "failures": "indistinct",
+   "glyphs": "afii10108 imacron",
+   "detail": "same ink as ಭ್ಷ"
+  },
+  {
+   "case_id": "clu-0CAD-0CCD-0C9B",
+   "group": "cluster",
+   "text": "ಭ್ಛ",
+   "codepoints": "U+0CAD U+0CCD U+0C9B",
+   "failures": "indistinct",
+   "glyphs": "afii10108 afii10019",
+   "detail": "same ink as ಭ್ಪ"
+  },
+  {
+   "case_id": "clu-0CAD-0CCD-0CAA",
+   "group": "cluster",
+   "text": "ಭ್ಪ",
+   "codepoints": "U+0CAD U+0CCD U+0CAA",
+   "failures": "indistinct",
+   "glyphs": "afii10108 lcedilla",
+   "detail": "same ink as ಭ್ಛ"
+  },
+  {
+   "case_id": "clu-0CAD-0CCD-0CB7",
+   "group": "cluster",
+   "text": "ಭ್ಷ",
+   "codepoints": "U+0CAD U+0CCD U+0CB7",
+   "failures": "indistinct",
+   "glyphs": "afii10108 afii10034",
+   "detail": "same ink as ಭ್ಘ"
+  },
+  {
+   "case_id": "rare-0CDD",
+   "group": "rare",
+   "text": "ಅವನೝ",
+   "codepoints": "U+0C85 U+0CB5 U+0CA8 U+0CDD",
+   "failures": "missing_glyph",
+   "glyphs": "afii10070 Wgrave afii10104 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "rare-0CF3",
+   "group": "rare",
+   "text": "ಕೳ",
+   "codepoints": "U+0C95 U+0CF3",
+   "failures": "missing_glyph",
+   "glyphs": "afii10085 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "rare-0CDC",
+   "group": "rare",
+   "text": "೜",
+   "codepoints": "U+0CDC",
+   "failures": "missing_glyph",
+   "glyphs": ".notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "rare-0CDC-word",
+   "group": "rare",
+   "text": "೜ಗಣೇಶ",
+   "codepoints": "U+0CDC U+0C97 U+0CA3 U+0CC7 U+0CB6",
+   "failures": "missing_glyph",
+   "glyphs": ".notdef afii10087 Emacron quoteright dagger wgrave",
+   "detail": ""
+  }
+ ]
+}

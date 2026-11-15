@@ -1,0 +1,115 @@
+{
+ "summary": {
+  "face_id": "hind-mysuru--hindmysuru-semibold",
+  "font_id": "hind-mysuru",
+  "family": "Hind Mysuru",
+  "style": "SemiBold",
+  "version": "Version 0.703;PS 1.0;hotconv 1.0.86;makeotf.lib2.5.63406",
+  "license": "OFL-1.1",
+  "license_in_font": "This Font Software is licensed under the SIL Open Font License, Version 1.1. This license is available with a FAQ at: http://scripts.sil.org/OFL",
+  "source": "Google Fonts",
+  "file": "HindMysuru-SemiBold.ttf",
+  "face_index": 0,
+  "sha256": "7a9eed3f486affb0e469acf75e60562743a1993737f79635bed740aaa8c82a84",
+  "variable": false,
+  "outlines": "TrueType",
+  "gsub_scripts": "DFLT knd2 knda",
+  "kannada_codepoints": 84,
+  "glyph_count": 827,
+  "cases": 1905,
+  "failing_cases": 6,
+  "missing_glyph": 6,
+  "notdef": 0,
+  "dotted_circle": 0,
+  "no_conjunct": 0,
+  "no_arkavattu": 0,
+  "collision": 0,
+  "indistinct": 0,
+  "missing_codepoints": "U+0CDC U+0CDD U+0CF1 U+0CF2 U+0CF3"
+ },
+ "font": {
+  "family": "Hind Mysuru",
+  "style": "SemiBold",
+  "full_name": "Hind Mysuru SemiBold",
+  "version": "Version 0.703;PS 1.0;hotconv 1.0.86;makeotf.lib2.5.63406",
+  "license_name": "This Font Software is licensed under the SIL Open Font License, Version 1.1. This license is available with a FAQ at: http://scripts.sil.org/OFL",
+  "license_url": "http://scripts.sil.org/OFL",
+  "copyright": "Copyright (c) 2015 Indian Type Foundry (info@indiantypefoundry.com)",
+  "designer": "Manushi Parikh, Hitesh Malaviya",
+  "vendor": "ITFO",
+  "glyph_count": 827,
+  "units_per_em": 1000,
+  "variable": false,
+  "axes": [],
+  "outlines": "TrueType",
+  "script_tags": {
+   "GSUB": [
+    "DFLT",
+    "knd2",
+    "knda"
+   ],
+   "GPOS": [
+    "DFLT",
+    "knd2",
+    "knda"
+   ]
+  },
+  "kannada_codepoints": 84
+ },
+ "failures": [
+  {
+   "case_id": "rare-0CDD",
+   "group": "rare",
+   "text": "ಅವನೝ",
+   "codepoints": "U+0C85 U+0CB5 U+0CA8 U+0CDD",
+   "failures": "missing_glyph",
+   "glyphs": "gid297 gid341 gid330 gid0",
+   "detail": ""
+  },
+  {
+   "case_id": "rare-0CF3",
+   "group": "rare",
+   "text": "ಕೳ",
+   "codepoints": "U+0C95 U+0CF3",
+   "failures": "missing_glyph",
+   "glyphs": "gid311 gid0",
+   "detail": ""
+  },
+  {
+   "case_id": "rare-0CDC",
+   "group": "rare",
+   "text": "೜",
+   "codepoints": "U+0CDC",
+   "failures": "missing_glyph",
+   "glyphs": "gid0",
+   "detail": ""
+  },
+  {
+   "case_id": "rare-0CDC-word",
+   "group": "rare",
+   "text": "೜ಗಣೇಶ",
+   "codepoints": "U+0CDC U+0C97 U+0CA3 U+0CC7 U+0CB6",
+   "failures": "missing_glyph",
+   "glyphs": "gid0 gid313 gid619 gid361 gid342",
+   "detail": ""
+  },
+  {
+   "case_id": "rare-0CF1",
+   "group": "rare",
+   "text": "ಅೱಕ",
+   "codepoints": "U+0C85 U+0CF1 U+0C95",
+   "failures": "missing_glyph",
+   "glyphs": "gid297 gid0 gid311",
+   "detail": ""
+  },
+  {
+   "case_id": "rare-0CF2",
+   "group": "rare",
+   "text": "ಅೲಪ",
+   "codepoints": "U+0C85 U+0CF2 U+0CAA",
+   "failures": "missing_glyph",
+   "glyphs": "gid297 gid0 gid331",
+   "detail": ""
+  }
+ ]
+}

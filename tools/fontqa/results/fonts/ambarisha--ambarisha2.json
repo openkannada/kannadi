@@ -1,0 +1,128 @@
+{
+ "summary": {
+  "face_id": "ambarisha--ambarisha2",
+  "font_id": "ambarisha",
+  "family": "a font named font[]",
+  "style": "Regular",
+  "version": "Version 001.000",
+  "license": "OFL-1.1",
+  "license_in_font": "",
+  "source": "https://github.com/appajid/Ambarisha",
+  "file": "Ambarisha2.ttf",
+  "face_index": 0,
+  "sha256": "289a93a0bfb38a09af3ed634ca977f97d202c2c33e59f5e14f0b12dd31419bcd",
+  "variable": false,
+  "outlines": "TrueType",
+  "gsub_scripts": "DFLT grek knd2 knda latn",
+  "kannada_codepoints": 84,
+  "glyph_count": 877,
+  "cases": 1905,
+  "failing_cases": 7,
+  "missing_glyph": 6,
+  "notdef": 0,
+  "dotted_circle": 0,
+  "no_conjunct": 0,
+  "no_arkavattu": 0,
+  "collision": 1,
+  "indistinct": 0,
+  "missing_codepoints": "U+0CDC U+0CDD U+0CF1 U+0CF2 U+0CF3"
+ },
+ "font": {
+  "family": "a font named font[]",
+  "style": "Regular",
+  "full_name": "a font named font[]",
+  "version": "Version 001.000",
+  "license_name": "",
+  "license_url": "",
+  "copyright": "Copyright (c) 2015, kelvin,,,",
+  "designer": "",
+  "vendor": "PfEd",
+  "glyph_count": 877,
+  "units_per_em": 1000,
+  "variable": false,
+  "axes": [],
+  "outlines": "TrueType",
+  "script_tags": {
+   "GSUB": [
+    "DFLT",
+    "grek",
+    "knd2",
+    "knda",
+    "latn"
+   ],
+   "GPOS": [
+    "DFLT",
+    "grek",
+    "knd2",
+    "knda",
+    "latn"
+   ]
+  },
+  "kannada_codepoints": 84
+ },
+ "failures": [
+  {
+   "case_id": "ark-0CB0-0CCD-0C95-0CC3",
+   "group": "arkavattu",
+   "text": "ರ್ಕೃ",
+   "codepoints": "U+0CB0 U+0CCD U+0C95 U+0CC3",
+   "failures": "collision",
+   "glyphs": "knKA knsignvR knReph",
+   "detail": "knsignvR x knReph 8%"
+  },
+  {
+   "case_id": "rare-0CDD",
+   "group": "rare",
+   "text": "ಅವನೝ",
+   "codepoints": "U+0C85 U+0CB5 U+0CA8 U+0CDD",
+   "failures": "missing_glyph",
+   "glyphs": "knA knVA knNA .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "rare-0CF3",
+   "group": "rare",
+   "text": "ಕೳ",
+   "codepoints": "U+0C95 U+0CF3",
+   "failures": "missing_glyph",
+   "glyphs": "knKA .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "rare-0CDC",
+   "group": "rare",
+   "text": "೜",
+   "codepoints": "U+0CDC",
+   "failures": "missing_glyph",
+   "glyphs": ".notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "rare-0CDC-word",
+   "group": "rare",
+   "text": "೜ಗಣೇಶ",
+   "codepoints": "U+0CDC U+0C97 U+0CA3 U+0CC7 U+0CB6",
+   "failures": "missing_glyph",
+   "glyphs": ".notdef knGA knNNE knLengthmark knSHA",
+   "detail": ""
+  },
+  {
+   "case_id": "rare-0CF1",
+   "group": "rare",
+   "text": "ಅೱಕ",
+   "codepoints": "U+0C85 U+0CF1 U+0C95",
+   "failures": "missing_glyph",
+   "glyphs": "knA .notdef knKA",
+   "detail": ""
+  },
+  {
+   "case_id": "rare-0CF2",
+   "group": "rare",
+   "text": "ಅೲಪ",
+   "codepoints": "U+0C85 U+0CF2 U+0CAA",
+   "failures": "missing_glyph",
+   "glyphs": "knA .notdef knPA",
+   "detail": ""
+  }
+ ]
+}

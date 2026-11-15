@@ -1,0 +1,1854 @@
+{
+ "summary": {
+  "face_id": "akaya-kanadaka--akayakanadaka-regular",
+  "font_id": "akaya-kanadaka",
+  "family": "Akaya Kanadaka",
+  "style": "Regular",
+  "version": "Version 1.002; ttfautohint (v1.8.3)",
+  "license": "OFL-1.1",
+  "license_in_font": "This Font Software is licensed under the SIL Open Font License, Version 1.1. This license is available with a FAQ at: http://scripts.sil.org/OFL",
+  "source": "Google Fonts",
+  "file": "AkayaKanadaka-Regular.ttf",
+  "face_index": 0,
+  "sha256": "7891840f8c14326220aafd73f599f592bf44c60e4f8882bcf7c57426d62e9427",
+  "variable": false,
+  "outlines": "TrueType",
+  "gsub_scripts": "DFLT knd2 knda latn",
+  "kannada_codepoints": 80,
+  "glyph_count": 843,
+  "cases": 1905,
+  "failing_cases": 199,
+  "missing_glyph": 121,
+  "notdef": 0,
+  "dotted_circle": 0,
+  "no_conjunct": 70,
+  "no_arkavattu": 0,
+  "collision": 8,
+  "indistinct": 0,
+  "missing_codepoints": "U+0CC4 U+0CDC U+0CDD U+0CE1 U+0CE2 U+0CE3 U+0CF1 U+0CF2 U+0CF3"
+ },
+ "font": {
+  "family": "Akaya Kanadaka",
+  "style": "Regular",
+  "full_name": "Akaya Kanadaka Regular",
+  "version": "Version 1.002; ttfautohint (v1.8.3)",
+  "license_name": "This Font Software is licensed under the SIL Open Font License, Version 1.1. This license is available with a FAQ at: http://scripts.sil.org/OFL",
+  "license_url": "http://scripts.sil.org/OFL",
+  "copyright": "Copyright 2015 The Akaya Kanadaka Project Authors (https://github.com/vaishnavimurthy/Akaya-Kanadaka)",
+  "designer": "Vaishnavi Murthy Yerkadithaya, Juan Luis Blanco Aristondo",
+  "vendor": "NONE",
+  "glyph_count": 843,
+  "units_per_em": 1000,
+  "variable": false,
+  "axes": [],
+  "outlines": "TrueType",
+  "script_tags": {
+   "GSUB": [
+    "DFLT",
+    "knd2",
+    "knda",
+    "latn"
+   ],
+   "GPOS": [
+    "DFLT",
+    "knd2",
+    "knda",
+    "latn"
+   ]
+  },
+  "kannada_codepoints": 80
+ },
+ "failures": [
+  {
+   "case_id": "syl-0C95-0CC4",
+   "group": "syllable",
+   "text": "ಕೄ",
+   "codepoints": "U+0C95 U+0CC4",
+   "failures": "missing_glyph",
+   "glyphs": "uni0C95 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0C95-0CE2",
+   "group": "syllable",
+   "text": "ಕೢ",
+   "codepoints": "U+0C95 U+0CE2",
+   "failures": "missing_glyph",
+   "glyphs": "uni0C95 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0C95-0CE3",
+   "group": "syllable",
+   "text": "ಕೣ",
+   "codepoints": "U+0C95 U+0CE3",
+   "failures": "missing_glyph",
+   "glyphs": "uni0C95 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0C96-0CC4",
+   "group": "syllable",
+   "text": "ಖೄ",
+   "codepoints": "U+0C96 U+0CC4",
+   "failures": "missing_glyph",
+   "glyphs": "uni0C96 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0C96-0CE2",
+   "group": "syllable",
+   "text": "ಖೢ",
+   "codepoints": "U+0C96 U+0CE2",
+   "failures": "missing_glyph",
+   "glyphs": "uni0C96 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0C96-0CE3",
+   "group": "syllable",
+   "text": "ಖೣ",
+   "codepoints": "U+0C96 U+0CE3",
+   "failures": "missing_glyph",
+   "glyphs": "uni0C96 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0C97-0CC4",
+   "group": "syllable",
+   "text": "ಗೄ",
+   "codepoints": "U+0C97 U+0CC4",
+   "failures": "missing_glyph",
+   "glyphs": "uni0C97 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0C97-0CE2",
+   "group": "syllable",
+   "text": "ಗೢ",
+   "codepoints": "U+0C97 U+0CE2",
+   "failures": "missing_glyph",
+   "glyphs": "uni0C97 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0C97-0CE3",
+   "group": "syllable",
+   "text": "ಗೣ",
+   "codepoints": "U+0C97 U+0CE3",
+   "failures": "missing_glyph",
+   "glyphs": "uni0C97 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0C98-0CC4",
+   "group": "syllable",
+   "text": "ಘೄ",
+   "codepoints": "U+0C98 U+0CC4",
+   "failures": "missing_glyph",
+   "glyphs": "uni0C98 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0C98-0CE2",
+   "group": "syllable",
+   "text": "ಘೢ",
+   "codepoints": "U+0C98 U+0CE2",
+   "failures": "missing_glyph",
+   "glyphs": "uni0C98 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0C98-0CE3",
+   "group": "syllable",
+   "text": "ಘೣ",
+   "codepoints": "U+0C98 U+0CE3",
+   "failures": "missing_glyph",
+   "glyphs": "uni0C98 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0C99-0CC4",
+   "group": "syllable",
+   "text": "ಙೄ",
+   "codepoints": "U+0C99 U+0CC4",
+   "failures": "missing_glyph",
+   "glyphs": "uni0C99 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0C99-0CE2",
+   "group": "syllable",
+   "text": "ಙೢ",
+   "codepoints": "U+0C99 U+0CE2",
+   "failures": "missing_glyph",
+   "glyphs": "uni0C99 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0C99-0CE3",
+   "group": "syllable",
+   "text": "ಙೣ",
+   "codepoints": "U+0C99 U+0CE3",
+   "failures": "missing_glyph",
+   "glyphs": "uni0C99 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0C9A-0CC4",
+   "group": "syllable",
+   "text": "ಚೄ",
+   "codepoints": "U+0C9A U+0CC4",
+   "failures": "missing_glyph",
+   "glyphs": "uni0C9A .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0C9A-0CE2",
+   "group": "syllable",
+   "text": "ಚೢ",
+   "codepoints": "U+0C9A U+0CE2",
+   "failures": "missing_glyph",
+   "glyphs": "uni0C9A .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0C9A-0CE3",
+   "group": "syllable",
+   "text": "ಚೣ",
+   "codepoints": "U+0C9A U+0CE3",
+   "failures": "missing_glyph",
+   "glyphs": "uni0C9A .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0C9B-0CC4",
+   "group": "syllable",
+   "text": "ಛೄ",
+   "codepoints": "U+0C9B U+0CC4",
+   "failures": "missing_glyph",
+   "glyphs": "uni0C9B .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0C9B-0CE2",
+   "group": "syllable",
+   "text": "ಛೢ",
+   "codepoints": "U+0C9B U+0CE2",
+   "failures": "missing_glyph",
+   "glyphs": "uni0C9B .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0C9B-0CE3",
+   "group": "syllable",
+   "text": "ಛೣ",
+   "codepoints": "U+0C9B U+0CE3",
+   "failures": "missing_glyph",
+   "glyphs": "uni0C9B .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0C9C-0CC4",
+   "group": "syllable",
+   "text": "ಜೄ",
+   "codepoints": "U+0C9C U+0CC4",
+   "failures": "missing_glyph",
+   "glyphs": "uni0C9C .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0C9C-0CE2",
+   "group": "syllable",
+   "text": "ಜೢ",
+   "codepoints": "U+0C9C U+0CE2",
+   "failures": "missing_glyph",
+   "glyphs": "uni0C9C .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0C9C-0CE3",
+   "group": "syllable",
+   "text": "ಜೣ",
+   "codepoints": "U+0C9C U+0CE3",
+   "failures": "missing_glyph",
+   "glyphs": "uni0C9C .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0C9D-0CC4",
+   "group": "syllable",
+   "text": "ಝೄ",
+   "codepoints": "U+0C9D U+0CC4",
+   "failures": "missing_glyph",
+   "glyphs": "uni0C9D .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0C9D-0CE2",
+   "group": "syllable",
+   "text": "ಝೢ",
+   "codepoints": "U+0C9D U+0CE2",
+   "failures": "missing_glyph",
+   "glyphs": "uni0C9D .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0C9D-0CE3",
+   "group": "syllable",
+   "text": "ಝೣ",
+   "codepoints": "U+0C9D U+0CE3",
+   "failures": "missing_glyph",
+   "glyphs": "uni0C9D .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0C9E-0CC4",
+   "group": "syllable",
+   "text": "ಞೄ",
+   "codepoints": "U+0C9E U+0CC4",
+   "failures": "missing_glyph",
+   "glyphs": "uni0C9E .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0C9E-0CE2",
+   "group": "syllable",
+   "text": "ಞೢ",
+   "codepoints": "U+0C9E U+0CE2",
+   "failures": "missing_glyph",
+   "glyphs": "uni0C9E .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0C9E-0CE3",
+   "group": "syllable",
+   "text": "ಞೣ",
+   "codepoints": "U+0C9E U+0CE3",
+   "failures": "missing_glyph",
+   "glyphs": "uni0C9E .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0C9F-0CC4",
+   "group": "syllable",
+   "text": "ಟೄ",
+   "codepoints": "U+0C9F U+0CC4",
+   "failures": "missing_glyph",
+   "glyphs": "uni0C9F .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0C9F-0CE2",
+   "group": "syllable",
+   "text": "ಟೢ",
+   "codepoints": "U+0C9F U+0CE2",
+   "failures": "missing_glyph",
+   "glyphs": "uni0C9F .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0C9F-0CE3",
+   "group": "syllable",
+   "text": "ಟೣ",
+   "codepoints": "U+0C9F U+0CE3",
+   "failures": "missing_glyph",
+   "glyphs": "uni0C9F .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CA0-0CC4",
+   "group": "syllable",
+   "text": "ಠೄ",
+   "codepoints": "U+0CA0 U+0CC4",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CA0 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CA0-0CE2",
+   "group": "syllable",
+   "text": "ಠೢ",
+   "codepoints": "U+0CA0 U+0CE2",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CA0 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CA0-0CE3",
+   "group": "syllable",
+   "text": "ಠೣ",
+   "codepoints": "U+0CA0 U+0CE3",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CA0 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CA1-0CC4",
+   "group": "syllable",
+   "text": "ಡೄ",
+   "codepoints": "U+0CA1 U+0CC4",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CA1 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CA1-0CE2",
+   "group": "syllable",
+   "text": "ಡೢ",
+   "codepoints": "U+0CA1 U+0CE2",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CA1 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CA1-0CE3",
+   "group": "syllable",
+   "text": "ಡೣ",
+   "codepoints": "U+0CA1 U+0CE3",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CA1 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CA2-0CC4",
+   "group": "syllable",
+   "text": "ಢೄ",
+   "codepoints": "U+0CA2 U+0CC4",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CA2 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CA2-0CE2",
+   "group": "syllable",
+   "text": "ಢೢ",
+   "codepoints": "U+0CA2 U+0CE2",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CA2 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CA2-0CE3",
+   "group": "syllable",
+   "text": "ಢೣ",
+   "codepoints": "U+0CA2 U+0CE3",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CA2 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CA3-0CC4",
+   "group": "syllable",
+   "text": "ಣೄ",
+   "codepoints": "U+0CA3 U+0CC4",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CA3 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CA3-0CE2",
+   "group": "syllable",
+   "text": "ಣೢ",
+   "codepoints": "U+0CA3 U+0CE2",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CA3 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CA3-0CE3",
+   "group": "syllable",
+   "text": "ಣೣ",
+   "codepoints": "U+0CA3 U+0CE3",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CA3 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CA4-0CC4",
+   "group": "syllable",
+   "text": "ತೄ",
+   "codepoints": "U+0CA4 U+0CC4",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CA4 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CA4-0CE2",
+   "group": "syllable",
+   "text": "ತೢ",
+   "codepoints": "U+0CA4 U+0CE2",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CA4 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CA4-0CE3",
+   "group": "syllable",
+   "text": "ತೣ",
+   "codepoints": "U+0CA4 U+0CE3",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CA4 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CA5-0CC4",
+   "group": "syllable",
+   "text": "ಥೄ",
+   "codepoints": "U+0CA5 U+0CC4",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CA5 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CA5-0CE2",
+   "group": "syllable",
+   "text": "ಥೢ",
+   "codepoints": "U+0CA5 U+0CE2",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CA5 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CA5-0CE3",
+   "group": "syllable",
+   "text": "ಥೣ",
+   "codepoints": "U+0CA5 U+0CE3",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CA5 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CA6-0CC4",
+   "group": "syllable",
+   "text": "ದೄ",
+   "codepoints": "U+0CA6 U+0CC4",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CA6 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CA6-0CE2",
+   "group": "syllable",
+   "text": "ದೢ",
+   "codepoints": "U+0CA6 U+0CE2",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CA6 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CA6-0CE3",
+   "group": "syllable",
+   "text": "ದೣ",
+   "codepoints": "U+0CA6 U+0CE3",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CA6 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CA7-0CC4",
+   "group": "syllable",
+   "text": "ಧೄ",
+   "codepoints": "U+0CA7 U+0CC4",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CA7 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CA7-0CE2",
+   "group": "syllable",
+   "text": "ಧೢ",
+   "codepoints": "U+0CA7 U+0CE2",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CA7 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CA7-0CE3",
+   "group": "syllable",
+   "text": "ಧೣ",
+   "codepoints": "U+0CA7 U+0CE3",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CA7 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CA8-0CC4",
+   "group": "syllable",
+   "text": "ನೄ",
+   "codepoints": "U+0CA8 U+0CC4",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CA8 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CA8-0CE2",
+   "group": "syllable",
+   "text": "ನೢ",
+   "codepoints": "U+0CA8 U+0CE2",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CA8 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CA8-0CE3",
+   "group": "syllable",
+   "text": "ನೣ",
+   "codepoints": "U+0CA8 U+0CE3",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CA8 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CAA-0CC4",
+   "group": "syllable",
+   "text": "ಪೄ",
+   "codepoints": "U+0CAA U+0CC4",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CAA .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CAA-0CE2",
+   "group": "syllable",
+   "text": "ಪೢ",
+   "codepoints": "U+0CAA U+0CE2",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CAA .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CAA-0CE3",
+   "group": "syllable",
+   "text": "ಪೣ",
+   "codepoints": "U+0CAA U+0CE3",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CAA .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CAB-0CC4",
+   "group": "syllable",
+   "text": "ಫೄ",
+   "codepoints": "U+0CAB U+0CC4",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CAB .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CAB-0CE2",
+   "group": "syllable",
+   "text": "ಫೢ",
+   "codepoints": "U+0CAB U+0CE2",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CAB .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CAB-0CE3",
+   "group": "syllable",
+   "text": "ಫೣ",
+   "codepoints": "U+0CAB U+0CE3",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CAB .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CAC-0CC4",
+   "group": "syllable",
+   "text": "ಬೄ",
+   "codepoints": "U+0CAC U+0CC4",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CAC .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CAC-0CE2",
+   "group": "syllable",
+   "text": "ಬೢ",
+   "codepoints": "U+0CAC U+0CE2",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CAC .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CAC-0CE3",
+   "group": "syllable",
+   "text": "ಬೣ",
+   "codepoints": "U+0CAC U+0CE3",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CAC .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CAD-0CC4",
+   "group": "syllable",
+   "text": "ಭೄ",
+   "codepoints": "U+0CAD U+0CC4",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CAD .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CAD-0CE2",
+   "group": "syllable",
+   "text": "ಭೢ",
+   "codepoints": "U+0CAD U+0CE2",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CAD .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CAD-0CE3",
+   "group": "syllable",
+   "text": "ಭೣ",
+   "codepoints": "U+0CAD U+0CE3",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CAD .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CAE-0CC4",
+   "group": "syllable",
+   "text": "ಮೄ",
+   "codepoints": "U+0CAE U+0CC4",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CAE .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CAE-0CE2",
+   "group": "syllable",
+   "text": "ಮೢ",
+   "codepoints": "U+0CAE U+0CE2",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CAE .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CAE-0CE3",
+   "group": "syllable",
+   "text": "ಮೣ",
+   "codepoints": "U+0CAE U+0CE3",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CAE .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CAF-0CC4",
+   "group": "syllable",
+   "text": "ಯೄ",
+   "codepoints": "U+0CAF U+0CC4",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CAF .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CAF-0CE2",
+   "group": "syllable",
+   "text": "ಯೢ",
+   "codepoints": "U+0CAF U+0CE2",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CAF .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CAF-0CE3",
+   "group": "syllable",
+   "text": "ಯೣ",
+   "codepoints": "U+0CAF U+0CE3",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CAF .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CB0-0CC4",
+   "group": "syllable",
+   "text": "ರೄ",
+   "codepoints": "U+0CB0 U+0CC4",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CB0 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CB0-0CE2",
+   "group": "syllable",
+   "text": "ರೢ",
+   "codepoints": "U+0CB0 U+0CE2",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CB0 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CB0-0CE3",
+   "group": "syllable",
+   "text": "ರೣ",
+   "codepoints": "U+0CB0 U+0CE3",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CB0 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CB1-0CC0",
+   "group": "syllable",
+   "text": "ಱೀ",
+   "codepoints": "U+0CB1 U+0CC0",
+   "failures": "collision",
+   "glyphs": "uni0CB1 uni0CBF uni0CD5",
+   "detail": "uni0CBF x uni0CD5 6%"
+  },
+  {
+   "case_id": "syl-0CB1-0CC4",
+   "group": "syllable",
+   "text": "ಱೄ",
+   "codepoints": "U+0CB1 U+0CC4",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CB1 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CB1-0CC7",
+   "group": "syllable",
+   "text": "ಱೇ",
+   "codepoints": "U+0CB1 U+0CC7",
+   "failures": "collision",
+   "glyphs": "uni0CB1 uni0CC6 uni0CD5",
+   "detail": "uni0CC6 x uni0CD5 17%"
+  },
+  {
+   "case_id": "syl-0CB1-0CCA",
+   "group": "syllable",
+   "text": "ಱೊ",
+   "codepoints": "U+0CB1 U+0CCA",
+   "failures": "collision",
+   "glyphs": "uni0CB1 uni0CC6 uni0CC2",
+   "detail": "uni0CC6 x uni0CC2 10%"
+  },
+  {
+   "case_id": "syl-0CB1-0CCB",
+   "group": "syllable",
+   "text": "ಱೋ",
+   "codepoints": "U+0CB1 U+0CCB",
+   "failures": "collision",
+   "glyphs": "uni0CB1 uni0CC6 uni0CC2 uni0CD5",
+   "detail": "uni0CC6 x uni0CC2 10%"
+  },
+  {
+   "case_id": "syl-0CB1-0CE2",
+   "group": "syllable",
+   "text": "ಱೢ",
+   "codepoints": "U+0CB1 U+0CE2",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CB1 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CB1-0CE3",
+   "group": "syllable",
+   "text": "ಱೣ",
+   "codepoints": "U+0CB1 U+0CE3",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CB1 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CB2-0CC4",
+   "group": "syllable",
+   "text": "ಲೄ",
+   "codepoints": "U+0CB2 U+0CC4",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CB2 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CB2-0CE2",
+   "group": "syllable",
+   "text": "ಲೢ",
+   "codepoints": "U+0CB2 U+0CE2",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CB2 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CB2-0CE3",
+   "group": "syllable",
+   "text": "ಲೣ",
+   "codepoints": "U+0CB2 U+0CE3",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CB2 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CB3-0CC4",
+   "group": "syllable",
+   "text": "ಳೄ",
+   "codepoints": "U+0CB3 U+0CC4",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CB3 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CB3-0CE2",
+   "group": "syllable",
+   "text": "ಳೢ",
+   "codepoints": "U+0CB3 U+0CE2",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CB3 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CB3-0CE3",
+   "group": "syllable",
+   "text": "ಳೣ",
+   "codepoints": "U+0CB3 U+0CE3",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CB3 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CB5-0CC4",
+   "group": "syllable",
+   "text": "ವೄ",
+   "codepoints": "U+0CB5 U+0CC4",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CB5 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CB5-0CE2",
+   "group": "syllable",
+   "text": "ವೢ",
+   "codepoints": "U+0CB5 U+0CE2",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CB5 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CB5-0CE3",
+   "group": "syllable",
+   "text": "ವೣ",
+   "codepoints": "U+0CB5 U+0CE3",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CB5 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CB6-0CC4",
+   "group": "syllable",
+   "text": "ಶೄ",
+   "codepoints": "U+0CB6 U+0CC4",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CB6 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CB6-0CE2",
+   "group": "syllable",
+   "text": "ಶೢ",
+   "codepoints": "U+0CB6 U+0CE2",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CB6 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CB6-0CE3",
+   "group": "syllable",
+   "text": "ಶೣ",
+   "codepoints": "U+0CB6 U+0CE3",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CB6 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CB7-0CC4",
+   "group": "syllable",
+   "text": "ಷೄ",
+   "codepoints": "U+0CB7 U+0CC4",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CB7 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CB7-0CE2",
+   "group": "syllable",
+   "text": "ಷೢ",
+   "codepoints": "U+0CB7 U+0CE2",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CB7 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CB7-0CE3",
+   "group": "syllable",
+   "text": "ಷೣ",
+   "codepoints": "U+0CB7 U+0CE3",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CB7 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CB8-0CC4",
+   "group": "syllable",
+   "text": "ಸೄ",
+   "codepoints": "U+0CB8 U+0CC4",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CB8 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CB8-0CE2",
+   "group": "syllable",
+   "text": "ಸೢ",
+   "codepoints": "U+0CB8 U+0CE2",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CB8 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CB8-0CE3",
+   "group": "syllable",
+   "text": "ಸೣ",
+   "codepoints": "U+0CB8 U+0CE3",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CB8 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CB9-0CC4",
+   "group": "syllable",
+   "text": "ಹೄ",
+   "codepoints": "U+0CB9 U+0CC4",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CB9 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CB9-0CE2",
+   "group": "syllable",
+   "text": "ಹೢ",
+   "codepoints": "U+0CB9 U+0CE2",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CB9 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CB9-0CE3",
+   "group": "syllable",
+   "text": "ಹೣ",
+   "codepoints": "U+0CB9 U+0CE3",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CB9 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CDE-0CC0",
+   "group": "syllable",
+   "text": "ೞೀ",
+   "codepoints": "U+0CDE U+0CC0",
+   "failures": "collision",
+   "glyphs": "uni0CDE uni0CBF uni0CD5",
+   "detail": "uni0CBF x uni0CD5 6%"
+  },
+  {
+   "case_id": "syl-0CDE-0CC4",
+   "group": "syllable",
+   "text": "ೞೄ",
+   "codepoints": "U+0CDE U+0CC4",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CDE .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CDE-0CC7",
+   "group": "syllable",
+   "text": "ೞೇ",
+   "codepoints": "U+0CDE U+0CC7",
+   "failures": "collision",
+   "glyphs": "uni0CDE uni0CC6 uni0CD5",
+   "detail": "uni0CC6 x uni0CD5 17%"
+  },
+  {
+   "case_id": "syl-0CDE-0CCA",
+   "group": "syllable",
+   "text": "ೞೊ",
+   "codepoints": "U+0CDE U+0CCA",
+   "failures": "collision",
+   "glyphs": "uni0CDE uni0CC6 uni0CC2",
+   "detail": "uni0CC6 x uni0CC2 10%"
+  },
+  {
+   "case_id": "syl-0CDE-0CCB",
+   "group": "syllable",
+   "text": "ೞೋ",
+   "codepoints": "U+0CDE U+0CCB",
+   "failures": "collision",
+   "glyphs": "uni0CDE uni0CC6 uni0CC2 uni0CD5",
+   "detail": "uni0CC6 x uni0CC2 10%"
+  },
+  {
+   "case_id": "syl-0CDE-0CE2",
+   "group": "syllable",
+   "text": "ೞೢ",
+   "codepoints": "U+0CDE U+0CE2",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CDE .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "syl-0CDE-0CE3",
+   "group": "syllable",
+   "text": "ೞೣ",
+   "codepoints": "U+0CDE U+0CE3",
+   "failures": "missing_glyph",
+   "glyphs": "uni0CDE .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "clu-0C95-0CCD-0CB1",
+   "group": "cluster",
+   "text": "ಕ್ಱ",
+   "codepoints": "U+0C95 U+0CCD U+0CB1",
+   "failures": "no_conjunct",
+   "glyphs": "uni0C950CCD uni0CB1",
+   "detail": ""
+  },
+  {
+   "case_id": "clu-0C95-0CCD-0CDE",
+   "group": "cluster",
+   "text": "ಕ್ೞ",
+   "codepoints": "U+0C95 U+0CCD U+0CDE",
+   "failures": "no_conjunct",
+   "glyphs": "uni0C950CCD uni0CDE",
+   "detail": ""
+  },
+  {
+   "case_id": "clu-0C96-0CCD-0CB1",
+   "group": "cluster",
+   "text": "ಖ್ಱ",
+   "codepoints": "U+0C96 U+0CCD U+0CB1",
+   "failures": "no_conjunct",
+   "glyphs": "uni0C960CCD uni0CB1",
+   "detail": ""
+  },
+  {
+   "case_id": "clu-0C96-0CCD-0CDE",
+   "group": "cluster",
+   "text": "ಖ್ೞ",
+   "codepoints": "U+0C96 U+0CCD U+0CDE",
+   "failures": "no_conjunct",
+   "glyphs": "uni0C960CCD uni0CDE",
+   "detail": ""
+  },
+  {
+   "case_id": "clu-0C97-0CCD-0CB1",
+   "group": "cluster",
+   "text": "ಗ್ಱ",
+   "codepoints": "U+0C97 U+0CCD U+0CB1",
+   "failures": "no_conjunct",
+   "glyphs": "uni0C970CCD uni0CB1",
+   "detail": ""
+  },
+  {
+   "case_id": "clu-0C97-0CCD-0CDE",
+   "group": "cluster",
+   "text": "ಗ್ೞ",
+   "codepoints": "U+0C97 U+0CCD U+0CDE",
+   "failures": "no_conjunct",
+   "glyphs": "uni0C970CCD uni0CDE",
+   "detail": ""
+  },
+  {
+   "case_id": "clu-0C98-0CCD-0CB1",
+   "group": "cluster",
+   "text": "ಘ್ಱ",
+   "codepoints": "U+0C98 U+0CCD U+0CB1",
+   "failures": "no_conjunct",
+   "glyphs": "uni0C980CCD uni0CB1",
+   "detail": ""
+  },
+  {
+   "case_id": "clu-0C98-0CCD-0CDE",
+   "group": "cluster",
+   "text": "ಘ್ೞ",
+   "codepoints": "U+0C98 U+0CCD U+0CDE",
+   "failures": "no_conjunct",
+   "glyphs": "uni0C980CCD uni0CDE",
+   "detail": ""
+  },
+  {
+   "case_id": "clu-0C99-0CCD-0CB1",
+   "group": "cluster",
+   "text": "ಙ್ಱ",
+   "codepoints": "U+0C99 U+0CCD U+0CB1",
+   "failures": "no_conjunct",
+   "glyphs": "uni0C990CCD uni0CB1",
+   "detail": ""
+  },
+  {
+   "case_id": "clu-0C99-0CCD-0CDE",
+   "group": "cluster",
+   "text": "ಙ್ೞ",
+   "codepoints": "U+0C99 U+0CCD U+0CDE",
+   "failures": "no_conjunct",
+   "glyphs": "uni0C990CCD uni0CDE",
+   "detail": ""
+  },
+  {
+   "case_id": "clu-0C9A-0CCD-0CB1",
+   "group": "cluster",
+   "text": "ಚ್ಱ",
+   "codepoints": "U+0C9A U+0CCD U+0CB1",
+   "failures": "no_conjunct",
+   "glyphs": "uni0C9A0CCD uni0CB1",
+   "detail": ""
+  },
+  {
+   "case_id": "clu-0C9A-0CCD-0CDE",
+   "group": "cluster",
+   "text": "ಚ್ೞ",
+   "codepoints": "U+0C9A U+0CCD U+0CDE",
+   "failures": "no_conjunct",
+   "glyphs": "uni0C9A0CCD uni0CDE",
+   "detail": ""
+  },
+  {
+   "case_id": "clu-0C9B-0CCD-0CB1",
+   "group": "cluster",
+   "text": "ಛ್ಱ",
+   "codepoints": "U+0C9B U+0CCD U+0CB1",
+   "failures": "no_conjunct",
+   "glyphs": "uni0C9B0CCD uni0CB1",
+   "detail": ""
+  },
+  {
+   "case_id": "clu-0C9B-0CCD-0CDE",
+   "group": "cluster",
+   "text": "ಛ್ೞ",
+   "codepoints": "U+0C9B U+0CCD U+0CDE",
+   "failures": "no_conjunct",
+   "glyphs": "uni0C9B0CCD uni0CDE",
+   "detail": ""
+  },
+  {
+   "case_id": "clu-0C9C-0CCD-0CB1",
+   "group": "cluster",
+   "text": "ಜ್ಱ",
+   "codepoints": "U+0C9C U+0CCD U+0CB1",
+   "failures": "no_conjunct",
+   "glyphs": "uni0C9C0CCD uni0CB1",
+   "detail": ""
+  },
+  {
+   "case_id": "clu-0C9C-0CCD-0CDE",
+   "group": "cluster",
+   "text": "ಜ್ೞ",
+   "codepoints": "U+0C9C U+0CCD U+0CDE",
+   "failures": "no_conjunct",
+   "glyphs": "uni0C9C0CCD uni0CDE",
+   "detail": ""
+  },
+  {
+   "case_id": "clu-0C9D-0CCD-0CB1",
+   "group": "cluster",
+   "text": "ಝ್ಱ",
+   "codepoints": "U+0C9D U+0CCD U+0CB1",
+   "failures": "no_conjunct",
+   "glyphs": "uni0C9D0CCD uni0CB1",
+   "detail": ""
+  },
+  {
+   "case_id": "clu-0C9D-0CCD-0CDE",
+   "group": "cluster",
+   "text": "ಝ್ೞ",
+   "codepoints": "U+0C9D U+0CCD U+0CDE",
+   "failures": "no_conjunct",
+   "glyphs": "uni0C9D0CCD uni0CDE",
+   "detail": ""
+  },
+  {
+   "case_id": "clu-0C9E-0CCD-0CB1",
+   "group": "cluster",
+   "text": "ಞ್ಱ",
+   "codepoints": "U+0C9E U+0CCD U+0CB1",
+   "failures": "no_conjunct",
+   "glyphs": "uni0C9E0CCD uni0CB1",
+   "detail": ""
+  },
+  {
+   "case_id": "clu-0C9E-0CCD-0CDE",
+   "group": "cluster",
+   "text": "ಞ್ೞ",
+   "codepoints": "U+0C9E U+0CCD U+0CDE",
+   "failures": "no_conjunct",
+   "glyphs": "uni0C9E0CCD uni0CDE",
+   "detail": ""
+  },
+  {
+   "case_id": "clu-0C9F-0CCD-0CB1",
+   "group": "cluster",
+   "text": "ಟ್ಱ",
+   "codepoints": "U+0C9F U+0CCD U+0CB1",
+   "failures": "no_conjunct",
+   "glyphs": "uni0C9F0CCD uni0CB1",
+   "detail": ""
+  },
+  {
+   "case_id": "clu-0C9F-0CCD-0CDE",
+   "group": "cluster",
+   "text": "ಟ್ೞ",
+   "codepoints": "U+0C9F U+0CCD U+0CDE",
+   "failures": "no_conjunct",
+   "glyphs": "uni0C9F0CCD uni0CDE",
+   "detail": ""
+  },
+  {
+   "case_id": "clu-0CA0-0CCD-0CB1",
+   "group": "cluster",
+   "text": "ಠ್ಱ",
+   "codepoints": "U+0CA0 U+0CCD U+0CB1",
+   "failures": "no_conjunct",
+   "glyphs": "uni0CA00CCD uni0CB1",
+   "detail": ""
+  },
+  {
+   "case_id": "clu-0CA0-0CCD-0CDE",
+   "group": "cluster",
+   "text": "ಠ್ೞ",
+   "codepoints": "U+0CA0 U+0CCD U+0CDE",
+   "failures": "no_conjunct",
+   "glyphs": "uni0CA00CCD uni0CDE",
+   "detail": ""
+  },
+  {
+   "case_id": "clu-0CA1-0CCD-0CB1",
+   "group": "cluster",
+   "text": "ಡ್ಱ",
+   "codepoints": "U+0CA1 U+0CCD U+0CB1",
+   "failures": "no_conjunct",
+   "glyphs": "uni0CA10CCD uni0CB1",
+   "detail": ""
+  },
+  {
+   "case_id": "clu-0CA1-0CCD-0CDE",
+   "group": "cluster",
+   "text": "ಡ್ೞ",
+   "codepoints": "U+0CA1 U+0CCD U+0CDE",
+   "failures": "no_conjunct",
+   "glyphs": "uni0CA10CCD uni0CDE",
+   "detail": ""
+  },
+  {
+   "case_id": "clu-0CA2-0CCD-0CB1",
+   "group": "cluster",
+   "text": "ಢ್ಱ",
+   "codepoints": "U+0CA2 U+0CCD U+0CB1",
+   "failures": "no_conjunct",
+   "glyphs": "uni0CA20CCD uni0CB1",
+   "detail": ""
+  },
+  {
+   "case_id": "clu-0CA2-0CCD-0CDE",
+   "group": "cluster",
+   "text": "ಢ್ೞ",
+   "codepoints": "U+0CA2 U+0CCD U+0CDE",
+   "failures": "no_conjunct",
+   "glyphs": "uni0CA20CCD uni0CDE",
+   "detail": ""
+  },
+  {
+   "case_id": "clu-0CA3-0CCD-0CB1",
+   "group": "cluster",
+   "text": "ಣ್ಱ",
+   "codepoints": "U+0CA3 U+0CCD U+0CB1",
+   "failures": "no_conjunct",
+   "glyphs": "uni0CA30CCD uni0CB1",
+   "detail": ""
+  },
+  {
+   "case_id": "clu-0CA3-0CCD-0CDE",
+   "group": "cluster",
+   "text": "ಣ್ೞ",
+   "codepoints": "U+0CA3 U+0CCD U+0CDE",
+   "failures": "no_conjunct",
+   "glyphs": "uni0CA30CCD uni0CDE",
+   "detail": ""
+  },
+  {
+   "case_id": "clu-0CA4-0CCD-0CB1",
+   "group": "cluster",
+   "text": "ತ್ಱ",
+   "codepoints": "U+0CA4 U+0CCD U+0CB1",
+   "failures": "no_conjunct",
+   "glyphs": "uni0CA40CCD uni0CB1",
+   "detail": ""
+  },
+  {
+   "case_id": "clu-0CA4-0CCD-0CDE",
+   "group": "cluster",
+   "text": "ತ್ೞ",
+   "codepoints": "U+0CA4 U+0CCD U+0CDE",
+   "failures": "no_conjunct",
+   "glyphs": "uni0CA40CCD uni0CDE",
+   "detail": ""
+  },
+  {
+   "case_id": "clu-0CA5-0CCD-0CB1",
+   "group": "cluster",
+   "text": "ಥ್ಱ",
+   "codepoints": "U+0CA5 U+0CCD U+0CB1",
+   "failures": "no_conjunct",
+   "glyphs": "uni0CA50CCD uni0CB1",
+   "detail": ""
+  },
+  {
+   "case_id": "clu-0CA5-0CCD-0CDE",
+   "group": "cluster",
+   "text": "ಥ್ೞ",
+   "codepoints": "U+0CA5 U+0CCD U+0CDE",
+   "failures": "no_conjunct",
+   "glyphs": "uni0CA50CCD uni0CDE",
+   "detail": ""
+  },
+  {
+   "case_id": "clu-0CA6-0CCD-0CB1",
+   "group": "cluster",
+   "text": "ದ್ಱ",
+   "codepoints": "U+0CA6 U+0CCD U+0CB1",
+   "failures": "no_conjunct",
+   "glyphs": "uni0CA60CCD uni0CB1",
+   "detail": ""
+  },
+  {
+   "case_id": "clu-0CA6-0CCD-0CDE",
+   "group": "cluster",
+   "text": "ದ್ೞ",
+   "codepoints": "U+0CA6 U+0CCD U+0CDE",
+   "failures": "no_conjunct",
+   "glyphs": "uni0CA60CCD uni0CDE",
+   "detail": ""
+  },
+  {
+   "case_id": "clu-0CA7-0CCD-0CB1",
+   "group": "cluster",
+   "text": "ಧ್ಱ",
+   "codepoints": "U+0CA7 U+0CCD U+0CB1",
+   "failures": "no_conjunct",
+   "glyphs": "uni0CA70CCD uni0CB1",
+   "detail": ""
+  },
+  {
+   "case_id": "clu-0CA7-0CCD-0CDE",
+   "group": "cluster",
+   "text": "ಧ್ೞ",
+   "codepoints": "U+0CA7 U+0CCD U+0CDE",
+   "failures": "no_conjunct",
+   "glyphs": "uni0CA70CCD uni0CDE",
+   "detail": ""
+  },
+  {
+   "case_id": "clu-0CA8-0CCD-0CB1",
+   "group": "cluster",
+   "text": "ನ್ಱ",
+   "codepoints": "U+0CA8 U+0CCD U+0CB1",
+   "failures": "no_conjunct",
+   "glyphs": "uni0CA80CCD uni0CB1",
+   "detail": ""
+  },
+  {
+   "case_id": "clu-0CA8-0CCD-0CDE",
+   "group": "cluster",
+   "text": "ನ್ೞ",
+   "codepoints": "U+0CA8 U+0CCD U+0CDE",
+   "failures": "no_conjunct",
+   "glyphs": "uni0CA80CCD uni0CDE",
+   "detail": ""
+  },
+  {
+   "case_id": "clu-0CAA-0CCD-0CB1",
+   "group": "cluster",
+   "text": "ಪ್ಱ",
+   "codepoints": "U+0CAA U+0CCD U+0CB1",
+   "failures": "no_conjunct",
+   "glyphs": "uni0CAA0CCD uni0CB1",
+   "detail": ""
+  },
+  {
+   "case_id": "clu-0CAA-0CCD-0CDE",
+   "group": "cluster",
+   "text": "ಪ್ೞ",
+   "codepoints": "U+0CAA U+0CCD U+0CDE",
+   "failures": "no_conjunct",
+   "glyphs": "uni0CAA0CCD uni0CDE",
+   "detail": ""
+  },
+  {
+   "case_id": "clu-0CAB-0CCD-0CB1",
+   "group": "cluster",
+   "text": "ಫ್ಱ",
+   "codepoints": "U+0CAB U+0CCD U+0CB1",
+   "failures": "no_conjunct",
+   "glyphs": "uni0CAB0CCD uni0CB1",
+   "detail": ""
+  },
+  {
+   "case_id": "clu-0CAB-0CCD-0CDE",
+   "group": "cluster",
+   "text": "ಫ್ೞ",
+   "codepoints": "U+0CAB U+0CCD U+0CDE",
+   "failures": "no_conjunct",
+   "glyphs": "uni0CAB0CCD uni0CDE",
+   "detail": ""
+  },
+  {
+   "case_id": "clu-0CAC-0CCD-0CB1",
+   "group": "cluster",
+   "text": "ಬ್ಱ",
+   "codepoints": "U+0CAC U+0CCD U+0CB1",
+   "failures": "no_conjunct",
+   "glyphs": "uni0CAC0CCD uni0CB1",
+   "detail": ""
+  },
+  {
+   "case_id": "clu-0CAC-0CCD-0CDE",
+   "group": "cluster",
+   "text": "ಬ್ೞ",
+   "codepoints": "U+0CAC U+0CCD U+0CDE",
+   "failures": "no_conjunct",
+   "glyphs": "uni0CAC0CCD uni0CDE",
+   "detail": ""
+  },
+  {
+   "case_id": "clu-0CAD-0CCD-0CB1",
+   "group": "cluster",
+   "text": "ಭ್ಱ",
+   "codepoints": "U+0CAD U+0CCD U+0CB1",
+   "failures": "no_conjunct",
+   "glyphs": "uni0CAD0CCD uni0CB1",
+   "detail": ""
+  },
+  {
+   "case_id": "clu-0CAD-0CCD-0CDE",
+   "group": "cluster",
+   "text": "ಭ್ೞ",
+   "codepoints": "U+0CAD U+0CCD U+0CDE",
+   "failures": "no_conjunct",
+   "glyphs": "uni0CAD0CCD uni0CDE",
+   "detail": ""
+  },
+  {
+   "case_id": "clu-0CAE-0CCD-0CB1",
+   "group": "cluster",
+   "text": "ಮ್ಱ",
+   "codepoints": "U+0CAE U+0CCD U+0CB1",
+   "failures": "no_conjunct",
+   "glyphs": "uni0CAE0CCD uni0CB1",
+   "detail": ""
+  },
+  {
+   "case_id": "clu-0CAE-0CCD-0CDE",
+   "group": "cluster",
+   "text": "ಮ್ೞ",
+   "codepoints": "U+0CAE U+0CCD U+0CDE",
+   "failures": "no_conjunct",
+   "glyphs": "uni0CAE0CCD uni0CDE",
+   "detail": ""
+  },
+  {
+   "case_id": "clu-0CAF-0CCD-0CB1",
+   "group": "cluster",
+   "text": "ಯ್ಱ",
+   "codepoints": "U+0CAF U+0CCD U+0CB1",
+   "failures": "no_conjunct",
+   "glyphs": "uni0CAF0CCD uni0CB1",
+   "detail": ""
+  },
+  {
+   "case_id": "clu-0CAF-0CCD-0CDE",
+   "group": "cluster",
+   "text": "ಯ್ೞ",
+   "codepoints": "U+0CAF U+0CCD U+0CDE",
+   "failures": "no_conjunct",
+   "glyphs": "uni0CAF0CCD uni0CDE",
+   "detail": ""
+  },
+  {
+   "case_id": "clu-0CB1-0CCD-0CB1",
+   "group": "cluster",
+   "text": "ಱ್ಱ",
+   "codepoints": "U+0CB1 U+0CCD U+0CB1",
+   "failures": "no_conjunct",
+   "glyphs": "uni0CB1 uni0CCD uni0CB1",
+   "detail": ""
+  },
+  {
+   "case_id": "clu-0CB1-0CCD-0CDE",
+   "group": "cluster",
+   "text": "ಱ್ೞ",
+   "codepoints": "U+0CB1 U+0CCD U+0CDE",
+   "failures": "no_conjunct",
+   "glyphs": "uni0CB1 uni0CCD uni0CDE",
+   "detail": ""
+  },
+  {
+   "case_id": "clu-0CB2-0CCD-0CB1",
+   "group": "cluster",
+   "text": "ಲ್ಱ",
+   "codepoints": "U+0CB2 U+0CCD U+0CB1",
+   "failures": "no_conjunct",
+   "glyphs": "uni0CB20CCD uni0CB1",
+   "detail": ""
+  },
+  {
+   "case_id": "clu-0CB2-0CCD-0CDE",
+   "group": "cluster",
+   "text": "ಲ್ೞ",
+   "codepoints": "U+0CB2 U+0CCD U+0CDE",
+   "failures": "no_conjunct",
+   "glyphs": "uni0CB20CCD uni0CDE",
+   "detail": ""
+  },
+  {
+   "case_id": "clu-0CB3-0CCD-0CB1",
+   "group": "cluster",
+   "text": "ಳ್ಱ",
+   "codepoints": "U+0CB3 U+0CCD U+0CB1",
+   "failures": "no_conjunct",
+   "glyphs": "uni0CB30CCD uni0CB1",
+   "detail": ""
+  },
+  {
+   "case_id": "clu-0CB3-0CCD-0CDE",
+   "group": "cluster",
+   "text": "ಳ್ೞ",
+   "codepoints": "U+0CB3 U+0CCD U+0CDE",
+   "failures": "no_conjunct",
+   "glyphs": "uni0CB30CCD uni0CDE",
+   "detail": ""
+  },
+  {
+   "case_id": "clu-0CB5-0CCD-0CB1",
+   "group": "cluster",
+   "text": "ವ್ಱ",
+   "codepoints": "U+0CB5 U+0CCD U+0CB1",
+   "failures": "no_conjunct",
+   "glyphs": "uni0CB50CCD uni0CB1",
+   "detail": ""
+  },
+  {
+   "case_id": "clu-0CB5-0CCD-0CDE",
+   "group": "cluster",
+   "text": "ವ್ೞ",
+   "codepoints": "U+0CB5 U+0CCD U+0CDE",
+   "failures": "no_conjunct",
+   "glyphs": "uni0CB50CCD uni0CDE",
+   "detail": ""
+  },
+  {
+   "case_id": "clu-0CB6-0CCD-0CB1",
+   "group": "cluster",
+   "text": "ಶ್ಱ",
+   "codepoints": "U+0CB6 U+0CCD U+0CB1",
+   "failures": "no_conjunct",
+   "glyphs": "uni0CB60CCD uni0CB1",
+   "detail": ""
+  },
+  {
+   "case_id": "clu-0CB6-0CCD-0CDE",
+   "group": "cluster",
+   "text": "ಶ್ೞ",
+   "codepoints": "U+0CB6 U+0CCD U+0CDE",
+   "failures": "no_conjunct",
+   "glyphs": "uni0CB60CCD uni0CDE",
+   "detail": ""
+  },
+  {
+   "case_id": "clu-0CB7-0CCD-0CB1",
+   "group": "cluster",
+   "text": "ಷ್ಱ",
+   "codepoints": "U+0CB7 U+0CCD U+0CB1",
+   "failures": "no_conjunct",
+   "glyphs": "uni0CB70CCD uni0CB1",
+   "detail": ""
+  },
+  {
+   "case_id": "clu-0CB7-0CCD-0CDE",
+   "group": "cluster",
+   "text": "ಷ್ೞ",
+   "codepoints": "U+0CB7 U+0CCD U+0CDE",
+   "failures": "no_conjunct",
+   "glyphs": "uni0CB70CCD uni0CDE",
+   "detail": ""
+  },
+  {
+   "case_id": "clu-0CB8-0CCD-0CB1",
+   "group": "cluster",
+   "text": "ಸ್ಱ",
+   "codepoints": "U+0CB8 U+0CCD U+0CB1",
+   "failures": "no_conjunct",
+   "glyphs": "uni0CB80CCD uni0CB1",
+   "detail": ""
+  },
+  {
+   "case_id": "clu-0CB8-0CCD-0CDE",
+   "group": "cluster",
+   "text": "ಸ್ೞ",
+   "codepoints": "U+0CB8 U+0CCD U+0CDE",
+   "failures": "no_conjunct",
+   "glyphs": "uni0CB80CCD uni0CDE",
+   "detail": ""
+  },
+  {
+   "case_id": "clu-0CB9-0CCD-0CB1",
+   "group": "cluster",
+   "text": "ಹ್ಱ",
+   "codepoints": "U+0CB9 U+0CCD U+0CB1",
+   "failures": "no_conjunct",
+   "glyphs": "uni0CB90CCD uni0CB1",
+   "detail": ""
+  },
+  {
+   "case_id": "clu-0CB9-0CCD-0CDE",
+   "group": "cluster",
+   "text": "ಹ್ೞ",
+   "codepoints": "U+0CB9 U+0CCD U+0CDE",
+   "failures": "no_conjunct",
+   "glyphs": "uni0CB90CCD uni0CDE",
+   "detail": ""
+  },
+  {
+   "case_id": "clu-0CDE-0CCD-0CB1",
+   "group": "cluster",
+   "text": "ೞ್ಱ",
+   "codepoints": "U+0CDE U+0CCD U+0CB1",
+   "failures": "no_conjunct",
+   "glyphs": "uni0CDE uni0CCD uni0CB1",
+   "detail": ""
+  },
+  {
+   "case_id": "clu-0CDE-0CCD-0CDE",
+   "group": "cluster",
+   "text": "ೞ್ೞ",
+   "codepoints": "U+0CDE U+0CCD U+0CDE",
+   "failures": "no_conjunct",
+   "glyphs": "uni0CDE uni0CCD uni0CDE",
+   "detail": ""
+  },
+  {
+   "case_id": "ark-0CB0-0CCD-0C95-0CC4",
+   "group": "arkavattu",
+   "text": "ರ್ಕೄ",
+   "codepoints": "U+0CB0 U+0CCD U+0C95 U+0CC4",
+   "failures": "missing_glyph",
+   "glyphs": "uni0C95 .notdef uni0CB00CCD.reph",
+   "detail": ""
+  },
+  {
+   "case_id": "ark-0CB0-0CCD-0C95-0CE2",
+   "group": "arkavattu",
+   "text": "ರ್ಕೢ",
+   "codepoints": "U+0CB0 U+0CCD U+0C95 U+0CE2",
+   "failures": "missing_glyph",
+   "glyphs": "uni0C95 .notdef uni0CB00CCD.reph",
+   "detail": ""
+  },
+  {
+   "case_id": "ark-0CB0-0CCD-0C95-0CE3",
+   "group": "arkavattu",
+   "text": "ರ್ಕೣ",
+   "codepoints": "U+0CB0 U+0CCD U+0C95 U+0CE3",
+   "failures": "missing_glyph",
+   "glyphs": "uni0C95 .notdef uni0CB00CCD.reph",
+   "detail": ""
+  },
+  {
+   "case_id": "rare-0CDD",
+   "group": "rare",
+   "text": "ಅವನೝ",
+   "codepoints": "U+0C85 U+0CB5 U+0CA8 U+0CDD",
+   "failures": "missing_glyph",
+   "glyphs": "uni0C85 uni0CB5 uni0CA8 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "rare-0CF3",
+   "group": "rare",
+   "text": "ಕೳ",
+   "codepoints": "U+0C95 U+0CF3",
+   "failures": "missing_glyph",
+   "glyphs": "uni0C95 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "rare-0CDC",
+   "group": "rare",
+   "text": "೜",
+   "codepoints": "U+0CDC",
+   "failures": "missing_glyph",
+   "glyphs": ".notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "rare-0CDC-word",
+   "group": "rare",
+   "text": "೜ಗಣೇಶ",
+   "codepoints": "U+0CDC U+0C97 U+0CA3 U+0CC7 U+0CB6",
+   "failures": "missing_glyph",
+   "glyphs": ".notdef uni0C97 uni0CA30CC6 uni0CD5 uni0CB6",
+   "detail": ""
+  },
+  {
+   "case_id": "rare-0CF1",
+   "group": "rare",
+   "text": "ಅೱಕ",
+   "codepoints": "U+0C85 U+0CF1 U+0C95",
+   "failures": "missing_glyph",
+   "glyphs": "uni0C85 .notdef uni0C95",
+   "detail": ""
+  },
+  {
+   "case_id": "rare-0CF2",
+   "group": "rare",
+   "text": "ಅೲಪ",
+   "codepoints": "U+0C85 U+0CF2 U+0CAA",
+   "failures": "missing_glyph",
+   "glyphs": "uni0C85 .notdef uni0CAA",
+   "detail": ""
+  },
+  {
+   "case_id": "rare-0CE2",
+   "group": "rare",
+   "text": "ಕೢ",
+   "codepoints": "U+0C95 U+0CE2",
+   "failures": "missing_glyph",
+   "glyphs": "uni0C95 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "rare-0CE3",
+   "group": "rare",
+   "text": "ಕೣ",
+   "codepoints": "U+0C95 U+0CE3",
+   "failures": "missing_glyph",
+   "glyphs": "uni0C95 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "rare-0CE1",
+   "group": "rare",
+   "text": "ೡ",
+   "codepoints": "U+0CE1",
+   "failures": "missing_glyph",
+   "glyphs": ".notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "rare-0CC4",
+   "group": "rare",
+   "text": "ಕೄ",
+   "codepoints": "U+0C95 U+0CC4",
+   "failures": "missing_glyph",
+   "glyphs": "uni0C95 .notdef",
+   "detail": ""
+  }
+ ]
+}
