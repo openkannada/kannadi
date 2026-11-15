@@ -398,7 +398,7 @@ impl Compiled {
         out
     }
 
-    /// A backslash before any other character is literal text.
+    /// True for characters a backslash escapes; a backslash before anything else is literal.
     fn is_escapable(&self, c: char) -> bool {
         self.escaped.contains(&c) || self.table.separator.starts_with(c)
     }
