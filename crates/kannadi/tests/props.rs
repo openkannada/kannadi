@@ -1,4 +1,5 @@
 use kannadi::chars::{class, Class};
+use kannadi::legacy::{nudi_to_unicode, unicode_to_nudi, Options};
 use kannadi::{aksharas, from_latin, modernize, normalize, numerals, split, to_latin, Scheme};
 use proptest::prelude::*;
 
@@ -35,14 +36,27 @@ fn kannada_text() -> impl Strategy<Value = String> {
 
 /// Well-formed words: consonant clusters and vowels with signs and modifiers.
 fn kannada_word() -> impl Strategy<Value = String> {
+    let vowels = ('\u{0C85}'..='\u{0CE1}')
+        .filter(|&c| class(c) == Class::Vowel)
+        .collect();
+    word(vowels, "ಾಿೀುೂೃೄೆೇೈೊೋೌೢೣ")
+}
+
+/// Well-formed words using only the letters and signs the Nudi layout has glyphs
+/// for, including clusters that end in a virama.
+fn nudi_word() -> impl Strategy<Value = String> {
+    let vowels = ('\u{0C85}'..='\u{0CE1}')
+        .filter(|&c| class(c) == Class::Vowel && !matches!(c, 'ಌ' | 'ೡ'))
+        .collect();
+    word(vowels, "ಾಿೀುೂೃೆೇೈೊೋೌ್")
+}
+
+fn word(vowels: Vec<char>, signs: &str) -> impl Strategy<Value = String> {
     let consonants: Vec<char> = ('\u{0C95}'..='\u{0CB9}')
         .chain(['\u{0CDE}'])
         .filter(|&c| class(c) == Class::Consonant)
         .collect();
-    let vowels: Vec<char> = ('\u{0C85}'..='\u{0CE1}')
-        .filter(|&c| class(c) == Class::Vowel)
-        .collect();
-    let signs: Vec<char> = "ಾಿೀುೂೃೄೆೇೈೊೋೌೢೣ".chars().collect();
+    let signs: Vec<char> = signs.chars().collect();
     let cons = prop::sample::select(consonants);
     let cluster = (
         prop::collection::vec(cons.clone(), 0..3),
@@ -136,6 +150,24 @@ proptest! {
         let m = modernize(&s);
         prop_assert!(!kannadi::has_old_kannada(&m));
         prop_assert_eq!(modernize(&m), m);
+    }
+
+    #[test]
+    fn nudi_roundtrip_words(s in prop::collection::vec(nudi_word(), 1..4)) {
+        let text = s.join(" ");
+        let encoded = unicode_to_nudi(&text);
+        prop_assert!(encoded.is_complete(), "{:?}", encoded);
+        let back = nudi_to_unicode(&encoded.text, &Options::default());
+        prop_assert!(back.is_clean(), "{:?} from {:?}", back, encoded.text);
+        prop_assert_eq!(back.text, text);
+    }
+
+    #[test]
+    fn nudi_reports_point_at_their_characters(s in kannada_text()) {
+        let encoded = unicode_to_nudi(&s);
+        for u in &encoded.unencodable {
+            prop_assert_eq!(s[u.offset..].chars().next(), Some(u.character));
+        }
     }
 
     #[test]

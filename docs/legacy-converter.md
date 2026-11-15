@@ -1,6 +1,6 @@
 # Legacy converter design
 
-Status: Nudi and Baraha to Unicode is implemented in `crates/kannadi/src/legacy.rs`, with the table in `crates/kannadi/data/nudi.tsv`. Unicode to legacy, DOCX and HTML input, and Shree-Lipi are still design.
+Status: Nudi and Baraha to Unicode and Unicode to Nudi and Baraha are implemented in `crates/kannadi/src/legacy/`, with the table in `crates/kannadi/data/nudi.tsv`. DOCX and HTML input, and Shree-Lipi, are still design.
 
 ## The problem
 
@@ -70,7 +70,13 @@ Every conversion returns the text with a report: characters converted, unknown g
 
 ### Unicode to legacy
 
-Offices that still print with legacy fonts need this direction. The text is split into aksharas, glyphs are chosen for each from the font table, and they are written in storage order: vowel sign before ottu, arkavattu last. Where a font can draw something 2 ways, the table marks 1 as preferred.
+Offices that still print with legacy fonts need this direction. The text is split into aksharas, glyphs are chosen for each from the font table, and they are written in storage order:
+
+```text
+consonant shape [mahaprana] [head stroke] vowel sign parts, ottus, ೃ ೕ ೖ, arkavattu, ಂ ಃ
+```
+
+The consonant shape is a letter glyph that already carries the sign (ಕಿ, ಮೆ) when the table has one. For no sign, ಿ, ು and ೂ, the shape is the letter form without a head stroke (ಜ, ಲ, ಟ) when the table has one, or else the base plus the head stroke. Other signs replace the head stroke, so they go on the base form. Where a font can draw something 2 ways, a fourth column in the table says when to prefer each glyph. The order and preferences were counted from 9,047 words typed on the 2002 government pages.
 
 ## File formats
 
@@ -80,28 +86,21 @@ Offices that still print with legacy fonts need this direction. The text is spli
 | HTML | `font-family` in styles, and `<font face>` | The font declaration is changed to a Unicode Kannada font. |
 | DOCX | Run properties `w:rFonts` | Only legacy-font runs change. Styles and layout stay. |
 
-## Public API sketch
+## Public API
 
 ```rust
-pub enum LegacyFont { Nudi, Baraha }
-
-pub struct Conversion {
-    pub text: String,
-    pub unknown: Vec<(usize, char)>,
-    pub malformed: Vec<std::ops::Range<usize>>,
-}
-
-pub fn legacy_to_unicode(text: &str, font: LegacyFont) -> Conversion;
-pub fn unicode_to_legacy(text: &str, font: LegacyFont) -> Result<String, Unmappable>;
+pub fn nudi_to_unicode(text: &str, options: &Options) -> Conversion; // text, unknown, malformed
+pub fn unicode_to_nudi(text: &str) -> Encoding;                     // text, unencodable
+pub fn decode_windows_1252(bytes: &[u8]) -> String;
 ```
 
-This lives in the core crate behind a `legacy` feature, so the browser build can include or leave out the tables.
+Nudi and Baraha ANSI share 1 layout, so there is 1 table and no font parameter yet. A second layout, such as Shree-Lipi, would add a table and a parameter.
 
 ## Testing
 
 - **Corpus:** every document in the corpus converts to its verified Unicode text with no differences. See [corpus-plan.md](corpus-plan.md).
 - **Rules:** 1 unit test for each issue listed above, built from the smallest example that shows it.
-- **Round trip:** for random well-formed Unicode Kannada, `legacy_to_unicode(unicode_to_legacy(x)) == x` for each font.
+- **Round trip:** for random well-formed Unicode Kannada, `nudi_to_unicode(unicode_to_nudi(x)) == x`.
 - **Ablation:** each reordering and joining rule is removed in turn to confirm a test fails.
 - **Accuracy:** akshara error rate (edit distance over `kannadi::aksharas`) on real documents, reported per document.
 

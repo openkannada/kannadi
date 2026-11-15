@@ -1,16 +1,3 @@
-//! Nudi and Baraha ANSI text to Unicode.
-//!
-//! Before Unicode, Kannada was typed in fonts that draw Kannada shapes at Latin-1
-//! code points. Nudi (up to version 5) and Baraha's ANSI fonts (BRH Kannada and
-//! others) share 1 glyph layout. Text in those fonts reads as `PÀ£ÀßqÀ` until it
-//! is converted.
-//!
-//! Glyphs are stored in drawing order: a subscript consonant comes after its
-//! syllable's vowel sign, the arkavattu after the cluster, and some vowel signs
-//! are split into 2 or 3 glyphs. [`nudi_to_unicode`] rebuilds each syllable in
-//! Unicode order. It reports every glyph it cannot place and every syllable that
-//! is not valid; spacing glyphs, which carry no text, are the only glyphs dropped.
-
 use std::ops::Range;
 use std::sync::OnceLock;
 
@@ -19,6 +6,9 @@ use unicode_normalization::UnicodeNormalization;
 use crate::chars::{class, Class, ANUSVARA, VIRAMA};
 use crate::lookup::Lookup;
 use crate::numerals::to_kannada_digit;
+
+use super::table::{rows, Entry};
+use super::{aspirated, is_passthrough};
 
 /// Settings for [`nudi_to_unicode`].
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -74,7 +64,7 @@ impl Conversion {
 /// Converts text typed in a Nudi or Baraha ANSI font to Unicode Kannada.
 ///
 /// The input is the text as stored, read as Windows-1252: Word documents and web
-/// pages give it that way. For raw bytes, use [`decode_windows_1252`] first.
+/// pages give it that way. For raw bytes, use [`decode_windows_1252`](super::decode_windows_1252) first.
 /// Only pass text that was set in a legacy font; English text in the same document
 /// would be converted too.
 ///
@@ -106,78 +96,15 @@ pub fn nudi_to_unicode(text: &str, options: &Options) -> Conversion {
     writer.finish()
 }
 
-/// Decodes Windows-1252 bytes, the encoding legacy Kannada text files use.
-/// The 5 bytes Windows-1252 leaves undefined map to the C1 control characters.
-///
-/// ```
-/// assert_eq!(kannadi::legacy::decode_windows_1252(&[0x50, 0xC0, 0x86]), "PÀ†");
-/// ```
-pub fn decode_windows_1252(bytes: &[u8]) -> String {
-    bytes.iter().map(|&b| windows_1252(b)).collect()
-}
-
-fn windows_1252(b: u8) -> char {
-    const HIGH: [char; 32] = [
-        '€', '\u{81}', '‚', 'ƒ', '„', '…', '†', '‡', 'ˆ', '‰', 'Š', '‹', 'Œ', '\u{8D}', 'Ž',
-        '\u{8F}', '\u{90}', '‘', '’', '“', '”', '•', '–', '—', '˜', '™', 'š', '›', 'œ', '\u{9D}',
-        'ž', 'Ÿ',
-    ];
-    match b {
-        0x80..=0x9F => HIGH[usize::from(b - 0x80)],
-        _ => char::from(b),
-    }
-}
-
-#[derive(Debug)]
-enum Entry {
-    Letter(String),
-    Base(String),
-    Sign(String),
-    Virama,
-    Ottu(char),
-    Arka,
-    Mod(char),
-    Aspirate,
-    Ignore,
-    Literal(String),
-}
-
 fn table() -> &'static Lookup<Entry> {
     static TABLE: OnceLock<Lookup<Entry>> = OnceLock::new();
-    TABLE.get_or_init(|| parse_table(include_str!("../data/nudi.tsv")))
-}
-
-fn parse_table(source: &str) -> Lookup<Entry> {
-    let mut entries = Lookup::new();
-    for line in source.lines() {
-        if line.trim().is_empty() || line.starts_with('#') {
-            continue;
+    TABLE.get_or_init(|| {
+        let mut lookup = Lookup::new();
+        for row in rows() {
+            lookup.insert(row.key, row.entry);
         }
-        let mut cols = line.split('\t');
-        let codes = cols.next().unwrap_or_default();
-        let kind = cols.next().unwrap_or_default();
-        let value = cols.next().unwrap_or_default();
-        let key: String = codes
-            .split_whitespace()
-            .map(|h| windows_1252(u8::from_str_radix(h, 16).expect("hex glyph code in nudi.tsv")))
-            .collect();
-        let first = value.chars().next();
-        let entry = match kind {
-            "letter" => Entry::Letter(value.to_string()),
-            "base" => Entry::Base(value.to_string()),
-            "sign" if first == Some(VIRAMA) => Entry::Virama,
-            "sign" => Entry::Sign(value.to_string()),
-            "ottu" => Entry::Ottu(first.expect("ottu needs a consonant")),
-            "arka" => Entry::Arka,
-            "mod" => Entry::Mod(first.expect("mod needs a sign")),
-            "aspirate" => Entry::Aspirate,
-            "ignore" => Entry::Ignore,
-            "literal" => Entry::Literal(value.to_string()),
-            other => panic!("unknown kind {other:?} in nudi.tsv"),
-        };
-        entries.insert(key, entry);
-    }
-    entries
+        lookup
+    })
 }
 
 /// Builds the output and both reports in 1 pass.
@@ -349,12 +276,8 @@ impl Syllable {
 
     fn aspirate(&mut self) -> bool {
         let mut chars = self.letter.chars();
-        let aspirated = match chars.next() {
-            Some('ಪ') => 'ಫ',
-            Some('ಬ') => 'ಭ',
-            Some('ಡ') => 'ಢ',
-            Some('ದ') => 'ಧ',
-            _ => return false,
+        let Some(aspirated) = chars.next().and_then(aspirated) else {
+            return false;
         };
         self.letter = std::iter::once(aspirated).chain(chars).collect();
         true
@@ -399,16 +322,10 @@ fn is_letter(c: char) -> bool {
     matches!(class(c), Class::Vowel | Class::Consonant | Class::VowelSign)
 }
 
-fn is_passthrough(c: char) -> bool {
-    c.is_whitespace()
-        || c.is_ascii_punctuation()
-        || ('\u{2010}'..='\u{2027}').contains(&c)
-        || c == '\u{A0}'
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::legacy::decode_windows_1252;
 
     fn conv(legacy: &[u8]) -> Conversion {
         nudi_to_unicode(&decode_windows_1252(legacy), &Options::default())
@@ -570,10 +487,5 @@ mod tests {
     #[test]
     fn zero_after_an_anusvara_stays_a_digit() {
         assert_eq!(report("PÀA0PÀ").text, "ಕಂ0ಕ");
-    }
-
-    #[test]
-    fn windows_1252_high_range() {
-        assert_eq!(decode_windows_1252(&[0x86, 0x87, 0x84, 0x81]), "†‡„\u{81}");
     }
 }
