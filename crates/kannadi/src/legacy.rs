@@ -1,0 +1,487 @@
+//! Nudi and Baraha ANSI text to Unicode.
+//!
+//! Before Unicode, Kannada was typed in fonts that draw Kannada shapes at Latin-1
+//! code points. Nudi (up to version 5) and Baraha's ANSI fonts (BRH Kannada and
+//! others) share 1 glyph layout. Text in those fonts reads as `PÀ£ÀßqÀ` until it
+//! is converted.
+//!
+//! Glyphs are stored in drawing order: a subscript consonant comes after its
+//! syllable's vowel sign, the arkavattu after the cluster, and some vowel signs
+//! are split into 2 or 3 glyphs. [`nudi_to_unicode`] rebuilds each syllable in
+//! Unicode order and reports every glyph it cannot place, so nothing is lost
+//! silently.
+
+use std::collections::HashMap;
+use std::ops::Range;
+use std::sync::OnceLock;
+
+use unicode_normalization::UnicodeNormalization;
+
+use crate::akshara::{aksharas, AksharaKind};
+use crate::chars::{class, Class, VIRAMA};
+use crate::numerals::to_kannada_digit;
+
+/// Settings for [`nudi_to_unicode`].
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct Options {
+    /// Write digits as Kannada digits. Use this for text set in the `k` variants of
+    /// the Nudi fonts, which draw Kannada digits at the ASCII digit positions.
+    pub kannada_digits: bool,
+    /// Turn a zero typed between 2 Kannada letters into an anusvara (ಂ), a common
+    /// typing habit in legacy documents: ಪ್ರಾರ0ಭ becomes ಪ್ರಾರಂಭ.
+    pub zero_as_anusvara: bool,
+}
+
+impl Default for Options {
+    fn default() -> Self {
+        Options {
+            kannada_digits: false,
+            zero_as_anusvara: true,
+        }
+    }
+}
+
+/// A glyph the converter could not place.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct Unknown {
+    /// Byte offset of the glyph in the input.
+    pub offset: usize,
+    /// The glyph, as it appears in the input.
+    pub glyph: char,
+}
+
+/// The result of a conversion.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct Conversion {
+    /// The Unicode text. Unknown glyphs are kept as they were.
+    pub text: String,
+    /// Glyphs with no known meaning in this layout.
+    pub unknown: Vec<Unknown>,
+    /// Byte ranges in `text` holding a vowel sign, virama or other mark with no
+    /// letter to attach to. A clean conversion has none.
+    pub malformed: Vec<Range<usize>>,
+}
+
+impl Conversion {
+    /// True if every glyph was converted and every syllable is well formed.
+    pub fn is_clean(&self) -> bool {
+        self.unknown.is_empty() && self.malformed.is_empty()
+    }
+}
+
+/// Converts text typed in a Nudi or Baraha ANSI font to Unicode Kannada.
+///
+/// The input is the text as stored, read as Windows-1252: Word documents and web
+/// pages give it that way. For raw bytes, use [`decode_windows_1252`] first.
+/// Only pass text that was set in a legacy font; English text in the same document
+/// would be converted too.
+///
+/// ```
+/// use kannadi::legacy::{nudi_to_unicode, Options};
+///
+/// let converted = nudi_to_unicode("PÀ£ÀßqÀ", &Options::default());
+/// assert_eq!(converted.text, "ಕನ್ನಡ");
+/// assert!(converted.is_clean());
+/// ```
+pub fn nudi_to_unicode(text: &str, options: &Options) -> Conversion {
+    let table = table();
+    let chars: Vec<(usize, char)> = text.char_indices().collect();
+    let mut out = String::with_capacity(text.len() * 2);
+    let mut unknown = Vec::new();
+    let mut syllable: Option<Syllable> = None;
+    let mut i = 0;
+    while i < chars.len() {
+        let (offset, c) = chars[i];
+        let Some((entry, len)) = table.longest_match(&chars[i..]) else {
+            flush(&mut syllable, &mut out);
+            if c.is_ascii_digit() {
+                let next_is_letter = matches!(
+                    table.longest_match(&chars[i + 1..]),
+                    Some((Entry::Letter(_), _))
+                );
+                if options.zero_as_anusvara && c == '0' && ends_with_letter(&out) && next_is_letter
+                {
+                    out.push('ಂ');
+                } else if options.kannada_digits {
+                    out.push(to_kannada_digit(c));
+                } else {
+                    out.push(c);
+                }
+            } else {
+                if !is_passthrough(c) {
+                    unknown.push(Unknown { offset, glyph: c });
+                }
+                out.push(c);
+            }
+            i += 1;
+            continue;
+        };
+        i += len;
+        match (entry, syllable.as_mut()) {
+            (Entry::Letter(letter), _) => {
+                flush(&mut syllable, &mut out);
+                syllable = Some(Syllable::new(letter));
+            }
+            (Entry::Sign(sign), Some(s)) => s.signs.push_str(sign),
+            (Entry::Ottu(c), Some(s)) => s.ottus.push(*c),
+            (Entry::Arka, Some(s)) => s.arka = true,
+            (Entry::Mod(m), Some(s)) => s.mods.push(*m),
+            (Entry::Aspirate, Some(s)) => {
+                if !s.aspirate() {
+                    unknown.push(Unknown { offset, glyph: c });
+                }
+            }
+            (Entry::Ignore, _) => {}
+            (Entry::Mod(m), None) => out.push(*m),
+            (Entry::Sign(sign), None) => out.push_str(sign),
+            (Entry::Ottu(c), None) => {
+                out.push(VIRAMA);
+                out.push(*c);
+            }
+            (Entry::Literal(l), _) => {
+                flush(&mut syllable, &mut out);
+                out.push_str(l);
+            }
+            _ => {
+                flush(&mut syllable, &mut out);
+                for &(o, g) in &chars[i - len..i] {
+                    unknown.push(Unknown {
+                        offset: o,
+                        glyph: g,
+                    });
+                    out.push(g);
+                }
+            }
+        }
+    }
+    flush(&mut syllable, &mut out);
+    let malformed = malformed_ranges(&out);
+    Conversion {
+        text: out,
+        unknown,
+        malformed,
+    }
+}
+
+/// Decodes Windows-1252 bytes, the encoding legacy Kannada text files use.
+/// The 5 bytes Windows-1252 leaves undefined map to the C1 control characters.
+///
+/// ```
+/// assert_eq!(kannadi::legacy::decode_windows_1252(&[0x50, 0xC0, 0x86]), "PÀ†");
+/// ```
+pub fn decode_windows_1252(bytes: &[u8]) -> String {
+    bytes.iter().map(|&b| windows_1252(b)).collect()
+}
+
+fn windows_1252(b: u8) -> char {
+    const HIGH: [char; 32] = [
+        '€', '\u{81}', '‚', 'ƒ', '„', '…', '†', '‡', 'ˆ', '‰', 'Š', '‹', 'Œ', '\u{8D}', 'Ž',
+        '\u{8F}', '\u{90}', '‘', '’', '“', '”', '•', '–', '—', '˜', '™', 'š', '›', 'œ', '\u{9D}',
+        'ž', 'Ÿ',
+    ];
+    match b {
+        0x80..=0x9F => HIGH[usize::from(b - 0x80)],
+        _ => char::from(b),
+    }
+}
+
+#[derive(Debug)]
+enum Entry {
+    Letter(String),
+    Sign(String),
+    Ottu(char),
+    Arka,
+    Mod(char),
+    Aspirate,
+    Ignore,
+    Literal(String),
+}
+
+struct Table {
+    entries: HashMap<String, Entry>,
+    longest: usize,
+}
+
+impl Table {
+    fn longest_match(&self, input: &[(usize, char)]) -> Option<(&Entry, usize)> {
+        let mut key = String::new();
+        for len in (1..=self.longest.min(input.len())).rev() {
+            key.clear();
+            key.extend(input[..len].iter().map(|&(_, c)| c));
+            if let Some(e) = self.entries.get(&key) {
+                return Some((e, len));
+            }
+        }
+        None
+    }
+}
+
+fn table() -> &'static Table {
+    static TABLE: OnceLock<Table> = OnceLock::new();
+    TABLE.get_or_init(|| parse_table(include_str!("../data/nudi.tsv")))
+}
+
+fn parse_table(source: &str) -> Table {
+    let mut entries = HashMap::new();
+    for line in source.lines() {
+        if line.trim().is_empty() || line.starts_with('#') {
+            continue;
+        }
+        let mut cols = line.split('\t');
+        let codes = cols.next().unwrap_or_default();
+        let kind = cols.next().unwrap_or_default();
+        let value = cols.next().unwrap_or_default();
+        let key: String = codes
+            .split_whitespace()
+            .map(|h| windows_1252(u8::from_str_radix(h, 16).expect("hex glyph code in nudi.tsv")))
+            .collect();
+        let first = value.chars().next();
+        let entry = match kind {
+            "letter" => Entry::Letter(value.to_string()),
+            "sign" => Entry::Sign(value.to_string()),
+            "ottu" => Entry::Ottu(first.expect("ottu needs a consonant")),
+            "arka" => Entry::Arka,
+            "mod" => Entry::Mod(first.expect("mod needs a sign")),
+            "aspirate" => Entry::Aspirate,
+            "ignore" => Entry::Ignore,
+            "literal" => Entry::Literal(value.to_string()),
+            other => panic!("unknown kind {other:?} in nudi.tsv"),
+        };
+        entries.insert(key, entry);
+    }
+    let longest = entries.keys().map(|k| k.chars().count()).max().unwrap_or(1);
+    Table { entries, longest }
+}
+
+struct Syllable {
+    letter: String,
+    signs: String,
+    ottus: Vec<char>,
+    arka: bool,
+    mods: String,
+}
+
+impl Syllable {
+    fn new(letter: &str) -> Self {
+        Syllable {
+            letter: letter.to_string(),
+            signs: String::new(),
+            ottus: Vec::new(),
+            arka: false,
+            mods: String::new(),
+        }
+    }
+
+    /// Applies the mahaprana mark; false if this letter has no aspirated form.
+    fn aspirate(&mut self) -> bool {
+        let mut chars = self.letter.chars();
+        let aspirated = match chars.next() {
+            Some('ಪ') => 'ಫ',
+            Some('ಬ') => 'ಭ',
+            Some('ಡ') => 'ಢ',
+            Some('ದ') => 'ಧ',
+            _ => return false,
+        };
+        self.letter = std::iter::once(aspirated).chain(chars).collect();
+        true
+    }
+
+    fn write(&self, out: &mut String) {
+        let mut letter = self.letter.chars();
+        let mut s = String::new();
+        if self.arka {
+            s.push('ರ');
+            s.push(VIRAMA);
+        }
+        s.extend(letter.next());
+        for &o in &self.ottus {
+            s.push(VIRAMA);
+            s.push(o);
+        }
+        s.extend(letter);
+        s.extend(self.signs.chars().filter(|&c| c != VIRAMA));
+        if self.signs.contains(VIRAMA) {
+            s.push(VIRAMA);
+        }
+        s.push_str(&self.mods);
+        out.extend(s.nfc());
+    }
+}
+
+fn flush(syllable: &mut Option<Syllable>, out: &mut String) {
+    if let Some(s) = syllable.take() {
+        s.write(out);
+    }
+}
+
+fn ends_with_letter(text: &str) -> bool {
+    text.chars().next_back().is_some_and(|c| {
+        matches!(
+            class(c),
+            Class::Vowel | Class::Consonant | Class::VowelSign | Class::Modifier
+        )
+    })
+}
+
+fn is_passthrough(c: char) -> bool {
+    c.is_whitespace()
+        || c.is_ascii_punctuation()
+        || ('\u{2010}'..='\u{2027}').contains(&c)
+        || c == '\u{A0}'
+}
+
+fn malformed_ranges(text: &str) -> Vec<Range<usize>> {
+    let mut ranges = Vec::new();
+    let mut offset = 0;
+    for a in aksharas(text) {
+        let starts_with_mark = a.text.chars().next().is_some_and(|c| {
+            matches!(
+                class(c),
+                Class::VowelSign | Class::Virama | Class::Nukta | Class::Modifier
+            )
+        });
+        if a.kind == AksharaKind::Other && starts_with_mark {
+            ranges.push(offset..offset + a.text.len());
+        }
+        offset += a.text.len();
+    }
+    ranges
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn conv(legacy: &[u8]) -> Conversion {
+        nudi_to_unicode(&decode_windows_1252(legacy), &Options::default())
+    }
+
+    fn text(legacy: &[u8]) -> String {
+        let c = conv(legacy);
+        assert!(c.is_clean(), "{c:?}");
+        c.text
+    }
+
+    #[test]
+    fn head_stroke_gives_the_inherent_vowel() {
+        assert_eq!(text(&[0x50, 0xC0]), "ಕ");
+        assert_eq!(text(&[0x50, 0xEF]), "ಕ್");
+        assert_eq!(text(&[0x50, 0xC1]), "ಕಾ");
+        assert_eq!(text(&[0x51]), "ಕಿ");
+    }
+
+    #[test]
+    fn split_vowel_signs_join() {
+        assert_eq!(text(&[0x51, 0xC3]), "ಕೀ");
+        assert_eq!(text(&[0x50, 0xC9, 0xC3]), "ಕೇ");
+        assert_eq!(text(&[0x50, 0xC9, 0xCA]), "ಕೈ");
+        assert_eq!(text(&[0x50, 0xC9, 0xC6]), "ಕೊ");
+        assert_eq!(text(&[0x50, 0xC9, 0xC6, 0xC3]), "ಕೋ");
+    }
+
+    #[test]
+    fn subscripts_move_before_the_vowel_sign() {
+        assert_eq!(text(&[0x50, 0xC0, 0xCC]), "ಕ್ಕ");
+        assert_eq!(
+            text(&[0xB8, 0xC9, 0xD6, 0xE7, 0xF6, 0xCA, 0x6D, 0xEF]),
+            "ಸ್ಟ್ರೈಟ್"
+        );
+        assert_eq!(text(&[0xAE, 0x50, 0xC0, 0xEB, 0xF6, 0xE5]), "ಲಕ್ಷ್ಯ");
+    }
+
+    #[test]
+    fn arkavattu_moves_to_the_front() {
+        assert_eq!(text(&[0x44, 0x67, 0xEF, 0xA9, 0x4C]), "ಆರ್ಬಿಐ");
+        assert_eq!(text(&[0x50, 0xC0, 0xF0]), "ರ್ಕ");
+    }
+
+    #[test]
+    fn composite_consonants() {
+        assert_eq!(text(&[0xAA, 0xC0, 0xC4]), "ಮ");
+        assert_eq!(text(&[0xAA, 0xC0, 0xC4, 0xC4]), "ಮು");
+        assert_eq!(text(&[0xAA, 0xC0, 0xC5]), "ವು");
+        assert_eq!(text(&[0xAA, 0xC9, 0xC6]), "ಮೊ");
+        assert_eq!(text(&[0xAA, 0xC9, 0xC7]), "ವೊ");
+        assert_eq!(text(&[0x41, 0x69, 0xC0, 0xC4]), "ಯ");
+        assert_eq!(text(&[0x67, 0xC0, 0x68, 0x69, 0xC1]), "ಝಾ");
+    }
+
+    #[test]
+    fn mahaprana_mark() {
+        assert_eq!(text(&[0xA5, 0x73, 0xC0]), "ಫ");
+        assert_eq!(text(&[0xA9, 0xFC]), "ಭಿ");
+        assert_eq!(text(&[0x7A, 0x73, 0xC0]), "ಧ");
+    }
+
+    #[test]
+    fn standalone_vowels_and_marks() {
+        assert_eq!(text(&[0x43, 0x41]), "ಅಂ");
+        assert_eq!(text(&[0x49, 0xC4]), "ಋ");
+        assert_eq!(text(&[0x50, 0xC0, 0x42]), "ಕಃ");
+    }
+
+    #[test]
+    fn punctuation_from_the_windows_1252_range() {
+        assert_eq!(text(&[0x50, 0xC0, 0x86]), "ಕ।");
+        assert_eq!(text(&[0x50, 0xC0, 0x87]), "ಕ॥");
+        assert_eq!(text(&[0x4A, 0x41, 0x8B, 0x4A, 0x41, 0x8B]), "ಎಂ.ಎಂ.");
+    }
+
+    #[test]
+    fn zero_between_letters_is_an_anusvara() {
+        let prarambha = [0xA5, 0xC0, 0xE6, 0xC1, 0x67, 0xC0, 0x30, 0xA8, 0x73, 0xC0];
+        assert_eq!(text(&prarambha), "ಪ್ರಾರಂಭ");
+        let off = Options {
+            zero_as_anusvara: false,
+            ..Options::default()
+        };
+        let raw = decode_windows_1252(&prarambha);
+        assert_eq!(nudi_to_unicode(&raw, &off).text, "ಪ್ರಾರ0ಭ");
+        assert_eq!(
+            nudi_to_unicode("PÀ 2002", &Options::default()).text,
+            "ಕ 2002"
+        );
+        assert_eq!(nudi_to_unicode("PÀ10", &Options::default()).text, "ಕ10");
+    }
+
+    #[test]
+    fn kannada_digits_option() {
+        let k = Options {
+            kannada_digits: true,
+            ..Options::default()
+        };
+        assert_eq!(nudi_to_unicode("PÀ 2026", &k).text, "ಕ ೨೦೨೬");
+    }
+
+    #[test]
+    fn uncertain_glyphs_stay_unknown() {
+        let c = conv(&[0xA5, 0xC0, 0xE6, 0x59, 0xF5, 0xEF]);
+        assert_eq!(c.unknown.len(), 1, "{c:?}");
+        assert_eq!(c.unknown[0].glyph, '\u{F5}');
+    }
+
+    #[test]
+    fn unknown_glyphs_are_reported_and_kept() {
+        let c = nudi_to_unicode("PÀ\u{F1}", &Options::default());
+        assert_eq!(c.text, "ಕ\u{F1}");
+        assert_eq!(
+            c.unknown,
+            [Unknown {
+                offset: 3,
+                glyph: '\u{F1}'
+            }]
+        );
+    }
+
+    #[test]
+    fn stray_signs_are_reported() {
+        let c = conv(&[0xC1, 0x50, 0xC0]);
+        assert_eq!(c.text, "ಾಕ");
+        assert_eq!(c.malformed, vec![0..3]);
+    }
+
+    #[test]
+    fn windows_1252_high_range() {
+        assert_eq!(decode_windows_1252(&[0x86, 0x87, 0x84, 0x81]), "†‡„\u{81}");
+    }
+}

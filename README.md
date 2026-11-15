@@ -18,7 +18,8 @@ Version 0.1, in development.
 | Normalisation and Old Kannada modernisation | Done |
 | Transliteration: ISO 15919, IAST, Baraha phonetic | Done |
 | Kannada numerals | Done |
-| Nudi and Baraha to Unicode, and back | Designed: [docs/legacy-converter.md](docs/legacy-converter.md) |
+| Nudi and Baraha to Unicode | Done, waiting on a native reader's check of 100 sample lines |
+| Unicode to Nudi and Baraha | Designed: [docs/legacy-converter.md](docs/legacy-converter.md) |
 | Verified test corpus | Planned: [docs/corpus-plan.md](docs/corpus-plan.md) |
 | Converter page that runs in the browser, with no upload | Planned |
 | Command-line tool for TXT, HTML and DOCX | Planned |
@@ -50,6 +51,28 @@ assert_eq!(numerals::format(1956), "೧೯೫೬");
 ```
 
 Run `cargo run --example demo` to see each feature on 1 sentence.
+
+## Legacy fonts
+
+Nudi (up to version 5) and Baraha's ANSI fonts store glyph codes in place of letters, so the text reads as `PÀ£ÀßqÀ` outside the font. `legacy::nudi_to_unicode` converts it:
+
+```rust
+use kannadi::legacy::{nudi_to_unicode, Options};
+
+let converted = nudi_to_unicode("PÀ£ÀßqÀ", &Options::default());
+assert_eq!(converted.text, "ಕನ್ನಡ");
+assert!(converted.unknown.is_empty());
+```
+
+- **How the table was built.** The glyph table in [nudi.tsv](crates/kannadi/data/nudi.tsv) comes from the Nudi font files. Each glyph was rendered and matched against the Unicode version of the same typeface, which HarfBuzz labels. The table was then checked against typed letter charts and Karnataka government pages from 2002.
+- **Nothing is dropped silently.** Glyphs with no known meaning are kept in the output and listed in `unknown`, with their byte offsets. Vowel signs with no letter to attach to are listed in `malformed`.
+- **Digits.** The `k` variants of the Nudi fonts draw Kannada digits at the ASCII digit positions. For text in those fonts, set `Options::kannada_digits`.
+- **Typed zeros.** A zero typed between 2 Kannada letters in place of an anusvara (ಪ್ರಾರ0ಭ) becomes ಂ by default.
+- **Limits.**
+  - Some glyphs look alike: the ೂ in ವೊ and ಮೊ, and the subscript ಜ and ಞ. A document that used the wrong key converts to what was typed.
+  - English text set in the same font is converted too, so pass only the legacy-font runs.
+
+Run `cargo run --example nudi -- file.txt` to convert a Windows-1252 text file.
 
 ## Segmentation
 
