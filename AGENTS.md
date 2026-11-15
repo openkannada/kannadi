@@ -43,6 +43,7 @@ crates/kannadi-wasm/  wasm-bindgen bindings for the page; offsets in UTF-16 code
 web/
   src/                the static converter page: HTML, CSS, 1 JavaScript module
   build.sh            builds the WebAssembly package and the page into web/dist
+  wasm-bindgen-version.sh  the wasm-bindgen version in Cargo.lock, for build.sh and CI
   test/smoke.mjs      checks the built package in Node
 docs/                 design notes, corpus plan, prior art
 ```
