@@ -21,7 +21,7 @@ Version 0.1, in development.
 | Nudi and Baraha to Unicode | Done, waiting on a native reader's check of 100 sample lines |
 | Unicode to Nudi and Baraha | Designed: [docs/legacy-converter.md](docs/legacy-converter.md) |
 | Verified test corpus | Planned: [docs/corpus-plan.md](docs/corpus-plan.md) |
-| Converter page that runs in the browser, with no upload | Planned |
+| Converter page that runs in the browser, with no upload | Built, not deployed: [web/](web/) |
 | Command-line tool for TXT, HTML and DOCX | Planned |
 
 ## Example
@@ -73,6 +73,21 @@ assert!(converted.unknown.is_empty());
   - English text set in the same font is converted too, so pass only the legacy-font runs.
 
 Run `cargo run --example nudi -- file.txt` to convert a Windows-1252 text file.
+
+## Converter page
+
+[web/](web/) is a static page that converts Nudi and Baraha text to Unicode in the browser. The crate runs as WebAssembly through the bindings in [crates/kannadi-wasm](crates/kannadi-wasm), so text never leaves the device. Paste text or open a TXT file, then copy or download the result. The page lists unknown glyphs and malformed syllables, and selecting one highlights it.
+
+Build and run it locally. It needs the `wasm32-unknown-unknown` target and the `wasm-bindgen` command at the version in `Cargo.lock`:
+
+```sh
+rustup target add wasm32-unknown-unknown
+cargo install wasm-bindgen-cli --version 0.2.130 --locked
+web/build.sh
+python3 -m http.server -d web/dist 8000
+```
+
+`web/dist` is a plain folder of static files that any static host can serve. `node web/test/smoke.mjs` checks the built package.
 
 ## Segmentation
 
@@ -147,6 +162,7 @@ Scheme spellings and legacy glyph layouts are data tables read by 1 engine each.
 cargo test
 PROPTEST_CASES=50000 cargo test --release --test props
 cargo clippy --all-targets
+web/build.sh && node web/test/smoke.mjs
 ```
 
 The minimum supported Rust version is 1.75.
