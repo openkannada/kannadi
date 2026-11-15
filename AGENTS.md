@@ -15,7 +15,9 @@ cargo fmt --all
 cargo clippy --all-targets -- -D warnings
 RUSTDOCFLAGS="-D warnings" cargo doc --no-deps
 cargo +1.75 check -p kannadi --lib                      # minimum supported Rust
-web/build.sh && node web/test/smoke.mjs                 # WebAssembly build and converter page
+web/build.sh && node web/test/smoke.mjs                 # WebAssembly build and editor page
+node --test web/test/units.mjs                          # page modules
+python3 web/serve.py 8000                               # serve web/dist locally
 cargo run --example nudi -- file.txt                    # convert a legacy text file
 ```
 
@@ -41,10 +43,20 @@ crates/kannadi/
   examples/           demo, and a command-line converter for legacy files
 crates/kannadi-wasm/  wasm-bindgen bindings for the page; offsets in UTF-16 code units
 web/
-  src/                the static converter page: HTML, CSS, 1 JavaScript module
+  src/                the static editor page: HTML, CSS, fonts (OFL), JavaScript
+    js/main.js        wires the page: toolbar, files, paste, shortcuts, autosave
+    js/editor.js      plain-text contenteditable with its own undo history
+    js/issues.js      unknown glyphs and malformed syllables: marks, list, fixes
+    js/compose.js     phonetic typing in Baraha and ISO 15919
+    js/files.js       open TXT, HTML and DOCX; save TXT, HTML and DOCX
+    js/docx.js        DOCX text and run fonts; zip.js reads and writes ZIP
+    js/text.js        pure helpers: legacy detection, diffs, anchors
+    js/kannadi.js     wrapper over the WebAssembly bindings
   build.sh            builds the WebAssembly package and the page into web/dist
   wasm-bindgen-version.sh  the wasm-bindgen version in Cargo.lock, for build.sh and CI
+  serve.py            local server for web/dist
   test/smoke.mjs      checks the built package in Node
+  test/units.mjs      tests the page modules in Node, with no WebAssembly
 docs/                 design notes, corpus plan, prior art
 ```
 
@@ -63,9 +75,12 @@ Principles:
 - **Unicode.** Name characters by code point (U+0CDE) and by glyph (ೞ). Cite the Unicode version when it matters.
 - **Third-party code.** Do not copy code or data from other converters. In particular, ascii2unicode is GPL 3.0. Tables are derived from font files and documents; record how in the table's header.
 
-## Converter page
+## Editor page
 
 - The page has no build tool, framework or third-party script. Keep it that way unless a need appears.
+- Kannada rules (conversion, syllable checks, fixes, transliteration) live in the crate and reach the page through `kannadi-wasm`. JavaScript handles the DOM, files and events.
+- Change the document through `DocEditor.replace`, so the edit is reported, marked and undoable.
+- Keep `web/src/js/text.js`, `docx.js`, `zip.js` and `compose.js` free of DOM access, so `units.mjs` can test them in Node.
 - No tracking, no cookies and no network requests beyond the page's own files. The Content-Security-Policy in `index.html` enforces this.
 - Build DOM nodes with `textContent`, never `innerHTML`, since the report shows user text.
 - Page copy follows the writing rules below. Do not claim a feature, such as Unicode to Nudi, before it ships.

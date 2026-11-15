@@ -3,27 +3,27 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'self'; style-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="no-referrer">
-<title>Nudi to Unicode converter: Kannada Unicode converter</title>
-<meta name="description" content="Free Nudi to Unicode converter for Kannada text in Nudi and Baraha fonts. Runs in your browser and nothing is uploaded. Unicode to Nudi is coming.">
+<title>Kannada editor and Nudi to Unicode converter</title>
+<meta name="description" content="Free Kannada editor in your browser. Convert Nudi and Baraha to Unicode, fix every unknown glyph inline, type Kannada with English letters, and save as Word, HTML or text. Nothing is uploaded.">
 <meta name="color-scheme" content="light dark">
-<meta name="theme-color" content="#fbf8f3" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#16130f" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#0c4a36">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Nudi to Unicode converter">
-<meta property="og:description" content="Convert Nudi and Baraha Kannada text to Unicode in your browser. Nothing is uploaded. Unknown glyphs and malformed syllables are reported.">
+<meta property="og:title" content="Kannada editor and Nudi to Unicode converter">
+<meta property="og:description" content="Convert Nudi and Baraha to Unicode, fix unknown glyphs inline, type Kannada with English letters, and save as Word, HTML or text. Runs in your browser.">
 <meta name="twitter:card" content="summary">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preload" href="fonts/noto-sans-kannada-kannada-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="style.css">
 <link rel="modulepreload" href="pkg/kannadi_wasm.js">
-<script type="module" src="app.js"></script>
+<script type="module" src="js/main.js"></script>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "WebApplication",
-  "name": "Nudi to Unicode converter",
-  "description": "Converts Kannada text typed in Nudi and Baraha ANSI fonts to Unicode, in the browser, and reports unknown glyphs and malformed syllables.",
+  "@type": "SoftwareApplication",
+  "name": "kannadi Kannada editor",
+  "description": "Converts Kannada text typed in Nudi and Baraha ANSI fonts to Unicode in the browser, shows unknown glyphs and malformed syllables inline with fixes, and types Kannada with Baraha or ISO 15919 letters.",
   "applicationCategory": "UtilitiesApplication",
   "operatingSystem": "Any",
   "inLanguage": ["en", "kn"],
@@ -34,98 +34,176 @@
 </script>
 </head>
 <body>
-<a class="skip" href="#converter">Skip to the converter</a>
-<noscript><p class="intro">The converter needs JavaScript and WebAssembly.</p></noscript>
+<!--
+THESIS: The editor is a route board: text travels from Nudi, Baraha or English letters to Unicode Kannada, and every stop where it could not travel is marked on the line. It refuses the converter-page default of two grey text boxes and a button.
+OWN-WORLD: KSRTC bus destination boards. Bottle-green enamel plates with white lettering, Kannada set large and English small beneath it, a Karnataka-yellow route disc, route stops drawn as dots on a line. The document sits on a plain white sheet below the board. Red marks unknown glyphs, amber marks malformed syllables.
+STORY: A clerk pastes an old Nudi file, sees it turn into Unicode, sees exactly where it could not, fixes each mark in 1 click, and saves a Word file.
+FIRST VIEWPORT: Green board across the top with the yellow disc, the bilingual name and the message panel; the route strip with typing stops and tools; H1 and 1-sentence definition; the white sheet with the empty-state guide; the stops rail of problems on the right.
+FORM: KSRTC route board, position 5 of 7, seed cd6bdcc7.
+FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, and DESIGN.md
+-->
+<a class="skip" href="#doc">Skip to the document</a>
 
-<header class="intro">
-  <h1>Nudi to Unicode converter</h1>
-  <p class="lede">Nudi to Unicode conversion turns Kannada text typed in the old Nudi or Baraha fonts into standard Unicode Kannada, which phones, websites and search engines can read.</p>
-  <p class="kn" lang="kn">ನುಡಿ ಮತ್ತು ಬರಹ ಪಠ್ಯವನ್ನು ಯುನಿಕೋಡ್ ಕನ್ನಡಕ್ಕೆ ಬದಲಾಯಿಸಿ.</p>
-  <p>This Kannada Unicode converter runs in your browser. Your text is not uploaded. When a glyph cannot be converted or a syllable is not valid Kannada, the report below the result tells you where.</p>
+<header class="board">
+  <a class="brand" href="./" aria-label="kannadi, Kannada editor, home">
+    <span class="disc" aria-hidden="true" lang="kn">ಕ</span>
+    <span class="brand-words">
+      <span class="brand-kn" lang="kn">ಕನ್ನಡಿ</span>
+      <span class="brand-en">kannadi editor</span>
+    </span>
+  </a>
+  <div class="message" id="message">
+    <p id="message-text" role="status" aria-live="polite">Loading the editor.</p>
+    <button type="button" id="message-action" class="message-action" hidden></button>
+  </div>
+  <nav class="board-actions" aria-label="Document">
+    <label class="plate" for="file" title="Open a file (Ctrl+O)">
+      <svg aria-hidden="true" viewBox="0 0 20 20"><path d="M3 5.5h5l1.5 2H17v8H3z"/></svg>
+      <span>Open</span>
+    </label>
+    <input type="file" id="file" accept=".txt,.docx,.html,.htm,text/plain,text/html,application/vnd.openxmlformats-officedocument.wordprocessingml.document" class="visually-hidden">
+    <details class="menu" id="export-menu">
+      <summary class="plate" title="Save a copy (Ctrl+S)">
+        <svg aria-hidden="true" viewBox="0 0 20 20"><path d="M10 3v9m-4-4 4 4 4-4M4 15.5h12"/></svg>
+        <span>Save</span>
+      </summary>
+      <div class="menu-list">
+        <button type="button" data-export="docx">Word document <small>.docx</small></button>
+        <button type="button" data-export="txt">Plain text <small>.txt</small></button>
+        <button type="button" data-export="html">Web page <small>.html</small></button>
+        <button type="button" id="copy">Copy all</button>
+      </div>
+    </details>
+    <button type="button" class="plate icon" id="theme" aria-label="Theme: auto. Change theme" data-theme="auto">
+      <svg aria-hidden="true" viewBox="0 0 20 20"><circle cx="10" cy="10" r="6"/><path d="M10 4a6 6 0 0 0 0 12z" class="fill"/></svg>
+    </button>
+    <button type="button" class="plate icon" id="shortcuts-open" aria-label="Keyboard shortcuts" title="Keyboard shortcuts (Ctrl+/)">
+      <svg aria-hidden="true" viewBox="0 0 20 20"><rect x="2.5" y="5" width="15" height="10" rx="1.5"/><path d="M5.5 8h1m2 0h1m2 0h1m2 0h1M6 12h8"/></svg>
+    </button>
+  </nav>
 </header>
 
-<main id="converter" tabindex="-1">
-  <section class="tool" aria-labelledby="tool-heading">
-    <h2 id="tool-heading" class="visually-hidden">Converter</h2>
-
-    <div class="panes">
-      <div class="pane">
-        <div class="pane-head">
-          <label for="input">Nudi or Baraha text</label>
-          <div class="actions">
-            <button type="button" id="sample" class="link">Try a sample</button>
-            <label class="button" for="file">Open a TXT file</label>
-            <input type="file" id="file" accept=".txt,text/plain" class="visually-hidden">
-          </div>
-        </div>
-        <textarea id="input" spellcheck="false" autocomplete="off" autocapitalize="off"
-          placeholder="Paste text such as PÀ£ÀßqÀ here, or drop a TXT file"
-          aria-describedby="input-help"></textarea>
-        <p id="input-help" class="help">Paste only the Kannada part of a document. English text in the same paste is converted too.</p>
-      </div>
-
-      <div class="pane">
-        <div class="pane-head">
-          <label for="output">Unicode Kannada</label>
-          <div class="actions">
-            <button type="button" id="copy" disabled>Copy</button>
-            <button type="button" id="download" disabled>Download</button>
-          </div>
-        </div>
-        <textarea id="output" lang="kn" readonly spellcheck="false"
-          placeholder="ಕನ್ನಡ" aria-describedby="status counts"></textarea>
-        <p class="help"><span id="status" role="status" aria-live="polite">Loading the converter.</span> <span id="counts"></span></p>
-      </div>
+<div class="routebar">
+  <fieldset class="route" aria-describedby="route-help">
+    <legend>Type with</legend>
+    <div class="stops">
+      <input type="radio" name="mode" id="mode-kannada" value="kannada" checked>
+      <label for="mode-kannada" data-name="a Kannada keyboard"><span class="stop-kn" lang="kn">ಕನ್ನಡ</span><span class="stop-en">Kannada keys</span></label>
+      <input type="radio" name="mode" id="mode-baraha" value="baraha">
+      <label for="mode-baraha" data-name="Baraha letters"><span class="stop-kn">kannaDa</span><span class="stop-en">Baraha letters</span></label>
+      <input type="radio" name="mode" id="mode-iso15919" value="iso15919">
+      <label for="mode-iso15919" data-name="ISO 15919 letters"><span class="stop-kn">kannaḍa</span><span class="stop-en">ISO 15919</span></label>
     </div>
-
-    <fieldset class="options">
-      <legend class="visually-hidden">Options</legend>
-      <label><input type="checkbox" id="zero" checked> Read a zero inside a word as an anusvara (ಪ್ರಾರ0ಭ to ಪ್ರಾರಂಭ)</label>
-      <label><input type="checkbox" id="digits"> Write digits as Kannada digits (for the Nudi fonts whose names end in k)</label>
+    <p id="route-help" class="visually-hidden">With Baraha or ISO 15919, type Kannada words with English letters. Alt+1, Alt+2 and Alt+3 switch.</p>
+  </fieldset>
+  <div class="tools" role="toolbar" aria-label="Text tools">
+    <button type="button" id="new" title="Start an empty document; undo brings the last one back">New</button>
+    <button type="button" id="convert" title="Convert the selection, or the whole document, from Nudi or Baraha">Convert Nudi</button>
+    <button type="button" id="normalize" title="Fix vowel signs typed in parts and doubled marks">Normalize</button>
+    <button type="button" id="modernize" title="Change ೞ, ಱ and ೝ to modern letters">Modernize</button>
+    <fieldset class="segmented">
+      <legend class="visually-hidden">Typeface</legend>
+      <input type="radio" name="font" id="font-sans" value="sans" checked><label for="font-sans">Sans</label>
+      <input type="radio" name="font" id="font-serif" value="serif"><label for="font-serif">Serif</label>
     </fieldset>
+  </div>
+</div>
 
-    <section id="report" class="report" aria-labelledby="report-heading" hidden>
-      <h2 id="report-heading">Report</h2>
-      <p id="report-summary"></p>
-      <ol id="report-list"></ol>
-      <p id="report-more" class="help" hidden></p>
+<main>
+  <div class="intro">
+    <h1>Kannada editor and Nudi to Unicode converter</h1>
+    <p>Nudi to Unicode conversion turns Kannada text typed in the old Nudi or Baraha fonts into standard Unicode Kannada, which phones, websites and search engines can read. This editor does it in your browser, marks every glyph it could not convert, and nothing is uploaded.</p>
+  </div>
+
+  <div class="workspace">
+    <section class="sheet" aria-label="Document">
+      <div id="doc" class="doc" role="textbox" aria-multiline="true" aria-label="Document text" aria-describedby="empty" lang="kn" spellcheck="false" autocapitalize="off"></div>
+      <div id="empty" class="empty">
+        <p class="empty-lead">Paste Nudi or Baraha text, open a TXT, Word or HTML file, or start typing.</p>
+        <ol class="empty-steps">
+          <li>Pasted Nudi and Baraha text turns into Unicode by itself.</li>
+          <li>Red and amber marks show what could not be converted. Select one to fix it.</li>
+          <li>Choose <b>Baraha letters</b> above to type <span lang="kn">ಕನ್ನಡ</span> as <kbd>kannaDa</kbd>.</li>
+        </ol>
+        <p class="empty-actions"><button type="button" id="sample">Try a 2002 government page</button></p>
+      </div>
     </section>
-  </section>
 
-  <section class="prose" aria-labelledby="how-heading">
-    <h2 id="how-heading">How it works</h2>
-    <p>Nudi (up to version 5) and Baraha's ANSI fonts, such as BRH Kannada, draw Kannada shapes on top of Latin letters. The file stores the Latin letters, so outside the font ಕನ್ನಡ reads as <code>PÀ£ÀßqÀ</code>. Both font families use the same layout, so 1 converter handles both.</p>
-    <p>The fonts store glyphs in drawing order. A subscript consonant comes after the vowel sign, and some vowel signs are split into 2 or 3 pieces. The converter rebuilds each syllable in Unicode order and checks that the result is a valid Kannada syllable.</p>
-  </section>
+    <aside class="rail" aria-label="Problems and options">
+      <section class="problems" aria-labelledby="problems-heading">
+        <h2 id="problems-heading">Problems <span class="badge" id="problem-count" data-zero="true">0</span></h2>
+        <p id="problems-empty" class="rail-note">None. Unknown glyphs and malformed syllables show up here. <kbd>F8</kbd> jumps to the next one.</p>
+        <ol id="problem-list" class="problem-list"></ol>
+        <p id="problem-more" class="rail-note" hidden></p>
+      </section>
+      <section class="options" aria-labelledby="options-heading">
+        <h2 id="options-heading">When converting</h2>
+        <label><input type="checkbox" id="auto-convert" checked> <span>Convert pasted Nudi and Baraha</span></label>
+        <label><input type="checkbox" id="zero" checked> <span>Read 0 inside a word as anusvara: <span lang="kn">ಪ್ರಾರ0ಭ</span> to <span lang="kn">ಪ್ರಾರಂಭ</span></span></label>
+        <label><input type="checkbox" id="digits"> <span>Kannada digits, for Nudi fonts whose names end in k</span></label>
+      </section>
+    </aside>
+  </div>
 
-  <section class="prose faq" aria-labelledby="faq-heading">
-    <h2 id="faq-heading">Questions</h2>
+  <footer class="status" aria-label="Document status">
+    <span><b id="count-aksharas">0</b> aksharas</span>
+    <span><b id="count-words">0</b> words</span>
+    <span><b id="count-chars">0</b> characters</span>
+    <span id="saved" class="saved">Not saved yet</span>
+  </footer>
 
-    <h3>Is my text uploaded?</h3>
-    <p>No. The converter is compiled to WebAssembly and runs on your device. The page loads its own files and makes no other network requests. It sets no cookies and has no analytics.</p>
+  <div class="prose">
+    <section aria-labelledby="how-heading">
+      <h2 id="how-heading">How to convert Nudi to Unicode</h2>
+      <ol>
+        <li>Open your file with <b>Open</b>, or copy the text from Word and paste it into the sheet. Word files keep their fonts, so only the text set in Nudi or Baraha fonts is converted.</li>
+        <li>Check the marks. Red is a glyph with no Kannada letter. Amber is a sign that cannot form a syllable. Select a mark, or press <kbd>F8</kbd>, and pick a fix.</li>
+        <li>Choose <b>Save</b> and pick Word, plain text or web page.</li>
+      </ol>
+    </section>
 
-    <h3>Which fonts does it convert?</h3>
-    <p>Nudi 1 to 5 fonts and Baraha ANSI fonts such as BRH Kannada. If the text already shows as Kannada letters when pasted, it is Unicode and needs no conversion. The page tells you when it sees Unicode Kannada.</p>
-
-    <h3>Can it convert Unicode to Nudi?</h3>
-    <p>Not yet. A Unicode to Nudi converter is coming.</p>
-
-    <h3>Can it convert Word files?</h3>
-    <p>Not yet. DOCX support is coming. For now, copy the text from Word and paste it here. Copying keeps the glyph codes, which is what the converter needs.</p>
-
-    <h3>How do I check the result?</h3>
-    <p>The report lists every glyph the converter could not place and every syllable that is not valid Kannada. Select an item to highlight it. Unknown glyphs stay in the result as they were, so nothing is lost. A measured error rate on a checked set of real documents will be published here when that test set is ready.</p>
-
-    <h3>What do the options do?</h3>
-    <p>Many typists entered a zero in place of the anusvara ಂ. The first option turns a zero between Kannada letters into ಂ. Leave it on unless your text has real zeros inside words. The second option is for text set in the Nudi fonts whose names end in k, which draw Kannada digits in place of 0 to 9.</p>
-
-    <h3>Who made this?</h3>
-    <p>It is built on <a href="https://github.com/prasadus92/kannadi">kannadi</a>, an open-source Rust library for Kannada text by Prasad Subrahmanya, released under the MIT license.</p>
-  </section>
+    <section aria-labelledby="faq-heading">
+      <h2 id="faq-heading">Questions</h2>
+      <h3>Is my text uploaded?</h3>
+      <p>No. The converter is compiled to WebAssembly and runs on your device. The page loads its own files and makes no other network requests. It sets no cookies and has no analytics. Your last document is kept in this browser's storage so it is still here when you come back.</p>
+      <h3>Which fonts does it convert?</h3>
+      <p>Nudi 1 to 5 fonts and Baraha ANSI fonts such as BRH Kannada. Text that already shows as Kannada letters is Unicode and needs no conversion.</p>
+      <h3>Can it convert Unicode to Nudi?</h3>
+      <p>Not yet. A Unicode to Nudi converter is coming.</p>
+      <h3>How do I type Kannada with an English keyboard?</h3>
+      <p>Choose <b>Baraha letters</b> and type words the way they sound: <kbd>kannaDa</kbd> gives <span lang="kn">ಕನ್ನಡ</span>, <kbd>nADu</kbd> gives <span lang="kn">ನಾಡು</span>. Capital letters give long vowels and retroflex sounds. Press <kbd>Esc</kbd> to keep a word in English letters.</p>
+      <h3>What do Normalize and Modernize do?</h3>
+      <p>Normalize joins vowel signs typed in 2 parts and removes doubled marks, so text that looks the same also searches the same. Modernize changes the Old Kannada letters <span lang="kn">ೞ ಱ ೝ</span> to <span lang="kn">ಳ ರ ನ್</span>.</p>
+      <h3>How accurate is it?</h3>
+      <p>Every glyph it cannot place is marked, and every syllable that is not valid Kannada is marked. A measured error rate on a checked set of real documents will be published when that test set is ready.</p>
+      <h3>Who made this?</h3>
+      <p>It is built on <a href="https://github.com/prasadus92/kannadi">kannadi</a>, an open-source Rust library for Kannada text by Prasad Subrahmanya, released under the MIT license. The fonts are Noto Sans Kannada and Noto Serif Kannada, under the SIL Open Font License.</p>
+    </section>
+  </div>
 </main>
 
-<footer>
+<footer class="credit">
   <p>If kannadi helps your project, a mention or a link to <a href="https://prasad.tech">prasad.tech</a> is appreciated.</p>
 </footer>
+
+<div id="popover" class="popover" role="dialog" aria-label="Fix this problem" hidden></div>
+
+<dialog id="shortcuts" aria-labelledby="shortcuts-heading">
+  <form method="dialog">
+    <h2 id="shortcuts-heading">Keyboard shortcuts</h2>
+    <dl class="keys">
+      <dt><kbd>Ctrl</kbd> <kbd>O</kbd></dt><dd>Open a file</dd>
+      <dt><kbd>Ctrl</kbd> <kbd>S</kbd></dt><dd>Save in the last format used</dd>
+      <dt><kbd>Ctrl</kbd> <kbd>Z</kbd></dt><dd>Undo, including conversions and fixes</dd>
+      <dt><kbd>F8</kbd></dt><dd>Next problem and its fixes</dd>
+      <dt><kbd>Shift</kbd> <kbd>F8</kbd></dt><dd>Previous problem</dd>
+      <dt><kbd>Alt</kbd> <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd></dt><dd>Type with Kannada keys, Baraha or ISO 15919</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Keep the word you are typing in English letters</dd>
+      <dt><kbd>Ctrl</kbd> <kbd>/</kbd></dt><dd>This list</dd>
+    </dl>
+    <p class="rail-note">On a Mac, use <kbd>⌘</kbd> for <kbd>Ctrl</kbd> and <kbd>Option</kbd> for <kbd>Alt</kbd>.</p>
+    <button type="submit">Close</button>
+  </form>
+</dialog>
 </body>
 </html>

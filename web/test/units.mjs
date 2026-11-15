@@ -1,0 +1,217 @@
+// Tests for the page modules that need no WebAssembly or DOM: node web/test/units.mjs
+import assert from "node:assert/strict";
+import { test } from "node:test";
+
+import { Composer } from "../src/js/compose.js";
+import { readDocx, writeDocx } from "../src/js/docx.js";
+import { DocEditor } from "../src/js/editor.js";
+import { codePoints, countWords, diff, isLegacyFont, joinSegments, looksLegacy, shiftAnchors } from "../src/js/text.js";
+import { readZip, writeZip } from "../src/js/zip.js";
+
+// Karnataka RDPR page, Dec 2002, BRH Kannada:
+// https://web.archive.org/web/20021227171554/http://www.kar.nic.in:80/rdpr/kan-www/Schemes/Chapter-1/Matter/1_2(M).htm
+const NUDI = "¸ÀPÁðj ¥ÁæxÀ«ÄPÀ ±Á¯ÉUÀ¼À°è ²PÀëPÀjUÉ vÀgÀ¨ÉÃw ¤ÃqÀÄªÀÅzÀÄ.";
+
+test("legacy text is told apart from English and Unicode Kannada", () => {
+  assert.ok(looksLegacy(NUDI));
+  assert.ok(looksLegacy("PÀ£ÀßqÀ"));
+  assert.ok(!looksLegacy("The village panchayat met on 12 March."));
+  assert.ok(!looksLegacy("Café crème brûlée in Bengaluru"));
+  assert.ok(!looksLegacy("Señor Müller’s “naïve” résumé — déjà vu"));
+  assert.ok(!looksLegacy("ಕನ್ನಡ ನಾಡು"));
+  assert.ok(!looksLegacy(""));
+});
+
+test("legacy font names", () => {
+  for (const f of ["BRH Kannada", "Nudi 01 e", "'Nudi Akshar'", "Baraha Kan", "Arial, BRH Kannada"]) assert.ok(isLegacyFont(f), f);
+  for (const f of ["Arial", "Nirmala UI", "NudiUni01e", "Nudi Unicode 01", "Tunga", undefined, null]) assert.ok(!isLegacyFont(f), f);
+});
+
+test("diff finds the single edit", () => {
+  assert.deepEqual(diff("abcdef", "abXYef"), { start: 2, oldEnd: 4, newEnd: 4 });
+  assert.deepEqual(diff("abc", "abc"), { start: 3, oldEnd: 3, newEnd: 3 });
+  assert.deepEqual(diff("aaa", "aaaa"), { start: 3, oldEnd: 3, newEnd: 4 });
+  assert.deepEqual(diff("", "x"), { start: 0, oldEnd: 0, newEnd: 1 });
+});
+
+test("anchors move with edits and drop when edited away", () => {
+  const before = "ab õ cd õ";
+  const anchors = [{ offset: 3, glyph: "õ" }, { offset: 8, glyph: "õ" }];
+  const after = "XXab õ cd õ";
+  assert.deepEqual(shiftAnchors(anchors, diff(before, after), after), [
+    { offset: 5, glyph: "õ" },
+    { offset: 10, glyph: "õ" },
+  ]);
+  const deleted = "ab  cd õ";
+  assert.deepEqual(shiftAnchors(anchors, diff(before, deleted), deleted), [{ offset: 7, glyph: "õ" }]);
+});
+
+test("segments merge before converting, and offsets point into the output", () => {
+  const convert = (text) => ({ text: text.toUpperCase(), unknown: [text.indexOf("q")].filter((i) => i >= 0) });
+  const joined = joinSegments(
+    [
+      { text: "Hi ", legacy: false },
+      { text: "ab", legacy: true },
+      { text: "qc", legacy: true },
+      { text: "", legacy: false },
+      { text: " end", legacy: false },
+    ],
+    convert,
+  );
+  assert.equal(joined.text, "Hi ABQC end");
+  assert.deepEqual(joined.unknown, [5]);
+  assert.equal(joined.converted, 4);
+});
+
+test("word count and code points", () => {
+  assert.equal(countWords("  ಕನ್ನಡ ನಾಡು\nಬೆಂಗಳೂರು "), 3);
+  assert.equal(codePoints("ಕ್"), "U+0C95 U+0CCD");
+});
+
+test("zip round trip", async () => {
+  const files = [
+    ["a.txt", "ಕನ್ನಡ ".repeat(500)],
+    ["dir/b.bin", new Uint8Array([0, 1, 2, 255])],
+  ];
+  const entries = await readZip(await writeZip(files));
+  assert.equal(new TextDecoder().decode(entries.get("a.txt")), files[0][1]);
+  assert.deepEqual([...entries.get("dir/b.bin")], [0, 1, 2, 255]);
+  await assert.rejects(readZip(new Uint8Array(30)), /not a ZIP/);
+});
+
+test("docx round trip keeps lines and tabs", async () => {
+  const text = "ಕನ್ನಡ ನಾಡು\n\nಸಾಲು 2\tಟ್ಯಾಬ್ <&> \"x\"\u0007";
+  const segments = await readDocx(await writeDocx(text));
+  assert.ok(segments.every((s) => !s.legacy));
+  assert.equal(segments.map((s) => s.text).join(""), text.replace("\u0007", ""));
+});
+
+const W = 'xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"';
+const run = (text, font) =>
+  `<w:r>${font ? `<w:rPr><w:rFonts w:ascii="${font}" w:hAnsi="${font}"/></w:rPr>` : ""}<w:t xml:space="preserve">${text}</w:t></w:r>`;
+
+async function docx(body, styles = "") {
+  return writeZip([
+    ["word/document.xml", `<?xml version="1.0"?><w:document ${W}><w:body>${body}</w:body></w:document>`],
+    ["word/styles.xml", `<?xml version="1.0"?><w:styles ${W}>${styles}</w:styles>`],
+  ]);
+}
+
+test("docx runs are legacy by run font, character style, paragraph style or default", async () => {
+  const styles =
+    '<w:docDefaults><w:rPrDefault><w:rPr><w:rFonts w:ascii="Times New Roman"/></w:rPr></w:rPrDefault></w:docDefaults>' +
+    '<w:style w:type="paragraph" w:styleId="Base"><w:rPr><w:rFonts w:ascii="Nudi 01 e"/></w:rPr></w:style>' +
+    '<w:style w:type="paragraph" w:styleId="Kan"><w:basedOn w:val="Base"/></w:style>' +
+    '<w:style w:type="character" w:styleId="Eng"><w:rPr><w:rFonts w:ascii="Arial"/></w:rPr></w:style>';
+  const body =
+    `<w:p>${run("English ", "Arial")}${run("PÀ£À", "BRH Kannada")}${run("ßqÀ", "BRH Kannada")}</w:p>` +
+    `<w:p><w:pPr><w:pStyle w:val="Kan"/><w:rPr><w:rFonts w:ascii="Arial"/></w:rPr></w:pPr>${run("¤ÃqÀÄ")}` +
+    `<w:r><w:rPr><w:rStyle w:val="Eng"/></w:rPr><w:t>Eng</w:t></w:r><w:r><w:tab/></w:r></w:p>` +
+    `<w:p>${run("Times &amp; more")}<w:r><w:br/></w:r></w:p>`;
+  const segments = await readDocx(await docx(body, styles));
+  assert.deepEqual(segments, [
+    { text: "English ", legacy: false },
+    { text: "PÀ£À", legacy: true },
+    { text: "ßqÀ", legacy: true },
+    { text: "\n", legacy: false },
+    { text: "¤ÃqÀÄ", legacy: true },
+    { text: "Eng", legacy: false },
+    { text: "\t", legacy: false },
+    { text: "\n", legacy: false },
+    { text: "Times & more", legacy: false },
+    { text: "\n", legacy: false },
+  ]);
+});
+
+test("a docx with no document part is refused", async () => {
+  await assert.rejects(readDocx(await writeZip([["x.xml", "<x/>"]])), /no Word document/);
+});
+
+/** Stands in for DocEditor: a string with a caret. */
+class FakeEditor {
+  constructor() {
+    this.text = "";
+    this.caret = 0;
+    this.onEdit = () => {};
+  }
+  type(chars) {
+    for (const c of chars) {
+      const before = this.text;
+      this.text = before.slice(0, this.caret) + c + before.slice(this.caret);
+      this.caret += c.length;
+      this.onEdit(diff(before, this.text), this.text, "insertText");
+    }
+  }
+  replace(start, end, text, inputType) {
+    const before = this.text;
+    this.text = before.slice(0, start) + text + before.slice(end);
+    this.caret = start + text.length;
+    this.onEdit(diff(before, this.text), this.text, inputType);
+  }
+  selection() {
+    return { start: this.caret, end: this.caret };
+  }
+}
+
+function composer(mode) {
+  const editor = new FakeEditor();
+  const translit = (text, from) => {
+    assert.equal(from, mode);
+    const table = { k: "ಕ್", ka: "ಕ", kan: "ಕನ್", kann: "ಕನ್ನ್", kanna: "ಕನ್ನ", kannaD: "ಕನ್ನಡ್", kannaDa: "ಕನ್ನಡ" };
+    return table[text] ?? `[${text}]`;
+  };
+  const c = new Composer(editor, translit, () => {});
+  editor.onEdit = (edit, after, type) => c.handle(edit, after, type);
+  c.setMode(mode);
+  return { editor, c };
+}
+
+test("phonetic typing re-renders the whole word on each letter", () => {
+  const { editor } = composer("baraha");
+  editor.type("kannaDa");
+  assert.equal(editor.text, "ಕನ್ನಡ");
+  editor.type(" ");
+  editor.type("ka");
+  assert.equal(editor.text, "ಕನ್ನಡ ಕ");
+});
+
+test("backspace removes a Latin letter and escape restores the Latin word", () => {
+  const { editor, c } = composer("baraha");
+  editor.type("kann");
+  const e = { inputType: "deleteContentBackward", cancelable: true, prevented: false, preventDefault() { this.prevented = true; } };
+  c.beforeInput(e);
+  assert.ok(e.prevented);
+  assert.equal(editor.text, "ಕನ್");
+  assert.ok(c.revert());
+  assert.equal(editor.text, "kan");
+  assert.ok(!c.revert());
+});
+
+test("Kannada keys mode and non-letters leave text alone", () => {
+  const { editor, c } = composer("baraha");
+  c.setMode("kannada");
+  editor.type("ka");
+  assert.equal(editor.text, "ka");
+  c.setMode("baraha");
+  editor.type("1");
+  assert.equal(editor.text, "ka1");
+});
+
+test("undo history merges typing into 1 step and keeps other edits apart", () => {
+  const el = { contentEditable: "", textContent: "", addEventListener() {} };
+  const editor = new DocEditor(el, () => {});
+  const step = (before, after, type) => editor.record(diff(before, after), before, after, type);
+  step("", "k", "insertText");
+  step("k", "ಕ್", "compose");
+  step("ಕ್", "ಕ", "compose");
+  step("ಕ", "ಕ ", "insertText");
+  step("ಕ ", "ಕ X", "insertReplacementText");
+  assert.deepEqual(
+    editor.undoStack.map(({ start, removed, inserted }) => ({ start, removed, inserted })),
+    [
+      { start: 0, removed: "", inserted: "ಕ" },
+      { start: 1, removed: "", inserted: " " },
+      { start: 2, removed: "", inserted: "X" },
+    ],
+  );
+});
