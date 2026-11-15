@@ -36,8 +36,11 @@ crates/kannadi/
   src/translit/       Kannada to and from ISO 15919, IAST, Baraha
     schemes.rs        the scheme tables, as data
     mod.rs            1 engine for all schemes: romanize and parse
-  src/legacy.rs       Nudi and Baraha ANSI to Unicode: a Writer builds the output
-                      and the reports; a Syllable decides what it can accept
+  src/legacy/         Nudi and Baraha ANSI to and from Unicode
+    table.rs          parses data/nudi.tsv once for both directions
+    decode.rs         to Unicode: a Writer builds the output and the reports;
+                      a Syllable decides what it can accept
+    encode.rs         from Unicode: each akshara written in storage order
   data/nudi.tsv       the legacy glyph table, as data
   tests/              golden fixtures, property tests, differential test
   examples/           demo, and a command-line converter for legacy files
@@ -55,6 +58,7 @@ web/
   build.sh            builds the WebAssembly package and the page into web/dist
   wasm-bindgen-version.sh  the wasm-bindgen version in Cargo.lock, for build.sh and CI
   serve.py            local server for web/dist
+  DESIGN.md           why the page looks as it does: world, tokens, contrast rules
   test/smoke.mjs      checks the built package in Node
   test/units.mjs      tests the page modules in Node, with no WebAssembly
 docs/                 design notes, corpus plan, prior art

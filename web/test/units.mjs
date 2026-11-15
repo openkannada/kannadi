@@ -5,7 +5,18 @@ import { test } from "node:test";
 import { Composer } from "../src/js/compose.js";
 import { readDocx, writeDocx } from "../src/js/docx.js";
 import { DocEditor } from "../src/js/editor.js";
-import { codePoints, countWords, diff, isLegacyFont, joinSegments, looksLegacy, shiftAnchors } from "../src/js/text.js";
+import { pasted } from "../src/js/files.js";
+import {
+  codePoints,
+  countWords,
+  diff,
+  escapeMarkup,
+  isLegacyFont,
+  joinSegments,
+  looksLegacy,
+  shiftAnchors,
+  shiftRanges,
+} from "../src/js/text.js";
 import { readZip, writeZip } from "../src/js/zip.js";
 
 // Karnataka RDPR page, Dec 2002, BRH Kannada:
@@ -32,6 +43,34 @@ test("diff finds the single edit", () => {
   assert.deepEqual(diff("abc", "abc"), { start: 3, oldEnd: 3, newEnd: 3 });
   assert.deepEqual(diff("aaa", "aaaa"), { start: 3, oldEnd: 3, newEnd: 4 });
   assert.deepEqual(diff("", "x"), { start: 0, oldEnd: 0, newEnd: 1 });
+});
+
+test("diff puts an edit inside a run of equal letters at the caret", () => {
+  assert.deepEqual(diff("xa", "xaa"), { start: 2, oldEnd: 2, newEnd: 3 });
+  assert.deepEqual(diff("xa", "xaa", 2), { start: 1, oldEnd: 1, newEnd: 2 });
+  assert.deepEqual(diff("aat", "at", 0), { start: 0, oldEnd: 1, newEnd: 0 });
+  assert.deepEqual(diff("xa", "xaa", 0), { start: 2, oldEnd: 2, newEnd: 3 }, "a caret that does not fit is ignored");
+  const big = "ಕನ್ನಡ ".repeat(200_000);
+  assert.deepEqual(diff(big, big + "x"), { start: big.length, oldEnd: big.length, newEnd: big.length + 1 });
+  assert.deepEqual(diff("x" + big, big), { start: 0, oldEnd: 1, newEnd: 0 });
+});
+
+test("ranges move with edits and drop when touched", () => {
+  const edit = diff("ab ಾ cd ೆ", "XXab ಾ cd ೆ");
+  assert.deepEqual(shiftRanges([3, 4, 8, 9], edit), [5, 6, 10, 11]);
+  assert.deepEqual(shiftRanges([3, 4, 8, 9], diff("ab ಾ cd ೆ", "ab ಾ c ೆ")), [3, 4, 7, 8]);
+  assert.deepEqual(shiftRanges([3, 4, 8, 9], diff("ab ಾ cd ೆ", "ab ಾ cdೆ")), [3, 4], "the edit touches the second range");
+});
+
+test("plain text that needs no conversion is kept exactly", () => {
+  const convert = () => assert.fail("nothing to convert");
+  for (const text of ["    indented code\n\n\n\nend ", "ಕನ್ನಡ  ನಾಡು\r\n\t", " "]) {
+    assert.deepEqual(pasted("", text, convert), { text, unknown: [], converted: 0 });
+  }
+});
+
+test("markup escaping", () => {
+  assert.equal(escapeMarkup('<a href="x">&</a>'), "&lt;a href=&quot;x&quot;&gt;&amp;&lt;/a&gt;");
 });
 
 test("anchors move with edits and drop when edited away", () => {
@@ -123,6 +162,35 @@ test("docx runs are legacy by run font, character style, paragraph style or defa
   ]);
 });
 
+test("docx text boxes are read once and keep the outer paragraph", async () => {
+  const box =
+    '<mc:AlternateContent><mc:Choice><w:drawing><w:txbxContent><w:p><w:r><w:t>BOX</w:t></w:r></w:p></w:txbxContent></w:drawing></mc:Choice>' +
+    "<mc:Fallback><w:pict><w:txbxContent><w:p><w:r><w:t>BOX</w:t></w:r></w:p></w:txbxContent></w:pict></mc:Fallback></mc:AlternateContent>";
+  const body = `<w:p><w:pPr><w:pStyle w:val="Kan"/></w:pPr>${run("PÀ")}<w:r>${box}</w:r>${run("£À")}</w:p>`;
+  const styles = '<w:style w:styleId="Kan"><w:rPr><w:rFonts w:ascii="BRH Kannada"/></w:rPr></w:style>';
+  const segments = await readDocx(await docx(body, styles));
+  assert.equal(segments.map((s) => s.text).join(""), "PÀ\nBOX\n£À");
+  assert.deepEqual(
+    segments.filter((s) => s.legacy).map((s) => s.text),
+    ["PÀ", "£À"],
+  );
+});
+
+test("docx tracked format changes and bad character references", async () => {
+  const tracked =
+    '<w:r><w:rPr><w:rFonts w:ascii="BRH Kannada"/><w:rPrChange><w:rPr><w:rFonts w:ascii="Arial"/></w:rPr></w:rPrChange></w:rPr><w:t>PÀ</w:t></w:r>';
+  const segments = await readDocx(await docx(`<w:p>${tracked}${run("&#x110000;&#65;")}</w:p>`));
+  assert.deepEqual(segments, [
+    { text: "PÀ", legacy: true },
+    { text: "\uFFFDA", legacy: false },
+  ]);
+});
+
+test("zip reads only the parts asked for", async () => {
+  const zip = await writeZip([["a", "1"], ["b", "2"]]);
+  assert.deepEqual([...(await readZip(zip, ["b"])).keys()], ["b"]);
+});
+
 test("a docx with no document part is refused", async () => {
   await assert.rejects(readDocx(await writeZip([["x.xml", "<x/>"]])), /no Word document/);
 });
@@ -139,14 +207,20 @@ class FakeEditor {
       const before = this.text;
       this.text = before.slice(0, this.caret) + c + before.slice(this.caret);
       this.caret += c.length;
-      this.onEdit(diff(before, this.text), this.text, "insertText");
+      this.onEdit(diff(before, this.text, this.caret), this.text, "insertText");
     }
   }
   replace(start, end, text, inputType) {
     const before = this.text;
     this.text = before.slice(0, start) + text + before.slice(end);
     this.caret = start + text.length;
-    this.onEdit(diff(before, this.text), this.text, inputType);
+    this.onEdit(diff(before, this.text, this.caret), this.text, inputType);
+  }
+  commit(text) {
+    const before = this.text;
+    this.text = before.slice(0, this.caret) + text + before.slice(this.caret);
+    this.caret += text.length;
+    this.onEdit(diff(before, this.text, this.caret), this.text, "insertCompositionText");
   }
   selection() {
     return { start: this.caret, end: this.caret };
@@ -185,6 +259,20 @@ test("backspace removes a Latin letter and escape restores the Latin word", () =
   assert.ok(c.revert());
   assert.equal(editor.text, "kan");
   assert.ok(!c.revert());
+});
+
+test("a letter typed next to the same letter converts in place", () => {
+  const { editor } = composer("baraha");
+  editor.text = "at";
+  editor.caret = 1;
+  editor.type("t");
+  assert.equal(editor.text, "a[t]t");
+});
+
+test("a word committed with its space converts", () => {
+  const { editor } = composer("baraha");
+  editor.commit("kannaDa ");
+  assert.equal(editor.text, "ಕನ್ನಡ ");
 });
 
 test("Kannada keys mode and non-letters leave text alone", () => {

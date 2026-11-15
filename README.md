@@ -19,7 +19,7 @@ Version 0.1, in development.
 | Transliteration: ISO 15919, IAST, Baraha phonetic | Done |
 | Kannada numerals | Done |
 | Nudi and Baraha to Unicode | Done, waiting on a native reader's check of 100 sample lines |
-| Unicode to Nudi and Baraha | Designed: [docs/legacy-converter.md](docs/legacy-converter.md) |
+| Unicode to Nudi and Baraha | Done |
 | Verified test corpus | Planned: [docs/corpus-plan.md](docs/corpus-plan.md) |
 | Editor page that runs in the browser, with no upload | Built, not deployed: [web/](web/) |
 | Command-line tool for TXT, HTML and DOCX | Planned |
@@ -73,6 +73,20 @@ assert!(converted.unknown.is_empty());
   - English text set in the same font is converted too, so pass only the legacy-font runs.
 
 Run `cargo run --example nudi -- file.txt` to convert a Windows-1252 text file.
+
+`legacy::unicode_to_nudi` goes the other way, for documents that must still be printed in a legacy font:
+
+```rust
+use kannadi::legacy::unicode_to_nudi;
+
+let encoded = unicode_to_nudi("ಕನ್ನಡ");
+assert_eq!(encoded.text, "PÀ£ÀßqÀ");
+assert!(encoded.is_clean());
+```
+
+- **Storage order.** Each akshara is written the way typists stored it: the consonant shape, the vowel sign, the subscripts, ೃ and the length marks ೕ and ೖ, the arkavattu, then ಂ or ಃ. Where the layout has 2 glyphs for 1 sign, such as the ು of ವು or a second subscript ರ, the table marks which one the font uses there. On 9,047 words from 35 Karnataka government pages from 2002, 9,029 encode to the exact bytes that were typed. The rest differ in typing habits: a zero for ಂ, an extra spacing glyph, or ರ್ typed as its own syllable.
+- **Round trip.** For well-formed Kannada, converting to Nudi and back gives the same text. A property test checks this.
+- **Unencodable characters.** Characters the layout has no glyph for, such as ಌ, ೄ, ೝ, the nukta, ZWJ, ZWNJ, Latin letters and spaces with no Windows-1252 byte, are kept in the output and listed in `unencodable` with their byte offsets. Aksharas that are not well formed, such as 2 vowel signs on 1 consonant, are listed in `malformed`. Kannada digits are written as ASCII digits; set the text in a `k` font to show Kannada digits.
 
 ## Editor page
 
@@ -158,7 +172,7 @@ The crate is split into small modules, each with 1 job:
 | `normalize` | Unicode NFC plus Kannada fixes; Old Kannada modernization |
 | `numerals` | Kannada digits: conversion, formatting, parsing |
 | `translit` | 1 engine that romanizes and parses, driven by a table per scheme |
-| `legacy` | Rebuilds Nudi and Baraha glyph sequences as Unicode syllables, driven by the glyph table in `data/nudi.tsv` |
+| `legacy` | Converts Nudi and Baraha glyph sequences to Unicode syllables and back, driven by the glyph table in `data/nudi.tsv` |
 
 Scheme spellings and legacy glyph layouts are data tables read by 1 engine each. [AGENTS.md](AGENTS.md) has the full guide for contributors.
 

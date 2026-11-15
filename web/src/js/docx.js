@@ -1,24 +1,27 @@
 // DOCX to text segments, and text to DOCX. Only the main document text is
 // read: headers, footers, notes, images and formatting are left out.
-import { isLegacyFont } from "./text.js";
+import { escapeMarkup, isLegacyFont } from "./text.js";
 import { readZip, writeZip } from "./zip.js";
 
+const SKIPPED = new Set(["mc:Fallback", "w:rPrChange", "w:pPrChange"]);
 const TOKEN = /<(\/?)([\w:.-]+)((?:\s+[\w:.-]+\s*=\s*(?:"[^"]*"|'[^']*'))*)\s*(\/?)>|<[?!][^>]*>|([^<]+)/g;
 const ATTRIBUTE = /([\w:.-]+)\s*=\s*(?:"([^"]*)"|'([^']*)')/g;
 const ENTITY = /&(?:#x([0-9a-f]+)|#(\d+)|(lt|gt|amp|quot|apos));/gi;
 const NAMED = { lt: "<", gt: ">", amp: "&", quot: '"', apos: "'" };
 
+function codePoint(n) {
+  return n <= 0x10ffff ? String.fromCodePoint(n) : "\uFFFD";
+}
+
 function unescapeXml(text) {
   return text.replace(ENTITY, (_, hex, dec, name) =>
-    hex ? String.fromCodePoint(parseInt(hex, 16)) : dec ? String.fromCodePoint(Number(dec)) : NAMED[name.toLowerCase()],
+    hex ? codePoint(parseInt(hex, 16)) : dec ? codePoint(Number(dec)) : NAMED[name.toLowerCase()],
   );
 }
 
 // XML 1.0 forbids most C0 control characters; Word rejects a file that has them.
 function escapeXml(text) {
-  return text
-    .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\uFFFE\uFFFF]/g, "")
-    .replace(/[<>&"]/g, (c) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;" })[c]);
+  return escapeMarkup(text.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\uFFFE\uFFFF]/g, ""));
 }
 
 /** Yields {close, name, attrs, empty} for tags and {text} for character data. */
@@ -86,7 +89,7 @@ function styleLegacy(styles, id) {
  * @returns {Promise<{text: string, legacy: boolean}[]>}
  */
 export async function readDocx(bytes) {
-  const entries = await readZip(bytes);
+  const entries = await readZip(bytes, ["word/document.xml", "word/styles.xml"]);
   const documentXml = entries.get("word/document.xml");
   if (!documentXml) throw new Error("This file has no Word document inside.");
   const decoder = new TextDecoder();
@@ -99,20 +102,37 @@ export async function readDocx(bytes) {
   let inText = false;
   let inParagraphProps = false;
   let paragraphs = 0;
+  // Text boxes nest paragraphs inside a run; the outer state comes back after them.
+  const outer = [];
+  // Markup inside these elements is a copy or a past state, not the document.
+  let skipDepth = 0;
   const push = (text, legacy) => segments.push({ text, legacy });
   const runLegacy = () =>
     run.legacy ?? styleLegacy(styles, run.style) ?? styleLegacy(styles, paragraphStyle) ?? defaultLegacy;
 
   for (const t of tokens(decoder.decode(documentXml))) {
+    if (t.text === undefined && SKIPPED.has(t.name) && !t.empty) {
+      skipDepth += t.close ? -1 : 1;
+      continue;
+    }
+    if (skipDepth > 0) continue;
     if (t.text !== undefined) {
       if (inText && run) push(t.text, runLegacy());
       continue;
     }
     switch (t.name) {
       case "w:p":
-        if (!t.close) {
+        if (t.close) {
+          if (outer.length) {
+            ({ paragraphStyle, run } = outer.pop());
+            push("\n", false);
+          }
+        } else {
           if (paragraphs++ > 0) push("\n", false);
+          if (run) outer.push({ paragraphStyle, run });
           paragraphStyle = null;
+          if (t.empty && outer.length) ({ paragraphStyle, run } = outer.pop());
+          else run = null;
         }
         break;
       case "w:pPr":

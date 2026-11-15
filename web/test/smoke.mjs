@@ -74,4 +74,12 @@ const css = readFileSync(join(dist, "style.css"), "utf8");
 for (const [, ref] of css.matchAll(/url\(([^)]+)\)/g)) readFileSync(join(dist, ref));
 assert.match(html, /<h1>Kannada editor and Nudi to Unicode converter<\/h1>/);
 
+// Dark mode is defined twice, for the system setting and for the theme
+// toggle; both must set the same tokens to the same values.
+const tokens = (block) => Object.fromEntries([...block.matchAll(/(--[\w-]+):\s*([^;]+);/g)].map((m) => [m[1], m[2].trim()]));
+const systemDark = css.match(/:root:not\(\[data-theme="light"\]\)\s*\{([^}]*)\}/)[1];
+const toggleDark = css.match(/:root\[data-theme="dark"\]\s*\{([^}]*)\}/)[1];
+assert.deepEqual(tokens(toggleDark), tokens(systemDark));
+assert.ok(Object.keys(tokens(systemDark)).length > 20);
+
 console.log("web smoke test passed");

@@ -1,7 +1,7 @@
 // Opening TXT, HTML and DOCX files as editor text, and saving the editor text
 // as TXT, HTML or DOCX.
 import { readDocx, writeDocx } from "./docx.js";
-import { decodeBytes, isLegacyFont, joinSegments, looksLegacy } from "./text.js";
+import { decodeBytes, escapeMarkup, isLegacyFont, joinSegments, looksLegacy } from "./text.js";
 
 const BLOCK = new Set([
   "ADDRESS", "ARTICLE", "ASIDE", "BLOCKQUOTE", "DD", "DIV", "DL", "DT", "FIGCAPTION", "FIGURE", "FOOTER",
@@ -52,60 +52,55 @@ function elementFont(el, selectors) {
 }
 
 /**
- * Reads an HTML document as segments. Text inherits the nearest font that
- * an element sets; with no font information at all, each block is judged by
- * whether its text looks like legacy glyph codes.
+ * Reads an HTML document as segments, 1 block per line, with white space
+ * collapsed as a browser shows it. Text inherits the nearest font that an
+ * element sets. Text with no font, or a whole page with no font information,
+ * is judged by whether it looks like legacy glyph codes.
  * @param {Document} doc
  */
 export function htmlSegments(doc) {
   const selectors = legacySelectors(doc);
   const segments = [];
   let fontsSeen = false;
-  const newline = () => {
-    const last = segments[segments.length - 1];
-    if (last && !last.text.endsWith("\n")) segments.push({ text: "\n", legacy: false, font: false });
+  const last = () => segments[segments.length - 1];
+  const atLineStart = () => !last() || last().text.endsWith("\n");
+  const lineBreak = (always) => {
+    if (!last() || (!always && atLineStart())) return;
+    last().text = last().text.replace(/ +$/, "");
+    segments.push({ text: "\n", font: false });
   };
   const walk = (node, inherited) => {
     if (node.nodeType === Node.TEXT_NODE) {
-      const text = node.data.replace(/\s+/g, " ");
-      if (text.trim() || (segments.length && !segments[segments.length - 1].text.endsWith("\n"))) {
-        segments.push({ text, legacy: inherited === true, font: inherited !== null });
-      }
+      let text = node.data.replace(/\s+/g, " ");
+      if (atLineStart() || last().text.endsWith(" ")) text = text.replace(/^ /, "");
+      if (text) segments.push({ text, font: inherited });
       return;
     }
     if (node.nodeType !== Node.ELEMENT_NODE || SKIP.has(node.tagName)) return;
     if (node.tagName === "BR") {
-      segments.push({ text: "\n", legacy: false, font: false });
+      lineBreak(true);
       return;
     }
     const own = elementFont(node, selectors);
     if (own !== null) fontsSeen = true;
     const font = own ?? inherited;
     const block = BLOCK.has(node.tagName);
-    if (block) newline();
+    if (block) lineBreak(false);
     for (const child of node.childNodes) walk(child, font);
-    if (block) newline();
+    if (block) lineBreak(false);
   };
   walk(doc.body ?? doc.documentElement, null);
+  while (last()?.text === "\n") segments.pop();
+  if (last()) last().text = last().text.replace(/ +$/, "");
 
   if (!fontsSeen) {
-    // Judge each line on its own text.
     const lines = segments.map((s) => s.text).join("").split("\n");
     return lines.flatMap((line, i) => [
       ...(i ? [{ text: "\n", legacy: false }] : []),
       { text: line, legacy: looksLegacy(line) },
     ]);
   }
-  return segments.map(({ text, legacy }) => ({ text, legacy }));
-}
-
-function trimLines(text) {
-  return text
-    .split("\n")
-    .map((line) => line.replace(/^ +| +$/g, ""))
-    .join("\n")
-    .replace(/\n{3,}/g, "\n\n")
-    .trim();
+  return segments.map(({ text, font }) => ({ text, legacy: font === true || (font === null && looksLegacy(text)) }));
 }
 
 /**
@@ -122,35 +117,18 @@ export async function openFile(file, { convert, decodeWindows1252 }) {
   }
   const text = decodeBytes(bytes, decodeWindows1252);
   if (name.endsWith(".html") || name.endsWith(".htm") || /^\s*<(!doctype|html)/i.test(text)) {
-    return fromSegments(htmlSegments(parseHtml(text)), convert);
+    return joinSegments(htmlSegments(parseHtml(text)), convert);
   }
-  return fromSegments([{ text, legacy: looksLegacy(text) }], convert);
+  return joinSegments([{ text, legacy: looksLegacy(text) }], convert);
 }
 
 /** Pasted clipboard data as editor text. */
 export function pasted(html, plain, convert) {
   if (html) {
     const segments = htmlSegments(parseHtml(html));
-    if (segments.some((s) => s.legacy)) return fromSegments(segments, convert);
+    if (segments.some((s) => s.legacy)) return joinSegments(segments, convert);
   }
-  return fromSegments([{ text: plain, legacy: looksLegacy(plain) }], convert);
-}
-
-function fromSegments(segments, convert) {
-  const joined = joinSegments(segments, convert);
-  const text = trimLines(joined.text);
-  if (text === joined.text) return joined;
-  // Trimming moved text; find each unknown glyph again by its order.
-  const glyphs = joined.unknown.map((o) => String.fromCodePoint(joined.text.codePointAt(o)));
-  const unknown = [];
-  let from = 0;
-  for (const g of glyphs) {
-    const at = text.indexOf(g, from);
-    if (at < 0) break;
-    unknown.push(at);
-    from = at + g.length;
-  }
-  return { ...joined, text, unknown };
+  return joinSegments([{ text: plain, legacy: looksLegacy(plain) }], convert);
 }
 
 const HTML_TEMPLATE = (title, body) => `<!doctype html>
@@ -167,10 +145,6 @@ ${body}
 </html>
 `;
 
-function escapeHtml(text) {
-  return text.replace(/[<>&"]/g, (c) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;" })[c]);
-}
-
 /** The editor text as a Blob in the given format. */
 export async function exportBlob(text, format, title) {
   if (format === "docx") {
@@ -181,9 +155,9 @@ export async function exportBlob(text, format, title) {
   if (format === "html") {
     const body = text
       .split(/\n{2,}/)
-      .map((p) => `<p>${escapeHtml(p).replace(/\n/g, "<br>")}</p>`)
+      .map((p) => `<p>${escapeMarkup(p).replace(/\n/g, "<br>")}</p>`)
       .join("\n");
-    return new Blob([HTML_TEMPLATE(escapeHtml(title), body)], { type: "text/html;charset=utf-8" });
+    return new Blob([HTML_TEMPLATE(escapeMarkup(title), body)], { type: "text/html;charset=utf-8" });
   }
   // The byte order mark lets older Windows editors detect UTF-8.
   return new Blob(["﻿", text], { type: "text/plain;charset=utf-8" });

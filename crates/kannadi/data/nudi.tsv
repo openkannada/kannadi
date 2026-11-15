@@ -1,6 +1,7 @@
 # Nudi and Baraha ANSI glyph table.
 #
-# Each line: glyph codes (hex, as Windows-1252 bytes), kind, Kannada value.
+# Each line: glyph codes (hex, as Windows-1252 bytes), kind, Kannada value, and
+# optionally when Unicode to Nudi prefers this glyph over others with the same value.
 # The codes were identified from the Nudi 01 e font file by rendering each glyph
 # and matching it against the Unicode Nudi font shaped with HarfBuzz, then checked
 # against typed letter charts and Karnataka government pages from 2002.
@@ -16,6 +17,13 @@
 #   aspirate  turns ಪ ಬ ಡ ದ into ಫ ಭ ಢ ಧ
 #   ignore    spacing glyph with no text
 #   literal   punctuation
+# Preferences (otherwise the first glyph with a value is written):
+#   on X      the syllable's consonant is one of X
+#   with X    the syllable's vowel sign contains one of X
+#   after-ottu  the glyph comes right after a subscript consonant
+# The preferences match how typists stored these glyphs on 35 Karnataka government
+# pages from 2002, archived by the Internet Archive under kar.nic.in/rdpr/kan-www/
+# and kar.nic.in/finance/bud2002-kan/: 9,047 words, counted per glyph sequence.
 # Vowels
 43	letter	ಅ
 44	letter	ಆ
@@ -111,23 +119,23 @@ AC C4	letter	ಯಿ
 6A 68 C4	letter	ಝಿ
 # Mahaprana mark: turns ಪ ಬ ಡ ದ into ಫ ಭ ಢ ಧ
 73	aspirate	
-FC	aspirate	
+FC	aspirate		with ಿ
 # Vowel signs. C0 is the head stroke for the inherent a.
 C0	sign	
 C1	sign	ಾ
 C2	sign	ಿ
 C3	sign	ೕ
 C4	sign	ು
-C5	sign	ು
+C5	sign	ು	on ಪ ಫ ವ
 C6	sign	ೂ
-C7	sign	ೂ
+C7	sign	ೂ	on ಪ ಫ ವ
 C8	sign	ೃ
 C9	sign	ೆ
 CA	sign	ೖ
 CB	sign	ೌ
 EF	sign	್
 # Variants found in real documents
-F8	sign	ೃ
+F8	sign	ೃ	after-ottu
 # Modifiers
 41	mod	ಂ
 42	mod	ಃ
@@ -159,7 +167,7 @@ E3	ottu	ಭ
 E4	ottu	ಮ
 E5	ottu	ಯ
 E6	ottu	ರ
-E7	ottu	ರ
+E7	ottu	ರ	after-ottu
 E8	ottu	ಲ
 E9	ottu	ವ
 EA	ottu	ಶ

@@ -1,7 +1,7 @@
 // Problems in the document: unknown glyphs left by a conversion, tracked
 // through edits, and malformed syllables, found again after each edit.
 // Each problem is highlighted inline and listed; selecting one offers fixes.
-import { codePoints, shiftAnchors } from "./text.js";
+import { codePoints, shiftAnchors, shiftRanges } from "./text.js";
 
 const LIST_LIMIT = 200;
 const FIX_LABELS = {
@@ -32,6 +32,10 @@ export class Issues {
         this.close(true);
       }
     });
+    // A dialog left open behind the focus would be read out of place.
+    document.addEventListener("focusin", (e) => {
+      if (this.open && !ui.popover.contains(e.target) && e.target !== editor.el) this.close(false);
+    });
   }
 
   get total() {
@@ -56,6 +60,7 @@ export class Issues {
   /** Follows an edit: moves unknown glyphs now, checks syllables shortly after. */
   edited(edit, after) {
     this.unknown = shiftAnchors(this.unknown, edit, after);
+    this.malformed = shiftRanges(this.malformed, edit);
     this.close(false);
     clearTimeout(this.timer);
     // About 1 ms per 5,000 characters: check less often in large documents.
@@ -128,7 +133,7 @@ export class Issues {
       button.className = `issue issue-${item.kind}`;
       const line = document.createElement("span");
       line.className = "issue-line";
-      line.textContent = String(lineOf(item.start));
+      line.textContent = `Line ${lineOf(item.start)}`;
       const what = document.createElement("span");
       what.className = "issue-what";
       what.textContent = item.kind === "unknown" ? "Unknown glyph" : "Malformed syllable";
@@ -172,7 +177,7 @@ export class Issues {
     title.className = "pop-title";
     const sample = document.createElement("span");
     sample.lang = "kn";
-    sample.className = "pop-sample";
+    sample.className = `pop-sample pop-sample-${item.kind}`;
     sample.textContent = bad;
     title.append(item.kind === "unknown" ? "Unknown glyph " : "Malformed syllable ", sample, ` ${codePoints(bad)}`);
     const why = document.createElement("p");
@@ -242,7 +247,20 @@ export class Issues {
     });
     form.append(label, input, preview, submit);
 
-    pop.replaceChildren(title, why, actions, form);
+    const close = document.createElement("button");
+    close.type = "button";
+    close.className = "pop-close";
+    close.setAttribute("aria-label", "Close");
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("viewBox", "0 0 16 16");
+    svg.setAttribute("aria-hidden", "true");
+    const cross = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    cross.setAttribute("d", "M4 4l8 8M12 4l-8 8");
+    svg.append(cross);
+    close.append(svg);
+    close.addEventListener("click", () => this.close(true));
+
+    pop.replaceChildren(close, title, why, actions, form);
     pop.hidden = false;
     this.open = item;
     this.place(item);
