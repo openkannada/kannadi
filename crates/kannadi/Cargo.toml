@@ -1,0 +1,19 @@
+[package]
+name = "kannadi"
+description = "Kannada text tools: akshara segmentation, normalisation, transliteration (ISO 15919, IAST, Baraha) and numerals, with Old Kannada support"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+readme = "../../README.md"
+keywords = ["kannada", "transliteration", "unicode", "indic", "akshara"]
+categories = ["text-processing", "internationalization"]
+
+[dependencies]
+unicode-normalization = "0.1.24"
+
+[dev-dependencies]
+proptest = "1.5"
+vidyut-lipi = "0.2.0"
