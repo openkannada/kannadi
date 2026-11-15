@@ -61,12 +61,11 @@ pub fn fix_zero_as_anusvara(text: &str) -> String {
     let mut out = String::with_capacity(text.len());
     let mut prev: Option<char> = None;
     for c in text.chars() {
-        let fixed = match prev {
-            Some(p) if c == '೦' && is_letter_or_mark(p) => 'ಂ',
-            _ => c,
-        };
-        out.push(fixed);
-        prev = Some(fixed);
+        match prev {
+            Some(p) if c == '೦' && is_letter_or_mark(p) => out.push('ಂ'),
+            _ => out.push(c),
+        }
+        prev = Some(c);
     }
     out
 }
@@ -92,7 +91,10 @@ pub fn modernize(text: &str) -> String {
             NAKAARA_POLLU => {
                 out.push('ನ');
                 out.push(VIRAMA);
-                if chars.peek().is_some_and(|&n| is_consonant(n)) {
+                if chars
+                    .peek()
+                    .is_some_and(|&n| is_consonant(n) || n == NAKAARA_POLLU)
+                {
                     out.push(ZWNJ);
                 }
             }
@@ -134,6 +136,7 @@ mod tests {
         assert_eq!(fix_zero_as_anusvara("೧೦೦"), "೧೦೦");
         assert_eq!(fix_zero_as_anusvara("೦"), "೦");
         assert_eq!(fix_zero_as_anusvara("ಕ ೦"), "ಕ ೦");
+        assert_eq!(fix_zero_as_anusvara("ಕ೦೦"), "ಕಂ೦");
     }
 
     #[test]
@@ -156,6 +159,7 @@ mod tests {
         assert_eq!(modernize("ಅವೝ"), "ಅವನ್");
         assert_eq!(modernize("ಅವೝ ಕಂಡ"), "ಅವನ್ ಕಂಡ");
         assert_eq!(modernize("ಅವೝಕಂಡ"), "ಅವನ್\u{200C}ಕಂಡ");
+        assert_eq!(modernize("ೝೝ"), "ನ್\u{200C}ನ್");
         assert_eq!(modernize("plain ಕನ್ನಡ"), "plain ಕನ್ನಡ");
         assert!(has_old_kannada("ಅಱಿ"));
         assert!(!has_old_kannada("ಅರಿ"));

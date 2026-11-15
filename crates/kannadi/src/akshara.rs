@@ -127,7 +127,10 @@ impl<'a> Iterator for Aksharas<'a> {
                 consonant_cluster(&mut cur);
                 AksharaKind::Consonant
             }
-            _ if first == NAKAARA_POLLU => AksharaKind::Consonant,
+            _ if first == NAKAARA_POLLU => {
+                cur.eat_while(|c| c == Class::Modifier);
+                AksharaKind::Consonant
+            }
             _ => {
                 cur.eat_while(is_mark);
                 AksharaKind::Other
@@ -226,6 +229,7 @@ mod tests {
     fn nakaara_pollu_is_a_consonant_akshara() {
         assert_eq!(split("ಅವೝ"), ["ಅ", "ವ", "ೝ"]);
         assert_eq!(count_aksharas("ಅವೝ"), 3);
+        assert_eq!(split("ೝಂ\u{0951}"), ["ೝಂ\u{0951}"]);
     }
 
     #[test]

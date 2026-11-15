@@ -118,7 +118,7 @@ pub(crate) static ISO_15919: Table = Table {
         ("'", 'ಽ'),
     ],
     joiners: &[],
-    aliases: &[("ṃ", "ṁ")],
+    aliases: &[("ṃ", "ṁ"), ("ṛ", "r̥"), ("ṝ", "r̥̄")],
     separator: ":",
     nukta_suffix: None,
     ha_breaker: None,

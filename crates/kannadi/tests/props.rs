@@ -27,7 +27,9 @@ fn kannada_text() -> impl Strategy<Value = String> {
         ' ', ' ', '\u{200C}', '\u{200D}', ',', '.', '?', '0', '7', '\n',
     ]);
     // Characters that schemes use in tokens, separators or escapes.
-    pool.extend([':', '\'', '\u{2019}', '_', '^', '~', '@', '\\', '\u{0951}']);
+    pool.extend([
+        ':', '\'', '\u{2019}', '_', '^', '~', '@', '\\', '\u{0951}', '\u{0952}', '\u{1CD4}',
+    ]);
     prop::collection::vec(prop::sample::select(pool), 0..40).prop_map(|v| v.into_iter().collect())
 }
 

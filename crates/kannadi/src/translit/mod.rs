@@ -309,7 +309,7 @@ impl Compiled {
         let mut i = 0;
         let mut buf = String::new();
         while i < input.len() {
-            if input[i] == ESCAPE && i + 1 < input.len() {
+            if input[i] == ESCAPE && input.get(i + 1).is_some_and(|&n| self.is_escapable(n)) {
                 if pending {
                     out.push(VIRAMA);
                     pending = false;
@@ -399,6 +399,11 @@ impl Compiled {
         out
     }
 
+    /// Characters that `romanise` writes after a backslash. A backslash before anything else is literal.
+    fn is_escapable(&self, c: char) -> bool {
+        self.escaped.contains(&c) || self.table.separator.starts_with(c)
+    }
+
     /// True if `input` begins with a token other than a separator, or a raw nukta, so a
     /// separator before it is meaningful.
     fn starts_token(&self, input: &[char], buf: &mut String) -> bool {
@@ -431,13 +436,13 @@ impl Compiled {
     }
 }
 
-/// Applies NFC to runs of non-Kannada text so Latin combining marks match the tables,
-/// while Kannada text passing through keeps its exact code points.
+/// Applies NFC to runs of Latin text only, so Kannada text and Vedic accents keep their
+/// exact code points and order.
 fn nfc_outside_kannada(text: &str) -> Vec<char> {
     let mut out = Vec::with_capacity(text.len());
     let mut run_start = 0;
     for (i, c) in text.char_indices() {
-        if is_kannada(c) {
+        if is_kannada(c) || class(c) == Class::Modifier {
             out.extend(text[run_start..i].nfc());
             out.push(c);
             run_start = i + c.len_utf8();
@@ -636,6 +641,19 @@ mod tests {
     }
 
     #[test]
+    fn backslash_before_ordinary_text_is_literal() {
+        assert_eq!(from_latin("C:\\path", Scheme::Iso15919), "ಚ್:\\ಪಥ್");
+        roundtrip("ಕ\\ಬ");
+    }
+
+    #[test]
+    fn vedic_accents_keep_their_place() {
+        roundtrip("ಕಁ\u{0952}");
+        roundtrip("ಕೃ\u{1CD4}");
+        roundtrip("ಌ\u{0952}");
+    }
+
+    #[test]
     fn baraha_metacharacters_in_text_survive() {
         roundtrip("ಕ~ರು");
         roundtrip("ಮನೆ@ಅವ");
@@ -654,8 +672,8 @@ mod tests {
     }
 
     #[test]
-    fn iso_flap_r_is_not_vocalic_r() {
-        assert_eq!(from_latin("ṛ", Scheme::Iso15919), "ṛ");
+    fn r_with_dot_below_reads_as_vocalic_r() {
+        assert_eq!(from_latin("kṛṣṇa", Scheme::Iso15919), "ಕೃಷ್ಣ");
         assert_eq!(from_latin("ṛ", Scheme::Iast), "ಋ");
         assert_eq!(from_latin("kḹ", Scheme::Iast), "ಕೣ");
     }
