@@ -29,22 +29,16 @@ pub fn normalize(text: &str) -> String {
         match (prev, c) {
             (Some('ಉ'), 'ಾ') => *out.last_mut().unwrap() = 'ಊ',
             (Some('ಋ'), 'ಾ') => *out.last_mut().unwrap() = 'ೠ',
-            (Some(p), c) if p == c && is_mark(c) => {}
+            (Some(p), c) if p == c && class(c).is_mark() => {}
             _ => out.push(c),
         }
     }
     out.into_iter().nfc().collect()
 }
 
-fn is_mark(c: char) -> bool {
-    matches!(
-        class(c),
-        Class::VowelSign | Class::Virama | Class::Nukta | Class::Modifier
-    )
-}
-
 fn is_letter_or_mark(c: char) -> bool {
-    matches!(class(c), Class::Vowel | Class::Consonant) || is_mark(c)
+    let c = class(c);
+    matches!(c, Class::Vowel | Class::Consonant) || c.is_mark()
 }
 
 /// Replaces a Kannada digit zero (೦) written right after a letter or sign with an

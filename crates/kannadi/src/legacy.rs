@@ -11,13 +11,13 @@
 //! Unicode order. It reports every glyph it cannot place and every syllable that
 //! is not valid; spacing glyphs, which carry no text, are the only glyphs dropped.
 
-use std::collections::HashMap;
 use std::ops::Range;
 use std::sync::OnceLock;
 
 use unicode_normalization::UnicodeNormalization;
 
 use crate::chars::{class, Class, ANUSVARA, VIRAMA};
+use crate::lookup::Lookup;
 use crate::numerals::to_kannada_digit;
 
 /// Settings for [`nudi_to_unicode`].
@@ -91,9 +91,9 @@ pub fn nudi_to_unicode(text: &str, options: &Options) -> Conversion {
     let mut writer = Writer::with_capacity(text.len() * 2);
     let mut i = 0;
     while i < chars.len() {
-        let Some((entry, len)) = table.longest_match(&chars[i..]) else {
+        let Some((entry, len)) = table.longest_match(chars[i..].iter().map(|&(_, c)| c)) else {
             let starts_syllable = matches!(
-                table.longest_match(&chars[i + 1..]),
+                table.longest_match(chars[i + 1..].iter().map(|&(_, c)| c)),
                 Some((Entry::Letter(_) | Entry::Base(_), _))
             );
             writer.plain(chars[i], options, starts_syllable);
@@ -141,32 +141,13 @@ enum Entry {
     Literal(String),
 }
 
-struct Table {
-    entries: HashMap<String, Entry>,
-    longest: usize,
-}
-
-impl Table {
-    fn longest_match(&self, input: &[(usize, char)]) -> Option<(&Entry, usize)> {
-        let mut key = String::new();
-        for len in (1..=self.longest.min(input.len())).rev() {
-            key.clear();
-            key.extend(input[..len].iter().map(|&(_, c)| c));
-            if let Some(e) = self.entries.get(&key) {
-                return Some((e, len));
-            }
-        }
-        None
-    }
-}
-
-fn table() -> &'static Table {
-    static TABLE: OnceLock<Table> = OnceLock::new();
+fn table() -> &'static Lookup<Entry> {
+    static TABLE: OnceLock<Lookup<Entry>> = OnceLock::new();
     TABLE.get_or_init(|| parse_table(include_str!("../data/nudi.tsv")))
 }
 
-fn parse_table(source: &str) -> Table {
-    let mut entries = HashMap::new();
+fn parse_table(source: &str) -> Lookup<Entry> {
+    let mut entries = Lookup::new();
     for line in source.lines() {
         if line.trim().is_empty() || line.starts_with('#') {
             continue;
@@ -194,8 +175,7 @@ fn parse_table(source: &str) -> Table {
         };
         entries.insert(key, entry);
     }
-    let longest = entries.keys().map(|k| k.chars().count()).max().unwrap_or(1);
-    Table { entries, longest }
+    entries
 }
 
 /// Builds the output and both reports in 1 pass.

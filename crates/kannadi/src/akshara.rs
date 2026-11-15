@@ -101,13 +101,6 @@ impl Cursor<'_> {
     }
 }
 
-fn is_mark(c: Class) -> bool {
-    matches!(
-        c,
-        Class::VowelSign | Class::Virama | Class::Nukta | Class::Modifier
-    )
-}
-
 impl<'a> Iterator for Aksharas<'a> {
     type Item = Akshara<'a>;
 
@@ -132,7 +125,7 @@ impl<'a> Iterator for Aksharas<'a> {
                 AksharaKind::Consonant
             }
             _ => {
-                cur.eat_while(is_mark);
+                cur.eat_while(Class::is_mark);
                 AksharaKind::Other
             }
         };

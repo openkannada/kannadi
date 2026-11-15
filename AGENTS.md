@@ -26,13 +26,15 @@ CI runs all of these. A change is ready when they pass.
 ```text
 crates/kannadi/
   src/chars.rs        character classes for the Kannada block
+  src/lookup.rs       longest-prefix lookup shared by the scheme and glyph tables
   src/akshara.rs      segmentation into aksharas (uses chars)
   src/normalize.rs    NFC plus Kannada fixes; Old Kannada modernisation
   src/numerals.rs     Kannada digits
   src/translit/       Kannada to and from ISO 15919, IAST, Baraha
     schemes.rs        the scheme tables, as data
     mod.rs            1 engine for all schemes: romanise and parse
-  src/legacy.rs       Nudi and Baraha ANSI to Unicode
+  src/legacy.rs       Nudi and Baraha ANSI to Unicode: a Writer builds the output
+                      and the reports; a Syllable decides what it can accept
   data/nudi.tsv       the legacy glyph table, as data
   tests/              golden fixtures, property tests, differential test
 docs/                 design notes, corpus plan, prior art

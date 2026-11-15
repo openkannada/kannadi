@@ -19,6 +19,8 @@
 mod schemes;
 
 use std::collections::{HashMap, HashSet};
+
+use crate::lookup::Lookup;
 use std::fmt;
 use std::str::FromStr;
 use std::sync::OnceLock;
@@ -167,8 +169,7 @@ struct Compiled {
     vowel: HashMap<char, &'static str>,
     sign: HashMap<char, &'static str>,
     mark: HashMap<char, &'static str>,
-    tokens: HashMap<String, Tok>,
-    longest_token: usize,
+    tokens: Lookup<Tok>,
     inherent: &'static str,
     /// Characters that start a token but are not letters; written with a backslash when literal.
     escaped: HashSet<char>,
@@ -176,7 +177,7 @@ struct Compiled {
 
 impl Compiled {
     fn new(table: &'static Table) -> Self {
-        let mut tokens: HashMap<String, Tok> = HashMap::new();
+        let mut tokens: Lookup<Tok> = Lookup::new();
         let mut vowel = HashMap::new();
         let mut sign = HashMap::new();
         let mut inherent = "a";
@@ -188,13 +189,13 @@ impl Compiled {
                 }
                 None => inherent = latin,
             }
-            tokens.insert(latin.into(), Tok::Vowel { letter, sign: s });
+            tokens.insert(latin, Tok::Vowel { letter, sign: s });
         }
         let mut consonant = HashMap::new();
         for &(latin, letter) in table.consonants {
             consonant.insert(letter, latin);
             tokens.insert(
-                latin.into(),
+                latin,
                 Tok::Consonant {
                     letter,
                     nukta: false,
@@ -205,7 +206,7 @@ impl Compiled {
         for &(latin, letter) in table.nukta_consonants {
             nukta_consonant.insert(letter, latin);
             tokens.insert(
-                latin.into(),
+                latin,
                 Tok::Consonant {
                     letter,
                     nukta: true,
@@ -215,18 +216,17 @@ impl Compiled {
         let mut mark = HashMap::new();
         for &(latin, m) in table.marks {
             mark.insert(m, latin);
-            tokens.insert(latin.into(), Tok::Mark(m));
+            tokens.insert(latin, Tok::Mark(m));
         }
         for &(latin, j) in table.joiners {
             mark.insert(j, latin);
-            tokens.insert(latin.into(), Tok::Joiner(j));
+            tokens.insert(latin, Tok::Joiner(j));
         }
         for &(alias, canonical) in table.aliases {
-            let tok = tokens[canonical];
-            tokens.insert(alias.into(), tok);
+            let tok = *tokens.get(canonical).expect("alias of a known spelling");
+            tokens.insert(alias, tok);
         }
-        tokens.insert(table.separator.into(), Tok::Separator);
-        let longest_token = tokens.keys().map(|k| k.chars().count()).max().unwrap_or(1);
+        tokens.insert(table.separator, Tok::Separator);
         let separator = table.separator.chars().next();
         let mut escaped: HashSet<char> = tokens
             .keys()
@@ -242,7 +242,6 @@ impl Compiled {
             sign,
             mark,
             tokens,
-            longest_token,
             inherent,
             escaped,
         }
@@ -306,7 +305,6 @@ impl Compiled {
         let mut pending = false;
         let mut after_token = false;
         let mut i = 0;
-        let mut buf = String::new();
         while i < input.len() {
             if input[i] == ESCAPE && input.get(i + 1).is_some_and(|&n| self.is_escapable(n)) {
                 if pending {
@@ -325,8 +323,7 @@ impl Compiled {
                     continue;
                 }
                 if let Some(suffix) = self.table.nukta_suffix {
-                    if starts_with(&input[i..], suffix)
-                        && self.longest_match(&input[i..], &mut buf).is_none()
+                    if starts_with(&input[i..], suffix) && self.longest_match(&input[i..]).is_none()
                     {
                         out.push(NUKTA);
                         i += suffix.chars().count();
@@ -334,7 +331,7 @@ impl Compiled {
                     }
                 }
             }
-            let Some((tok, len)) = self.longest_match(&input[i..], &mut buf) else {
+            let Some((tok, len)) = self.longest_match(&input[i..]) else {
                 if pending {
                     out.push(VIRAMA);
                     pending = false;
@@ -345,7 +342,7 @@ impl Compiled {
                 continue;
             };
             if matches!(tok, Tok::Separator)
-                && !(after_token && self.starts_token(&input[i + len..], &mut buf))
+                && !(after_token && self.starts_token(&input[i + len..]))
             {
                 if pending {
                     out.push(VIRAMA);
@@ -404,30 +401,23 @@ impl Compiled {
     }
 
     /// A separator only counts before a token or a raw nukta.
-    fn starts_token(&self, input: &[char], buf: &mut String) -> bool {
+    fn starts_token(&self, input: &[char]) -> bool {
         input.first() == Some(&NUKTA)
-            || matches!(self.longest_match(input, buf), Some((tok, _)) if !matches!(tok, Tok::Separator))
+            || matches!(self.longest_match(input), Some((tok, _)) if !matches!(tok, Tok::Separator))
     }
 
     /// Returns the longest token at the start of `input` and its length in chars.
-    fn longest_match(&self, input: &[char], buf: &mut String) -> Option<(Tok, usize)> {
-        let max = self.longest_token.min(input.len());
-        for len in (1..=max).rev() {
-            buf.clear();
-            buf.extend(&input[..len]);
-            if let Some(&tok) = self.tokens.get(buf.as_str()) {
-                return Some((tok, len));
-            }
-        }
-        None
+    fn longest_match(&self, input: &[char]) -> Option<(Tok, usize)> {
+        self.tokens
+            .longest_match(input.iter().copied())
+            .map(|(&tok, len)| (tok, len))
     }
 
     /// True if the parser, reading `joined` from its start, would take a token longer than `first`.
     fn would_merge(&self, first: &str, joined: &str) -> bool {
         let first_len = first.chars().count();
         let chars: Vec<char> = joined.chars().collect();
-        let mut buf = String::new();
-        match self.longest_match(&chars, &mut buf) {
+        match self.longest_match(&chars) {
             Some((_, len)) => len > first_len,
             None => false,
         }

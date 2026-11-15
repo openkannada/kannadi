@@ -126,6 +126,21 @@ ISO 15919 output is cross-checked against [vidyut-lipi](https://github.com/ambud
 
 See [docs/prior-art.md](docs/prior-art.md).
 
+## Architecture
+
+The crate is small modules, each with 1 job:
+
+| Module | Job |
+|---|---|
+| `chars` | Classifies characters in the Kannada block |
+| `akshara` | Splits text into aksharas |
+| `normalize` | Unicode NFC plus Kannada fixes; Old Kannada modernisation |
+| `numerals` | Kannada digits |
+| `translit` | 1 engine that romanises and parses, driven by a table per scheme |
+| `legacy` | Rebuilds Nudi and Baraha glyph sequences as Unicode syllables, driven by the glyph table in `data/nudi.tsv` |
+
+Schemes and font layouts are data. Adding a scheme or a legacy font means adding a table, with no new engine code. [AGENTS.md](AGENTS.md) has the full guide for contributors.
+
 ## Development
 
 ```sh
