@@ -133,7 +133,7 @@ export class Issues {
       button.className = `issue issue-${item.kind}`;
       const line = document.createElement("span");
       line.className = "issue-line";
-      line.textContent = String(lineOf(item.start));
+      line.textContent = `Line ${lineOf(item.start)}`;
       const what = document.createElement("span");
       what.className = "issue-what";
       what.textContent = item.kind === "unknown" ? "Unknown glyph" : "Malformed syllable";
@@ -177,7 +177,7 @@ export class Issues {
     title.className = "pop-title";
     const sample = document.createElement("span");
     sample.lang = "kn";
-    sample.className = "pop-sample";
+    sample.className = `pop-sample pop-sample-${item.kind}`;
     sample.textContent = bad;
     title.append(item.kind === "unknown" ? "Unknown glyph " : "Malformed syllable ", sample, ` ${codePoints(bad)}`);
     const why = document.createElement("p");
@@ -247,7 +247,20 @@ export class Issues {
     });
     form.append(label, input, preview, submit);
 
-    pop.replaceChildren(title, why, actions, form);
+    const close = document.createElement("button");
+    close.type = "button";
+    close.className = "pop-close";
+    close.setAttribute("aria-label", "Close");
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("viewBox", "0 0 16 16");
+    svg.setAttribute("aria-hidden", "true");
+    const cross = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    cross.setAttribute("d", "M4 4l8 8M12 4l-8 8");
+    svg.append(cross);
+    close.append(svg);
+    close.addEventListener("click", () => this.close(true));
+
+    pop.replaceChildren(close, title, why, actions, form);
     pop.hidden = false;
     this.open = item;
     this.place(item);

@@ -127,7 +127,8 @@ function update(text) {
 function save() {
   const unknown = issues.unknown.map((u) => u.offset);
   const ok = store.write({ text: editor.text, unknown, settings, fileName, savedAt: Date.now() });
-  ui.saved.textContent = ok ? "Saved in this browser" : "Too large to save in this browser";
+  if (!editor.text) ui.saved.textContent = "Not saved yet";
+  else ui.saved.textContent = ok ? "Saved in this browser" : "Too large to save in this browser";
 }
 
 function saveSettings() {
@@ -227,7 +228,7 @@ function setTheme(theme) {
 }
 
 function nextProblem(dir) {
-  const first = $("popover").querySelector("button");
+  const first = $("popover").querySelector(".pop-actions button");
   if (issues.open && first && !$("popover").contains(document.activeElement)) {
     first.focus();
     return;
