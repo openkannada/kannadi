@@ -12,6 +12,8 @@ rust-version = "1.85"
 [[bin]]
 name = "kannadi"
 path = "src/main.rs"
+# The library crate is also named kannadi; documenting both would collide.
+doc = false
 
 [dependencies]
 anyhow = "1.0.104"
