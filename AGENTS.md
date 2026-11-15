@@ -34,8 +34,11 @@ crates/kannadi/
   src/translit/       Kannada to and from ISO 15919, IAST, Baraha
     schemes.rs        the scheme tables, as data
     mod.rs            1 engine for all schemes: romanize and parse
-  src/legacy.rs       Nudi and Baraha ANSI to Unicode: a Writer builds the output
-                      and the reports; a Syllable decides what it can accept
+  src/legacy/         Nudi and Baraha ANSI to and from Unicode
+    table.rs          parses data/nudi.tsv once for both directions
+    decode.rs         to Unicode: a Writer builds the output and the reports;
+                      a Syllable decides what it can accept
+    encode.rs         from Unicode: each akshara written in storage order
   data/nudi.tsv       the legacy glyph table, as data
   tests/              golden fixtures, property tests, differential test
   examples/           demo, and a command-line converter for legacy files
