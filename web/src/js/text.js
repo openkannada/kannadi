@@ -71,21 +71,47 @@ export function joinSegments(segments, convert) {
   return { text, unknown, converted };
 }
 
+const CHUNK = 4096;
+
+/** Length of the common prefix, compared in native chunks so a 1 MB text costs microseconds. */
+function commonPrefix(a, b, limit) {
+  let i = 0;
+  while (i + CHUNK <= limit && a.substr(i, CHUNK) === b.substr(i, CHUNK)) i += CHUNK;
+  while (i < limit && a.charCodeAt(i) === b.charCodeAt(i)) i++;
+  return i;
+}
+
+function commonSuffix(a, b, limit) {
+  let i = 0;
+  while (i + CHUNK <= limit && a.substr(a.length - i - CHUNK, CHUNK) === b.substr(b.length - i - CHUNK, CHUNK)) i += CHUNK;
+  while (i < limit && a.charCodeAt(a.length - 1 - i) === b.charCodeAt(b.length - 1 - i)) i++;
+  return i;
+}
+
 /**
  * The single edit that turns `before` into `after`: the range start..oldEnd
- * of `before` was replaced by start..newEnd of `after`.
+ * of `before` was replaced by start..newEnd of `after`. An insertion or
+ * deletion inside a run of equal letters fits several places; when `caret`
+ * (the collapsed caret after the edit) is given and fits, the edit is put there.
  */
-export function diff(before, after) {
-  let start = 0;
-  const limit = Math.min(before.length, after.length);
-  while (start < limit && before.charCodeAt(start) === after.charCodeAt(start)) start++;
-  let oldEnd = before.length;
-  let newEnd = after.length;
-  while (oldEnd > start && newEnd > start && before.charCodeAt(oldEnd - 1) === after.charCodeAt(newEnd - 1)) {
-    oldEnd--;
-    newEnd--;
+export function diff(before, after, caret = -1) {
+  const start = commonPrefix(before, after, Math.min(before.length, after.length));
+  const tail = commonSuffix(before, after, Math.min(before.length, after.length) - start);
+  const edit = { start, oldEnd: before.length - tail, newEnd: after.length - tail };
+  const inserted = edit.newEnd - edit.start;
+  const removed = edit.oldEnd - edit.start;
+  if (caret < 0 || (inserted && removed) || caret === edit.newEnd) return edit;
+  if (removed === 0) {
+    const at = caret - inserted;
+    if (at >= 0 && before.slice(0, at) === after.slice(0, at) && before.slice(at) === after.slice(caret)) {
+      return { start: at, oldEnd: at, newEnd: caret };
+    }
+  } else if (inserted === 0) {
+    if (before.slice(0, caret) === after.slice(0, caret) && before.slice(caret + removed) === after.slice(caret)) {
+      return { start: caret, oldEnd: caret + removed, newEnd: caret };
+    }
   }
-  return { start, oldEnd, newEnd };
+  return edit;
 }
 
 /**
@@ -98,16 +124,30 @@ export function shiftAnchors(anchors, edit, after) {
   const out = [];
   for (const a of anchors) {
     let offset = a.offset;
-    if (offset + a.glyph.length <= edit.start) {
-      // before the edit
-    } else if (offset >= edit.oldEnd) {
-      offset += delta;
-    } else {
-      continue;
-    }
+    if (offset >= edit.oldEnd) offset += delta;
+    else if (offset + a.glyph.length > edit.start) continue;
     if (after.startsWith(a.glyph, offset)) out.push({ offset, glyph: a.glyph });
   }
   return out;
+}
+
+/** Moves flat [start, end, ...] ranges through an edit, dropping those it touches. */
+export function shiftRanges(ranges, edit) {
+  const delta = edit.newEnd - edit.oldEnd;
+  const out = [];
+  for (let i = 0; i + 1 < ranges.length; i += 2) {
+    const [start, end] = [ranges[i], ranges[i + 1]];
+    if (end < edit.start) out.push(start, end);
+    else if (start > edit.oldEnd) out.push(start + delta, end + delta);
+  }
+  return out;
+}
+
+const MARKUP = { "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;" };
+
+/** Escapes text for HTML or XML content and attribute values. */
+export function escapeMarkup(text) {
+  return text.replace(/[<>&"]/g, (c) => MARKUP[c]);
 }
 
 /** Words separated by white space. */

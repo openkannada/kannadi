@@ -5,8 +5,8 @@ import init, * as wasm from "../pkg/kannadi_wasm.js";
 export { init };
 
 /**
- * Converts Nudi or Baraha text. Offsets are UTF-16 code units in the output.
- * @returns {{text: string, unknown: number[], malformed: number[]}}
+ * Converts Nudi or Baraha text. Unknown glyph offsets are UTF-16 code units in the output.
+ * @returns {{text: string, unknown: number[]}}
  */
 export function convertLegacy(text, { kannadaDigits = false, zeroAsAnusvara = true } = {}) {
   const options = new wasm.NudiOptions();
@@ -17,7 +17,6 @@ export function convertLegacy(text, { kannadaDigits = false, zeroAsAnusvara = tr
   const out = {
     text: result.text,
     unknown: Array.from(result.unknownInText),
-    malformed: Array.from(result.malformed),
   };
   result.free();
   return out;

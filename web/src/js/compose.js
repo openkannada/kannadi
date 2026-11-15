@@ -7,6 +7,9 @@ const LETTERS = {
   baraha: /^[A-Za-z~^_]+$/,
   iso15919: /^[\p{Script=Latin}\p{M}:]+$/u,
 };
+// Phone keyboards that compose whole words often commit the word and the
+// space after it as 1 insertion.
+const WORD_AND_BREAK = /^(.+?)([\s.,;:!?]+)$/u;
 
 export class Composer {
   /**
@@ -64,17 +67,23 @@ export class Composer {
       return;
     }
     const inserted = after.slice(edit.start, edit.newEnd);
-    const pure = edit.oldEnd === edit.start && inserted && LETTERS[this.mode].test(inserted);
-    if (!pure) {
-      this.commit();
+    const insertOnly = edit.oldEnd === edit.start && inserted;
+    if (insertOnly && LETTERS[this.mode].test(inserted)) {
+      this.extend(edit.start, inserted);
+      this.render(edit.newEnd);
       return;
     }
-    if (this.word && edit.start === this.end()) {
-      this.word.latin += inserted;
-    } else {
-      this.word = { start: edit.start, latin: inserted, rendered: "" };
+    const m = insertOnly && inserted.match(WORD_AND_BREAK);
+    if (m && LETTERS[this.mode].test(m[1])) {
+      this.extend(edit.start, m[1]);
+      this.render(edit.start + m[1].length);
     }
-    this.render(edit.newEnd);
+    this.commit();
+  }
+
+  extend(at, letters) {
+    if (this.word && at === this.end()) this.word.latin += letters;
+    else this.word = { start: at, latin: letters, rendered: "" };
   }
 
   /** Backspace inside the word removes the last Latin letter, not a Kannada sign. */

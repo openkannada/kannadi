@@ -1,7 +1,7 @@
 // Problems in the document: unknown glyphs left by a conversion, tracked
 // through edits, and malformed syllables, found again after each edit.
 // Each problem is highlighted inline and listed; selecting one offers fixes.
-import { codePoints, shiftAnchors } from "./text.js";
+import { codePoints, shiftAnchors, shiftRanges } from "./text.js";
 
 const LIST_LIMIT = 200;
 const FIX_LABELS = {
@@ -32,6 +32,10 @@ export class Issues {
         this.close(true);
       }
     });
+    // A dialog left open behind the focus would be read out of place.
+    document.addEventListener("focusin", (e) => {
+      if (this.open && !ui.popover.contains(e.target) && e.target !== editor.el) this.close(false);
+    });
   }
 
   get total() {
@@ -56,6 +60,7 @@ export class Issues {
   /** Follows an edit: moves unknown glyphs now, checks syllables shortly after. */
   edited(edit, after) {
     this.unknown = shiftAnchors(this.unknown, edit, after);
+    this.malformed = shiftRanges(this.malformed, edit);
     this.close(false);
     clearTimeout(this.timer);
     // About 1 ms per 5,000 characters: check less often in large documents.

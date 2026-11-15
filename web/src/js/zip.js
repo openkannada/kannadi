@@ -1,6 +1,11 @@
 // Minimal ZIP reading and writing for DOCX files, built on the platform's
 // DecompressionStream and CompressionStream. No ZIP64, encryption or spanning.
 
+// A DOCX part this large is not text; refusing it keeps a hostile file from
+// filling the tab's memory.
+const MAX_ENTRY = 64 * 1024 * 1024;
+const ZIP64 = 0xffffffff;
+
 const LOCAL = 0x04034b50;
 const CENTRAL = 0x02014b50;
 const END = 0x06054b50;
@@ -13,11 +18,13 @@ async function pipe(bytes, stream) {
 }
 
 /**
- * Reads the entries of a ZIP archive.
+ * Reads entries of a ZIP archive: all of them, or only the names in `wanted`.
  * @param {Uint8Array} bytes
+ * @param {Iterable<string>} [wanted]
  * @returns {Promise<Map<string, Uint8Array>>}
  */
-export async function readZip(bytes) {
+export async function readZip(bytes, wanted) {
+  const only = wanted ? new Set(wanted) : null;
   const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
   let end = -1;
   for (let i = bytes.length - 22; i >= Math.max(0, bytes.length - 22 - 0xffff); i--) {
@@ -29,18 +36,23 @@ export async function readZip(bytes) {
   if (end < 0) throw new Error("not a ZIP file");
   const count = view.getUint16(end + 10, true);
   let at = view.getUint32(end + 16, true);
+  if (count === 0xffff || at === ZIP64) throw new Error("This file uses ZIP64, which is not supported.");
   const names = new TextDecoder();
   const entries = new Map();
   for (let n = 0; n < count; n++) {
     if (view.getUint32(at, true) !== CENTRAL) throw new Error("damaged ZIP directory");
     const method = view.getUint16(at + 10, true);
     const size = view.getUint32(at + 20, true);
+    const unpacked = view.getUint32(at + 24, true);
     const nameLength = view.getUint16(at + 28, true);
     const extraLength = view.getUint16(at + 30, true);
     const commentLength = view.getUint16(at + 32, true);
     const local = view.getUint32(at + 42, true);
     const name = names.decode(bytes.subarray(at + 46, at + 46 + nameLength));
     at += 46 + nameLength + extraLength + commentLength;
+    if (only && !only.has(name)) continue;
+    if (size === ZIP64 || unpacked === ZIP64 || local === ZIP64) throw new Error("This file uses ZIP64, which is not supported.");
+    if (unpacked > MAX_ENTRY) throw new Error(`${name} is too large to read.`);
 
     if (view.getUint32(local, true) !== LOCAL) throw new Error("damaged ZIP entry");
     const start = local + 30 + view.getUint16(local + 26, true) + view.getUint16(local + 28, true);

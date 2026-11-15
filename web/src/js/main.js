@@ -113,10 +113,11 @@ const composer = new Composer(editor, kannadi.transliterate, (range) => editor.h
 function update(text) {
   ui.empty.hidden = text.length > 0;
   ui.chars.textContent = text.length.toLocaleString("en-IN");
-  ui.words.textContent = countWords(text).toLocaleString("en-IN");
   clearTimeout(countTimer);
   countTimer = setTimeout(() => {
-    ui.aksharas.textContent = kannadi.countAksharas(editor.text).toLocaleString("en-IN");
+    const current = editor.text;
+    ui.words.textContent = countWords(current).toLocaleString("en-IN");
+    ui.aksharas.textContent = kannadi.countAksharas(current).toLocaleString("en-IN");
   }, Math.min(600, 80 + text.length / 10000));
   clearTimeout(saveTimer);
   ui.saved.textContent = "Saving";
@@ -226,6 +227,11 @@ function setTheme(theme) {
 }
 
 function nextProblem(dir) {
+  const first = $("popover").querySelector("button");
+  if (issues.open && first && !$("popover").contains(document.activeElement)) {
+    first.focus();
+    return;
+  }
   const sel = editor.selection();
   const at = sel ? (dir > 0 ? sel.end : sel.start) : -1;
   const item = issues.next(at, dir);
@@ -249,6 +255,10 @@ function wire() {
       say(ui.messageText.textContent, {
         label: "Paste as is",
         run: () => {
+          if (editor.text.slice(start, start + result.text.length) !== result.text) {
+            say("The pasted text has changed since, so it was left as it is.");
+            return;
+          }
           editor.replace(start, start + result.text.length, plain);
           say("Pasted as is, without converting.");
         },
@@ -260,7 +270,10 @@ function wire() {
     if (!sel || sel.start !== sel.end) return;
     issues.flush();
     const item = issues.at(sel.start);
-    if (item) issues.popover(item, false);
+    if (item) {
+      issues.popover(item, false);
+      say(`${item.kind === "unknown" ? "Unknown glyph" : "Malformed syllable"} here. Press F8 to reach its fixes.`);
+    }
   });
   ui.doc.addEventListener("keydown", (e) => {
     if (e.key === "Escape" && composer.revert()) e.preventDefault();

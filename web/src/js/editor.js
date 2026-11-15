@@ -36,7 +36,7 @@ export class DocEditor {
     el.addEventListener("compositionend", () => this.sync("insertCompositionText"));
     el.addEventListener("keydown", (e) => {
       const mod = e.ctrlKey || e.metaKey;
-      if (!mod || e.altKey) return;
+      if (!mod || e.altKey || e.isComposing) return;
       const key = e.key.toLowerCase();
       if (key === "z" || key === "y") {
         e.preventDefault();
@@ -47,6 +47,7 @@ export class DocEditor {
   }
 
   beforeInput(e) {
+    if (e.isComposing) return;
     switch (e.inputType) {
       case "historyUndo":
         e.preventDefault();
@@ -94,7 +95,8 @@ export class DocEditor {
     this.flatten();
     const after = this.text;
     if (after === this.before) return;
-    const edit = diff(this.before, after);
+    const sel = this.selection();
+    const edit = diff(this.before, after, sel && sel.start === sel.end ? sel.start : -1);
     if (record) this.record(edit, this.before, after, inputType);
     this.before = after;
     this.onEdit(edit, after, inputType);
@@ -114,7 +116,7 @@ export class DocEditor {
       last && entry.start <= last.start + last.inserted.length && entry.start + entry.removed.length >= last.start;
     const breaksWord = /\s/.test(entry.inserted) && !/\s/.test(last?.inserted ?? " ");
     if (last && entry.typing && last.typing && touches && !breaksWord && entry.time - last.time < 1500) {
-      // Merge into 1 step: the union of both edits, in the coordinates of `before`.
+      // Merge into 1 step covering both edits, in the coordinates of the text before `last`.
       const lo = Math.min(last.start, entry.start);
       const hiMid = Math.max(last.start + last.inserted.length, entry.start + entry.removed.length);
       last.removed =
