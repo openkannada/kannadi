@@ -65,11 +65,11 @@ assert!(converted.unknown.is_empty());
 ```
 
 - **How the table was built.** The glyph table in [nudi.tsv](crates/kannadi/data/nudi.tsv) comes from the Nudi font files. Each glyph was rendered and matched against the Unicode version of the same typeface, which HarfBuzz labels. The table was then checked against typed letter charts and Karnataka government pages from 2002.
-- **Nothing is dropped silently.** Glyphs with no known meaning are kept in the output and listed in `unknown`, with their byte offsets. Vowel signs with no letter to attach to are listed in `malformed`.
+- **Nothing is dropped silently.** Glyphs the converter cannot place are kept in the output and listed in `unknown`, with their byte offsets. Syllables that cannot be valid Kannada are listed in `malformed`: a mark with no letter, 2 vowel signs on 1 consonant, a sign on a vowel letter, or a consonant shape typed without its sign. Spacing glyphs carry no text and are the only glyphs dropped.
 - **Digits.** The `k` variants of the Nudi fonts draw Kannada digits at the ASCII digit positions. For text in those fonts, set `Options::kannada_digits`.
 - **Typed zeros.** A zero typed between 2 Kannada letters in place of an anusvara (ಪ್ರಾರ0ಭ) becomes ಂ by default.
 - **Limits.**
-  - Some glyphs look alike: the ೂ in ವೊ and ಮೊ, and the subscript ಜ and ಞ. A document that used the wrong key converts to what was typed.
+  - Some glyphs look alike: the ೂ in ವೊ and ಮೊ, the ು in ವು and the tail of ಮ, and the subscript ಜ and ಞ. A document that used the wrong key converts to what was typed.
   - English text set in the same font is converted too, so pass only the legacy-font runs.
 
 Run `cargo run --example nudi -- file.txt` to convert a Windows-1252 text file.

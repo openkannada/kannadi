@@ -15,5 +15,26 @@ fn main() -> std::io::Result<()> {
     for u in converted.unknown.iter().take(20) {
         eprintln!("  U+{:04X} at byte {}", u.glyph as u32, u.offset);
     }
+    for range in converted.malformed.iter().take(20) {
+        eprintln!(
+            "  malformed \"{}\" in \"{}\"",
+            &converted.text[range.clone()],
+            context(&converted.text, range.clone())
+        );
+    }
     Ok(())
+}
+
+/// Up to 8 characters on each side of `range`.
+fn context(text: &str, range: std::ops::Range<usize>) -> &str {
+    let start = text[..range.start]
+        .char_indices()
+        .rev()
+        .nth(7)
+        .map_or(0, |(i, _)| i);
+    let end = text[range.end..]
+        .char_indices()
+        .nth(8)
+        .map_or(text.len(), |(i, _)| range.end + i);
+    &text[start..end]
 }

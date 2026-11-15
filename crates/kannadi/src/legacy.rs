@@ -8,8 +8,8 @@
 //! Glyphs are stored in drawing order: a subscript consonant comes after its
 //! syllable's vowel sign, the arkavattu after the cluster, and some vowel signs
 //! are split into 2 or 3 glyphs. [`nudi_to_unicode`] rebuilds each syllable in
-//! Unicode order and reports every glyph it cannot place, so nothing is lost
-//! silently.
+//! Unicode order. It reports every glyph it cannot place and every syllable that
+//! is not valid; spacing glyphs, which carry no text, are the only glyphs dropped.
 
 use std::collections::HashMap;
 use std::ops::Range;
@@ -17,8 +17,7 @@ use std::sync::OnceLock;
 
 use unicode_normalization::UnicodeNormalization;
 
-use crate::akshara::{aksharas, AksharaKind};
-use crate::chars::{class, Class, VIRAMA};
+use crate::chars::{class, Class, ANUSVARA, VIRAMA};
 use crate::numerals::to_kannada_digit;
 
 /// Settings for [`nudi_to_unicode`].
@@ -27,8 +26,9 @@ pub struct Options {
     /// Write digits as Kannada digits. Use this for text set in the `k` variants of
     /// the Nudi fonts, which draw Kannada digits at the ASCII digit positions.
     pub kannada_digits: bool,
-    /// Turn a zero typed between 2 Kannada letters into an anusvara (ಂ), a common
-    /// typing habit in legacy documents: ಪ್ರಾರ0ಭ becomes ಪ್ರಾರಂಭ.
+    /// Turn a zero typed between a Kannada letter or vowel sign and the next letter
+    /// into an anusvara (ಂ), a common typing habit in legacy documents: ಪ್ರಾರ0ಭ
+    /// becomes ಪ್ರಾರಂಭ.
     pub zero_as_anusvara: bool,
 }
 
@@ -55,10 +55,12 @@ pub struct Unknown {
 pub struct Conversion {
     /// The Unicode text. Unknown glyphs are kept as they were.
     pub text: String,
-    /// Glyphs with no known meaning in this layout.
+    /// Glyphs the converter could not place: glyphs with no known meaning, and
+    /// known glyphs in a position they cannot take, such as a second arkavattu.
     pub unknown: Vec<Unknown>,
-    /// Byte ranges in `text` holding a vowel sign, virama or other mark with no
-    /// letter to attach to. A clean conversion has none.
+    /// Byte ranges in `text` that are not valid syllables: a mark with no letter,
+    /// 2 vowel signs on 1 consonant, a sign on a vowel letter, or a consonant shape
+    /// typed without its sign. A clean conversion has none.
     pub malformed: Vec<Range<usize>>,
 }
 
@@ -86,81 +88,22 @@ impl Conversion {
 pub fn nudi_to_unicode(text: &str, options: &Options) -> Conversion {
     let table = table();
     let chars: Vec<(usize, char)> = text.char_indices().collect();
-    let mut out = String::with_capacity(text.len() * 2);
-    let mut unknown = Vec::new();
-    let mut syllable: Option<Syllable> = None;
+    let mut writer = Writer::with_capacity(text.len() * 2);
     let mut i = 0;
     while i < chars.len() {
-        let (offset, c) = chars[i];
         let Some((entry, len)) = table.longest_match(&chars[i..]) else {
-            flush(&mut syllable, &mut out);
-            if c.is_ascii_digit() {
-                let next_is_letter = matches!(
-                    table.longest_match(&chars[i + 1..]),
-                    Some((Entry::Letter(_), _))
-                );
-                if options.zero_as_anusvara && c == '0' && ends_with_letter(&out) && next_is_letter
-                {
-                    out.push('ಂ');
-                } else if options.kannada_digits {
-                    out.push(to_kannada_digit(c));
-                } else {
-                    out.push(c);
-                }
-            } else {
-                if !is_passthrough(c) {
-                    unknown.push(Unknown { offset, glyph: c });
-                }
-                out.push(c);
-            }
+            let starts_syllable = matches!(
+                table.longest_match(&chars[i + 1..]),
+                Some((Entry::Letter(_) | Entry::Base(_), _))
+            );
+            writer.plain(chars[i], options, starts_syllable);
             i += 1;
             continue;
         };
+        writer.apply(entry, &chars[i..i + len]);
         i += len;
-        match (entry, syllable.as_mut()) {
-            (Entry::Letter(letter), _) => {
-                flush(&mut syllable, &mut out);
-                syllable = Some(Syllable::new(letter));
-            }
-            (Entry::Sign(sign), Some(s)) => s.signs.push_str(sign),
-            (Entry::Ottu(c), Some(s)) => s.ottus.push(*c),
-            (Entry::Arka, Some(s)) => s.arka = true,
-            (Entry::Mod(m), Some(s)) => s.mods.push(*m),
-            (Entry::Aspirate, Some(s)) => {
-                if !s.aspirate() {
-                    unknown.push(Unknown { offset, glyph: c });
-                }
-            }
-            (Entry::Ignore, _) => {}
-            (Entry::Mod(m), None) => out.push(*m),
-            (Entry::Sign(sign), None) => out.push_str(sign),
-            (Entry::Ottu(c), None) => {
-                out.push(VIRAMA);
-                out.push(*c);
-            }
-            (Entry::Literal(l), _) => {
-                flush(&mut syllable, &mut out);
-                out.push_str(l);
-            }
-            _ => {
-                flush(&mut syllable, &mut out);
-                for &(o, g) in &chars[i - len..i] {
-                    unknown.push(Unknown {
-                        offset: o,
-                        glyph: g,
-                    });
-                    out.push(g);
-                }
-            }
-        }
     }
-    flush(&mut syllable, &mut out);
-    let malformed = malformed_ranges(&out);
-    Conversion {
-        text: out,
-        unknown,
-        malformed,
-    }
+    writer.finish()
 }
 
 /// Decodes Windows-1252 bytes, the encoding legacy Kannada text files use.
@@ -188,6 +131,7 @@ fn windows_1252(b: u8) -> char {
 #[derive(Debug)]
 enum Entry {
     Letter(String),
+    Base(String),
     Sign(String),
     Ottu(char),
     Arka,
@@ -238,6 +182,7 @@ fn parse_table(source: &str) -> Table {
         let first = value.chars().next();
         let entry = match kind {
             "letter" => Entry::Letter(value.to_string()),
+            "base" => Entry::Base(value.to_string()),
             "sign" => Entry::Sign(value.to_string()),
             "ottu" => Entry::Ottu(first.expect("ottu needs a consonant")),
             "arka" => Entry::Arka,
@@ -253,26 +198,172 @@ fn parse_table(source: &str) -> Table {
     Table { entries, longest }
 }
 
-struct Syllable {
-    letter: String,
-    signs: String,
-    ottus: Vec<char>,
-    arka: bool,
-    mods: String,
+/// Builds the output and both reports in 1 pass.
+struct Writer {
+    out: String,
+    unknown: Vec<Unknown>,
+    malformed: Vec<Range<usize>>,
+    syllable: Option<Syllable>,
 }
 
-impl Syllable {
-    fn new(letter: &str) -> Self {
-        Syllable {
-            letter: letter.to_string(),
-            signs: String::new(),
-            ottus: Vec::new(),
-            arka: false,
-            mods: String::new(),
+impl Writer {
+    fn with_capacity(capacity: usize) -> Self {
+        Writer {
+            out: String::with_capacity(capacity),
+            unknown: Vec::new(),
+            malformed: Vec::new(),
+            syllable: None,
         }
     }
 
-    /// Applies the mahaprana mark; false if this letter has no aspirated form.
+    fn apply(&mut self, entry: &Entry, glyphs: &[(usize, char)]) {
+        match entry {
+            Entry::Letter(letter) => self.start(letter, false),
+            Entry::Base(letter) => self.start(letter, true),
+            Entry::Ignore => {}
+            Entry::Literal(l) => {
+                self.flush();
+                self.out.push_str(l);
+            }
+            _ => match self.syllable.as_mut() {
+                Some(s) => {
+                    if !s.add(entry) {
+                        s.rejected.extend(glyphs.iter().map(|&(_, g)| g));
+                        self.report(glyphs);
+                    }
+                }
+                None => self.stray(entry, glyphs),
+            },
+        }
+    }
+
+    fn start(&mut self, letter: &str, needs_sign: bool) {
+        self.flush();
+        self.syllable = Some(Syllable::new(letter, needs_sign));
+    }
+
+    /// Writes a sign, subscript or mark that has no syllable to attach to.
+    fn stray(&mut self, entry: &Entry, glyphs: &[(usize, char)]) {
+        let start = self.out.len();
+        match entry {
+            Entry::Sign(sign) if !sign.is_empty() => self.out.push_str(sign),
+            Entry::Mod(m) => self.out.push(*m),
+            Entry::Ottu(c) => {
+                self.out.push(VIRAMA);
+                self.out.push(*c);
+            }
+            _ => {
+                self.report(glyphs);
+                self.out.extend(glyphs.iter().map(|&(_, g)| g));
+                return;
+            }
+        }
+        self.malformed.push(start..self.out.len());
+    }
+
+    /// Writes a character the table does not cover: digits, spaces, punctuation or
+    /// an unknown glyph.
+    fn plain(&mut self, (offset, c): (usize, char), options: &Options, starts_syllable: bool) {
+        self.flush();
+        if c.is_ascii_digit() {
+            let between_letters =
+                starts_syllable && self.out.chars().next_back().is_some_and(is_letter);
+            if options.zero_as_anusvara && c == '0' && between_letters {
+                self.out.push(ANUSVARA);
+            } else if options.kannada_digits {
+                self.out.push(to_kannada_digit(c));
+            } else {
+                self.out.push(c);
+            }
+            return;
+        }
+        if !is_passthrough(c) {
+            self.unknown.push(Unknown { offset, glyph: c });
+        }
+        self.out.push(c);
+    }
+
+    fn report(&mut self, glyphs: &[(usize, char)]) {
+        self.unknown.extend(
+            glyphs
+                .iter()
+                .map(|&(offset, glyph)| Unknown { offset, glyph }),
+        );
+    }
+
+    fn flush(&mut self) {
+        if let Some(s) = self.syllable.take() {
+            let start = self.out.len();
+            if !s.write(&mut self.out) {
+                self.malformed.push(start..self.out.len());
+            }
+        }
+    }
+
+    fn finish(mut self) -> Conversion {
+        self.flush();
+        Conversion {
+            text: self.out,
+            unknown: self.unknown,
+            malformed: self.malformed,
+        }
+    }
+}
+
+struct Syllable {
+    letter: String,
+    needs_sign: bool,
+    signed: bool,
+    signs: String,
+    virama: bool,
+    ottus: Vec<char>,
+    arka: bool,
+    mods: String,
+    /// Known glyphs that cannot belong here; written after the syllable.
+    rejected: String,
+}
+
+impl Syllable {
+    fn new(letter: &str, needs_sign: bool) -> Self {
+        Syllable {
+            letter: letter.to_string(),
+            needs_sign,
+            signed: false,
+            signs: String::new(),
+            virama: false,
+            ottus: Vec::new(),
+            arka: false,
+            mods: String::new(),
+            rejected: String::new(),
+        }
+    }
+
+    /// Adds a glyph to the syllable; false if it cannot belong here.
+    fn add(&mut self, entry: &Entry) -> bool {
+        match entry {
+            Entry::Sign(sign) if sign.as_str() == "\u{0CCD}" => {
+                self.signed = true;
+                !std::mem::replace(&mut self.virama, true)
+            }
+            Entry::Sign(sign) => {
+                self.signed = true;
+                self.signs.push_str(sign);
+                true
+            }
+            Entry::Ottu(c) => {
+                self.ottus.push(*c);
+                true
+            }
+            Entry::Arka => !std::mem::replace(&mut self.arka, true),
+            Entry::Mod(m) => {
+                self.mods.push(*m);
+                true
+            }
+            Entry::Aspirate => self.aspirate(),
+            _ => false,
+        }
+    }
+
     fn aspirate(&mut self) -> bool {
         let mut chars = self.letter.chars();
         let aspirated = match chars.next() {
@@ -286,41 +377,43 @@ impl Syllable {
         true
     }
 
-    fn write(&self, out: &mut String) {
+    /// Writes the syllable in Unicode order; false if it is not a valid syllable.
+    fn write(&self, out: &mut String) -> bool {
         let mut letter = self.letter.chars();
+        let head = letter.next();
         let mut s = String::new();
         if self.arka {
             s.push('ರ');
             s.push(VIRAMA);
         }
-        s.extend(letter.next());
+        s.extend(head);
         for &o in &self.ottus {
             s.push(VIRAMA);
             s.push(o);
         }
         s.extend(letter);
-        s.extend(self.signs.chars().filter(|&c| c != VIRAMA));
-        if self.signs.contains(VIRAMA) {
+        s.push_str(&self.signs);
+        if self.virama {
             s.push(VIRAMA);
         }
         s.push_str(&self.mods);
-        out.extend(s.nfc());
+        let composed: String = s.nfc().collect();
+        let vowel_signs = composed
+            .chars()
+            .filter(|&c| class(c) == Class::VowelSign)
+            .count();
+        let on_vowel = head.is_some_and(|c| class(c) == Class::Vowel);
+        let valid = !(self.needs_sign && !self.signed)
+            && vowel_signs <= 1
+            && !(on_vowel && (self.arka || self.signed || !self.ottus.is_empty()));
+        out.push_str(&composed);
+        out.push_str(&self.rejected);
+        valid
     }
 }
 
-fn flush(syllable: &mut Option<Syllable>, out: &mut String) {
-    if let Some(s) = syllable.take() {
-        s.write(out);
-    }
-}
-
-fn ends_with_letter(text: &str) -> bool {
-    text.chars().next_back().is_some_and(|c| {
-        matches!(
-            class(c),
-            Class::Vowel | Class::Consonant | Class::VowelSign | Class::Modifier
-        )
-    })
+fn is_letter(c: char) -> bool {
+    matches!(class(c), Class::Vowel | Class::Consonant | Class::VowelSign)
 }
 
 fn is_passthrough(c: char) -> bool {
@@ -328,24 +421,6 @@ fn is_passthrough(c: char) -> bool {
         || c.is_ascii_punctuation()
         || ('\u{2010}'..='\u{2027}').contains(&c)
         || c == '\u{A0}'
-}
-
-fn malformed_ranges(text: &str) -> Vec<Range<usize>> {
-    let mut ranges = Vec::new();
-    let mut offset = 0;
-    for a in aksharas(text) {
-        let starts_with_mark = a.text.chars().next().is_some_and(|c| {
-            matches!(
-                class(c),
-                Class::VowelSign | Class::Virama | Class::Nukta | Class::Modifier
-            )
-        });
-        if a.kind == AksharaKind::Other && starts_with_mark {
-            ranges.push(offset..offset + a.text.len());
-        }
-        offset += a.text.len();
-    }
-    ranges
 }
 
 #[cfg(test)]
@@ -478,6 +553,40 @@ mod tests {
         let c = conv(&[0xC1, 0x50, 0xC0]);
         assert_eq!(c.text, "ಾಕ");
         assert_eq!(c.malformed, vec![0..3]);
+    }
+
+    fn report(input: &str) -> Conversion {
+        nudi_to_unicode(input, &Options::default())
+    }
+
+    #[test]
+    fn stray_marks_after_spaces_and_digits_are_malformed() {
+        for input in [" Á", "PÀ Á", "1Á", " A", "\nÌ", "†A"] {
+            assert!(!report(input).malformed.is_empty(), "{input:?}");
+        }
+    }
+
+    #[test]
+    fn misplaced_known_glyphs_are_reported() {
+        assert_eq!(report("À").unknown.len(), 1);
+        assert_eq!(report("PÀðð").unknown.len(), 1);
+        assert_eq!(report("Pïï").unknown.len(), 1);
+        let c = report("PsÀ");
+        assert_eq!(c.unknown.len(), 1);
+        assert!(c.text.contains('s'), "{c:?}");
+    }
+
+    #[test]
+    fn invalid_syllables_are_malformed() {
+        for input in ["PÁÁ", "QÁ", "PÉÃÆ", "CÁ", "Dð", "P", "PP"] {
+            assert!(!report(input).malformed.is_empty(), "{input:?}");
+        }
+        assert!(report("PÉÆÃ").is_clean());
+    }
+
+    #[test]
+    fn zero_after_an_anusvara_stays_a_digit() {
+        assert_eq!(report("PÀA0PÀ").text, "ಕಂ0ಕ");
     }
 
     #[test]
