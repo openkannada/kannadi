@@ -16,3 +16,4 @@
 - `kannadi-wasm`: WebAssembly bindings for `legacy::nudi_to_unicode`, `transliterate`, `normalize` and `aksharas`, with report offsets in UTF-16 code units.
 - A static converter page in `web/`: paste text or open a TXT file, convert Nudi or Baraha to Unicode in the browser, see unknown glyphs and malformed syllables, then copy or download the result. CI builds it and checks the package in Node.
 - Nudi and Baraha ANSI to Unicode (`legacy::nudi_to_unicode`), with a glyph table derived from the font files, reports of unknown glyphs and malformed syllables, and fixtures from Karnataka government pages.
+- `tools/fontqa`: HarfBuzz shaping tests for Kannada fonts, results for 41 fonts (146 faces) with a data card, proof sheets, and fixes for broken `knd2` tables, broken `morx` tables and missing ೄ, ೢ and ೣ.

@@ -1,0 +1,127 @@
+{
+ "summary": {
+  "face_id": "hubballi--hubballi-regular",
+  "font_id": "hubballi",
+  "family": "Hubballi",
+  "style": "Regular",
+  "version": "Version 1.000; ttfautohint (v1.8.3)",
+  "license": "OFL-1.1",
+  "license_in_font": "This Font Software is licensed under the SIL Open Font License, Version 1.1. This license is available with a FAQ at: https://scripts.sil.org/OFL",
+  "source": "Google Fonts",
+  "file": "Hubballi-Regular.ttf",
+  "face_index": 0,
+  "sha256": "e51ad77d40b5adccd6c6ca537863ef4e364bd374c56593e007fbf5402a9a1cdd",
+  "variable": false,
+  "outlines": "TrueType",
+  "gsub_scripts": "DFLT knd2 knda latn",
+  "kannada_codepoints": 87,
+  "glyph_count": 859,
+  "cases": 2146,
+  "failing_cases": 7,
+  "missing_glyph": 4,
+  "notdef": 0,
+  "dotted_circle": 0,
+  "no_conjunct": 0,
+  "no_arkavattu": 0,
+  "collision": 3,
+  "indistinct": 0,
+  "missing_codepoints": "U+0CDC U+0CDD U+0CF3"
+ },
+ "font": {
+  "family": "Hubballi",
+  "style": "Regular",
+  "full_name": "Hubballi Regular",
+  "version": "Version 1.000; ttfautohint (v1.8.3)",
+  "license_name": "This Font Software is licensed under the SIL Open Font License, Version 1.1. This license is available with a FAQ at: https://scripts.sil.org/OFL",
+  "license_url": "http://scripts.sil.org/OFL",
+  "copyright": "Copyright 2016 The Hubballi Project Authors (https://github.com/erinmclaughlin/Hubballi)",
+  "designer": "Erin McLaughlin",
+  "vendor": "GOOG",
+  "glyph_count": 859,
+  "units_per_em": 1000,
+  "variable": false,
+  "axes": [],
+  "outlines": "TrueType",
+  "script_tags": {
+   "GSUB": [
+    "DFLT",
+    "knd2",
+    "knda",
+    "latn"
+   ],
+   "GPOS": [
+    "DFLT",
+    "knd2",
+    "knda",
+    "latn"
+   ]
+  },
+  "aat_morx": false,
+  "kannada_codepoints": 87
+ },
+ "failures": [
+  {
+   "case_id": "sig-0C95-0CCD-0CB7-0CC3",
+   "group": "signed_cluster",
+   "text": "ಕ್ಷೃ",
+   "codepoints": "U+0C95 U+0CCD U+0CB7 U+0CC3",
+   "failures": "collision",
+   "glyphs": "uni0C95 uni0CB7.below.kssa uni0CC3",
+   "detail": "uni0CB7.below.kssa x uni0CC3 27%"
+  },
+  {
+   "case_id": "sig-0C95-0CCD-0CB7-0CC8",
+   "group": "signed_cluster",
+   "text": "ಕ್ಷೈ",
+   "codepoints": "U+0C95 U+0CCD U+0CB7 U+0CC8",
+   "failures": "collision",
+   "glyphs": "uni0C950CC6 uni0CB7.below.kssa uni0CD6",
+   "detail": "uni0CB7.below.kssa x uni0CD6 27%"
+  },
+  {
+   "case_id": "sig-0C95-0CCD-0CB7-0CCD-0CAE",
+   "group": "signed_cluster",
+   "text": "ಕ್ಷ್ಮ",
+   "codepoints": "U+0C95 U+0CCD U+0CB7 U+0CCD U+0CAE",
+   "failures": "collision",
+   "glyphs": "uni0C95 uni0CB7.below.kssa uni0CCD0CAE",
+   "detail": "uni0CB7.below.kssa x uni0CCD0CAE 13%"
+  },
+  {
+   "case_id": "rare-0CDD",
+   "group": "rare",
+   "text": "ಅವನೝ",
+   "codepoints": "U+0C85 U+0CB5 U+0CA8 U+0CDD",
+   "failures": "missing_glyph",
+   "glyphs": "uni0C85 uni0CB5 uni0CA8 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "rare-0CF3",
+   "group": "rare",
+   "text": "ಕೳ",
+   "codepoints": "U+0C95 U+0CF3",
+   "failures": "missing_glyph",
+   "glyphs": "uni0C95 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "rare-0CDC",
+   "group": "rare",
+   "text": "೜",
+   "codepoints": "U+0CDC",
+   "failures": "missing_glyph",
+   "glyphs": ".notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "rare-0CDC-word",
+   "group": "rare",
+   "text": "೜ಗಣೇಶ",
+   "codepoints": "U+0CDC U+0C97 U+0CA3 U+0CC7 U+0CB6",
+   "failures": "missing_glyph",
+   "glyphs": ".notdef uni0C97 uni0CA30CC6 uni0CD5 uni0CB6",
+   "detail": ""
+  }
+ ]
+}
