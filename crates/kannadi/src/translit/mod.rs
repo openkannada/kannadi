@@ -26,8 +26,9 @@ use std::sync::OnceLock;
 use unicode_normalization::UnicodeNormalization;
 
 use crate::chars::{class, is_kannada, Class, NUKTA, VIRAMA, ZWJ, ZWNJ};
+use crate::lookup::Lookup;
 
-/// Marks the next character as literal text in romanised output.
+/// Marks the next character as literal text in romanized output.
 const ESCAPE: char = '\\';
 use crate::numerals::to_ascii_digit;
 use schemes::Table;
@@ -37,9 +38,9 @@ use schemes::Table;
 pub enum Scheme {
     /// Kannada script (Unicode).
     Kannada,
-    /// ISO 15919 romanisation.
+    /// ISO 15919 romanization.
     Iso15919,
-    /// IAST romanisation, extended for Kannada.
+    /// IAST romanization, extended for Kannada.
     Iast,
     /// Baraha phonetic input scheme.
     Baraha,
@@ -83,7 +84,7 @@ impl fmt::Display for Scheme {
     }
 }
 
-/// Error returned when a scheme name is not recognised.
+/// Error returned when a scheme name is not recognized.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct UnknownScheme(pub String);
 
@@ -124,18 +125,18 @@ impl FromStr for Scheme {
 pub fn transliterate(text: &str, from: Scheme, to: Scheme) -> String {
     match (from.table(), to.table()) {
         (None, None) => text.to_string(),
-        (None, Some(t)) => t.romanise(text),
+        (None, Some(t)) => t.romanize(text),
         (Some(f), None) => f.parse(text),
-        (Some(f), Some(t)) => t.romanise(&f.parse(text)),
+        (Some(f), Some(t)) => t.romanize(&f.parse(text)),
     }
 }
 
-/// Romanises Kannada text. Shorthand for `transliterate(text, Scheme::Kannada, scheme)`.
+/// Romanizes Kannada text. Shorthand for `transliterate(text, Scheme::Kannada, scheme)`.
 pub fn to_latin(text: &str, scheme: Scheme) -> String {
     transliterate(text, Scheme::Kannada, scheme)
 }
 
-/// Converts romanised text to Kannada. Shorthand for `transliterate(text, scheme, Scheme::Kannada)`.
+/// Converts romanized text to Kannada. Shorthand for `transliterate(text, scheme, Scheme::Kannada)`.
 pub fn from_latin(text: &str, scheme: Scheme) -> String {
     transliterate(text, scheme, Scheme::Kannada)
 }
@@ -167,8 +168,7 @@ struct Compiled {
     vowel: HashMap<char, &'static str>,
     sign: HashMap<char, &'static str>,
     mark: HashMap<char, &'static str>,
-    tokens: HashMap<String, Tok>,
-    longest_token: usize,
+    tokens: Lookup<Tok>,
     inherent: &'static str,
     /// Characters that start a token but are not letters; written with a backslash when literal.
     escaped: HashSet<char>,
@@ -176,7 +176,7 @@ struct Compiled {
 
 impl Compiled {
     fn new(table: &'static Table) -> Self {
-        let mut tokens: HashMap<String, Tok> = HashMap::new();
+        let mut tokens: Lookup<Tok> = Lookup::new();
         let mut vowel = HashMap::new();
         let mut sign = HashMap::new();
         let mut inherent = "a";
@@ -188,13 +188,13 @@ impl Compiled {
                 }
                 None => inherent = latin,
             }
-            tokens.insert(latin.into(), Tok::Vowel { letter, sign: s });
+            tokens.insert(latin, Tok::Vowel { letter, sign: s });
         }
         let mut consonant = HashMap::new();
         for &(latin, letter) in table.consonants {
             consonant.insert(letter, latin);
             tokens.insert(
-                latin.into(),
+                latin,
                 Tok::Consonant {
                     letter,
                     nukta: false,
@@ -205,7 +205,7 @@ impl Compiled {
         for &(latin, letter) in table.nukta_consonants {
             nukta_consonant.insert(letter, latin);
             tokens.insert(
-                latin.into(),
+                latin,
                 Tok::Consonant {
                     letter,
                     nukta: true,
@@ -215,18 +215,17 @@ impl Compiled {
         let mut mark = HashMap::new();
         for &(latin, m) in table.marks {
             mark.insert(m, latin);
-            tokens.insert(latin.into(), Tok::Mark(m));
+            tokens.insert(latin, Tok::Mark(m));
         }
         for &(latin, j) in table.joiners {
             mark.insert(j, latin);
-            tokens.insert(latin.into(), Tok::Joiner(j));
+            tokens.insert(latin, Tok::Joiner(j));
         }
         for &(alias, canonical) in table.aliases {
-            let tok = tokens[canonical];
-            tokens.insert(alias.into(), tok);
+            let tok = *tokens.get(canonical).expect("alias of a known spelling");
+            tokens.insert(alias, tok);
         }
-        tokens.insert(table.separator.into(), Tok::Separator);
-        let longest_token = tokens.keys().map(|k| k.chars().count()).max().unwrap_or(1);
+        tokens.insert(table.separator, Tok::Separator);
         let separator = table.separator.chars().next();
         let mut escaped: HashSet<char> = tokens
             .keys()
@@ -242,13 +241,12 @@ impl Compiled {
             sign,
             mark,
             tokens,
-            longest_token,
             inherent,
             escaped,
         }
     }
 
-    fn romanise(&self, text: &str) -> String {
+    fn romanize(&self, text: &str) -> String {
         let mut out = Emitter {
             scheme: self,
             out: String::with_capacity(text.len()),
@@ -306,13 +304,9 @@ impl Compiled {
         let mut pending = false;
         let mut after_token = false;
         let mut i = 0;
-        let mut buf = String::new();
         while i < input.len() {
             if input[i] == ESCAPE && input.get(i + 1).is_some_and(|&n| self.is_escapable(n)) {
-                if pending {
-                    out.push(VIRAMA);
-                    pending = false;
-                }
+                close_consonant(&mut out, &mut pending);
                 out.push(input[i + 1]);
                 after_token = false;
                 i += 2;
@@ -325,8 +319,7 @@ impl Compiled {
                     continue;
                 }
                 if let Some(suffix) = self.table.nukta_suffix {
-                    if starts_with(&input[i..], suffix)
-                        && self.longest_match(&input[i..], &mut buf).is_none()
+                    if starts_with(&input[i..], suffix) && self.longest_match(&input[i..]).is_none()
                     {
                         out.push(NUKTA);
                         i += suffix.chars().count();
@@ -334,23 +327,17 @@ impl Compiled {
                     }
                 }
             }
-            let Some((tok, len)) = self.longest_match(&input[i..], &mut buf) else {
-                if pending {
-                    out.push(VIRAMA);
-                    pending = false;
-                }
+            let Some((tok, len)) = self.longest_match(&input[i..]) else {
+                close_consonant(&mut out, &mut pending);
                 out.push(input[i]);
                 after_token = false;
                 i += 1;
                 continue;
             };
             if matches!(tok, Tok::Separator)
-                && !(after_token && self.starts_token(&input[i + len..], &mut buf))
+                && !(after_token && self.starts_token(&input[i + len..]))
             {
-                if pending {
-                    out.push(VIRAMA);
-                    pending = false;
-                }
+                close_consonant(&mut out, &mut pending);
                 out.extend(&input[i..i + len]);
                 after_token = false;
                 i += len;
@@ -368,9 +355,7 @@ impl Compiled {
                     }
                 }
                 Tok::Consonant { letter, nukta } => {
-                    if pending {
-                        out.push(VIRAMA);
-                    }
+                    close_consonant(&mut out, &mut pending);
                     out.push(letter);
                     if nukta {
                         out.push(NUKTA);
@@ -378,23 +363,15 @@ impl Compiled {
                     pending = true;
                 }
                 Tok::Mark(m) | Tok::Joiner(m) => {
-                    if pending {
-                        out.push(VIRAMA);
-                        pending = false;
-                    }
+                    close_consonant(&mut out, &mut pending);
                     out.push(m);
                 }
                 Tok::Separator => {
-                    if pending {
-                        out.push(VIRAMA);
-                        pending = false;
-                    }
+                    close_consonant(&mut out, &mut pending);
                 }
             }
         }
-        if pending {
-            out.push(VIRAMA);
-        }
+        close_consonant(&mut out, &mut pending);
         out
     }
 
@@ -404,33 +381,24 @@ impl Compiled {
     }
 
     /// A separator only counts before a token or a raw nukta.
-    fn starts_token(&self, input: &[char], buf: &mut String) -> bool {
+    fn starts_token(&self, input: &[char]) -> bool {
         input.first() == Some(&NUKTA)
-            || matches!(self.longest_match(input, buf), Some((tok, _)) if !matches!(tok, Tok::Separator))
+            || matches!(self.longest_match(input), Some((tok, _)) if !matches!(tok, Tok::Separator))
     }
 
     /// Returns the longest token at the start of `input` and its length in chars.
-    fn longest_match(&self, input: &[char], buf: &mut String) -> Option<(Tok, usize)> {
-        let max = self.longest_token.min(input.len());
-        for len in (1..=max).rev() {
-            buf.clear();
-            buf.extend(&input[..len]);
-            if let Some(&tok) = self.tokens.get(buf.as_str()) {
-                return Some((tok, len));
-            }
-        }
-        None
+    fn longest_match(&self, input: &[char]) -> Option<(Tok, usize)> {
+        self.tokens
+            .longest_match(input.iter().copied())
+            .map(|(&tok, len)| (tok, len))
     }
 
-    /// True if the parser, reading `joined` from its start, would take a token longer than `first`.
-    fn would_merge(&self, first: &str, joined: &str) -> bool {
+    /// True if the parser, reading `first` then `next`, would take a token longer than `first`.
+    fn would_merge(&self, first: &str, next: &str) -> bool {
         let first_len = first.chars().count();
-        let chars: Vec<char> = joined.chars().collect();
-        let mut buf = String::new();
-        match self.longest_match(&chars, &mut buf) {
-            Some((_, len)) => len > first_len,
-            None => false,
-        }
+        self.tokens
+            .longest_match(first.chars().chain(next.chars()))
+            .is_some_and(|(_, len)| len > first_len)
     }
 }
 
@@ -448,6 +416,13 @@ fn nfc_outside_kannada(text: &str) -> Vec<char> {
     }
     out.extend(text[run_start..].nfc());
     out
+}
+
+/// Ends a consonant still waiting for its vowel with a virama.
+fn close_consonant(out: &mut String, pending: &mut bool) {
+    if std::mem::take(pending) {
+        out.push(VIRAMA);
+    }
 }
 
 fn starts_with(input: &[char], prefix: &str) -> bool {
@@ -485,13 +460,11 @@ impl Emitter<'_> {
         let mut piece = piece;
         let prev = &self.out[self.last_start..];
         let dead_then_vowel = self.last == Piece::DeadConsonant && kind == Piece::Vowel;
-        let merges = !prev.is_empty() && self.scheme.would_merge(prev, &format!("{prev}{piece}"));
+        let merges = !prev.is_empty() && self.scheme.would_merge(prev, piece);
         if dead_then_vowel || merges {
             let is_ha = kind == Piece::Consonant && self.scheme.consonant.get(&'ಹ') == Some(&piece);
             match table.ha_breaker {
-                Some(breaker)
-                    if is_ha && !self.scheme.would_merge(prev, &format!("{prev}{breaker}")) =>
-                {
+                Some(breaker) if is_ha && !self.scheme.would_merge(prev, breaker) => {
                     piece = breaker;
                 }
                 _ => self.out.push_str(table.separator),
@@ -525,9 +498,7 @@ impl Emitter<'_> {
         let suffix = self.scheme.table.nukta_suffix;
         let prev = &self.out[self.last_start..];
         match suffix {
-            Some(s) if !self.scheme.would_merge(prev, &format!("{prev}{s}")) => {
-                self.out.push_str(s)
-            }
+            Some(s) if !self.scheme.would_merge(prev, s) => self.out.push_str(s),
             _ => self.out.push(NUKTA),
         }
         self.last = Piece::Consonant;
@@ -596,7 +567,7 @@ mod tests {
     }
 
     #[test]
-    fn iso_input_is_case_insensitive_and_normalised() {
+    fn iso_input_is_case_insensitive_and_normalized() {
         assert_eq!(from_latin("KANNAḌA", Scheme::Iso15919), "ಕನ್ನಡ");
         assert_eq!(
             from_latin("kanna\u{0064}\u{0323}a", Scheme::Iso15919),

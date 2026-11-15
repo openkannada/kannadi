@@ -15,7 +15,7 @@ Version 0.1, in development.
 | Part | State |
 |---|---|
 | Akshara segmentation | Done |
-| Normalisation and Old Kannada modernisation | Done |
+| Normalization and Old Kannada modernization | Done |
 | Transliteration: ISO 15919, IAST, Baraha phonetic | Done |
 | Kannada numerals | Done |
 | Nudi and Baraha to Unicode | Done, waiting on a native reader's check of 100 sample lines |
@@ -33,7 +33,7 @@ use kannadi::{aksharas, fix_zero_as_anusvara, modernize, normalize, numerals, tr
 let parts: Vec<&str> = aksharas("ಸ್ತ್ರೀಯರು").map(|a| a.text).collect();
 assert_eq!(parts, ["ಸ್ತ್ರೀ", "ಯ", "ರು"]);
 
-// Normalisation fixes text that looks right but compares wrong.
+// Normalization fixes text that looks right but compares wrong.
 assert_eq!(normalize("ಕಿ\u{0CD5}ರ್ತಿ"), "ಕೀರ್ತಿ"); // vowel sign typed in 2 parts
 
 // For converted or scanned text: a digit zero typed for an anusvara.
@@ -80,7 +80,7 @@ Run `cargo run --example nudi -- file.txt` to convert a Windows-1252 text file.
 
 The legacy converter uses segmentation to check its own output.
 
-## Normalisation
+## Normalization
 
 `normalize(text)` applies Unicode NFC, then 2 Kannada fixes:
 
@@ -126,6 +126,21 @@ ISO 15919 output is cross-checked against [vidyut-lipi](https://github.com/ambud
 
 See [docs/prior-art.md](docs/prior-art.md).
 
+## Architecture
+
+The crate is split into small modules, each with 1 job:
+
+| Module | Job |
+|---|---|
+| `chars` | Classifies characters in the Kannada block |
+| `akshara` | Splits text into aksharas |
+| `normalize` | Unicode NFC plus Kannada fixes; Old Kannada modernization |
+| `numerals` | Kannada digits: conversion, formatting, parsing |
+| `translit` | 1 engine that romanizes and parses, driven by a table per scheme |
+| `legacy` | Rebuilds Nudi and Baraha glyph sequences as Unicode syllables, driven by the glyph table in `data/nudi.tsv` |
+
+Scheme spellings and legacy glyph layouts are data tables read by 1 engine each. [AGENTS.md](AGENTS.md) has the full guide for contributors.
+
 ## Development
 
 ```sh
@@ -136,7 +151,7 @@ cargo clippy --all-targets
 
 The minimum supported Rust version is 1.75.
 
-## Licence
+## License
 
 MIT. See [LICENSE](LICENSE).
 

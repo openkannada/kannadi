@@ -1,4 +1,4 @@
-//! Romanisation tables. Each table lists the canonical spelling used for output;
+//! Romanization tables. Each table lists the canonical spelling used for output;
 //! `aliases` lists extra spellings accepted on input.
 
 pub(crate) struct Table {

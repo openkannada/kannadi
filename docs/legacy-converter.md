@@ -48,7 +48,7 @@ Each font family is 1 data file, such as `fonts/nudi.toml`. It lists:
 - for each code point, the glyph's role (consonant, vowel, vowel sign part, ottu of a consonant, arkavattu, modifier, digit, punctuation) and its Unicode value;
 - glyph sequences that form 1 letter.
 
-### Decode and tokenise
+### Decode and tokenize
 
 Each input character is mapped to its glyph code, then matched against the longest glyph sequence in the table. Unknown codes become `Unknown(code)` tokens and appear in the report. They are never dropped.
 
@@ -60,7 +60,7 @@ Tokens are grouped 1 visual syllable at a time: a base, then the vowel sign part
 [ರ ್ if arkavattu] base [nukta] (್ ottu consonant)* vowel sign, modifiers
 ```
 
-### Join, normalise, check
+### Join, normalize, check
 
 Vowel sign parts are joined into 1 sign. Then `kannadi::normalize` runs, which already fixes Unicode pairs and the digit zero typed for an anusvara. Finally `kannadi::aksharas` splits the result, and any segment that is not a well-formed akshara is flagged.
 

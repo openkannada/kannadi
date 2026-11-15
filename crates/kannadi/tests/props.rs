@@ -2,7 +2,7 @@ use kannadi::chars::{class, Class};
 use kannadi::{aksharas, from_latin, modernize, normalize, numerals, split, to_latin, Scheme};
 use proptest::prelude::*;
 
-/// Every assigned character in the Kannada block except digits, which romanise to ASCII.
+/// Every assigned character in the Kannada block except digits, which romanize to ASCII.
 fn kannada_chars() -> Vec<char> {
     ('\u{0C80}'..='\u{0CFF}')
         .filter(|&c| class(c) != Class::Digit)

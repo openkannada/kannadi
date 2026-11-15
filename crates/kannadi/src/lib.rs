@@ -21,6 +21,7 @@
 pub mod akshara;
 pub mod chars;
 pub mod legacy;
+mod lookup;
 pub mod normalize;
 pub mod numerals;
 pub mod translit;

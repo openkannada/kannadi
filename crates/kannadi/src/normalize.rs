@@ -1,10 +1,10 @@
-//! Normalisation and modernisation.
+//! Normalization and modernization.
 
 use unicode_normalization::UnicodeNormalization;
 
-use crate::chars::{class, is_consonant, Class, LLLA, NAKAARA_POLLU, RRA, VIRAMA, ZWNJ};
+use crate::chars::{class, is_consonant, Class, ANUSVARA, LLLA, NAKAARA_POLLU, RRA, VIRAMA, ZWNJ};
 
-/// Normalises Kannada text so that equal-looking text compares equal.
+/// Normalizes Kannada text so that equal-looking text compares equal.
 ///
 /// Steps, in order:
 ///
@@ -29,22 +29,16 @@ pub fn normalize(text: &str) -> String {
         match (prev, c) {
             (Some('ಉ'), 'ಾ') => *out.last_mut().unwrap() = 'ಊ',
             (Some('ಋ'), 'ಾ') => *out.last_mut().unwrap() = 'ೠ',
-            (Some(p), c) if p == c && is_mark(c) => {}
+            (Some(p), c) if p == c && class(c).is_mark() => {}
             _ => out.push(c),
         }
     }
     out.into_iter().nfc().collect()
 }
 
-fn is_mark(c: char) -> bool {
-    matches!(
-        class(c),
-        Class::VowelSign | Class::Virama | Class::Nukta | Class::Modifier
-    )
-}
-
 fn is_letter_or_mark(c: char) -> bool {
-    matches!(class(c), Class::Vowel | Class::Consonant) || is_mark(c)
+    let c = class(c);
+    matches!(c, Class::Vowel | Class::Consonant) || c.is_mark()
 }
 
 /// Replaces a Kannada digit zero (೦) written right after a letter or sign with an
@@ -62,7 +56,7 @@ pub fn fix_zero_as_anusvara(text: &str) -> String {
     let mut prev: Option<char> = None;
     for c in text.chars() {
         match prev {
-            Some(p) if c == '೦' && is_letter_or_mark(p) => out.push('ಂ'),
+            Some(p) if c == '೦' && is_letter_or_mark(p) => out.push(ANUSVARA),
             _ => out.push(c),
         }
         prev = Some(c);

@@ -51,6 +51,16 @@ pub enum Class {
     Other,
 }
 
+impl Class {
+    /// True for signs that attach to a letter: vowel signs, virama, nukta and modifiers.
+    pub const fn is_mark(self) -> bool {
+        matches!(
+            self,
+            Class::VowelSign | Class::Virama | Class::Nukta | Class::Modifier
+        )
+    }
+}
+
 /// Classifies a character.
 pub fn class(c: char) -> Class {
     match c {
