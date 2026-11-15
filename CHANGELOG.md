@@ -19,3 +19,4 @@
 - `Akshara::is_well_formed`: finds stray signs, signs on vowel letters and doubled vowel signs in Unicode text.
 - `kannadi-wasm`: `malformed`, `fixes`, `countAksharas`, `modernize`, and unknown glyph offsets in the converted text.
 - Nudi and Baraha ANSI to Unicode (`legacy::nudi_to_unicode`), with a glyph table derived from the font files, reports of unknown glyphs and malformed syllables, and fixtures from Karnataka government pages.
+- `tools/fontqa`: HarfBuzz shaping tests for Kannada fonts, results for 41 fonts (146 faces) with a data card, proof sheets, and fixes for broken `knd2` tables, broken `morx` tables and missing ೄ, ೢ and ೣ.

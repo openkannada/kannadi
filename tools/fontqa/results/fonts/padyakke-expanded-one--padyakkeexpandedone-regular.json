@@ -1,0 +1,118 @@
+{
+ "summary": {
+  "face_id": "padyakke-expanded-one--padyakkeexpandedone-regular",
+  "font_id": "padyakke-expanded-one",
+  "family": "Padyakke Expanded One",
+  "style": "Regular",
+  "version": "Version 1.500; ttfautohint (v1.8.4.7-5d5b)",
+  "license": "OFL-1.1",
+  "license_in_font": "This Font Software is licensed under the SIL Open Font License, Version 1.1. This license is available with a FAQ at: http://scripts.sil.org/OFL",
+  "source": "Google Fonts",
+  "file": "PadyakkeExpandedOne-Regular.ttf",
+  "face_index": 0,
+  "sha256": "fcdc6cb3fc277895c98fc120acaf12d421c911bba768eba2891049b5df225032",
+  "variable": false,
+  "outlines": "TrueType",
+  "gsub_scripts": "DFLT knd2 knda latn",
+  "kannada_codepoints": 87,
+  "glyph_count": 996,
+  "cases": 2146,
+  "failing_cases": 6,
+  "missing_glyph": 4,
+  "notdef": 0,
+  "dotted_circle": 0,
+  "no_conjunct": 0,
+  "no_arkavattu": 0,
+  "collision": 2,
+  "indistinct": 0,
+  "missing_codepoints": "U+0CDC U+0CDD U+0CF3"
+ },
+ "font": {
+  "family": "Padyakke Expanded One",
+  "style": "Regular",
+  "full_name": "Padyakke Expanded One Regular",
+  "version": "Version 1.500; ttfautohint (v1.8.4.7-5d5b)",
+  "license_name": "This Font Software is licensed under the SIL Open Font License, Version 1.1. This license is available with a FAQ at: http://scripts.sil.org/OFL",
+  "license_url": "http://scripts.sil.org/OFL",
+  "copyright": "Copyright 2015 The Padyakke Project Authors (https://github.com/DunwichType/Padyakke_Libre)",
+  "designer": "James Puckett",
+  "vendor": "NONE",
+  "glyph_count": 996,
+  "units_per_em": 1000,
+  "variable": false,
+  "axes": [],
+  "outlines": "TrueType",
+  "script_tags": {
+   "GSUB": [
+    "DFLT",
+    "knd2",
+    "knda",
+    "latn"
+   ],
+   "GPOS": [
+    "DFLT",
+    "knd2",
+    "knda",
+    "latn"
+   ]
+  },
+  "aat_morx": false,
+  "kannada_codepoints": 87
+ },
+ "failures": [
+  {
+   "case_id": "sig-0CAA-0CCD-0CAA-0CC3",
+   "group": "signed_cluster",
+   "text": "ಪ್ಪೃ",
+   "codepoints": "U+0CAA U+0CCD U+0CAA U+0CC3",
+   "failures": "collision",
+   "glyphs": "uni0CAA uni0CCD0CAA uni0CC3.following",
+   "detail": "uni0CCD0CAA x uni0CC3.following 7%"
+  },
+  {
+   "case_id": "sig-0CAA-0CCD-0CAA-0CC8",
+   "group": "signed_cluster",
+   "text": "ಪ್ಪೈ",
+   "codepoints": "U+0CAA U+0CCD U+0CAA U+0CC8",
+   "failures": "collision",
+   "glyphs": "uni0CAA0CC6 uni0CCD0CAA uni0CD6.following",
+   "detail": "uni0CCD0CAA x uni0CD6.following 7%"
+  },
+  {
+   "case_id": "rare-0CDD",
+   "group": "rare",
+   "text": "ಅವನೝ",
+   "codepoints": "U+0C85 U+0CB5 U+0CA8 U+0CDD",
+   "failures": "missing_glyph",
+   "glyphs": "uni0C85 uni0CB5 uni0CA8 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "rare-0CF3",
+   "group": "rare",
+   "text": "ಕೳ",
+   "codepoints": "U+0C95 U+0CF3",
+   "failures": "missing_glyph",
+   "glyphs": "uni0C95 .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "rare-0CDC",
+   "group": "rare",
+   "text": "೜",
+   "codepoints": "U+0CDC",
+   "failures": "missing_glyph",
+   "glyphs": ".notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "rare-0CDC-word",
+   "group": "rare",
+   "text": "೜ಗಣೇಶ",
+   "codepoints": "U+0CDC U+0C97 U+0CA3 U+0CC7 U+0CB6",
+   "failures": "missing_glyph",
+   "glyphs": ".notdef uni0C97 uni0CA30CC6 uni0CD5 uni0CB6",
+   "detail": ""
+  }
+ ]
+}
