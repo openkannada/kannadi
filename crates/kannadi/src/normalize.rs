@@ -2,7 +2,7 @@
 
 use unicode_normalization::UnicodeNormalization;
 
-use crate::chars::{class, Class, LLLA, NAKAARA_POLLU, RRA, VIRAMA};
+use crate::chars::{class, is_consonant, Class, LLLA, NAKAARA_POLLU, RRA, VIRAMA, ZWNJ};
 
 /// Normalises Kannada text so that equal-looking text compares equal.
 ///
@@ -12,17 +12,14 @@ use crate::chars::{class, Class, LLLA, NAKAARA_POLLU, RRA, VIRAMA};
 ///    ೆ + ೂ becomes ೊ, ೆ + ೂ + ೕ becomes ೋ.
 /// 2. Look-alike vowel letters that Unicode says not to build from parts:
 ///    ಉ + ಾ becomes ಊ, ಋ + ಾ becomes ೠ.
-/// 3. A Kannada digit zero (೦) right after a letter or sign becomes an anusvara (ಂ).
-///    Legacy fonts and OCR often confuse the two; a digit never follows a letter
-///    inside a Kannada word.
-/// 4. A combining mark repeated twice in a row (for example ್್ or ಂಂ) is kept once.
-/// 5. NFC again, in case step 4 made a new composable pair.
+/// 3. A combining mark repeated twice in a row (for example ್್ or ಂಂ) is kept once.
+/// 4. NFC again, in case step 3 made a new composable pair.
 ///
-/// Text outside the Kannada block is only touched by NFC.
+/// Text outside the Kannada block is only touched by NFC. For text from legacy fonts
+/// or OCR, see also [`fix_zero_as_anusvara`].
 ///
 /// ```
 /// assert_eq!(kannadi::normalize("ಕಿ\u{0CD5}ರ್ತಿ"), "ಕೀರ್ತಿ");
-/// assert_eq!(kannadi::normalize("ಕ೦ದ"), "ಕಂದ");
 /// ```
 pub fn normalize(text: &str) -> String {
     let composed: Vec<char> = text.nfc().collect();
@@ -32,7 +29,6 @@ pub fn normalize(text: &str) -> String {
         match (prev, c) {
             (Some('ಉ'), 'ಾ') => *out.last_mut().unwrap() = 'ಊ',
             (Some('ಋ'), 'ಾ') => *out.last_mut().unwrap() = 'ೠ',
-            (Some(p), '೦') if is_letter_or_mark(p) => out.push('ಂ'),
             (Some(p), c) if p == c && is_mark(c) => {}
             _ => out.push(c),
         }
@@ -51,24 +47,54 @@ fn is_letter_or_mark(c: char) -> bool {
     matches!(class(c), Class::Vowel | Class::Consonant) || is_mark(c)
 }
 
+/// Replaces a Kannada digit zero (೦) written right after a letter or sign with an
+/// anusvara (ಂ). Legacy fonts and OCR often confuse the two.
+///
+/// Use this on converted or scanned text only: a number written directly after a
+/// word, such as ಕೊಠಡಿ೦೧, is changed too.
+///
+/// ```
+/// assert_eq!(kannadi::fix_zero_as_anusvara("ಬೆ೦ಗಳೂರು"), "ಬೆಂಗಳೂರು");
+/// assert_eq!(kannadi::fix_zero_as_anusvara("೧೦೦"), "೧೦೦");
+/// ```
+pub fn fix_zero_as_anusvara(text: &str) -> String {
+    let mut out = String::with_capacity(text.len());
+    let mut prev: Option<char> = None;
+    for c in text.chars() {
+        let fixed = match prev {
+            Some(p) if c == '೦' && is_letter_or_mark(p) => 'ಂ',
+            _ => c,
+        };
+        out.push(fixed);
+        prev = Some(fixed);
+    }
+    out
+}
+
 /// Maps Old Kannada letters to their modern equivalents, for search and indexing.
 ///
 /// - ೞ (LLLA) becomes ಳ
 /// - ಱ (RRA) becomes ರ
-/// - ೝ (nakaara pollu) becomes ನ್
+/// - ೝ (nakaara pollu) becomes ನ್, followed by ZWNJ when a consonant comes next,
+///   so it does not join that consonant into a conjunct
 ///
 /// ```
-/// assert_eq!(kannadi::modernise("ಅಱಿವು ಬಾೞ್"), "ಅರಿವು ಬಾಳ್");
+/// assert_eq!(kannadi::modernize("ಅಱಿವು ಬಾೞ್"), "ಅರಿವು ಬಾಳ್");
+/// assert_eq!(kannadi::modernize("ಅವೝಕಂಡ"), "ಅವನ್\u{200C}ಕಂಡ");
 /// ```
-pub fn modernise(text: &str) -> String {
+pub fn modernize(text: &str) -> String {
     let mut out = String::with_capacity(text.len());
-    for c in text.chars() {
+    let mut chars = text.chars().peekable();
+    while let Some(c) = chars.next() {
         match c {
             LLLA => out.push('ಳ'),
             RRA => out.push('ರ'),
             NAKAARA_POLLU => {
                 out.push('ನ');
                 out.push(VIRAMA);
+                if chars.peek().is_some_and(|&n| is_consonant(n)) {
+                    out.push(ZWNJ);
+                }
             }
             _ => out.push(c),
         }
@@ -76,7 +102,7 @@ pub fn modernise(text: &str) -> String {
     out
 }
 
-/// True if `text` contains an Old Kannada letter that [`modernise`] would change.
+/// True if `text` contains an Old Kannada letter that [`modernize`] would change.
 pub fn has_old_kannada(text: &str) -> bool {
     text.chars()
         .any(|c| matches!(c, LLLA | RRA | NAKAARA_POLLU))
@@ -103,11 +129,17 @@ mod tests {
 
     #[test]
     fn zero_after_letter_becomes_anusvara() {
-        assert_eq!(normalize("ಬೆ೦ಗಳೂರು"), "ಬೆಂಗಳೂರು");
-        assert_eq!(normalize("ಅ೦ಗಡಿ"), "ಅಂಗಡಿ");
-        assert_eq!(normalize("೧೦೦"), "೧೦೦");
-        assert_eq!(normalize("೦"), "೦");
-        assert_eq!(normalize("ಕ ೦"), "ಕ ೦");
+        assert_eq!(fix_zero_as_anusvara("ಬೆ೦ಗಳೂರು"), "ಬೆಂಗಳೂರು");
+        assert_eq!(fix_zero_as_anusvara("ಅ೦ಗಡಿ"), "ಅಂಗಡಿ");
+        assert_eq!(fix_zero_as_anusvara("೧೦೦"), "೧೦೦");
+        assert_eq!(fix_zero_as_anusvara("೦"), "೦");
+        assert_eq!(fix_zero_as_anusvara("ಕ ೦"), "ಕ ೦");
+    }
+
+    #[test]
+    fn normalize_leaves_numbers_after_words_alone() {
+        assert_eq!(normalize("ಕೊಠಡಿ೦೧"), "ಕೊಠಡಿ೦೧");
+        assert_eq!(normalize("ಬೆ೦ಗಳೂರು"), "ಬೆ೦ಗಳೂರು");
     }
 
     #[test]
@@ -118,11 +150,13 @@ mod tests {
     }
 
     #[test]
-    fn modernise_maps_old_letters() {
-        assert_eq!(modernise("ಕೞ್ತೆ"), "ಕಳ್ತೆ");
-        assert_eq!(modernise("ಅಱಿ"), "ಅರಿ");
-        assert_eq!(modernise("ಅವೝ"), "ಅವನ್");
-        assert_eq!(modernise("plain ಕನ್ನಡ"), "plain ಕನ್ನಡ");
+    fn modernize_maps_old_letters() {
+        assert_eq!(modernize("ಕೞ್ತೆ"), "ಕಳ್ತೆ");
+        assert_eq!(modernize("ಅಱಿ"), "ಅರಿ");
+        assert_eq!(modernize("ಅವೝ"), "ಅವನ್");
+        assert_eq!(modernize("ಅವೝ ಕಂಡ"), "ಅವನ್ ಕಂಡ");
+        assert_eq!(modernize("ಅವೝಕಂಡ"), "ಅವನ್\u{200C}ಕಂಡ");
+        assert_eq!(modernize("plain ಕನ್ನಡ"), "plain ಕನ್ನಡ");
         assert!(has_old_kannada("ಅಱಿ"));
         assert!(!has_old_kannada("ಅರಿ"));
     }

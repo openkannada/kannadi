@@ -1,5 +1,5 @@
 use kannadi::chars::{class, Class};
-use kannadi::{aksharas, from_latin, modernise, normalize, numerals, split, to_latin, Scheme};
+use kannadi::{aksharas, from_latin, modernize, normalize, numerals, split, to_latin, Scheme};
 use proptest::prelude::*;
 
 /// Every assigned character in the Kannada block except digits, which romanise to ASCII.
@@ -19,13 +19,15 @@ fn is_assigned(c: char) -> bool {
     )
 }
 
-/// Any sequence of Kannada characters, spaces, joiners and ASCII punctuation that no
-/// scheme uses as a letter or separator.
+/// Any sequence of Kannada characters, spaces, joiners, digits and ASCII punctuation,
+/// including the characters schemes use as separators and escapes.
 fn kannada_text() -> impl Strategy<Value = String> {
     let mut pool = kannada_chars();
     pool.extend([
         ' ', ' ', '\u{200C}', '\u{200D}', ',', '.', '?', '0', '7', '\n',
     ]);
+    // Characters that schemes use in tokens, separators or escapes.
+    pool.extend([':', '\'', '\u{2019}', '_', '^', '~', '@', '\\', '\u{0951}']);
     prop::collection::vec(prop::sample::select(pool), 0..40).prop_map(|v| v.into_iter().collect())
 }
 
@@ -111,8 +113,9 @@ proptest! {
     fn segments_cover_kannada_exactly(s in kannada_text()) {
         let parts = split(&s);
         prop_assert_eq!(parts.concat(), s.clone());
-        let again: Vec<String> = split(&parts.concat()).into_iter().map(String::from).collect();
-        prop_assert_eq!(again, parts.iter().map(|p| p.to_string()).collect::<Vec<_>>());
+        for part in &parts {
+            prop_assert_eq!(split(part), vec![*part], "segment {:?} of {:?}", part, s);
+        }
     }
 
     #[test]
@@ -127,10 +130,10 @@ proptest! {
     }
 
     #[test]
-    fn modernise_removes_old_letters(s in kannada_text()) {
-        let m = modernise(&s);
+    fn modernize_removes_old_letters(s in kannada_text()) {
+        let m = modernize(&s);
         prop_assert!(!kannadi::has_old_kannada(&m));
-        prop_assert_eq!(modernise(&m), m);
+        prop_assert_eq!(modernize(&m), m);
     }
 
     #[test]

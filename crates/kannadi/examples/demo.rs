@@ -1,6 +1,6 @@
 //! Prints each feature on a sample sentence: `cargo run --example demo`.
 
-use kannadi::{aksharas, modernise, normalize, numerals, transliterate, Scheme};
+use kannadi::{aksharas, fix_zero_as_anusvara, modernize, numerals, transliterate, Scheme};
 
 fn main() {
     let text = "ಕನ್ನಡ ನಾಡು ೧೯೫೬";
@@ -12,7 +12,7 @@ fn main() {
     }
     let parts: Vec<&str> = aksharas("ಸ್ತ್ರೀಯರು").map(|a| a.text).collect();
     println!(" aksharas: {}", parts.join(" | "));
-    println!("normalise: {}", normalize("ಬೆ೦ಗಳೂರು"));
-    println!("modernise: {}", modernise("ಅಱಿವು ಬಾೞ್"));
+    println!(" zero fix: {}", fix_zero_as_anusvara("ಬೆ೦ಗಳೂರು"));
+    println!("modernize: {}", modernize("ಅಱಿವು ಬಾೞ್"));
     println!("  numbers: {}", numerals::format(2026));
 }

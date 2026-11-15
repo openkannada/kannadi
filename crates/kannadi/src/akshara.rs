@@ -15,7 +15,7 @@
 //! a vowel sign in a chart). Concatenating the segments always gives back the
 //! input exactly.
 
-use crate::chars::{class, Class};
+use crate::chars::{class, Class, NAKAARA_POLLU};
 
 /// What kind of segment an [`Akshara`] is.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -127,6 +127,7 @@ impl<'a> Iterator for Aksharas<'a> {
                 consonant_cluster(&mut cur);
                 AksharaKind::Consonant
             }
+            _ if first == NAKAARA_POLLU => AksharaKind::Consonant,
             _ => {
                 cur.eat_while(is_mark);
                 AksharaKind::Other
@@ -219,6 +220,17 @@ mod tests {
             ["\u{25CC}ಾ", " ", "a", "b", " ", "೧", "೨"]
         );
         assert_eq!(split("್ಕ"), ["್", "ಕ"]);
+    }
+
+    #[test]
+    fn nakaara_pollu_is_a_consonant_akshara() {
+        assert_eq!(split("ಅವೝ"), ["ಅ", "ವ", "ೝ"]);
+        assert_eq!(count_aksharas("ಅವೝ"), 3);
+    }
+
+    #[test]
+    fn vedic_accents_stay_with_their_syllable() {
+        assert_eq!(split("ಅ\u{0951}ಗ್ನಿ"), ["ಅ\u{0951}", "ಗ್ನಿ"]);
     }
 
     #[test]

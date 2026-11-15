@@ -118,7 +118,7 @@ pub(crate) static ISO_15919: Table = Table {
         ("'", 'ಽ'),
     ],
     joiners: &[],
-    aliases: &[("ṃ", "ṁ"), ("ṛ", "r̥"), ("ṝ", "r̥̄"), ("’", "'")],
+    aliases: &[("ṃ", "ṁ")],
     separator: ":",
     nukta_suffix: None,
     ha_breaker: None,
@@ -126,7 +126,7 @@ pub(crate) static ISO_15919: Table = Table {
 };
 
 /// IAST, extended for Kannada with ē, ō, ṟ, ḷ (ಳ) and ḻ (ೞ). Vocalic l is written
-/// l̥ as in ISO 15919, because IAST's ḷ is used for ಳ.
+/// l̥ as in ISO 15919, because IAST's ḷ is used for ಳ. Long vocalic l is also read as ḹ.
 pub(crate) static IAST: Table = Table {
     vowels: IAST_VOWELS,
     consonants: ISO_CONSONANTS,
@@ -140,7 +140,7 @@ pub(crate) static IAST: Table = Table {
         ("'", 'ಽ'),
     ],
     joiners: &[],
-    aliases: &[("ṁ", "ṃ"), ("r̥", "ṛ"), ("r̥̄", "ṝ"), ("’", "'")],
+    aliases: &[("ṁ", "ṃ"), ("r̥", "ṛ"), ("r̥̄", "ṝ"), ("ḹ", "l̥̄")],
     separator: ":",
     nukta_suffix: None,
     ha_breaker: None,

@@ -2,7 +2,7 @@
 //!
 //! - [`aksharas()`]: split text into aksharas (orthographic syllables).
 //! - [`normalize()`]: make equal-looking Kannada text compare equal.
-//! - [`modernise()`]: map Old Kannada letters (ೞ, ಱ, ೝ) to modern ones.
+//! - [`modernize()`]: map Old Kannada letters (ೞ, ಱ, ೝ) to modern ones.
 //! - [`transliterate()`]: Kannada to and from ISO 15919, IAST and Baraha phonetic.
 //! - [`numerals`]: Kannada digits.
 //!
@@ -24,7 +24,7 @@ pub mod numerals;
 pub mod translit;
 
 pub use akshara::{aksharas, count_aksharas, split, Akshara, AksharaKind, Aksharas};
-pub use normalize::{has_old_kannada, modernise, normalize};
+pub use normalize::{fix_zero_as_anusvara, has_old_kannada, modernize, normalize};
 pub use translit::{from_latin, to_latin, transliterate, Scheme, UnknownScheme};
 
 /// Runs the README examples as doctests.

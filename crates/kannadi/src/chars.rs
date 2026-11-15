@@ -35,7 +35,8 @@ pub enum Class {
     /// Nukta.
     Nukta,
     /// Sign that follows a syllable: anusvara, visarga, candrabindu,
-    /// jihvamuliya, upadhmaniya, or the combining anusvara above right.
+    /// jihvamuliya, upadhmaniya, the combining anusvara above right, or a
+    /// Vedic accent mark used with Kannada (U+0951 to U+0954, U+1CD0 to U+1CF9).
     Modifier,
     /// Kannada digit ೦ to ೯.
     Digit,
@@ -66,6 +67,12 @@ pub fn class(c: char) -> Class {
         VIRAMA => Class::Virama,
         NUKTA => Class::Nukta,
         '\u{0C81}'..='\u{0C83}' | '\u{0CF1}'..='\u{0CF3}' => Class::Modifier,
+        '\u{0951}'..='\u{0954}'
+        | '\u{1CD0}'..='\u{1CD2}'
+        | '\u{1CD4}'..='\u{1CE8}'
+        | '\u{1CED}'
+        | '\u{1CF4}'
+        | '\u{1CF7}'..='\u{1CF9}' => Class::Modifier,
         '\u{0CE6}'..='\u{0CEF}' => Class::Digit,
         ZWJ => Class::Zwj,
         ZWNJ => Class::Zwnj,
@@ -107,6 +114,7 @@ mod tests {
         assert_eq!(class('ಂ'), Class::Modifier);
         assert_eq!(class('೭'), Class::Digit);
         assert_eq!(class('a'), Class::Other);
+        assert_eq!(class('\u{0951}'), Class::Modifier);
     }
 
     #[test]

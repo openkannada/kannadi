@@ -1,28 +1,34 @@
 //! Transliteration between Kannada script and Latin.
 //!
 //! Supported schemes: ISO 15919, IAST (extended for Kannada) and Baraha phonetic.
-//! All of them cover the Old Kannada letters ಱ and ೞ, nakaara pollu, the rare
-//! vowels ೠ ಌ ೡ and their signs, candrabindu, jihvamuliya and upadhmaniya.
+//! All of them cover the Old Kannada letters ಱ and ೞ, the rare vowels ೠ ಌ ೡ and
+//! their signs, candrabindu, jihvamuliya and upadhmaniya.
 //!
-//! Kannada to Latin and back is lossless for Kannada text: when two letters would
-//! otherwise read as one, the scheme's separator is written between them
-//! (`k:h` for ಕ್ಹ in ISO 15919, `bakkiMg~hAm` in Baraha). Characters a scheme
-//! has no spelling for, such as ZWNJ in ISO 15919, pass through unchanged and
-//! survive the round trip. Kannada digits become ASCII digits.
+//! Kannada to Latin and back is lossless for Kannada text, apart from digits:
+//! - when two letters would otherwise read as one, the scheme's separator goes
+//!   between them (`k:h` for ಕ್ಹ in ISO 15919, `bakkiMg~hAm` in Baraha);
+//! - characters a scheme has no spelling for, such as ZWNJ or nakaara pollu,
+//!   pass through unchanged;
+//! - a literal character the scheme would read as a token is written with a
+//!   backslash, such as `\'` for an apostrophe in ISO 15919;
+//! - Kannada digits become ASCII digits.
 //!
 //! Latin to Kannada converts every Latin letter it can read, so English words
 //! mixed into Latin input are converted too.
 
 mod schemes;
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::fmt;
 use std::str::FromStr;
 use std::sync::OnceLock;
 
 use unicode_normalization::UnicodeNormalization;
 
-use crate::chars::{class, is_kannada, Class, NUKTA, VIRAMA};
+use crate::chars::{class, is_kannada, Class, NUKTA, VIRAMA, ZWJ, ZWNJ};
+
+/// Marks the next character as literal text in romanised output.
+const ESCAPE: char = '\\';
 use crate::numerals::to_ascii_digit;
 use schemes::Table;
 
@@ -165,6 +171,8 @@ struct Compiled {
     tokens: HashMap<String, Tok>,
     longest_token: usize,
     inherent: &'static str,
+    /// Characters that start a token but are not letters; written with a backslash when literal.
+    escaped: HashSet<char>,
 }
 
 impl Compiled {
@@ -220,6 +228,13 @@ impl Compiled {
         }
         tokens.insert(table.separator.into(), Tok::Separator);
         let longest_token = tokens.keys().map(|k| k.chars().count()).max().unwrap_or(1);
+        let separator = table.separator.chars().next();
+        let mut escaped: HashSet<char> = tokens
+            .keys()
+            .filter_map(|k| k.chars().next())
+            .filter(|c| !c.is_alphabetic() && Some(*c) != separator)
+            .collect();
+        escaped.insert(ESCAPE);
         Compiled {
             table,
             consonant,
@@ -230,6 +245,7 @@ impl Compiled {
             tokens,
             longest_token,
             inherent,
+            escaped,
         }
     }
 
@@ -239,6 +255,7 @@ impl Compiled {
             out: String::with_capacity(text.len()),
             last_start: 0,
             last: Piece::Other,
+            last_is_token: false,
         };
         let mut chars = text.chars().peekable();
         while let Some(c) = chars.next() {
@@ -268,10 +285,10 @@ impl Compiled {
                     out.push(self.sign[&c], Piece::Vowel);
                 }
                 Class::Vowel => out.push(self.vowel[&c], Piece::Vowel),
-                Class::Digit => out.push_char(to_ascii_digit(c)),
+                Class::Digit => out.push_char(to_ascii_digit(c), None),
                 _ => match self.mark.get(&c) {
                     Some(latin) => out.push(latin, Piece::Other),
-                    None => out.push_char(c),
+                    None => out.push_char(c, chars.peek().copied()),
                 },
             }
         }
@@ -288,9 +305,20 @@ impl Compiled {
         }
         let mut out = String::with_capacity(text.len() * 2);
         let mut pending = false;
+        let mut after_token = false;
         let mut i = 0;
         let mut buf = String::new();
         while i < input.len() {
+            if input[i] == ESCAPE && i + 1 < input.len() {
+                if pending {
+                    out.push(VIRAMA);
+                    pending = false;
+                }
+                out.push(input[i + 1]);
+                after_token = false;
+                i += 2;
+                continue;
+            }
             if pending {
                 if input[i] == NUKTA {
                     out.push(NUKTA);
@@ -313,9 +341,23 @@ impl Compiled {
                     pending = false;
                 }
                 out.push(input[i]);
+                after_token = false;
                 i += 1;
                 continue;
             };
+            if matches!(tok, Tok::Separator)
+                && !(after_token && self.starts_token(&input[i + len..], &mut buf))
+            {
+                if pending {
+                    out.push(VIRAMA);
+                    pending = false;
+                }
+                out.extend(&input[i..i + len]);
+                after_token = false;
+                i += len;
+                continue;
+            }
+            after_token = true;
             i += len;
             match tok {
                 Tok::Vowel { letter, sign } => {
@@ -355,6 +397,13 @@ impl Compiled {
             out.push(VIRAMA);
         }
         out
+    }
+
+    /// True if `input` begins with a token other than a separator, or a raw nukta, so a
+    /// separator before it is meaningful.
+    fn starts_token(&self, input: &[char], buf: &mut String) -> bool {
+        input.first() == Some(&NUKTA)
+            || matches!(self.longest_match(input, buf), Some((tok, _)) if !matches!(tok, Tok::Separator))
     }
 
     /// Finds the longest token at the start of `input`, returning it and its length in chars.
@@ -423,6 +472,8 @@ struct Emitter<'a> {
     /// Byte offset in `out` where the last token-shaped piece starts.
     last_start: usize,
     last: Piece,
+    /// Whether the last thing written was a scheme token, as opposed to pass-through text.
+    last_is_token: bool,
 }
 
 impl Emitter<'_> {
@@ -446,15 +497,24 @@ impl Emitter<'_> {
         self.last_start = self.out.len();
         self.out.push_str(piece);
         self.last = kind;
+        self.last_is_token = true;
     }
 
-    fn push_char(&mut self, c: char) {
+    /// Writes a character with no spelling in the scheme. `next` is the following input character.
+    fn push_char(&mut self, c: char, next: Option<char>) {
         if c == NUKTA && self.last == Piece::DeadConsonant {
             self.out.push_str(self.scheme.table.separator);
         }
         self.last_start = self.out.len();
+        let separator = self.scheme.table.separator.starts_with(c);
+        let may_start_token = next.is_some_and(|n| is_kannada(n) || n == ZWJ || n == ZWNJ);
+        if self.scheme.escaped.contains(&c) || (separator && self.last_is_token && may_start_token)
+        {
+            self.out.push(ESCAPE);
+        }
         self.out.push(c);
         self.last = Piece::Other;
+        self.last_is_token = false;
     }
 
     /// Adds a nukta to the consonant just written, keeping it open for a vowel.
@@ -544,6 +604,60 @@ mod tests {
     #[test]
     fn digits_become_ascii_and_others_pass_through() {
         assert_eq!(iso("ಪುಟ ೧೨, ZWNJ ಡ್\u{200C}ಗೆ"), "puṭa 12, ZWNJ ḍ\u{200C}ge");
+    }
+
+    fn roundtrip(kn: &str) {
+        for scheme in [Scheme::Iso15919, Scheme::Iast, Scheme::Baraha] {
+            let latin = to_latin(kn, scheme);
+            assert_eq!(
+                from_latin(&latin, scheme),
+                kn,
+                "{kn} via {scheme} as {latin}"
+            );
+        }
+    }
+
+    #[test]
+    fn colons_in_text_survive() {
+        assert_eq!(iso("ಸಮಯ: ೧೦:೩೦"), "samaya: 10:30");
+        assert_eq!(from_latin("samaya: 10:30", Scheme::Iso15919), "ಸಮಯ: 10:30");
+        assert_eq!(iso("ಕ:ಹ"), "ka\\:ha");
+        roundtrip("ಕ:ಹ");
+        roundtrip("ಸಮಯ: 10:30");
+    }
+
+    #[test]
+    fn quote_marks_are_not_avagraha() {
+        assert_eq!(iso("'ಕನ್ನಡ'"), "\\'kannaḍa\\'");
+        roundtrip("'ಕನ್ನಡ'");
+        roundtrip("\u{2018}ಕನ್ನಡ\u{2019}");
+        assert_eq!(from_latin("so'ham", Scheme::Iso15919), "ಸೊಽಹಮ್");
+        assert_eq!(from_latin("‘kannaḍa’", Scheme::Iso15919), "‘ಕನ್ನಡ’");
+    }
+
+    #[test]
+    fn baraha_metacharacters_in_text_survive() {
+        roundtrip("ಕ~ರು");
+        roundtrip("ಮನೆ@ಅವ");
+        roundtrip("ಕ_ಖ");
+        roundtrip("ಅ^ಬ");
+        roundtrip("ಕ\\ಬ");
+        assert_eq!(to_latin("ಕ~ರು", Scheme::Baraha), "ka\\~ru");
+    }
+
+    #[test]
+    fn separators_still_work_between_letters() {
+        roundtrip("ಕ್ಹ");
+        roundtrip("ಕಇ");
+        roundtrip("ಕ್\u{0CBC}");
+        roundtrip("\u{200D}\u{200D}");
+    }
+
+    #[test]
+    fn iso_flap_r_is_not_vocalic_r() {
+        assert_eq!(from_latin("ṛ", Scheme::Iso15919), "ṛ");
+        assert_eq!(from_latin("ṛ", Scheme::Iast), "ಋ");
+        assert_eq!(from_latin("kḹ", Scheme::Iast), "ಕೣ");
     }
 
     #[test]
