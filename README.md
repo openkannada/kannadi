@@ -81,12 +81,12 @@ use kannadi::legacy::unicode_to_nudi;
 
 let encoded = unicode_to_nudi("ಕನ್ನಡ");
 assert_eq!(encoded.text, "PÀ£ÀßqÀ");
-assert!(encoded.is_complete());
+assert!(encoded.is_clean());
 ```
 
-- **Storage order.** Each akshara is written the way typists stored it: the consonant shape, the vowel sign, the subscripts, the length marks ೕ and ೖ, the arkavattu, then ಂ or ಃ. Where the layout has 2 glyphs for 1 sign, such as the ು of ವು or a second subscript ರ, the table marks which one the font uses there. On 9,047 words from the 2002 government pages, 9,029 encode to the exact bytes that were typed. The rest differ in typing habits: a zero for ಂ, an extra spacing glyph, or ರ್ typed as its own syllable.
+- **Storage order.** Each akshara is written the way typists stored it: the consonant shape, the vowel sign, the subscripts, ೃ and the length marks ೕ and ೖ, the arkavattu, then ಂ or ಃ. Where the layout has 2 glyphs for 1 sign, such as the ು of ವು or a second subscript ರ, the table marks which one the font uses there. On 9,047 words from 35 Karnataka government pages from 2002, 9,029 encode to the exact bytes that were typed. The rest differ in typing habits: a zero for ಂ, an extra spacing glyph, or ರ್ typed as its own syllable.
 - **Round trip.** For well-formed Kannada, converting to Nudi and back gives the same text. A property test checks this.
-- **Unencodable characters.** Characters the layout has no glyph for, such as ಌ, ೄ, the nukta, ZWJ, ZWNJ and Latin letters, are kept in the output and listed in `unencodable` with their byte offsets. Kannada digits are written as ASCII digits; set the text in a `k` font to show Kannada digits.
+- **Unencodable characters.** Characters the layout has no glyph for, such as ಌ, ೄ, ೝ, the nukta, ZWJ, ZWNJ, Latin letters and spaces with no Windows-1252 byte, are kept in the output and listed in `unencodable` with their byte offsets. Aksharas that are not well formed, such as 2 vowel signs on 1 consonant, are listed in `malformed`. Kannada digits are written as ASCII digits; set the text in a `k` font to show Kannada digits.
 
 ## Segmentation
 

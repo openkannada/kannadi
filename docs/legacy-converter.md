@@ -76,7 +76,7 @@ Offices that still print with legacy fonts need this direction. The text is spli
 consonant shape [mahaprana] [head stroke] vowel sign parts, ottus, ೃ ೕ ೖ, arkavattu, ಂ ಃ
 ```
 
-The consonant shape is a letter glyph that already carries the sign (ಕಿ, ಮೆ) when the table has one. For no sign, ಿ, ು and ೂ, the shape is the letter form without a head stroke (ಜ, ಲ, ಟ) when the table has one, or else the base plus the head stroke. Other signs replace the head stroke, so they go on the base form. Where a font can draw something 2 ways, a fourth column in the table says when to prefer each glyph. The order and preferences were counted from 9,047 words typed on the 2002 government pages.
+The consonant shape is a letter glyph that already carries the sign (ಕಿ, ಮೆ) when the table has one. For no sign, ಿ, ು and ೂ, the shape is the letter form without a head stroke (ಜ, ಲ, ಟ) when the table has one, or else the base plus the head stroke. Other signs replace the head stroke, so they go on the base form. Where a font can draw something 2 ways, a fourth column in the table says when to prefer each glyph. The order and preferences were counted from 9,047 words typed on 35 Karnataka government pages from 2002, archived by the Internet Archive under `kar.nic.in/rdpr/kan-www/` and `kar.nic.in/finance/bud2002-kan/`. On those words, 9,029 encode to the exact bytes that were typed.
 
 ## File formats
 

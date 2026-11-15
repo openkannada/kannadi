@@ -30,12 +30,30 @@ pub fn decode_windows_1252(bytes: &[u8]) -> String {
     bytes.iter().map(|&b| windows_1252(b)).collect()
 }
 
+/// The Windows-1252 byte for `c`, the inverse of [`decode_windows_1252`].
+///
+/// ```
+/// use kannadi::legacy::windows_1252_byte;
+///
+/// assert_eq!(windows_1252_byte('À'), Some(0xC0));
+/// assert_eq!(windows_1252_byte('†'), Some(0x86));
+/// assert_eq!(windows_1252_byte('ಕ'), None);
+/// ```
+pub fn windows_1252_byte(c: char) -> Option<u8> {
+    if let Some(i) = HIGH.iter().position(|&h| h == c) {
+        return u8::try_from(0x80 + i).ok();
+    }
+    u8::try_from(u32::from(c))
+        .ok()
+        .filter(|b| !(0x80..=0x9F).contains(b))
+}
+
+const HIGH: [char; 32] = [
+    '€', '\u{81}', '‚', 'ƒ', '„', '…', '†', '‡', 'ˆ', '‰', 'Š', '‹', 'Œ', '\u{8D}', 'Ž', '\u{8F}',
+    '\u{90}', '‘', '’', '“', '”', '•', '–', '—', '˜', '™', 'š', '›', 'œ', '\u{9D}', 'ž', 'Ÿ',
+];
+
 fn windows_1252(b: u8) -> char {
-    const HIGH: [char; 32] = [
-        '€', '\u{81}', '‚', 'ƒ', '„', '…', '†', '‡', 'ˆ', '‰', 'Š', '‹', 'Œ', '\u{8D}', 'Ž',
-        '\u{8F}', '\u{90}', '‘', '’', '“', '”', '•', '–', '—', '˜', '™', 'š', '›', 'œ', '\u{9D}',
-        'ž', 'Ÿ',
-    ];
     match b {
         0x80..=0x9F => HIGH[usize::from(b - 0x80)],
         _ => char::from(b),
@@ -74,6 +92,15 @@ mod tests {
     #[test]
     fn windows_1252_high_range() {
         assert_eq!(decode_windows_1252(&[0x86, 0x87, 0x84, 0x81]), "†‡„\u{81}");
+    }
+
+    #[test]
+    fn windows_1252_roundtrips_every_byte() {
+        for b in 0..=255u8 {
+            let c = windows_1252(b);
+            assert_eq!(windows_1252_byte(c), Some(b), "{b:02X}");
+        }
+        assert_eq!(windows_1252_byte('\u{0080}'), None);
     }
 
     #[test]

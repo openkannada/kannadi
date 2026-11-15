@@ -21,8 +21,9 @@
 #   on X      the syllable's consonant is one of X
 #   with X    the syllable's vowel sign contains one of X
 #   after-ottu  the glyph comes right after a subscript consonant
-# The preferences match how typists stored these glyphs on the 2002 government
-# pages in tests/fixtures/nudi.tsv: 9,049 words, counted per glyph sequence.
+# The preferences match how typists stored these glyphs on 35 Karnataka government
+# pages from 2002, archived by the Internet Archive under kar.nic.in/rdpr/kan-www/
+# and kar.nic.in/finance/bud2002-kan/: 9,047 words, counted per glyph sequence.
 # Vowels
 43	letter	ಅ
 44	letter	ಆ

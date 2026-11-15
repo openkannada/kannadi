@@ -1,14 +1,15 @@
 use std::collections::{HashMap, HashSet};
+use std::ops::Range;
 use std::sync::OnceLock;
 
 use unicode_normalization::UnicodeNormalization;
 
-use crate::akshara::{aksharas, AksharaKind};
+use crate::akshara::{aksharas, Akshara, AksharaKind};
 use crate::chars::{class, Class, VIRAMA};
 use crate::numerals::to_ascii_digit;
 
 use super::table::{rows, Entry, Prefer};
-use super::{is_passthrough, unaspirated};
+use super::{is_passthrough, unaspirated, windows_1252_byte};
 
 /// A character [`unicode_to_nudi`] could not encode.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -25,25 +26,30 @@ pub struct Encoding {
     /// The glyph codes as Windows-1252 characters, ready to be set in a Nudi or
     /// Baraha ANSI font. Characters that could not be encoded are kept as they were.
     pub text: String,
-    /// Characters with no glyph in the layout, in input order.
+    /// Characters with no glyph in the layout, in input order. Joiners and nuktas
+    /// are kept at the end of their akshara.
     pub unencodable: Vec<Unencodable>,
+    /// Byte ranges in the input that are not valid aksharas: a mark with no letter,
+    /// 2 vowel signs on 1 consonant, or a sign on a vowel letter. Their glyphs are
+    /// written, but they may not read back as the same text.
+    pub malformed: Vec<Range<usize>>,
 }
 
 impl Encoding {
-    /// True if every character was encoded.
-    pub fn is_complete(&self) -> bool {
-        self.unencodable.is_empty()
+    /// True if every character was encoded and every akshara is well formed.
+    pub fn is_clean(&self) -> bool {
+        self.unencodable.is_empty() && self.malformed.is_empty()
     }
 }
 
 /// Converts Unicode Kannada to the glyph codes of the Nudi and Baraha ANSI fonts.
 ///
 /// Each akshara is written in the order typists stored it: the consonant shape,
-/// the vowel sign, the subscript consonants, the length marks, the arkavattu and
-/// then ಂ or ಃ. Where the layout has 2 glyphs for 1 sign, the one the font uses in
-/// that position is chosen.
+/// the vowel sign, the subscript consonants, ೃ and the length marks ೕ ೖ, the
+/// arkavattu and then ಂ or ಃ. Where the layout has 2 glyphs for 1 sign, the one the
+/// font uses in that position is chosen.
 ///
-/// For well-formed Kannada with no unencodable characters,
+/// When the result [`is_clean`](Encoding::is_clean),
 /// [`nudi_to_unicode`](super::nudi_to_unicode) gives back the NFC form of the input.
 /// Kannada digits are written as ASCII digits, which the `k` variants of the fonts
 /// draw as Kannada digits. A digit zero written between 2 letters reads back as ಂ
@@ -54,7 +60,7 @@ impl Encoding {
 ///
 /// let encoded = unicode_to_nudi("ಕನ್ನಡ");
 /// assert_eq!(encoded.text, "PÀ£ÀßqÀ");
-/// assert!(encoded.is_complete());
+/// assert!(encoded.is_clean());
 ///
 /// let mixed = unicode_to_nudi("ಕ A");
 /// assert_eq!(mixed.unencodable[0].character, 'A');
@@ -65,18 +71,39 @@ pub fn unicode_to_nudi(text: &str) -> Encoding {
         out: String::with_capacity(text.len()),
         unencodable: Vec::new(),
     };
+    let mut malformed = Vec::new();
     let mut offset = 0;
     for akshara in aksharas(text) {
-        let chars = akshara.text.char_indices().map(|(i, c)| (offset + i, c));
-        match akshara.kind {
-            AksharaKind::Consonant => writer.consonant(&Parts::of(chars)),
-            AksharaKind::Vowel | AksharaKind::Other => chars.for_each(|c| writer.single(c)),
+        let chars: Vec<(usize, char)> = akshara
+            .text
+            .char_indices()
+            .map(|(i, c)| (offset + i, c))
+            .collect();
+        if !is_well_formed(&akshara) {
+            malformed.push(offset..offset + akshara.text.len());
+        }
+        match Parts::of(&chars) {
+            Some(parts) => writer.consonant(&parts),
+            None => chars.iter().for_each(|&c| writer.single(c)),
         }
         offset += akshara.text.len();
     }
     Encoding {
         text: writer.out,
         unencodable: writer.unencodable,
+        malformed,
+    }
+}
+
+fn is_well_formed(akshara: &Akshara) -> bool {
+    let mut classes = akshara.text.chars().map(class);
+    match akshara.kind {
+        AksharaKind::Other => !classes.any(Class::is_mark),
+        AksharaKind::Vowel => !classes.any(|c| matches!(c, Class::VowelSign | Class::Virama)),
+        AksharaKind::Consonant => {
+            let composed = akshara.text.nfc().map(class);
+            composed.filter(|&c| c == Class::VowelSign).count() <= 1
+        }
     }
 }
 
@@ -123,6 +150,18 @@ fn glyphs() -> &'static Glyphs {
                 key: row.key,
                 prefer: row.prefer,
             };
+            let choosable = matches!(
+                row.entry,
+                Entry::Sign(ref s) if !s.is_empty()
+            ) || matches!(
+                row.entry,
+                Entry::Virama | Entry::Ottu(_) | Entry::Arka | Entry::Aspirate
+            );
+            assert!(
+                choosable || choice.prefer == Prefer::Otherwise,
+                "nudi.tsv: a preference on {:?} has no effect",
+                row.entry
+            );
             match row.entry {
                 Entry::Letter(l) => {
                     g.letters.entry(l.nfd().collect()).or_insert(choice.key);
@@ -164,7 +203,7 @@ fn single(value: &str) -> char {
 
 /// What a glyph's preference is checked against.
 struct Context<'a> {
-    consonant: char,
+    consonant: Option<char>,
     signs: &'a [char],
     after_ottu: bool,
 }
@@ -172,19 +211,20 @@ struct Context<'a> {
 /// The glyph to write: the first whose preference holds, or else the first with none.
 fn choose<'a>(choices: &'a [Choice], context: &Context) -> Option<&'a str> {
     let holds = |p: &Prefer| match p {
-        Prefer::Always => false,
-        Prefer::On(cs) => cs.contains(context.consonant),
+        Prefer::Otherwise => false,
+        Prefer::On(cs) => context.consonant.is_some_and(|c| cs.contains(c)),
         Prefer::With(cs) => context.signs.iter().any(|&s| cs.contains(s)),
         Prefer::AfterOttu => context.after_ottu,
     };
     choices
         .iter()
         .find(|c| holds(&c.prefer))
-        .or_else(|| choices.iter().find(|c| c.prefer == Prefer::Always))
+        .or_else(|| choices.iter().find(|c| c.prefer == Prefer::Otherwise))
         .map(|c| c.key.as_str())
 }
 
-/// A consonant akshara taken apart, each character with its byte offset.
+/// A consonant akshara taken apart, each character with its byte offset. There is
+/// always at least 1 consonant.
 #[derive(Default)]
 struct Parts {
     consonants: Vec<(usize, char)>,
@@ -196,16 +236,22 @@ struct Parts {
 }
 
 impl Parts {
-    fn of(chars: impl Iterator<Item = (usize, char)>) -> Self {
+    /// None unless `chars` starts with a consonant.
+    fn of(chars: &[(usize, char)]) -> Option<Self> {
+        if chars.first().map(|&(_, c)| class(c)) != Some(Class::Consonant) {
+            return None;
+        }
         let mut parts = Parts::default();
-        let mut chars = chars.peekable();
-        while let Some((i, c)) = chars.next() {
+        for (n, &(i, c)) in chars.iter().enumerate() {
+            let class_at = |k: usize| chars.get(k).map(|&(_, c)| class(c));
             match class(c) {
                 Class::Consonant => parts.consonants.push((i, c)),
                 Class::Virama => {
-                    let joins = chars
-                        .peek()
-                        .is_some_and(|&(_, n)| matches!(class(n), Class::Consonant | Class::Zwj));
+                    let joins = match class_at(n + 1) {
+                        Some(Class::Consonant) => true,
+                        Some(Class::Zwj) => class_at(n + 2) == Some(Class::Consonant),
+                        _ => false,
+                    };
                     if !joins {
                         parts.signs.push((i, c));
                     }
@@ -215,7 +261,7 @@ impl Parts {
                 _ => parts.other.push((i, c)),
             }
         }
-        parts
+        Some(parts)
     }
 }
 
@@ -229,16 +275,14 @@ impl Writer {
     fn consonant(&mut self, parts: &Parts) {
         let arka = parts.consonants.len() > 1 && parts.consonants[0].1 == RA;
         let cluster = &parts.consonants[usize::from(arka)..];
-        let Some(&(head_offset, head)) = cluster.first() else {
-            return;
-        };
+        let (head_offset, head) = cluster[0];
         let sign_chars: Vec<char> = parts.signs.iter().map(|&(_, c)| c).collect();
         let (before, after): (Vec<_>, Vec<_>) = parts
             .signs
             .iter()
             .partition(|&&(_, c)| !AFTER_SUBSCRIPTS.contains(&c));
         let mut context = Context {
-            consonant: head,
+            consonant: Some(head),
             signs: &sign_chars,
             after_ottu: false,
         };
@@ -323,12 +367,13 @@ impl Writer {
     /// Writes a character outside a consonant akshara.
     fn single(&mut self, (offset, c): (usize, char)) {
         let g = self.glyphs;
-        if c.is_ascii_digit() || (is_passthrough(c) && !g.key_starts.contains(&c)) {
+        let plain = c.is_ascii_digit() || is_passthrough(c);
+        if plain && windows_1252_byte(c).is_some() && !g.key_starts.contains(&c) {
             self.out.push(c);
             return;
         }
         let context = Context {
-            consonant: '\0',
+            consonant: None,
             signs: &[],
             after_ottu: false,
         };
@@ -339,10 +384,11 @@ impl Writer {
                 self.write(key.map(String::as_str), offset, c);
             }
             Class::VowelSign | Class::Virama => {
-                for part in c.nfd() {
-                    let key = g.signs.get(&part).and_then(|s| choose(s, &context));
-                    self.write(key, offset, c);
-                }
+                let keys: Option<String> = c
+                    .nfd()
+                    .map(|part| g.signs.get(&part).and_then(|s| choose(s, &context)))
+                    .collect();
+                self.write(keys.as_deref(), offset, c);
             }
             Class::Modifier => self.write(g.mods.get(&c).map(String::as_str), offset, c),
             _ => self.write(g.literals.get(&c).map(String::as_str), offset, c),
@@ -365,18 +411,14 @@ impl Writer {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::legacy::{decode_windows_1252, nudi_to_unicode, Options};
+    use crate::legacy::{nudi_to_unicode, Options};
 
     fn encode(text: &str) -> Vec<u8> {
         let e = unicode_to_nudi(text);
-        assert!(e.is_complete(), "{e:?}");
+        assert!(e.is_clean(), "{e:?}");
         e.text
             .chars()
-            .map(|c| {
-                (0u8..=255)
-                    .find(|&b| decode_windows_1252(&[b]).starts_with(c))
-                    .expect("Windows-1252 character")
-            })
+            .map(|c| windows_1252_byte(c).expect("Windows-1252 character"))
             .collect()
     }
 
@@ -490,7 +532,7 @@ mod tests {
             .collect();
         assert_eq!(found, [(4, 'A'), (6, 'ಌ'), (13, '\u{0CBC}')]);
         assert!(e.text.contains('A') && e.text.contains('ಌ'));
-        assert!(!unicode_to_nudi("„").is_complete());
+        assert!(!unicode_to_nudi("„").is_clean());
     }
 
     #[test]
@@ -499,6 +541,44 @@ mod tests {
         assert_eq!(e.unencodable.len(), 1);
         let back = nudi_to_unicode(&e.text.replace('\u{200C}', ""), &Options::default());
         assert_eq!(back.text, "ಡ್ಗೆ");
+    }
+
+    #[test]
+    fn zwj_is_reported_and_the_cluster_kept() {
+        let e = unicode_to_nudi("ರ್\u{200D}ಕ");
+        assert_eq!(e.unencodable.len(), 1);
+        let back = nudi_to_unicode(&e.text.replace('\u{200D}', ""), &Options::default());
+        assert_eq!(back.text, "ರ್ಕ");
+        let e = unicode_to_nudi("ಕ್\u{200D}");
+        assert_eq!(e.unencodable.len(), 1);
+        let back = nudi_to_unicode(&e.text.replace('\u{200D}', ""), &Options::default());
+        assert_eq!(back.text, "ಕ್");
+    }
+
+    #[test]
+    fn nakaara_pollu_is_reported() {
+        let e = unicode_to_nudi("ವೝು");
+        assert_eq!(e.unencodable[0].character, 'ೝ');
+        assert!(e.text.contains('ೝ'));
+    }
+
+    #[test]
+    fn malformed_aksharas_are_reported() {
+        for text in ["ಕಂಾ", "ಕೇೂ", "ಠೕೆ", "ಅಾ", "ಾ", "1ಾ", " ್"] {
+            let e = unicode_to_nudi(text);
+            assert!(!e.malformed.is_empty(), "{text}");
+        }
+        let e = unicode_to_nudi("ಕ ಕೇೂ");
+        assert_eq!(e.malformed, vec![4..13]);
+        assert!(unicode_to_nudi("ಕಿ\u{0CD5}").is_clean());
+    }
+
+    #[test]
+    fn characters_without_a_windows_1252_byte_are_reported() {
+        for text in ["ಕ\u{2003}ಕ", "ಕ\u{2010}", "\u{3000}"] {
+            assert!(!unicode_to_nudi(text).unencodable.is_empty(), "{text:?}");
+        }
+        assert!(unicode_to_nudi("ಕ\u{A0}ಕ\u{2013}").is_clean());
     }
 
     #[test]

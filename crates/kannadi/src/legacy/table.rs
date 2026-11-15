@@ -22,8 +22,8 @@ pub(super) enum Entry {
 /// When the encoder prefers a glyph over others with the same meaning.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub(super) enum Prefer {
-    /// No condition; the first such glyph in the table is the default.
-    Always,
+    /// The default when no other preference holds; the first such glyph wins.
+    Otherwise,
     /// The syllable's consonant is one of these.
     On(String),
     /// The syllable's vowel sign contains one of these.
@@ -79,7 +79,7 @@ fn parse(source: &str) -> Vec<Row> {
 
 fn parse_prefer(column: &str) -> Prefer {
     match column.split_once(' ') {
-        None if column.is_empty() => Prefer::Always,
+        None if column.is_empty() => Prefer::Otherwise,
         None if column == "after-ottu" => Prefer::AfterOttu,
         Some(("on", chars)) => Prefer::On(chars.replace(' ', "")),
         Some(("with", chars)) => Prefer::With(chars.replace(' ', "")),
@@ -93,7 +93,7 @@ mod tests {
 
     #[test]
     fn preferences_parse() {
-        assert_eq!(parse_prefer(""), Prefer::Always);
+        assert_eq!(parse_prefer(""), Prefer::Otherwise);
         assert_eq!(parse_prefer("after-ottu"), Prefer::AfterOttu);
         assert_eq!(parse_prefer("on ಪ ಫ ವ"), Prefer::On("ಪಫವ".into()));
         assert_eq!(parse_prefer("with ಿ"), Prefer::With("ಿ".into()));
