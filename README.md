@@ -21,7 +21,7 @@ Version 0.1, in development.
 | Nudi and Baraha to Unicode | Done, waiting on a native reader's check of 100 sample lines |
 | Unicode to Nudi and Baraha | Done |
 | Verified test corpus | Planned: [docs/corpus-plan.md](docs/corpus-plan.md) |
-| Converter page that runs in the browser, with no upload | Planned |
+| Converter page that runs in the browser, with no upload | Built, not deployed: [web/](web/) |
 | Command-line tool for TXT, HTML and DOCX | Planned |
 
 ## Example
@@ -87,6 +87,21 @@ assert!(encoded.is_clean());
 - **Storage order.** Each akshara is written the way typists stored it: the consonant shape, the vowel sign, the subscripts, ೃ and the length marks ೕ and ೖ, the arkavattu, then ಂ or ಃ. Where the layout has 2 glyphs for 1 sign, such as the ು of ವು or a second subscript ರ, the table marks which one the font uses there. On 9,047 words from 35 Karnataka government pages from 2002, 9,029 encode to the exact bytes that were typed. The rest differ in typing habits: a zero for ಂ, an extra spacing glyph, or ರ್ typed as its own syllable.
 - **Round trip.** For well-formed Kannada, converting to Nudi and back gives the same text. A property test checks this.
 - **Unencodable characters.** Characters the layout has no glyph for, such as ಌ, ೄ, ೝ, the nukta, ZWJ, ZWNJ, Latin letters and spaces with no Windows-1252 byte, are kept in the output and listed in `unencodable` with their byte offsets. Aksharas that are not well formed, such as 2 vowel signs on 1 consonant, are listed in `malformed`. Kannada digits are written as ASCII digits; set the text in a `k` font to show Kannada digits.
+
+## Converter page
+
+[web/](web/) is a static page that converts Nudi and Baraha text to Unicode in the browser. The crate runs as WebAssembly through the bindings in [crates/kannadi-wasm](crates/kannadi-wasm), so text never leaves the device. Paste text or open a TXT file, then copy or download the result. The page lists unknown glyphs and malformed syllables, and selecting one highlights it.
+
+Build and run it locally. It needs the `wasm32-unknown-unknown` target and the `wasm-bindgen` command at the version in `Cargo.lock`:
+
+```sh
+rustup target add wasm32-unknown-unknown
+cargo install wasm-bindgen-cli --version 0.2.130 --locked
+web/build.sh
+python3 -m http.server -d web/dist 8000
+```
+
+`web/dist` is a plain folder of static files that any static host can serve. `node web/test/smoke.mjs` checks the built package.
 
 ## Segmentation
 
@@ -161,6 +176,7 @@ Scheme spellings and legacy glyph layouts are data tables read by 1 engine each.
 cargo test
 PROPTEST_CASES=50000 cargo test --release --test props
 cargo clippy --all-targets
+web/build.sh && node web/test/smoke.mjs
 ```
 
 The minimum supported Rust version is 1.75.
