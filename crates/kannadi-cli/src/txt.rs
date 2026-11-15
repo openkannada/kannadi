@@ -53,10 +53,14 @@ fn utf16(bytes: &[u8]) -> Option<Result<String>> {
         [0xFE, 0xFF, ..] => false,
         _ => return None,
     };
-    let units: Vec<u16> = bytes[2..]
-        .chunks(2)
+    let payload = &bytes[2..];
+    if payload.len() % 2 == 1 {
+        return Some(Err(anyhow::anyhow!("UTF-16 file ends in half a character")));
+    }
+    let units: Vec<u16> = payload
+        .chunks_exact(2)
         .map(|c| {
-            let pair = [c[0], c.get(1).copied().unwrap_or(0)];
+            let pair = [c[0], c[1]];
             if little {
                 u16::from_le_bytes(pair)
             } else {
@@ -97,6 +101,15 @@ mod tests {
         let mut utf16 = vec![0xFF, 0xFE];
         utf16.extend("PÀ".encode_utf16().flat_map(u16::to_le_bytes));
         let (out, _) = convert_file(&utf16, &to_unicode()).unwrap();
+        assert_eq!(String::from_utf8(out).unwrap(), "ಕ");
+    }
+
+    #[test]
+    fn truncated_utf16_is_an_error() {
+        for bytes in [&b"\xFF\xFE\x20"[..], b"\xFE\xFF\x00\x20\x00"] {
+            assert!(convert_file(bytes, &to_unicode()).is_err());
+        }
+        let (out, _) = convert_file(b"\xFE\xFF\x00\x50\x00\xC0", &to_unicode()).unwrap();
         assert_eq!(String::from_utf8(out).unwrap(), "ಕ");
     }
 
