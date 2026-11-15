@@ -15,11 +15,11 @@ cargo fmt --all
 cargo clippy --all-targets -- -D warnings
 RUSTDOCFLAGS="-D warnings" cargo doc --no-deps
 cargo +1.75 check -p kannadi --lib                      # minimum supported Rust
-cargo build -p kannadi --lib --release --target wasm32-unknown-unknown
+web/build.sh && node web/test/smoke.mjs                 # WebAssembly build and converter page
 cargo run --example nudi -- file.txt                    # convert a legacy text file
 ```
 
-CI runs these with `--locked`, apart from the example. A change is ready when they pass.
+CI runs these with `--locked`, apart from the example. A change is ready when they pass. `web/build.sh` needs the `wasm32-unknown-unknown` target and `wasm-bindgen-cli` at the `wasm-bindgen` version in `Cargo.lock`.
 
 ## Architecture
 
@@ -39,6 +39,11 @@ crates/kannadi/
   data/nudi.tsv       the legacy glyph table, as data
   tests/              golden fixtures, property tests, differential test
   examples/           demo, and a command-line converter for legacy files
+crates/kannadi-wasm/  wasm-bindgen bindings for the page; offsets in UTF-16 code units
+web/
+  src/                the static converter page: HTML, CSS, 1 JavaScript module
+  build.sh            builds the WebAssembly package and the page into web/dist
+  test/smoke.mjs      checks the built package in Node
 docs/                 design notes, corpus plan, prior art
 ```
 
@@ -56,6 +61,13 @@ Principles:
 - **Doc comments** on public items say what the item guarantees, with an example where it helps.
 - **Unicode.** Name characters by code point (U+0CDE) and by glyph (ೞ). Cite the Unicode version when it matters.
 - **Third-party code.** Do not copy code or data from other converters. In particular, ascii2unicode is GPL 3.0. Tables are derived from font files and documents; record how in the table's header.
+
+## Converter page
+
+- The page has no build tool, framework or third-party script. Keep it that way unless a need appears.
+- No tracking, no cookies and no network requests beyond the page's own files. The Content-Security-Policy in `index.html` enforces this.
+- Build DOM nodes with `textContent`, never `innerHTML`, since the report shows user text.
+- Page copy follows the writing rules below. Do not claim a feature, such as Unicode to Nudi, before it ships.
 
 ## Tests
 

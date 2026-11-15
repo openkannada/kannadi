@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'self'; style-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
+<title>Nudi to Unicode converter: Kannada Unicode converter for Nudi and Baraha text</title>
+<meta name="description" content="Free Nudi to Unicode converter for Kannada text in Nudi and Baraha fonts. Runs in your browser and nothing is uploaded. Unicode to Nudi is coming.">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#fbf8f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#16130f" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Nudi to Unicode converter">
+<meta property="og:description" content="Convert Nudi and Baraha Kannada text to Unicode in your browser. Nothing is uploaded. Unknown glyphs and malformed syllables are reported.">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+<link rel="modulepreload" href="pkg/kannadi_wasm.js">
+<script type="module" src="app.js"></script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Nudi to Unicode converter",
+  "description": "Converts Kannada text typed in Nudi and Baraha ANSI fonts to Unicode, in the browser, and reports unknown glyphs and malformed syllables.",
+  "applicationCategory": "UtilitiesApplication",
+  "operatingSystem": "Any",
+  "inLanguage": ["en", "kn"],
+  "isAccessibleForFree": true,
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "INR" },
+  "author": { "@type": "Person", "name": "Prasad Subrahmanya", "url": "https://prasad.tech" }
+}
+</script>
+</head>
+<body>
+<a class="skip" href="#converter">Skip to the converter</a>
+<noscript><p class="intro">The converter needs JavaScript and WebAssembly.</p></noscript>
+
+<header class="intro">
+  <h1>Nudi to Unicode converter</h1>
+  <p class="lede">Nudi to Unicode conversion turns Kannada text typed in the old Nudi or Baraha fonts into standard Unicode Kannada, which works on any phone, website or search engine.</p>
+  <p class="kn" lang="kn">ನುಡಿ ಮತ್ತು ಬರಹ ಪಠ್ಯವನ್ನು ಯುನಿಕೋಡ್ ಕನ್ನಡಕ್ಕೆ ಬದಲಾಯಿಸಿ.</p>
+  <p>This Kannada Unicode converter runs in your browser. Your text is not uploaded. When a glyph cannot be converted or a syllable is not valid Kannada, the report below the result tells you where.</p>
+</header>
+
+<main id="converter" tabindex="-1">
+  <section class="tool" aria-labelledby="tool-heading">
+    <h2 id="tool-heading" class="visually-hidden">Converter</h2>
+
+    <div class="panes">
+      <div class="pane">
+        <div class="pane-head">
+          <label for="input">Nudi or Baraha text</label>
+          <div class="actions">
+            <button type="button" id="sample" class="link">Try a sample</button>
+            <label class="button" for="file">Open a TXT file</label>
+            <input type="file" id="file" accept=".txt,text/plain" class="visually-hidden">
+          </div>
+        </div>
+        <textarea id="input" spellcheck="false" autocomplete="off" autocapitalize="off"
+          placeholder="Paste text such as PÀ£ÀßqÀ here, or drop a TXT file"
+          aria-describedby="input-help"></textarea>
+        <p id="input-help" class="help">Paste only the Kannada part of a document. English text in the same paste is converted too.</p>
+      </div>
+
+      <div class="pane">
+        <div class="pane-head">
+          <label for="output">Unicode Kannada</label>
+          <div class="actions">
+            <button type="button" id="copy" disabled>Copy</button>
+            <button type="button" id="download" disabled>Download</button>
+          </div>
+        </div>
+        <textarea id="output" lang="kn" readonly spellcheck="false"
+          placeholder="ಕನ್ನಡ" aria-describedby="status"></textarea>
+        <p id="status" class="help" role="status" aria-live="polite">Loading the converter.</p>
+      </div>
+    </div>
+
+    <fieldset class="options">
+      <legend class="visually-hidden">Options</legend>
+      <label><input type="checkbox" id="zero" checked> Read a zero inside a word as an anusvara (ಪ್ರಾರ0ಭ to ಪ್ರಾರಂಭ)</label>
+      <label><input type="checkbox" id="digits"> Write digits as Kannada digits (for the Nudi fonts whose names end in k)</label>
+    </fieldset>
+
+    <section id="report" class="report" aria-labelledby="report-heading" hidden>
+      <h2 id="report-heading">Report</h2>
+      <p id="report-summary"></p>
+      <ol id="report-list"></ol>
+      <p id="report-more" class="help" hidden></p>
+    </section>
+  </section>
+
+  <section class="prose" aria-labelledby="how-heading">
+    <h2 id="how-heading">How it works</h2>
+    <p>Nudi (up to version 5) and Baraha's ANSI fonts, such as BRH Kannada, draw Kannada shapes on top of Latin letters. The file stores the Latin letters, so outside the font ಕನ್ನಡ reads as <code>PÀ£ÀßqÀ</code>. Both font families use the same layout, so 1 converter handles both.</p>
+    <p>The fonts store glyphs in drawing order. A subscript consonant comes after the vowel sign, and some vowel signs are split into 2 or 3 pieces. The converter rebuilds each syllable in Unicode order and checks that the result is a valid Kannada syllable.</p>
+  </section>
+
+  <section class="prose faq" aria-labelledby="faq-heading">
+    <h2 id="faq-heading">Questions</h2>
+
+    <h3>Is my text uploaded?</h3>
+    <p>No. The converter is compiled to WebAssembly and runs on your device. The page loads its own files and makes no other network requests. It sets no cookies and has no analytics.</p>
+
+    <h3>Which fonts does it convert?</h3>
+    <p>Nudi 1 to 5 fonts and Baraha ANSI fonts such as BRH Kannada. If the text already shows as Kannada letters when pasted, it is Unicode and needs no conversion. The page tells you when it sees Unicode Kannada.</p>
+
+    <h3>Can it convert Unicode to Nudi?</h3>
+    <p>Not yet. A Unicode to Nudi converter is coming.</p>
+
+    <h3>Can it convert Word files?</h3>
+    <p>Not yet. DOCX support is coming. For now, copy the text from Word and paste it here. Copying keeps the glyph codes, which is what the converter needs.</p>
+
+    <h3>How do I check the result?</h3>
+    <p>The report lists every glyph the converter could not place and every syllable that is not valid Kannada. Select an item to highlight it. Unknown glyphs stay in the result as they were, so nothing is lost. A measured error rate on a checked set of real documents will be published here when that test set is ready.</p>
+
+    <h3>What do the options do?</h3>
+    <p>Many typists entered a zero in place of the anusvara ಂ. The first option turns a zero between Kannada letters into ಂ. Leave it on unless your text has real zeros inside words. The second option is for text set in the Nudi fonts whose names end in k, which draw Kannada digits in place of 0 to 9.</p>
+
+    <h3>Who made this?</h3>
+    <p>It is built on <a href="https://github.com/prasadus92/kannadi">kannadi</a>, an open-source Rust library for Kannada text by Prasad Subrahmanya, released under the MIT license.</p>
+  </section>
+</main>
+
+<footer>
+  <p>If kannadi helps your project, a mention or a link to <a href="https://prasad.tech">prasad.tech</a> is appreciated.</p>
+</footer>
+</body>
+</html>
