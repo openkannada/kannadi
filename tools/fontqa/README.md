@@ -60,3 +60,15 @@ A proof sheet shows each failing string in the tested font, large, with Noto San
 - Composing refuses a sign that already has a glyph with ink, and removes the `hdmx` and `LTSH` tables, which hold 1 entry per glyph.
 
 The composed signs are drafts. A Kannada reader checks the proof sheet before they are used.
+
+## Gates for drafted glyphs
+
+`fontqa.gates` checks a drafted glyph against the font it goes into:
+
+- `gate_strokes`: vertical stem, horizontal stroke and their ratio within 15% of the font's own glyphs, measured on scanlines;
+- `gate_vertical`: the bottom and top ink edges within 20 units of theirs;
+- `gate_contours`: closed contours with no tiny contours or short segments, the font's contour direction, and the expected number of counters with no slivers after overlap removal;
+- `gate_compatible`: the same contours and points in every master of a variable font;
+- `gate_shaping`: no test string fails that passed before.
+
+Passing the gates means a draft is well formed and in proportion. It does not mean the shape is right; a reader decides that.

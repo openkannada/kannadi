@@ -16,6 +16,8 @@ from fontTools.pens.recordingPen import DecomposingRecordingPen
 from fontTools.pens.ttGlyphPen import TTGlyphPen
 from fontTools.ttLib import TTFont
 
+from .outline import polygons
+
 U_SIGN, UU_SIGN, R_SIGN, RR_SIGN = 0x0CC1, 0x0CC2, 0x0CC3, 0x0CC4
 L_SIGN, LL_SIGN = 0x0CE2, 0x0CE3
 LETTER_R, LETTER_RR, LETTER_L, LETTER_LL = 0x0C8B, 0x0CE0, 0x0C8C, 0x0CE1
@@ -130,46 +132,15 @@ def compose_l_signs(font: TTFont) -> list[str]:
 
 def stem(path: pathops.Path) -> float:
     """Mean stroke width of an outline: 2 x area / perimeter, close for long thin strokes."""
-    flat = pathops.Path()
-    flat.addPath(path)
+    flat = pathops.Path(path)
     flat.convertConicsToQuads()
     perimeter = 0.0
-    for contour in _polylines(flat):
+    for contour in polygons(flat, steps=8):
         perimeter += sum(
             ((x1 - x0) ** 2 + (y1 - y0) ** 2) ** 0.5
             for (x0, y0), (x1, y1) in zip(contour, contour[1:] + contour[:1], strict=True)
         )
     return 2 * abs(flat.area) / perimeter if perimeter else 0.0
-
-
-def _polylines(path: pathops.Path, steps: int = 8) -> list[list[tuple[float, float]]]:
-    out, current, last = [], [], (0.0, 0.0)
-    for verb, pts in path.segments:
-        if verb == "moveTo":
-            current, last = [pts[0]], pts[0]
-        elif verb == "lineTo":
-            current.append(pts[0])
-            last = pts[0]
-        elif verb in ("qCurveTo", "curveTo"):
-            ctrl = [last, *pts]
-            for i in range(1, steps + 1):
-                current.append(_bezier(ctrl, i / steps))
-            last = pts[-1]
-        elif verb in ("closePath", "endPath"):
-            if current:
-                out.append(current)
-            current = []
-    return out
-
-
-def _bezier(ctrl, t):
-    pts = list(ctrl)
-    while len(pts) > 1:
-        pts = [
-            ((1 - t) * a[0] + t * b[0], (1 - t) * a[1] + t * b[1])
-            for a, b in zip(pts, pts[1:], strict=False)
-        ]
-    return pts[0]
 
 
 def _require(cmap, *cps):
