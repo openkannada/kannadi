@@ -2,7 +2,7 @@
 
 use unicode_normalization::UnicodeNormalization;
 
-use crate::chars::{class, is_consonant, Class, LLLA, NAKAARA_POLLU, RRA, VIRAMA, ZWNJ};
+use crate::chars::{class, is_consonant, Class, ANUSVARA, LLLA, NAKAARA_POLLU, RRA, VIRAMA, ZWNJ};
 
 /// Normalizes Kannada text so that equal-looking text compares equal.
 ///
@@ -56,7 +56,7 @@ pub fn fix_zero_as_anusvara(text: &str) -> String {
     let mut prev: Option<char> = None;
     for c in text.chars() {
         match prev {
-            Some(p) if c == '೦' && is_letter_or_mark(p) => out.push('ಂ'),
+            Some(p) if c == '೦' && is_letter_or_mark(p) => out.push(ANUSVARA),
             _ => out.push(c),
         }
         prev = Some(c);

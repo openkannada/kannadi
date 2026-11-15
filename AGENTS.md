@@ -19,17 +19,18 @@ cargo build -p kannadi --lib --release --target wasm32-unknown-unknown
 cargo run --example nudi -- file.txt                    # convert a legacy text file
 ```
 
-CI runs all of these. A change is ready when they pass.
+CI runs these with `--locked`, apart from the example. A change is ready when they pass.
 
 ## Architecture
 
 ```text
 crates/kannadi/
+  src/lib.rs          public API and re-exports
   src/chars.rs        character classes for the Kannada block
   src/lookup.rs       longest-prefix lookup shared by the scheme and glyph tables
   src/akshara.rs      segmentation into aksharas (uses chars)
   src/normalize.rs    NFC plus Kannada fixes; Old Kannada modernization
-  src/numerals.rs     Kannada digits
+  src/numerals.rs     Kannada digits: conversion, formatting, parsing
   src/translit/       Kannada to and from ISO 15919, IAST, Baraha
     schemes.rs        the scheme tables, as data
     mod.rs            1 engine for all schemes: romanize and parse
@@ -37,19 +38,20 @@ crates/kannadi/
                       and the reports; a Syllable decides what it can accept
   data/nudi.tsv       the legacy glyph table, as data
   tests/              golden fixtures, property tests, differential test
+  examples/           demo, and a command-line converter for legacy files
 docs/                 design notes, corpus plan, prior art
 ```
 
 Principles:
 
-- **Tables are data and engines are generic.** A new scheme or font layout is a new table, with no new engine code. Keep scheme-specific behavior as fields on the table.
-- **Lossless by default.** Transliteration round-trips Kannada text exactly. When the converter cannot place a glyph, it reports it. Nothing is dropped silently.
+- **Tables are data and engines are generic.** Scheme spellings and glyph layouts live in tables. A new transliteration scheme needs a table and an entry in the `Scheme` enum. A new legacy font layout needs a table; the converter currently loads only `nudi.tsv`. Keep scheme-specific behavior as fields on the table.
+- **Lossless by default.** Transliteration round-trips Kannada text exactly. When the converter cannot place a glyph, it reports it. Nothing is dropped silently, except spacing glyphs, which carry no text.
 - **Small modules with 1 job each.** Shared behavior goes in 1 place; do not copy code between modules.
 - **No abstraction before it earns its place.** Add a trait when a second implementation exists.
 
 ## Code rules
 
-- **Idiomatic Rust.** Return `Option` and `Result` from public functions, never `panic!`. A panic is acceptable only on a broken built-in table, which a test catches.
+- **Idiomatic Rust.** Report failure with `Option`, `Result` or a report value, and never panic on user input. A panic is acceptable only on a broken built-in table, which a test catches.
 - **Comments.** Write a comment only for what the code cannot say: a Unicode code point or spec reference, a rule that is not obvious, or why a choice was made. Delete comments that restate the code.
 - **Doc comments** on public items say what the item guarantees, with an example where it helps.
 - **Unicode.** Name characters by code point (U+0CDE) and by glyph (ೞ). Cite the Unicode version when it matters.

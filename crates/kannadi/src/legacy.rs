@@ -133,6 +133,7 @@ enum Entry {
     Letter(String),
     Base(String),
     Sign(String),
+    Virama,
     Ottu(char),
     Arka,
     Mod(char),
@@ -164,6 +165,7 @@ fn parse_table(source: &str) -> Lookup<Entry> {
         let entry = match kind {
             "letter" => Entry::Letter(value.to_string()),
             "base" => Entry::Base(value.to_string()),
+            "sign" if first == Some(VIRAMA) => Entry::Virama,
             "sign" => Entry::Sign(value.to_string()),
             "ottu" => Entry::Ottu(first.expect("ottu needs a consonant")),
             "arka" => Entry::Arka,
@@ -228,6 +230,7 @@ impl Writer {
         match entry {
             Entry::Sign(sign) if !sign.is_empty() => self.out.push_str(sign),
             Entry::Mod(m) => self.out.push(*m),
+            Entry::Virama => self.out.push(VIRAMA),
             Entry::Ottu(c) => {
                 self.out.push(VIRAMA);
                 self.out.push(*c);
@@ -321,7 +324,7 @@ impl Syllable {
     /// Adds a glyph to the syllable; false if it cannot belong here.
     fn add(&mut self, entry: &Entry) -> bool {
         match entry {
-            Entry::Sign(sign) if sign.as_str() == "\u{0CCD}" => {
+            Entry::Virama => {
                 self.signed = true;
                 !std::mem::replace(&mut self.virama, true)
             }
@@ -541,7 +544,7 @@ mod tests {
 
     #[test]
     fn stray_marks_after_spaces_and_digits_are_malformed() {
-        for input in [" Á", "PÀ Á", "1Á", " A", "\nÌ", "†A"] {
+        for input in [" Á", "PÀ Á", "1Á", " A", "\nÌ", "†A", " ï"] {
             assert!(!report(input).malformed.is_empty(), "{input:?}");
         }
     }

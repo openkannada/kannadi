@@ -11,5 +11,6 @@
 - Kannada numerals: digit conversion, formatting and parsing.
 - Golden fixtures, property tests, and a differential test against vidyut-lipi.
 - Design for the Nudi and Baraha legacy converter, and the test corpus plan.
+- `chars::Class::is_mark`.
 - MIT license and `CITATION.cff`.
 - Nudi and Baraha ANSI to Unicode (`legacy::nudi_to_unicode`), with a glyph table derived from the font files, reports of unknown glyphs and malformed syllables, and fixtures from Karnataka government pages.

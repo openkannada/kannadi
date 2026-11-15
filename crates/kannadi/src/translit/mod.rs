@@ -19,8 +19,6 @@
 mod schemes;
 
 use std::collections::{HashMap, HashSet};
-
-use crate::lookup::Lookup;
 use std::fmt;
 use std::str::FromStr;
 use std::sync::OnceLock;
@@ -28,6 +26,7 @@ use std::sync::OnceLock;
 use unicode_normalization::UnicodeNormalization;
 
 use crate::chars::{class, is_kannada, Class, NUKTA, VIRAMA, ZWJ, ZWNJ};
+use crate::lookup::Lookup;
 
 /// Marks the next character as literal text in romanized output.
 const ESCAPE: char = '\\';
@@ -307,10 +306,7 @@ impl Compiled {
         let mut i = 0;
         while i < input.len() {
             if input[i] == ESCAPE && input.get(i + 1).is_some_and(|&n| self.is_escapable(n)) {
-                if pending {
-                    out.push(VIRAMA);
-                    pending = false;
-                }
+                close_consonant(&mut out, &mut pending);
                 out.push(input[i + 1]);
                 after_token = false;
                 i += 2;
@@ -332,10 +328,7 @@ impl Compiled {
                 }
             }
             let Some((tok, len)) = self.longest_match(&input[i..]) else {
-                if pending {
-                    out.push(VIRAMA);
-                    pending = false;
-                }
+                close_consonant(&mut out, &mut pending);
                 out.push(input[i]);
                 after_token = false;
                 i += 1;
@@ -344,10 +337,7 @@ impl Compiled {
             if matches!(tok, Tok::Separator)
                 && !(after_token && self.starts_token(&input[i + len..]))
             {
-                if pending {
-                    out.push(VIRAMA);
-                    pending = false;
-                }
+                close_consonant(&mut out, &mut pending);
                 out.extend(&input[i..i + len]);
                 after_token = false;
                 i += len;
@@ -365,9 +355,7 @@ impl Compiled {
                     }
                 }
                 Tok::Consonant { letter, nukta } => {
-                    if pending {
-                        out.push(VIRAMA);
-                    }
+                    close_consonant(&mut out, &mut pending);
                     out.push(letter);
                     if nukta {
                         out.push(NUKTA);
@@ -375,23 +363,15 @@ impl Compiled {
                     pending = true;
                 }
                 Tok::Mark(m) | Tok::Joiner(m) => {
-                    if pending {
-                        out.push(VIRAMA);
-                        pending = false;
-                    }
+                    close_consonant(&mut out, &mut pending);
                     out.push(m);
                 }
                 Tok::Separator => {
-                    if pending {
-                        out.push(VIRAMA);
-                        pending = false;
-                    }
+                    close_consonant(&mut out, &mut pending);
                 }
             }
         }
-        if pending {
-            out.push(VIRAMA);
-        }
+        close_consonant(&mut out, &mut pending);
         out
     }
 
@@ -413,14 +393,12 @@ impl Compiled {
             .map(|(&tok, len)| (tok, len))
     }
 
-    /// True if the parser, reading `joined` from its start, would take a token longer than `first`.
-    fn would_merge(&self, first: &str, joined: &str) -> bool {
+    /// True if the parser, reading `first` then `next`, would take a token longer than `first`.
+    fn would_merge(&self, first: &str, next: &str) -> bool {
         let first_len = first.chars().count();
-        let chars: Vec<char> = joined.chars().collect();
-        match self.longest_match(&chars) {
-            Some((_, len)) => len > first_len,
-            None => false,
-        }
+        self.tokens
+            .longest_match(first.chars().chain(next.chars()))
+            .is_some_and(|(_, len)| len > first_len)
     }
 }
 
@@ -438,6 +416,13 @@ fn nfc_outside_kannada(text: &str) -> Vec<char> {
     }
     out.extend(text[run_start..].nfc());
     out
+}
+
+/// Ends a consonant still waiting for its vowel with a virama.
+fn close_consonant(out: &mut String, pending: &mut bool) {
+    if std::mem::take(pending) {
+        out.push(VIRAMA);
+    }
 }
 
 fn starts_with(input: &[char], prefix: &str) -> bool {
@@ -475,13 +460,11 @@ impl Emitter<'_> {
         let mut piece = piece;
         let prev = &self.out[self.last_start..];
         let dead_then_vowel = self.last == Piece::DeadConsonant && kind == Piece::Vowel;
-        let merges = !prev.is_empty() && self.scheme.would_merge(prev, &format!("{prev}{piece}"));
+        let merges = !prev.is_empty() && self.scheme.would_merge(prev, piece);
         if dead_then_vowel || merges {
             let is_ha = kind == Piece::Consonant && self.scheme.consonant.get(&'ಹ') == Some(&piece);
             match table.ha_breaker {
-                Some(breaker)
-                    if is_ha && !self.scheme.would_merge(prev, &format!("{prev}{breaker}")) =>
-                {
+                Some(breaker) if is_ha && !self.scheme.would_merge(prev, breaker) => {
                     piece = breaker;
                 }
                 _ => self.out.push_str(table.separator),
@@ -515,9 +498,7 @@ impl Emitter<'_> {
         let suffix = self.scheme.table.nukta_suffix;
         let prev = &self.out[self.last_start..];
         match suffix {
-            Some(s) if !self.scheme.would_merge(prev, &format!("{prev}{s}")) => {
-                self.out.push_str(s)
-            }
+            Some(s) if !self.scheme.would_merge(prev, s) => self.out.push_str(s),
             _ => self.out.push(NUKTA),
         }
         self.last = Piece::Consonant;
@@ -586,7 +567,7 @@ mod tests {
     }
 
     #[test]
-    fn iso_input_is_case_insensitive_and_normalised() {
+    fn iso_input_is_case_insensitive_and_normalized() {
         assert_eq!(from_latin("KANNAḌA", Scheme::Iso15919), "ಕನ್ನಡ");
         assert_eq!(
             from_latin("kanna\u{0064}\u{0323}a", Scheme::Iso15919),
