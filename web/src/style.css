@@ -62,6 +62,7 @@
   --malformed-line: #d98200;
   --malformed-bg: #ffecb8;
   --composing: #0c4a36;
+  --line: #0c4a36;
   --shadow: 0 1px 2px rgb(12 42 31 / 0.06), 0 12px 32px -16px rgb(12 74 54 / 0.28);
   --radius: 10px;
   --sans: "Noto Sans Kannada", "Nirmala UI", "Kannada Sangam MN", system-ui, sans-serif;
@@ -94,6 +95,7 @@
     --malformed-line: #ffb13b;
     --malformed-bg: #42300b;
     --composing: #7fd8b0;
+  --line: #4fae86;
     --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 16px 40px -20px rgb(0 0 0 / 0.7);
     color-scheme: dark;
   }
@@ -119,6 +121,7 @@
   --malformed-line: #ffb13b;
   --malformed-bg: #42300b;
   --composing: #7fd8b0;
+  --line: #4fae86;
   --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 16px 40px -20px rgb(0 0 0 / 0.7);
   color-scheme: dark;
 }
@@ -322,8 +325,7 @@ kbd {
   top: 0.78rem;
   height: 3px;
   border-radius: 2px;
-  background: var(--board);
-  opacity: 0.85;
+  background: var(--line);
 }
 .stops input { position: absolute; opacity: 0; pointer-events: none; }
 .stops label {
@@ -344,7 +346,7 @@ kbd {
   height: 1rem;
   border-radius: 50%;
   background: var(--sheet);
-  box-shadow: 0 0 0 3px var(--board);
+  box-shadow: 0 0 0 3px var(--line);
   transition: background-color 180ms ease-out, transform 180ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 .stops label:hover { background: var(--ground); }
@@ -426,7 +428,7 @@ body.dragging .sheet { outline: 3px dashed var(--board); outline-offset: 4px; }
 .empty-lead { margin: 0 0 1rem; font-size: 1.1875rem; line-height: 1.6; color: var(--ink); opacity: 0.75; }
 .empty-steps { margin: 0 0 1.5rem; padding-left: 1.25rem; }
 .empty-steps li { margin: 0.35rem 0; }
-.empty-steps li::marker { color: var(--board); font-weight: 700; }
+.empty-steps li::marker { color: var(--line); font-weight: 700; }
 .empty-actions { margin: 0; pointer-events: auto; }
 .empty #sample { background: var(--board); border-color: var(--board); color: var(--board-ink); }
 .empty #sample:hover { background: var(--board-raised); }
@@ -537,7 +539,7 @@ body.dragging .sheet { outline: 3px dashed var(--board); outline-offset: 4px; }
 .prose p, .prose li { max-width: 70ch; }
 .prose ol { padding-left: 1.25rem; }
 .prose li { margin: 0.5rem 0; }
-.prose li::marker { color: var(--board); font-weight: 700; }
+.prose li::marker { color: var(--line); font-weight: 700; }
 .prose a { color: var(--board); font-weight: 600; }
 :root[data-theme="dark"] .prose a { color: var(--disc); }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .prose a { color: var(--disc); } }
