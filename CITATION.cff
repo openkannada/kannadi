@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "If you use kannadi, please cite it as below."
+title: "kannadi: Kannada text tools"
+type: software
+authors:
+  - family-names: Subrahmanya
+    given-names: Prasad
+    website: "https://prasad.tech"
+repository-code: "https://github.com/prasadus92/kannadi"
+url: "https://prasad.tech"
+license: MIT
+version: 0.1.0
+keywords:
+  - kannada
+  - unicode
+  - nudi
+  - baraha
+  - transliteration
