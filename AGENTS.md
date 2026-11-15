@@ -55,6 +55,7 @@ web/
   build.sh            builds the WebAssembly package and the page into web/dist
   wasm-bindgen-version.sh  the wasm-bindgen version in Cargo.lock, for build.sh and CI
   serve.py            local server for web/dist
+  DESIGN.md           why the page looks as it does: world, tokens, contrast rules
   test/smoke.mjs      checks the built package in Node
   test/units.mjs      tests the page modules in Node, with no WebAssembly
 docs/                 design notes, corpus plan, prior art
