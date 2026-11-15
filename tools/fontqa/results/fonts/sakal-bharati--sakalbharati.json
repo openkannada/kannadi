@@ -1,0 +1,154 @@
+{
+ "summary": {
+  "face_id": "sakal-bharati--sakalbharati",
+  "font_id": "sakal-bharati",
+  "family": "SakalBharati",
+  "style": "Regular",
+  "version": "13.02",
+  "license": "OFL-1.1",
+  "license_in_font": "This Font Software is licensed under the SIL Open Font License, Version 1.1. This license is available with a FAQ at: http://scripts.sil.org/OFL",
+  "source": "C-DAC GIST (binary from sanchaya/fonts)",
+  "file": "SakalBharati.ttf",
+  "face_index": 0,
+  "sha256": "f27cf39cfae18b05929792fc2610f5be55d27e31afeeca2a7d6d6040733b0805",
+  "variable": false,
+  "outlines": "TrueType",
+  "gsub_scripts": "arab beng dev2 deva gujr guru knda mlym mtei olck orya taml telu",
+  "kannada_codepoints": 87,
+  "glyph_count": 4426,
+  "cases": 2146,
+  "failing_cases": 8,
+  "missing_glyph": 4,
+  "notdef": 0,
+  "dotted_circle": 0,
+  "no_conjunct": 0,
+  "no_arkavattu": 0,
+  "collision": 4,
+  "indistinct": 0,
+  "missing_codepoints": "U+0CDC U+0CDD U+0CF3"
+ },
+ "font": {
+  "family": "SakalBharati",
+  "style": "Regular",
+  "full_name": "SakalBharati",
+  "version": "13.02",
+  "license_name": "This Font Software is licensed under the SIL Open Font License, Version 1.1. This license is available with a FAQ at: http://scripts.sil.org/OFL",
+  "license_url": "http://scripts.sil.org/OFL",
+  "copyright": "Copyright (c) 2015, C-DAC, GIST PUNE, INDIA. SakalBharati a trademark of CDAC GIST is released under the SIL Open Font License.",
+  "designer": "CDAC GIST",
+  "vendor": "CDAC",
+  "glyph_count": 4426,
+  "units_per_em": 2048,
+  "variable": false,
+  "axes": [],
+  "outlines": "TrueType",
+  "script_tags": {
+   "GSUB": [
+    "arab",
+    "beng",
+    "dev2",
+    "deva",
+    "gujr",
+    "guru",
+    "knda",
+    "mlym",
+    "mtei",
+    "olck",
+    "orya",
+    "taml",
+    "telu"
+   ],
+   "GPOS": [
+    "arab",
+    "beng",
+    "dev2",
+    "deva",
+    "gujr",
+    "guru",
+    "knda",
+    "mlym",
+    "mtei",
+    "olck",
+    "orya",
+    "taml",
+    "telu"
+   ]
+  },
+  "aat_morx": false,
+  "kannada_codepoints": 87
+ },
+ "failures": [
+  {
+   "case_id": "sig-0C95-0CCD-0CB7-0CC3",
+   "group": "signed_cluster",
+   "text": "ಕ್ಷೃ",
+   "codepoints": "U+0C95 U+0CCD U+0CB7 U+0CC3",
+   "failures": "collision",
+   "glyphs": "knlka .notdef .notdef",
+   "detail": ".notdef x .notdef 6%"
+  },
+  {
+   "case_id": "sig-0C95-0CCD-0CB7-0CC8",
+   "group": "signed_cluster",
+   "text": "ಕ್ಷೈ",
+   "codepoints": "U+0C95 U+0CCD U+0CB7 U+0CC8",
+   "failures": "collision",
+   "glyphs": ".notdef knvse .notdef .notdef",
+   "detail": ".notdef x .notdef 6%"
+  },
+  {
+   "case_id": "sig-0C95-0CCD-0CB7-0CCD-0CAE",
+   "group": "signed_cluster",
+   "text": "ಕ್ಷ್ಮ",
+   "codepoints": "U+0C95 U+0CCD U+0CB7 U+0CCD U+0CAE",
+   "failures": "collision",
+   "glyphs": "knlka .notdef .notdef",
+   "detail": ".notdef x .notdef 8%"
+  },
+  {
+   "case_id": "rare-0CDD",
+   "group": "rare",
+   "text": "ಅವನೝ",
+   "codepoints": "U+0C85 U+0CB5 U+0CA8 U+0CDD",
+   "failures": "missing_glyph",
+   "glyphs": "knla knlva knlna .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "rare-0CF3",
+   "group": "rare",
+   "text": "ಕೳ",
+   "codepoints": "U+0C95 U+0CF3",
+   "failures": "missing_glyph",
+   "glyphs": "knlka .notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "rare-0CDC",
+   "group": "rare",
+   "text": "೜",
+   "codepoints": "U+0CDC",
+   "failures": "missing_glyph",
+   "glyphs": ".notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "rare-0CDC-word",
+   "group": "rare",
+   "text": "೜ಗಣೇಶ",
+   "codepoints": "U+0CDC U+0C97 U+0CA3 U+0CC7 U+0CB6",
+   "failures": "missing_glyph",
+   "glyphs": ".notdef knlga .notdef knvse knlengthmark knlsha",
+   "detail": ""
+  },
+  {
+   "case_id": "rare-0CDE",
+   "group": "rare",
+   "text": "ಬಾೞ್",
+   "codepoints": "U+0CAC U+0CBE U+0CDE U+0CCD",
+   "failures": "collision",
+   "glyphs": ".notdef knsaa knlfa knsviram",
+   "detail": "knlfa x knsviram 9%"
+  }
+ ]
+}

@@ -1,0 +1,109 @@
+{
+ "summary": {
+  "face_id": "nanni--nanni-regular",
+  "font_id": "nanni",
+  "family": "Nanni",
+  "style": "Regular",
+  "version": "Version 1.004",
+  "license": "OFL-1.1",
+  "license_in_font": "This Font Software is licensed under the SIL Open Font License, Version 1.1. This license is available with a FAQ at: https://openfontlicense.org",
+  "source": "https://github.com/suniljayaprakash/nanni-indic-font",
+  "file": "Nanni-Regular.ttf",
+  "face_index": 0,
+  "sha256": "c81facb01b89f39ed7e34b78e454187fadd0dbc9e5c1f1afa4385426d08e0876",
+  "variable": false,
+  "outlines": "TrueType",
+  "gsub_scripts": "DFLT knd2 knda latn",
+  "kannada_codepoints": 92,
+  "glyph_count": 928,
+  "cases": 2146,
+  "failing_cases": 5,
+  "missing_glyph": 0,
+  "notdef": 0,
+  "dotted_circle": 0,
+  "no_conjunct": 0,
+  "no_arkavattu": 0,
+  "collision": 5,
+  "indistinct": 0,
+  "missing_codepoints": ""
+ },
+ "font": {
+  "family": "Nanni",
+  "style": "Regular",
+  "full_name": "Nanni Regular",
+  "version": "Version 1.004",
+  "license_name": "This Font Software is licensed under the SIL Open Font License, Version 1.1. This license is available with a FAQ at: https://openfontlicense.org",
+  "license_url": "https://openfontlicense.org",
+  "copyright": "Copyright 2026 The Nanni Project Authors (https://github.com/suniljayaprakash/nanni-indic-font)",
+  "designer": "",
+  "vendor": "NANI",
+  "glyph_count": 928,
+  "units_per_em": 1000,
+  "variable": false,
+  "axes": [],
+  "outlines": "TrueType",
+  "script_tags": {
+   "GSUB": [
+    "DFLT",
+    "knd2",
+    "knda",
+    "latn"
+   ],
+   "GPOS": [
+    "DFLT",
+    "knd2",
+    "knda",
+    "latn"
+   ]
+  },
+  "aat_morx": false,
+  "kannada_codepoints": 92
+ },
+ "failures": [
+  {
+   "case_id": "sig-0C95-0CCD-0C95-0CC8",
+   "group": "signed_cluster",
+   "text": "ಕ್ಕೈ",
+   "codepoints": "U+0C95 U+0CCD U+0C95 U+0CC8",
+   "failures": "collision",
+   "glyphs": "uniE61D uni0CCD0C95 uni0CD6.below.following",
+   "detail": "uni0CCD0C95 x uni0CD6.below.following 30%"
+  },
+  {
+   "case_id": "sig-0CA6-0CCD-0CAF-0CC8",
+   "group": "signed_cluster",
+   "text": "ದ್ಯೈ",
+   "codepoints": "U+0CA6 U+0CCD U+0CAF U+0CC8",
+   "failures": "collision",
+   "glyphs": "uniE6D7 uni0CCD0CAF uni0CD6.below.following",
+   "detail": "uni0CCD0CAF x uni0CD6.below.following 21%"
+  },
+  {
+   "case_id": "sig-0CB8-0CCD-0CB5-0CC8",
+   "group": "signed_cluster",
+   "text": "ಸ್ವೈ",
+   "codepoints": "U+0CB8 U+0CCD U+0CB5 U+0CC8",
+   "failures": "collision",
+   "glyphs": "uniE770 uni0CCD0CB5 uni0CD6.below.following",
+   "detail": "uni0CCD0CB5 x uni0CD6.below.following 25%"
+  },
+  {
+   "case_id": "sig-0CAA-0CCD-0CAA-0CC8",
+   "group": "signed_cluster",
+   "text": "ಪ್ಪೈ",
+   "codepoints": "U+0CAA U+0CCD U+0CAA U+0CC8",
+   "failures": "collision",
+   "glyphs": "uniE6F8 uni0CCD0CAA uni0CD6.below.following",
+   "detail": "uni0CCD0CAA x uni0CD6.below.following 11%"
+  },
+  {
+   "case_id": "sig-0CAE-0CCD-0CAE-0CC8",
+   "group": "signed_cluster",
+   "text": "ಮ್ಮೈ",
+   "codepoints": "U+0CAE U+0CCD U+0CAE U+0CC8",
+   "failures": "collision",
+   "glyphs": "uniE724 uni0CCD0CAE uni0CD6.below.following",
+   "detail": "uni0CCD0CAE x uni0CD6.below.following 7%"
+  }
+ ]
+}

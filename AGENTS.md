@@ -19,6 +19,7 @@ web/build.sh && node web/test/smoke.mjs                 # WebAssembly build and 
 node --test web/test/units.mjs                          # page modules
 python3 web/serve.py 8000                               # serve web/dist locally
 cargo run --example nudi -- file.txt                    # convert a legacy text file
+cd tools/fontqa && uv run pytest && uv run ruff check . # font shaping tests (Python)
 ```
 
 CI runs these with `--locked`, apart from the example. A change is ready when they pass. `web/build.sh` needs the `wasm32-unknown-unknown` target and `wasm-bindgen-cli` at the `wasm-bindgen` version in `Cargo.lock`.
@@ -64,6 +65,8 @@ web/
   DESIGN.md           why the page looks as it does: world, tokens, contrast rules
   test/smoke.mjs      checks the built package in Node
   test/units.mjs      tests the page modules in Node, with no WebAssembly
+tools/fontqa/         Python: HarfBuzz shaping tests for Kannada fonts, results,
+                      and fixes for font tables; see its README
 docs/                 design notes, corpus plan, prior art
 ```
 

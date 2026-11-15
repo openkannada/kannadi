@@ -1,0 +1,88 @@
+{
+ "summary": {
+  "face_id": "noto-serif-kannada--notoserifkannada-wght",
+  "font_id": "noto-serif-kannada",
+  "family": "Noto Serif Kannada",
+  "style": "Regular",
+  "version": "Version 2.005",
+  "license": "OFL-1.1",
+  "license_in_font": "This Font Software is licensed under the SIL Open Font License, Version 1.1. This license is available with a FAQ at: https://scripts.sil.org/OFL",
+  "source": "Google Fonts",
+  "file": "NotoSerifKannada[wght].ttf",
+  "face_index": 0,
+  "sha256": "3d97c98dd59251a85fcc6e95edf9be02b60147e92486927390247f1cd4d5eb37",
+  "variable": true,
+  "outlines": "TrueType",
+  "gsub_scripts": "DFLT cyrl grek knd2 knda latn",
+  "kannada_codepoints": 91,
+  "glyph_count": 700,
+  "cases": 2146,
+  "failing_cases": 2,
+  "missing_glyph": 2,
+  "notdef": 0,
+  "dotted_circle": 0,
+  "no_conjunct": 0,
+  "no_arkavattu": 0,
+  "collision": 0,
+  "indistinct": 0,
+  "missing_codepoints": "U+0CDC"
+ },
+ "font": {
+  "family": "Noto Serif Kannada",
+  "style": "Regular",
+  "full_name": "Noto Serif Kannada Regular",
+  "version": "Version 2.005",
+  "license_name": "This Font Software is licensed under the SIL Open Font License, Version 1.1. This license is available with a FAQ at: https://scripts.sil.org/OFL",
+  "license_url": "https://scripts.sil.org/OFL",
+  "copyright": "Copyright 2022 The Noto Project Authors (https://github.com/notofonts/kannada)",
+  "designer": "Universal Thirst, Indian Type Foundry and the Monotype Design Team",
+  "vendor": "GOOG",
+  "glyph_count": 700,
+  "units_per_em": 1000,
+  "variable": true,
+  "axes": [
+   "wght"
+  ],
+  "outlines": "TrueType",
+  "script_tags": {
+   "GSUB": [
+    "DFLT",
+    "cyrl",
+    "grek",
+    "knd2",
+    "knda",
+    "latn"
+   ],
+   "GPOS": [
+    "DFLT",
+    "cyrl",
+    "grek",
+    "knd2",
+    "knda",
+    "latn"
+   ]
+  },
+  "aat_morx": false,
+  "kannada_codepoints": 91
+ },
+ "failures": [
+  {
+   "case_id": "rare-0CDC",
+   "group": "rare",
+   "text": "೜",
+   "codepoints": "U+0CDC",
+   "failures": "missing_glyph",
+   "glyphs": ".notdef",
+   "detail": ""
+  },
+  {
+   "case_id": "rare-0CDC-word",
+   "group": "rare",
+   "text": "೜ಗಣೇಶ",
+   "codepoints": "U+0CDC U+0C97 U+0CA3 U+0CC7 U+0CB6",
+   "failures": "missing_glyph",
+   "glyphs": ".notdef ga_kannada nne_kannada length_kannada sha_kannada",
+   "detail": ""
+  }
+ ]
+}
