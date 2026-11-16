@@ -47,7 +47,7 @@ Version 0.1, in development.
 | Kannada numerals | Done |
 | Nudi and Baraha to Unicode | Done, waiting on a native reader's check of 100 sample lines |
 | Unicode to Nudi and Baraha | Done |
-| Akruti to Unicode and back | Done in the library and the command-line tool, checked on 908,075 glyphs from 35 documents; a Kannada reader's check of 125 lines is pending |
+| Akruti to Unicode and back | Done in the library, the command-line tool and the editor page, checked on 908,075 glyphs from 35 documents; a Kannada reader's check of 125 lines is pending |
 | Test corpus | 207 lines from 31 government pages of 2002 in [corpus/](https://github.com/prasadus92/kannadi/tree/main/corpus); a Kannada reader's check is pending |
 | Editor page that runs in the browser, with no upload | Built, not hosted yet: [web/](https://github.com/prasadus92/kannadi/tree/main/web) |
 | Command-line tool for TXT, HTML, DOCX and PDF | Done; PDF to Unicode only |
@@ -112,7 +112,7 @@ let converted = to_unicode("dâ}â", Layout::Akruti, &Options::default());
 assert_eq!(converted.text, "ಕನ");
 ```
 
-The Akruti table was derived from the fonts embedded in public PDFs and checked against the pages; [docs/akruti.md](https://github.com/prasadus92/kannadi/blob/main/docs/akruti.md) has the method and results. The command-line tool reads Akruti too; the editor page reads Nudi and Baraha only for now.
+The Akruti table was derived from the fonts embedded in public PDFs and checked against the pages; [docs/akruti.md](https://github.com/prasadus92/kannadi/blob/main/docs/akruti.md) has the method and results. The command-line tool reads Akruti too. So does the editor page: by font name in DOCX and HTML files, and otherwise (pasted text, text files, HTML with no font, the Convert button) in the layout that converts best, chosen by `legacy::best_layout` once for all such text in a paste, a file or a selection.
 
 `legacy::unicode_to_nudi` goes the other way, for documents that must still be printed in a legacy font:
 
@@ -132,7 +132,7 @@ assert!(encoded.is_clean());
 
 [web/](https://github.com/prasadus92/kannadi/tree/main/web) is a static Kannada editor that runs in the browser. The crate runs as WebAssembly through the bindings in [crates/kannadi-wasm](https://github.com/prasadus92/kannadi/tree/main/crates/kannadi-wasm), so text never leaves the device.
 
-- Paste text, or open a TXT, DOCX or HTML file. Nudi and Baraha text is converted to Unicode. In DOCX and HTML files, only text set in a Nudi or Baraha font is converted.
+- Paste text, or open a TXT, DOCX or HTML file. Nudi, Baraha and Akruti text is converted to Unicode. In DOCX files, only text set in one of their fonts is converted; in HTML files, also text with no font that looks like legacy codes.
 - Unknown glyphs and malformed syllables are marked in the text and listed beside it. Selecting one offers checked fixes, or a replacement typed in Baraha letters.
 - Type Kannada with Baraha or ISO 15919 letters.
 - Normalize, modernize Old Kannada letters, and count aksharas and words.

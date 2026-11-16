@@ -28,6 +28,7 @@ Command-line tool (`kannadi-cli`):
 Editor page and bindings:
 
 - `kannadi-wasm`: WebAssembly bindings for conversion in both directions, transliteration, normalization, segmentation, syllable checks and fixes, with offsets in UTF-16 code units.
+- The editor page reads Akruti: DOCX and HTML text by its font, pasted and plain text in the layout that converts best (`legacy::best_layout`, which breaks ties by fewer viramas), chosen once per paste, file or selection. `kannadi-wasm`: `toUnicode` with a layout name, and `bestLayout`.
 - A static Kannada editor in `web/`: open TXT, DOCX and HTML, converting only text set in Nudi or Baraha fonts; inline marks for unknown glyphs and malformed syllables with checked fixes; Baraha and ISO 15919 typing; normalize and modernize; akshara and word counts; save as DOCX, TXT, HTML or Nudi text; autosave in the browser. Self-hosted Noto Sans Kannada and Noto Serif Kannada.
 - Landing pages for Nudi to Unicode, Unicode to Nudi, Baraha to Unicode, Kannada typing and English to Kannada typing, built from 1 template with JSON-LD, Open Graph cards, `llms.txt`, and a sitemap when the site URL is set.
 

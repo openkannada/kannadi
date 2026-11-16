@@ -5,7 +5,7 @@ import { test } from "node:test";
 import { Composer } from "../src/js/compose.js";
 import { readDocx, writeDocx } from "../src/js/docx.js";
 import { DocEditor } from "../src/js/editor.js";
-import { pasted } from "../src/js/files.js";
+import { htmlSegments, pasted } from "../src/js/files.js";
 import {
   codePoints,
   countWords,
@@ -13,6 +13,8 @@ import {
   escapeMarkup,
   isLegacyFont,
   joinSegments,
+  legacyLayout,
+  resolveAuto,
   looksLegacy,
   nudiNotes,
   shiftAnchors,
@@ -37,6 +39,12 @@ test("legacy text is told apart from English and Unicode Kannada", () => {
 test("legacy font names", () => {
   for (const f of ["BRH Kannada", "Nudi 01 e", "'Nudi Akshar'", "Baraha Kan", "Arial, BRH Kannada"]) assert.ok(isLegacyFont(f), f);
   for (const f of ["Arial", "Nirmala UI", "NudiUni01e", "Nudi Unicode 01", "Tunga", undefined, null]) assert.ok(!isLegacyFont(f), f);
+  assert.equal(legacyLayout("BRH Kannada"), "nudi");
+  assert.equal(legacyLayout("AkrutiKndPadmaDemi"), "akruti");
+  assert.equal(legacyLayout("'Akruti Knd Padma', serif"), "akruti");
+  assert.equal(legacyLayout("Arial, Nudi 01 e"), "nudi");
+  assert.equal(legacyLayout("AkrutiKndPadmini"), null);
+  assert.equal(legacyLayout("Arial"), null);
 });
 
 test("diff finds the single edit", () => {
@@ -65,8 +73,9 @@ test("ranges move with edits and drop when touched", () => {
 
 test("plain text that needs no conversion is kept exactly", () => {
   const convert = () => assert.fail("nothing to convert");
+  const bestLayout = () => assert.fail("nothing to judge");
   for (const text of ["    indented code\n\n\n\nend ", "ಕನ್ನಡ  ನಾಡು\r\n\t", " "]) {
-    assert.deepEqual(pasted("", text, convert), { text, unknown: [], converted: 0 });
+    assert.deepEqual(pasted("", text, { convert, bestLayout }), { text, unknown: [], converted: 0, layouts: [] });
   }
 });
 
@@ -95,21 +104,80 @@ test("anchors move with edits and drop when edited away", () => {
   assert.deepEqual(shiftAnchors(anchors, diff(before, deleted), deleted), [{ offset: 7, glyph: "õ" }]);
 });
 
-test("segments merge before converting, and offsets point into the output", () => {
-  const convert = (text) => ({ text: text.toUpperCase(), unknown: [text.indexOf("q")].filter((i) => i >= 0) });
+test("segments of 1 layout merge before converting, and offsets point into the output", () => {
+  const layouts = [];
+  const convert = (text, layout) => {
+    layouts.push(layout);
+    return { text: text.toUpperCase(), unknown: [text.indexOf("q")].filter((i) => i >= 0) };
+  };
   const joined = joinSegments(
     [
       { text: "Hi ", legacy: false },
-      { text: "ab", legacy: true },
-      { text: "qc", legacy: true },
+      { text: "ab", legacy: "nudi" },
+      { text: "qc", legacy: "nudi" },
       { text: "", legacy: false },
       { text: " end", legacy: false },
     ],
     convert,
   );
   assert.equal(joined.text, "Hi ABQC end");
+  assert.deepEqual(joined.layouts, ["nudi"]);
   assert.deepEqual(joined.unknown, [5]);
   assert.equal(joined.converted, 4);
+  assert.deepEqual(layouts, ["nudi"]);
+  const mixed = joinSegments(
+    [
+      { text: "ab", legacy: "nudi" },
+      { text: "cd", legacy: "akruti" },
+      { text: "ef", legacy: "auto" },
+    ],
+    convert,
+  );
+  assert.equal(mixed.text, "ABCDEF");
+  assert.deepEqual(layouts.slice(1), ["nudi", "akruti", "auto"]);
+});
+
+test("auto segments get 1 layout, chosen over all their text", () => {
+  const seen = [];
+  const bestLayout = (text) => {
+    seen.push(text);
+    return "akruti";
+  };
+  const segments = [
+    { text: "ab", legacy: "auto" },
+    { text: " ", legacy: false },
+    { text: "cd", legacy: "auto" },
+    { text: "ef", legacy: "nudi" },
+  ];
+  assert.deepEqual(
+    resolveAuto(segments, bestLayout).map((s) => s.legacy),
+    ["akruti", false, "akruti", "nudi"],
+  );
+  assert.deepEqual(seen, ["ab\ncd"]);
+  assert.equal(resolveAuto([{ text: "x", legacy: false }], () => assert.fail("no auto text")).length, 1);
+});
+
+// Just enough DOM for htmlSegments: elements with attributes, classes and children.
+globalThis.Node ??= { TEXT_NODE: 3, ELEMENT_NODE: 1 };
+const el = (tag, attrs = {}, ...kids) => ({
+  nodeType: 1,
+  tagName: tag.toUpperCase(),
+  childNodes: kids.map((k) => (typeof k === "string" ? { nodeType: 3, data: k } : k)),
+  getAttribute: (n) => attrs[n] ?? null,
+  hasAttribute: (n) => n in attrs,
+  classList: (attrs.class ?? "").split(" ").filter(Boolean),
+});
+const page = (css, body) => ({ body, querySelectorAll: () => [{ textContent: css }] });
+const fontOf = (css, body) => htmlSegments(page(css, el("body", {}, body))).find((s) => s.text.trim()).legacy;
+
+test("html text takes the font of the last class rule, and a page-wide plain font leaves it to its looks", () => {
+  const text = "PÀ£ÀßqÀ £ÁqÀÄ";
+  assert.equal(fontOf(".a{font-family:'Nudi 01 e'} .b{font-family:Arial}", el("span", { class: "a b" }, text)), false);
+  assert.equal(fontOf(".b{font-family:Arial} .a{font-family:'Nudi 01 e'}", el("span", { class: "b a" }, text)), "nudi");
+  assert.equal(fontOf(".a{font-family:AkrutiKndPadma}", el("p", { class: "a" }, text)), "akruti");
+  assert.equal(fontOf("p{font-family:'Nudi 01 e'} .x{font-family:Arial}", el("p", { class: "x" }, text)), false);
+  assert.equal(fontOf("body{font-family:Arial} #kan{font-family:'BRH Kannada'}", el("div", { id: "kan" }, text)), "auto");
+  assert.equal(fontOf("body{font-family:Arial}", el("p", {}, text)), "auto");
 });
 
 test("word count and code points", () => {
@@ -146,6 +214,15 @@ async function docx(body, styles = "") {
   ]);
 }
 
+test("docx runs carry the layout of their font", async () => {
+  const body = `<w:p>${run("PÀ", "Nudi 01 e")}${run("dâ}â", "AkrutiKndPadmaDemi")}${run("Hi", "Arial")}</w:p>`;
+  assert.deepEqual(await readDocx(await docx(body, "")), [
+    { text: "PÀ", legacy: "nudi" },
+    { text: "dâ}â", legacy: "akruti" },
+    { text: "Hi", legacy: false },
+  ]);
+});
+
 test("docx runs are legacy by run font, character style, paragraph style or default", async () => {
   const styles =
     '<w:docDefaults><w:rPrDefault><w:rPr><w:rFonts w:ascii="Times New Roman"/></w:rPr></w:rPrDefault></w:docDefaults>' +
@@ -160,10 +237,10 @@ test("docx runs are legacy by run font, character style, paragraph style or defa
   const segments = await readDocx(await docx(body, styles));
   assert.deepEqual(segments, [
     { text: "English ", legacy: false },
-    { text: "PÀ£À", legacy: true },
-    { text: "ßqÀ", legacy: true },
+    { text: "PÀ£À", legacy: "nudi" },
+    { text: "ßqÀ", legacy: "nudi" },
     { text: "\n", legacy: false },
-    { text: "¤ÃqÀÄ", legacy: true },
+    { text: "¤ÃqÀÄ", legacy: "nudi" },
     { text: "Eng", legacy: false },
     { text: "\t", legacy: false },
     { text: "\n", legacy: false },
@@ -191,7 +268,7 @@ test("docx tracked format changes and bad character references", async () => {
     '<w:r><w:rPr><w:rFonts w:ascii="BRH Kannada"/><w:rPrChange><w:rPr><w:rFonts w:ascii="Arial"/></w:rPr></w:rPrChange></w:rPr><w:t>PÀ</w:t></w:r>';
   const segments = await readDocx(await docx(`<w:p>${tracked}${run("&#x110000;&#65;")}</w:p>`));
   assert.deepEqual(segments, [
-    { text: "PÀ", legacy: true },
+    { text: "PÀ", legacy: "nudi" },
     { text: "\uFFFDA", legacy: false },
   ]);
 });

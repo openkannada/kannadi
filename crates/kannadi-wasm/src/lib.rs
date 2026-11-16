@@ -12,7 +12,8 @@ use kannadi::legacy;
 use kannadi::Scheme;
 use wasm_bindgen::prelude::*;
 
-/// Settings for [`nudi_to_unicode`]. The defaults match [`legacy::Options`].
+/// Settings for [`to_unicode`] and [`nudi_to_unicode`]. The defaults match
+/// [`legacy::Options`].
 #[wasm_bindgen(js_name = NudiOptions)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct NudiOptions {
@@ -107,7 +108,24 @@ impl Conversion {
 /// See [`legacy::nudi_to_unicode`].
 #[wasm_bindgen(js_name = nudiToUnicode)]
 pub fn nudi_to_unicode(text: &str, options: &NudiOptions) -> Conversion {
-    let converted = legacy::nudi_to_unicode(text, &(*options).into());
+    convert(text, legacy::Layout::Nudi, options)
+}
+
+/// Converts text typed in a legacy font with the layout named `layout`, such as
+/// `"nudi"` or `"akruti"`, to Unicode Kannada. See [`legacy::to_unicode`].
+#[wasm_bindgen(js_name = toUnicode)]
+pub fn to_unicode(text: &str, layout: &str, options: &NudiOptions) -> Result<Conversion, JsError> {
+    Ok(convert(text, layout.parse()?, options))
+}
+
+/// The name of the layout `text` reads best in. See [`legacy::best_layout`].
+#[wasm_bindgen(js_name = bestLayout)]
+pub fn best_layout(text: &str) -> String {
+    legacy::best_layout(text).name().to_string()
+}
+
+fn convert(text: &str, layout: legacy::Layout, options: &NudiOptions) -> Conversion {
+    let converted = legacy::to_unicode(text, layout, &(*options).into());
 
     let mut input = Utf16Cursor::new(text);
     let unknown = converted
@@ -388,6 +406,16 @@ mod tests {
         let c = nudi_to_unicode("PÀ£ÀßqÀ", &NudiOptions::new());
         assert_eq!(c.text(), "ಕನ್ನಡ");
         assert!(c.is_clean());
+    }
+
+    #[test]
+    fn each_layout_converts() {
+        let c = to_unicode("dâ}â", "akruti", &NudiOptions::new()).unwrap();
+        assert_eq!(c.text(), "ಕನ");
+        let c = to_unicode("PÀ£ÀßqÀ", "Nudi", &NudiOptions::new()).unwrap();
+        assert_eq!(c.text(), "ಕನ್ನಡ");
+        assert_eq!(best_layout("dâ}â"), "akruti");
+        assert_eq!(best_layout("PÀ£ÀßqÀ"), "nudi");
     }
 
     #[test]

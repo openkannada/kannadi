@@ -23,7 +23,7 @@ const WHO = {
   a: 'It is built on <a href="https://github.com/prasadus92/kannadi">kannadi</a>, an open-source Rust library for Kannada text by Prasad Subrahmanya, released under the MIT license. The fonts are Noto Sans Kannada and Noto Serif Kannada, under the SIL Open Font License.',
 };
 const CONVERT_STEPS = [
-  "Open your file with <b>Open</b>, or copy the text from Word and paste it into the sheet. Word files keep their fonts, so only the text set in Nudi or Baraha fonts is converted.",
+  "Open your file with <b>Open</b>, or copy the text from Word and paste it into the sheet. Word files keep their fonts, so only the text set in Nudi, Baraha or Akruti fonts is converted.",
   "Check the marks. Red is a glyph with no Kannada letter. Amber is a sign that cannot form a syllable. Select a mark, or press <kbd>F8</kbd>, and pick a fix.",
   "Choose <b>Save</b> and pick Word, plain text or web page.",
 ];
@@ -103,14 +103,14 @@ export const PAGES = [
       "Convert Nudi Kannada text and Word files to Unicode in your browser. Every glyph that could not be converted is marked with a fix. Nothing is uploaded.",
     h1: "Nudi to Unicode converter",
     intro:
-      "A Nudi to Unicode converter turns Kannada typed in the Nudi fonts, which store Latin letters such as <code>PÀ£ÀßqÀ</code>, into Unicode Kannada such as <span lang=\"kn\">ಕನ್ನಡ</span>. Paste the text or open the file below. Only the text set in Nudi or Baraha fonts is converted.",
+      "A Nudi to Unicode converter turns Kannada typed in the Nudi fonts, which store Latin letters such as <code>PÀ£ÀßqÀ</code>, into Unicode Kannada such as <span lang=\"kn\">ಕನ್ನಡ</span>. Paste the text or open the file below. Only the text set in Nudi, Baraha or Akruti fonts is converted.",
     mode: "kannada",
     howTitle: "How to convert a Nudi file to Unicode",
     steps: CONVERT_STEPS,
     faq: [
       {
         q: "How do I convert a Nudi file to Unicode?",
-        a: "Choose <b>Open</b> and pick the Word, text or web page file. The editor reads the fonts in the file and converts the text set in Nudi or Baraha fonts. Check the marked problems, then choose <b>Save</b>.",
+        a: "Choose <b>Open</b> and pick the Word, text or web page file. The editor reads the fonts in the file and converts the text set in Nudi, Baraha or Akruti fonts. Check the marked problems, then choose <b>Save</b>.",
       },
       {
         q: "How can I tell if my text is Nudi or Unicode?",

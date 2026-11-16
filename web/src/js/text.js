@@ -4,8 +4,12 @@
 const LEGACY_CHAR = /[¡-ÿŒœŠšŸŽžƒˆ˜–—‘-„†-•…‰‹›€™]/gu;
 const KANNADA_CHAR = /[ಀ-೿]/gu;
 const NON_SPACE = /\S/gu;
-// Legacy font families. Nudi's Unicode fonts carry "Uni" in their names.
-const LEGACY_FONT = /^(?!.*uni)\s*['"]?(nudi|brh\b|baraha)/i;
+// Legacy font families and their layouts. Nudi's Unicode fonts carry "Uni" in
+// their names.
+const LEGACY_FONTS = [
+  [/^(?!.*uni)\s*['"]?(nudi|brh\b|baraha)/i, "nudi"],
+  [/^\s*['"]?akruti\s*knd\s*padma/i, "akruti"],
+];
 
 const count = (text, pattern) => (text.match(pattern) || []).length;
 
@@ -21,9 +25,22 @@ export function looksLegacy(text) {
   return legacy / count(text, NON_SPACE) >= 0.4;
 }
 
-/** True for a Nudi or Baraha ANSI font family name, such as "BRH Kannada". */
+/**
+ * The layout of the first legacy family in a font-family list, such as "nudi"
+ * for "BRH Kannada" or "akruti" for "AkrutiKndPadma", or null.
+ */
+export function legacyLayout(family) {
+  if (typeof family !== "string") return null;
+  for (const f of family.split(",")) {
+    const found = LEGACY_FONTS.find(([pattern]) => pattern.test(f.trim()));
+    if (found) return found[1];
+  }
+  return null;
+}
+
+/** True for a legacy font family name, such as "BRH Kannada". */
 export function isLegacyFont(family) {
-  return typeof family === "string" && family.split(",").some((f) => LEGACY_FONT.test(f.trim()));
+  return legacyLayout(family) !== null;
 }
 
 /**
@@ -40,12 +57,30 @@ export function decodeBytes(bytes, decodeWindows1252) {
   }
 }
 
+/** What the page calls each layout. */
+export const LAYOUT_NAMES = { nudi: "Nudi or Baraha", akruti: "Akruti" };
+
 /**
- * Joins text segments, converting the legacy ones. Adjacent segments of the
- * same kind are merged first, so a syllable split across Word runs converts whole.
- * @param {{text: string, legacy: boolean}[]} segments
- * @param {(text: string) => {text: string, unknown: number[]}} convert
- * @returns {{text: string, unknown: number[], converted: number}}
+ * Replaces "auto" in every segment with 1 layout, chosen over all their text
+ * together, so a document is not read in 2 layouts by chance.
+ * @param {{text: string, legacy: false | string}[]} segments
+ * @param {(text: string) => string} bestLayout
+ */
+export function resolveAuto(segments, bestLayout) {
+  const auto = segments.filter((s) => s.legacy === "auto");
+  if (!auto.length) return segments;
+  const layout = bestLayout(auto.map((s) => s.text).join("\n"));
+  return segments.map((s) => (s.legacy === "auto" ? { ...s, legacy: layout } : s));
+}
+
+/**
+ * Joins text segments, converting the legacy ones. A segment's `legacy` is false,
+ * a layout name, or "auto" for legacy text in an unknown font. Adjacent segments
+ * of the same kind are merged first, so a syllable split across Word runs
+ * converts whole.
+ * @param {{text: string, legacy: false | string}[]} segments
+ * @param {(text: string, layout: string) => {text: string, unknown: number[], layout: string}} convert
+ * @returns {{text: string, unknown: number[], converted: number, layouts: string[]}}
  */
 export function joinSegments(segments, convert) {
   const merged = [];
@@ -58,9 +93,11 @@ export function joinSegments(segments, convert) {
   let text = "";
   const unknown = [];
   let converted = 0;
+  const layouts = new Set();
   for (const s of merged) {
     if (s.legacy) {
-      const result = convert(s.text);
+      const result = convert(s.text, s.legacy);
+      layouts.add(result.layout ?? s.legacy);
       for (const offset of result.unknown) unknown.push(text.length + offset);
       text += result.text;
       converted += s.text.length;
@@ -68,7 +105,7 @@ export function joinSegments(segments, convert) {
       text += s.text;
     }
   }
-  return { text, unknown, converted };
+  return { text, unknown, converted, layouts: [...layouts] };
 }
 
 const CHUNK = 4096;
