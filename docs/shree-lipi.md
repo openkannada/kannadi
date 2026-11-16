@@ -38,7 +38,7 @@ Karnataka Acts in Kannada on `dpal.kar.nic.in`, made with PageMaker 6.52 and Acr
 
 About 19 more Kannada Acts are listed in the [Internet Archive index for dpal.kar.nic.in](http://web.archive.org/cdx/search/cdx?url=dpal.kar.nic.in&matchType=domain&filter=mimetype:application/pdf&collapse=urlkey). The 2002 budget PDFs [bh2002k.pdf](http://web.archive.org/web/20040822015443/http://www.kar.nic.in:80/finance/bud2002-kan/bh2002k.pdf) and [bs2002-k.pdf](http://web.archive.org/web/20060517033426/http://kar.nic.in:80/finance/bud2002-kan/bs2002-k.pdf) also use `AkrutiKndPadma`.
 
-Akruti text does not decode with the Nudi table. On page 1 of `bh2002k.pdf`, the Nudi converter reports 68 unknown glyphs and 212 malformed syllables. That is 1 page; it shows the layouts differ, not by how much. Baraha lists a font named `AkrutiKndPadmini`. Whether all Akruti Kannada fonts share 1 layout is not known, so each font name may need checking.
+Akruti text does not decode with the Nudi table. On page 1 of `bh2002k.pdf`, the Nudi converter reports 68 unknown glyphs and 212 malformed syllables. That is 1 page. It shows that the layouts differ; it does not show by how much. Baraha lists a font named `AkrutiKndPadmini`. Whether all Akruti Kannada fonts share 1 layout is not known, so each font name may need checking.
 
 ### Other public Kannada PDFs checked
 
@@ -60,16 +60,16 @@ Checked on 16 November 2026, with the Akruti work.
 - **Legislative Assembly member pages.** The unnamed font in `13mem/50.pdf` is a third layout, described above. Its subset holds only the 117 glyphs that page uses, too few to test the Udayavani text against, so whether it is Shree-Kan-0850 is not known.
 - **Web search.** Searches for PDFs naming `Shree-Kan` fonts found only font shops and converters.
 
-A Shree-Lipi table can be built the way Akruti was if its glyphs can be seen: from a public PDF that embeds a named Shree-Lipi font, or from the web font Udayavani served with its pages. The Udayavani text then checks the table, as the Acts checked Akruti. Whether to render the font Udayavani served is a decision for the maintainer: it was published for readers of those pages, but it is a font file and not a document.
+A Shree-Lipi table can be built the way Akruti was if its glyphs can be seen: from a public PDF that embeds a named Shree-Lipi font, or from the web font Udayavani served with its pages. The Udayavani text then checks the table, as the Acts checked Akruti. Whether to render the font Udayavani served is a decision for the maintainer. It was published for readers of those pages, but it is a font file of its own, outside any document.
 
 ## How a table is derived
 
-The Akruti table was built this way, and Shree-Lipi will follow it. [akruti.md](akruti.md) has the details.
+The Akruti table was built this way. Shree-Lipi would follow it once a source is found. [akruti.md](akruti.md) has the details.
 
 1. Collect public PDFs whose font names, as `pdffonts` lists them, identify the layout.
 2. Render each glyph of the embedded fonts and identify it, with glyphs shaped by HarfBuzz from Unicode Kannada fonts as a second opinion.
 3. Convert every document, and read each unknown glyph and malformed syllable against the rendered page.
-4. Store the result as a table in the format of `data/nudi.tsv`, with its sources in the header, and add the layout to `Layout`.
+4. Store the result as a table in the format of `crates/kannadi/data/nudi.tsv`, with its sources in the header, and add the layout to `Layout`.
 5. Build a golden fixture from short excerpts with source URLs, read against the page, and report accuracy per document and per font.
 
 A table covers the codes that appear in the collected documents. Rare conjunct glyphs may stay unknown; the converter reports them.
