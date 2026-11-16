@@ -5,6 +5,7 @@
 //! every other part of the package is copied unchanged.
 
 mod part;
+mod scan;
 mod styles;
 mod xml;
 
@@ -228,6 +229,95 @@ mod tests {
             .map(|t| &t[t.find('>').unwrap() + 1..t.find("</w:t>").unwrap()])
             .collect();
         assert_eq!(text, "ಕನ್ನಡ ನಾಡು, ಸ್ತ್ರೀ");
+    }
+
+    #[test]
+    fn odd_but_valid_xml_is_handled() {
+        let bom = format!("\u{FEFF}<w:document {W}><w:body><w:p><w:r><w:rPr>{NUDI}</w:rPr><w:t>PÀ</w:t></w:r></w:p></w:body></w:document>");
+        let mut writer = ZipWriter::new(Cursor::new(Vec::new()));
+        writer
+            .start_file("word/document.xml", SimpleFileOptions::default())
+            .unwrap();
+        writer.write_all(bom.as_bytes()).unwrap();
+        let bytes = writer.finish().unwrap().into_inner();
+        let (xml, _) = run(&bytes, to_unicode());
+        assert!(
+            xml.starts_with('\u{FEFF}') && xml.contains(">ಕ</w:t>"),
+            "{xml}"
+        );
+
+        let open_close =
+            "<w:p><w:r><w:rPr><w:rFonts w:ascii=\"Nudi 01 e\" w:hAnsi=\"Nudi 01 e\"></w:rFonts>\
+                          <w:sz w:val=\"28\"></w:sz></w:rPr><w:t>PÀ</w:t></w:r></w:p>";
+        let (xml, _) = run(&docx(open_close, None), to_unicode());
+        assert!(!xml.contains("</w:rFonts>"), "{xml}");
+        assert!(
+            xml.contains("<w:sz w:val=\"28\"></w:sz><w:szCs w:val=\"28\"/>"),
+            "{xml}"
+        );
+
+        let nudi_normal = format!(
+            "<w:style w:type=\"paragraph\" w:default=\"1\" w:styleId=\"Normal\"><w:rPr>{NUDI}</w:rPr></w:style>"
+        );
+        let nested = "<w:p><w:r><w:rPr><w:r><w:t>PÀ</w:t></w:r></w:rPr><w:t>PÀ</w:t></w:r></w:p>";
+        let (xml, _) = run(&docx(nested, Some(&nudi_normal)), to_unicode());
+        assert!(xml.contains("<w:r><w:t>PÀ</w:t></w:r>"), "{xml}");
+        assert!(
+            xml.contains("<w:t xml:space=\"preserve\">ಕ</w:t></w:r></w:p>"),
+            "{xml}"
+        );
+    }
+
+    #[test]
+    fn tracked_changes_are_read_like_word_does() {
+        let styles = format!(
+            "<w:style w:type=\"paragraph\" w:styleId=\"Kn\"><w:rPr>{NUDI}</w:rPr></w:style>\
+             <w:style w:type=\"paragraph\" w:default=\"1\" w:styleId=\"Normal\"/>"
+        );
+        let body = "<w:p><w:pPr><w:pStyle w:val=\"Kn\"/><w:pPrChange w:id=\"1\"><w:pPr><w:pStyle w:val=\"Normal\"/></w:pPr></w:pPrChange></w:pPr>\
+                    <w:r><w:t>PÀ</w:t></w:r><w:del w:id=\"2\"><w:r><w:delText>£À</w:delText></w:r></w:del></w:p>";
+        let (xml, _) = run(&docx(body, Some(&styles)), to_unicode());
+        assert!(xml.contains(">ಕ</w:t>"), "{xml}");
+        assert!(
+            xml.contains("<w:delText xml:space=\"preserve\">ನ</w:delText>"),
+            "{xml}"
+        );
+    }
+
+    #[test]
+    fn a_zero_at_a_run_boundary_reads_as_in_one_run() {
+        let body = format!(
+            "<w:p><w:r><w:rPr>{NUDI}</w:rPr><w:t>¥ÀæÁgÀ</w:t></w:r><w:r><w:rPr>{NUDI}</w:rPr><w:t>0¨sÀ</w:t></w:r></w:p>"
+        );
+        let (xml, _) = run(&docx(&body, None), to_unicode());
+        let text: String = xml
+            .split("<w:t")
+            .skip(1)
+            .map(|t| &t[t.find('>').unwrap() + 1..t.find("</w:t>").unwrap()])
+            .collect();
+        assert_eq!(text, "ಪ್ರಾರಂಭ");
+    }
+
+    #[test]
+    fn bold_italic_and_size_follow_the_script() {
+        let body = format!("<w:p><w:r><w:rPr>{NUDI}<w:b/><w:i w:val=\"1\"/><w:sz w:val=\"28\"/></w:rPr><w:t>PÀ</w:t></w:r></w:p>");
+        let (xml, _) = run(&docx(&body, None), to_unicode());
+        assert!(xml.contains("<w:b/><w:bCs/><w:i w:val=\"1\"/><w:iCs w:val=\"1\"/><w:sz w:val=\"28\"/><w:szCs w:val=\"28\"/>"), "{xml}");
+        let body = "<w:p><w:r><w:rPr><w:bCs/><w:sz w:val=\"22\"/><w:szCs w:val=\"32\"/></w:rPr><w:t>ಕ</w:t></w:r></w:p>";
+        let (xml, _) = run(&docx(body, None), Direction::ToNudi);
+        assert!(xml.contains("<w:b/><w:bCs/><w:sz w:val=\"32\"/><w:szCs w:val=\"32\"/></w:rPr><w:t xml:space=\"preserve\">PÀ"), "{xml}");
+    }
+
+    #[test]
+    fn text_box_fallback_copies_are_converted_but_not_reported_twice() {
+        let box_text = format!("<w:p><w:r><w:rPr>{NUDI}</w:rPr><w:t>P</w:t></w:r></w:p>");
+        let body = format!(
+            "<w:p><w:r><mc:AlternateContent><mc:Choice><w:txbxContent>{box_text}</w:txbxContent></mc:Choice>\
+             <mc:Fallback><w:txbxContent>{box_text}</w:txbxContent></mc:Fallback></mc:AlternateContent></w:r></w:p>"
+        );
+        let (_, report) = run(&docx(&body, None), to_unicode());
+        assert_eq!(report.rows.len(), 1, "{:?}", report.rows);
+        assert_eq!(report.rows[0].location, "word/document.xml, paragraph 2");
     }
 
     #[test]

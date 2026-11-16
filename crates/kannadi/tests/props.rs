@@ -208,6 +208,28 @@ proptest! {
     }
 
     #[test]
+    fn nudi_converts_the_same_split_anywhere_it_allows(
+        bytes in prop::collection::vec(any::<u8>(), 0..60),
+        cuts in prop::collection::vec(any::<prop::sample::Index>(), 0..6),
+    ) {
+        let legacy = kannadi::legacy::decode_windows_1252(&bytes);
+        let starts = nudi_syllable_starts(&legacy);
+        let mut at: Vec<usize> = match starts.len() {
+            0 => Vec::new(),
+            n => cuts.iter().map(|c| starts[c.index(n)]).collect(),
+        };
+        at.extend([0, legacy.len()]);
+        at.sort_unstable();
+        at.dedup();
+        let options = Options { zero_as_anusvara: false, ..Options::default() };
+        let whole = nudi_to_unicode(&legacy, &options);
+        let pieces: Vec<_> = at.windows(2).map(|w| nudi_to_unicode(&legacy[w[0]..w[1]], &options)).collect();
+        prop_assert_eq!(pieces.iter().map(|p| p.text.as_str()).collect::<String>(), whole.text);
+        prop_assert_eq!(pieces.iter().map(|p| p.unknown.len()).sum::<usize>(), whole.unknown.len());
+        prop_assert_eq!(pieces.iter().map(|p| p.malformed.len()).sum::<usize>(), whole.malformed.len());
+    }
+
+    #[test]
     fn nudi_reports_point_at_their_characters(s in kannada_text()) {
         let encoded = unicode_to_nudi(&s);
         for u in &encoded.unencodable {

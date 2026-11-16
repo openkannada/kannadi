@@ -1,5 +1,13 @@
 //! XML text and attribute values: the 5 predefined entities and character references.
 
+use quick_xml::events::BytesStart;
+
+/// An attribute value with references decoded.
+pub fn attr(e: &BytesStart, name: &str) -> Option<String> {
+    let a = e.try_get_attribute(name).ok()??;
+    Some(decode(&a.value))
+}
+
 /// `text` with references replaced. Unknown references stay as written.
 pub fn decode(text: &str) -> String {
     let mut out = String::with_capacity(text.len());

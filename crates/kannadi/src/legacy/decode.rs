@@ -97,9 +97,10 @@ pub fn nudi_to_unicode(text: &str, options: &Options) -> Conversion {
 }
 
 /// Byte offsets in legacy `text` where a syllable or other character starts, in
-/// order. Text split only at these offsets converts piece by piece the same way
-/// as whole, apart from a zero typed for ಂ at a split. Signs, subscripts and other
-/// marks never start a piece.
+/// order, always including 0 for text that is not empty. Text split only at
+/// these offsets converts piece by piece the same way as whole, apart from a zero
+/// typed for ಂ at a split. Signs, subscripts and other marks start a piece only at
+/// offset 0.
 ///
 /// ```
 /// use kannadi::legacy::nudi_syllable_starts;
