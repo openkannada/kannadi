@@ -11,6 +11,56 @@ pub enum Direction {
 #[derive(Clone, Debug)]
 pub struct Settings {
     pub direction: Direction,
+    pub fonts: Fonts,
+}
+
+impl Settings {
+    pub fn new(direction: Direction) -> Self {
+        Settings {
+            direction,
+            fonts: Fonts::default(),
+        }
+    }
+}
+
+/// Font names for documents that record fonts, such as HTML.
+#[derive(Clone, Debug)]
+pub struct Fonts {
+    /// Set on text converted to Unicode.
+    pub unicode: String,
+    /// Set on text converted to Nudi.
+    pub legacy: String,
+    /// More font names to treat as Nudi and Baraha ANSI fonts.
+    pub extra_legacy: Vec<String>,
+}
+
+impl Default for Fonts {
+    fn default() -> Self {
+        Fonts {
+            unicode: "Noto Sans Kannada".to_string(),
+            legacy: "Nudi 01 e".to_string(),
+            extra_legacy: Vec::new(),
+        }
+    }
+}
+
+impl Fonts {
+    pub fn is_legacy(&self, font: &str) -> bool {
+        crate::fonts::is_legacy(font, &self.extra_legacy)
+    }
+
+    /// A `font-family` list with each legacy family replaced by the Unicode font,
+    /// in `quote` marks when given. A trailing `!important` is kept.
+    pub fn unicode_family(&self, list: &str, quote: Option<char>) -> String {
+        let trimmed = list.trim_end();
+        let (families, important) = match trimmed.strip_suffix("!important") {
+            Some(rest) => (rest.trim_end(), &list[rest.trim_end().len()..]),
+            None => (list, ""),
+        };
+        let replaced =
+            crate::fonts::replace_legacy(families, &self.unicode, quote, &self.extra_legacy);
+        format!("{replaced}{important}")
+    }
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
@@ -172,6 +222,33 @@ fn window<'t>(text: &'t str, lines: &Lines, at: usize) -> &'t str {
     text[start..end].trim_end_matches('\r')
 }
 
+/// Byte ranges of Kannada text in `text`. Each starts and ends with a Kannada
+/// character, and may hold spaces, joiners, digits and punctuation between.
+pub fn kannada_runs(text: &str) -> Vec<std::ops::Range<usize>> {
+    let mut runs = Vec::new();
+    let mut open: Option<std::ops::Range<usize>> = None;
+    for (i, c) in text.char_indices() {
+        if is_kannada_text(c) {
+            let end = i + c.len_utf8();
+            open = Some(open.map_or(i..end, |r| r.start..end));
+        } else if !(c.is_whitespace()
+            || c.is_ascii_punctuation()
+            || c.is_ascii_digit()
+            || c == '\u{200C}'
+            || c == '\u{200D}')
+        {
+            runs.extend(open.take());
+        }
+    }
+    runs.extend(open);
+    runs
+}
+
+/// Kannada letters and marks, and the dandas (U+0964, U+0965) Kannada uses.
+fn is_kannada_text(c: char) -> bool {
+    kannadi::chars::is_kannada(c) || c == '\u{0964}' || c == '\u{0965}'
+}
+
 pub fn describe_char(c: char) -> String {
     if c.is_control() || c.is_whitespace() {
         format!("U+{:04X}", u32::from(c))
@@ -193,7 +270,14 @@ mod tests {
     use super::*;
 
     fn settings(direction: Direction) -> Settings {
-        Settings { direction }
+        Settings::new(direction)
+    }
+
+    #[test]
+    fn kannada_runs_stop_at_other_scripts() {
+        let text = "Dept: ಕನ್ನಡ ನಾಡು, 2026। English ಕ";
+        let runs: Vec<&str> = kannada_runs(text).into_iter().map(|r| &text[r]).collect();
+        assert_eq!(runs, ["ಕನ್ನಡ ನಾಡು, 2026।", "ಕ"]);
     }
 
     fn to_unicode() -> Settings {

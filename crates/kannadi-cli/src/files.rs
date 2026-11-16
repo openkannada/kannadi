@@ -8,6 +8,7 @@ use anyhow::{bail, Context, Result};
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Format {
     Txt,
+    Html,
 }
 
 impl Format {
@@ -15,6 +16,7 @@ impl Format {
         let ext = path.extension()?.to_str()?.to_ascii_lowercase();
         match ext.as_str() {
             "txt" => Some(Format::Txt),
+            "htm" | "html" => Some(Format::Html),
             _ => None,
         }
     }

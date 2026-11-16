@@ -22,7 +22,7 @@ Version 0.1, in development.
 | Unicode to Nudi and Baraha | Done |
 | Test corpus | 207 lines from 31 government pages of 2002 in [corpus/](corpus/); a Kannada reader's check is pending |
 | Editor page that runs in the browser, with no upload | Built, not deployed: [web/](web/) |
-| Command-line tool for TXT, HTML and DOCX | TXT done; HTML and DOCX next |
+| Command-line tool for TXT, HTML and DOCX | TXT and HTML done; DOCX next |
 | Shaping tests for Kannada fonts, with results for 41 fonts | Done: [tools/fontqa](tools/fontqa) |
 
 ## Example
@@ -125,6 +125,8 @@ kannadi to-nudi letter.txt --out for-printing/ --strict
 - When a file has unknown glyphs, malformed syllables or unencodable characters, the tool writes `FILE.report.tsv` next to the output: the line, the problem, and up to 30 characters of Unicode text on each side. Rows are in line order. A clean run removes an old report.
 - `--strict` exits with status 1 if any file has a problem. Errors, such as an unreadable file or folder, exit with status 2; the other files are still converted.
 - `to-unicode` takes `--kannada-digits` and `--keep-zeros`, the same settings as `legacy::Options`.
+- **HTML.** Only text set in a Nudi or Baraha ANSI font is converted to Unicode. The font of each piece of text comes from its `style` attribute, then `<style>` rules for tags and classes such as `td.xl24` or `.font12` (the most specific, then the last), then `<font face>`, inherited from enclosing elements. End tags HTML lets authors leave out, such as `</td>` and `</p>`, are closed where a browser would close them. Legacy font names are replaced with `--font` (Noto Sans Kannada by default). `to-nudi` converts Kannada text outside legacy fonts and wraps it in a span set in `--font` (Nudi 01 e by default); the rest of the text is copied as it was. A page that declares a Windows-1252 or ISO-8859-1 charset is read that way. Output is UTF-8, and the charset declaration says so. Text in `<title>`, `<textarea>` and attribute values is not converted, and a syllable split across tags is converted piece by piece, so it shows as malformed in the report. More complex selectors and the `font` shorthand are not read.
+- **Legacy font names.** The tool knows the ANSI Nudi fonts (Nudi 01 e to Nudi 05 k, Nudi Akshara, Nudi B-Akshara) and Baraha's BRH fonts for Kannada. `--legacy-font NAME` adds another.
 
 ## Segmentation
 
