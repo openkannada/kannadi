@@ -416,9 +416,9 @@ impl Syllable {
     }
 }
 
-/// The length of the consonant cluster a letter starts with, such as ಕ್ಷ in ಕ್ಷಿ;
-/// subscripts typed after the letter join the cluster there. A vowel letter counts
-/// as 1.
+/// Where subscripts typed after a letter join it: after its consonant cluster, such
+/// as ಕ್ಷ in ಕ್ಷಿ, but before a final ್ರ, which Unicode keeps last (ಶ್ರೀ with ಕ is
+/// ಶ್ಕ್ರೀ). A vowel letter counts as 1.
 fn cluster_len(letter: &[char]) -> usize {
     let mut end = usize::from(!letter.is_empty());
     while end + 1 < letter.len()
@@ -426,6 +426,9 @@ fn cluster_len(letter: &[char]) -> usize {
         && class(letter[end + 1]) == Class::Consonant
     {
         end += 2;
+    }
+    if end >= 3 && letter[end - 2] == VIRAMA && letter[end - 1] == 'ರ' {
+        end -= 2;
     }
     end
 }
@@ -632,6 +635,11 @@ mod tests {
         let stray = akruti(&[0x20, 0xE5]);
         assert_eq!(stray.text, " ್ಟ್ರ");
         assert_eq!(stray.malformed.len(), 1);
+    }
+
+    #[test]
+    fn a_subscript_after_a_letter_with_ra_goes_before_the_ra() {
+        assert_eq!(akruti(&[0xDE, 0x22]).text, "ಶ್ಕ್ರೀ");
     }
 
     #[test]

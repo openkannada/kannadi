@@ -45,6 +45,8 @@ Run on public PDFs from Karnataka government sources, kept outside the repositor
 | Unicode L2/03-068 from Karnataka DIT, [PDF](https://www.unicode.org/L2/L2003/03068-kannada.pdf), 16 pages | 5 Nudi01k subsets, renumbered by pdfFactory | 47 Kannada lines read through the ToUnicode map of 1 subset, 1 malformed syllable; the other 4 subsets are charts of single glyphs, which read as malformed syllables, and are reported as renumbered |
 | Legislative Assembly member page, [13mem/50.pdf](http://web.archive.org/web/20150427105120/http://kla.kar.nic.in/13mem/50.pdf), 2 pages | Renamed TrueType subset with a `Differences` list, made by Ghostscript | Reported as another layout; not converted |
 
+With the Shree-Lipi table added on 17 November 2026, the Legislative Assembly pages (all 5 archived ones), the Repealing and Amending Act of 2003 with its AkliteKndPadmini lines, and 6 budget and school-board PDFs in Kan-Eng and KN-Nandi fonts give the same output as before: their fonts are still reported as other layouts.
+
 The Gazette notification also has a heading in a Unicode font whose ToUnicode map is broken; it comes out garbled, as it does in other extractors. That is not a legacy font.
 
 ## What does not work
