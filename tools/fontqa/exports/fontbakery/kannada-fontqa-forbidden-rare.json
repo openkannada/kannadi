@@ -1,0 +1,57 @@
+{
+ "configuration": {
+  "comment": "Kannada strings from kannadi fontqa. None may produce these glyphs.",
+  "forbidden_glyphs": [
+   ".notdef",
+   "uni25CC",
+   "dottedcircle",
+   "dottedCircle"
+  ]
+ },
+ "tests": [
+  {
+   "input": "ಅವನೝ",
+   "comment": "rare-0CDD"
+  },
+  {
+   "input": "ಕೳ",
+   "comment": "rare-0CF3"
+  },
+  {
+   "input": "೜",
+   "comment": "rare-0CDC"
+  },
+  {
+   "input": "೜ಗಣೇಶ",
+   "comment": "rare-0CDC-word"
+  },
+  {
+   "input": "ಅೱಕ",
+   "comment": "rare-0CF1"
+  },
+  {
+   "input": "ಅೲಪ",
+   "comment": "rare-0CF2"
+  },
+  {
+   "input": "ಱ",
+   "comment": "rare-0CB1"
+  },
+  {
+   "input": "ಬಾೞ್",
+   "comment": "rare-0CDE"
+  },
+  {
+   "input": "ಜ಼",
+   "comment": "rare-0CBC-ja"
+  },
+  {
+   "input": "ಫ಼",
+   "comment": "rare-0CBC-pha"
+  },
+  {
+   "input": "ಸೋಽಹಂ",
+   "comment": "rare-0CBD"
+  }
+ ]
+}

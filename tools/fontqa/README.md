@@ -108,13 +108,14 @@ The drafts are a starting point for a reader to judge, not finished design.
 `uv run fontqa export` writes the test strings for other tools to `exports/`:
 
 - `fontbakery/kannada-fontqa-forbidden.json`: FontBakery `shaping/forbidden`; no string may shape to `.notdef` or a dotted circle.
+- `fontbakery/kannada-fontqa-forbidden-rare.json`: the same for the rare characters (U+0CDC, U+0CDD, U+0CF3 and others), apart so a font can adopt the common tests first.
 - `fontbakery/kannada-fontqa-collisions.json`: FontBakery `shaping/collides`, collidoscope on strings with marks.
 - `fontbakery/fontbakery.yml`: the configuration that points FontBakery at that folder:
 
-      fontbakery check-googlefonts --config exports/fontbakery/fontbakery.yml -c shaping/forbidden -c shaping/collides FONT.ttf
+      fontbakery check-googlefonts --config fontbakery.yml -c shaping/forbidden -c shaping/collides FONT.ttf
 
   This needs `fontbakery[googlefonts,shaping]`. Run it from the `exports/fontbakery` folder.
-- `shaperglot/kn_Knda.toml`: Shaperglot `ShapingDiffers` checks for conjuncts and the arkavattu, in the format of its `manual_checks.toml`.
+- `shaperglot/kn_Knda.toml`: Shaperglot `ShapingDiffers` checks in the format of its `manual_checks.toml`: each cluster must shape differently with its conjunct features (`akhn`, `rphf`, `blwf`, `half`, `pstf`, `cjct`) off, and each ra + virama + consonant with `rphf` off. Shaperglot compares the whole output, so pairs with a joiner would always differ.
 
 The exports cover missing glyphs, dotted circles, collisions, conjuncts and the arkavattu. Only fontqa itself checks indistinct strings. Draft upstream texts are in `drafts/`.
 

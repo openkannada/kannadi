@@ -33,7 +33,9 @@ def build(results: Path, out: Path) -> Path:
         families=len({f["font_id"] for f in faces}),
         cases=f"{int(total):,}",
         clean=sum(1 for f in faces if f["failing_cases"] == "0"),
-        heads="".join(f"<th scope=col data-num>{_label(k)}</th>" for k in FAILURES),
+        heads="".join(
+            f"<th scope=col data-num><button>{_label(k)}</button></th>" for k in FAILURES
+        ),
         rows=rows,
     )
     out.mkdir(parents=True, exist_ok=True)
@@ -55,7 +57,8 @@ def _examples(path: Path) -> dict[str, list[str]]:
 def _row(face: dict, examples: dict[str, list[str]]) -> str:
     missing = set(face["missing_codepoints"].split())
     new = "".join(
-        f'<span class="{"no" if cp in missing else "yes"}" title="{cp}">{ch}</span>'
+        f'<span class="{"no" if cp in missing else "yes"}" title="{cp}">{ch}'
+        f'<span class="sr"> {cp} {"missing" if cp in missing else "present"}</span></span>'
         for cp, ch in NEW_CHARACTERS.items()
     )
     knd2 = "yes" if "knd2" in face["gsub_scripts"].split() else "no"
@@ -71,8 +74,9 @@ def _row(face: dict, examples: dict[str, list[str]]) -> str:
         if examples.get(k)
     )
     name = f"{face['family']} {face['style']}".strip()
+    search = escape(f"{name} {face['license']}".lower(), quote=True)
     return (
-        f"<tr><th scope=row><details><summary>{escape(name)}</summary>"
+        f'<tr data-search="{search}"><th scope=row><details><summary>{escape(name)}</summary>'
         f"{detail or '<p>No failures.</p>'}</details></th>"
         f"<td>{escape(face['version'])}</td><td>{escape(face['license'])}</td>"
         f'<td data-num class="{"bad" if face["failing_cases"] != "0" else ""}">'

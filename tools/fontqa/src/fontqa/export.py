@@ -8,7 +8,6 @@ from .kannada import RA, VIRAMA, Case
 
 # Glyph names fonts give U+25CC; HarfBuzz inserts it before a broken cluster.
 DOTTED_CIRCLE_NAMES = ("uni25CC", "dottedcircle", "dottedCircle")
-ZWJ = "\u200d"
 
 
 def fontbakery_forbidden(cases: list[Case]) -> dict:
@@ -35,34 +34,38 @@ def fontbakery_collisions(cases: list[Case]) -> dict:
 
 
 def shaperglot_checks(cases: list[Case], language: str = "kn_Knda") -> str:
-    """Shaperglot manual checks (TOML): conjuncts and the arkavattu must shape differently from
-    the same text with a joiner that blocks them."""
-    conjuncts = [(c.text, c.unjoined) for c in cases if c.unjoined]
-    reph = RA + VIRAMA
-    arkavattu = [
-        (c.text, RA + ZWJ + VIRAMA + c.text[len(reph) :])
-        for c in cases
-        if c.text.startswith(reph) and c.unjoined
-    ]
+    """Shaperglot manual checks (TOML): each cluster must shape differently with its conjunct
+    features on and off. Shaperglot compares the whole output, so a joiner would always differ."""
+    clusters = [c.text for c in cases if c.unjoined]
+    # ರ್ರ forms a subscript ra in many fonts, not a reph, so it is a conjunct case only.
+    arkavattu = [t for t in clusters if t.startswith(RA + VIRAMA) and t != RA + VIRAMA + RA]
     checks = [
         (
             "Consonant clusters form conjuncts",
-            "A cluster with a virama should shape differently from the same cluster with ZWNJ"
-            " after the virama, which asks for an explicit virama.",
-            conjuncts,
+            "A cluster with a virama should shape differently with the features that form"
+            " conjuncts turned off.",
+            clusters,
+            CONJUNCT_FEATURES,
         ),
         (
             "Ra before a consonant forms the arkavattu",
-            "Ra + virama + consonant should shape differently from ra + ZWJ + virama + consonant,"
-            " which asks for ra with a visible virama.",
+            "Ra + virama + consonant should shape differently with rphf turned off.",
             arkavattu,
+            ("-rphf",),
         ),
     ]
     return "\n".join(_shaperglot_check(language, *check) for check in checks)
 
 
-def _shaperglot_check(language: str, name: str, description: str, pairs) -> str:
-    rows = ",\n".join(f"    [{{ text = {_toml(a)} }}, {{ text = {_toml(b)} }}]" for a, b in pairs)
+CONJUNCT_FEATURES = ("-akhn", "-rphf", "-blwf", "-half", "-pstf", "-cjct")
+
+
+def _shaperglot_check(language, name, description, texts, features_off) -> str:
+    off = "[" + ", ".join(_toml(f) for f in features_off) + "]"
+    rows = ",\n".join(
+        f"    [{{ text = {_toml(t)}, features = [] }}, {{ text = {_toml(t)}, features = {off} }}]"
+        for t in texts
+    )
     return (
         f"[[{language}]]\n"
         f"name = {_toml(name)}\n"
@@ -73,7 +76,7 @@ def _shaperglot_check(language: str, name: str, description: str, pairs) -> str:
         f"[[{language}.implementations]]\n"
         'type = "ShapingDiffers"\n'
         "features_optional = false\n"
-        "ignore_notdefs = false\n"
+        "ignore_notdefs = true\n"
         f"pairs = [\n{rows},\n]\n"
     )
 

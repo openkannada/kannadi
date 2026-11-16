@@ -232,8 +232,11 @@ def cmd_export(args) -> int:
     cases = all_cases()
     bakery = args.out / "fontbakery"
     bakery.mkdir(parents=True, exist_ok=True)
+    common = [c for c in cases if c.group != "rare"]
+    rare = [c for c in cases if c.group == "rare"]
     for name, data in (
-        ("kannada-fontqa-forbidden.json", export.fontbakery_forbidden(cases)),
+        ("kannada-fontqa-forbidden.json", export.fontbakery_forbidden(common)),
+        ("kannada-fontqa-forbidden-rare.json", export.fontbakery_forbidden(rare)),
         ("kannada-fontqa-collisions.json", export.fontbakery_collisions(cases)),
     ):
         (bakery / name).write_text(json.dumps(data, ensure_ascii=False, indent=1) + "\n")
