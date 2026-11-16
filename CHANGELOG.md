@@ -4,6 +4,7 @@
 
 ### Added
 
+- Akruti to Unicode and back (`legacy::to_unicode` and `legacy::from_unicode` with `Layout::Akruti`), with a glyph table derived from the fonts embedded in Karnataka Acts and checked on 908,075 glyphs from 35 documents, and a fixture of 125 lines read against the pages. `legacy::Layout` and `UnknownLayout`, `syllable_starts`; `nudi_to_unicode` and `unicode_to_nudi` stay as the Nudi calls.
 - `tools/glyphdraft`: drafts U+0CDC, U+0CDD and U+0CF3 into a FontForge source, matched to the font's stems, weight, heights and spacing. fontqa `measure` and `gate` commands, and a mean stroke width gate.
 - Akshara segmentation (`aksharas`, `split`, `count_aksharas`), including conjuncts, nukta, ZWJ and ZWNJ after a virama, and Old Kannada letters.
 - Normalization (`normalize`): NFC, look-alike vowel letters, repeated marks. `fix_zero_as_anusvara` for converted and scanned text.

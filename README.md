@@ -1,6 +1,6 @@
 # kannadi
 
-Tools for Kannada text in Rust. The goal is to convert documents typed in old Nudi and Baraha fonts to Unicode, and back, with checked accuracy.
+Tools for Kannada text in Rust. The goal is to convert documents typed in old Nudi, Baraha and Akruti fonts to Unicode, and back, with checked accuracy.
 
 ಕನ್ನಡಿ (kannaḍi) means mirror.
 
@@ -20,6 +20,7 @@ Version 0.1, in development.
 | Kannada numerals | Done |
 | Nudi and Baraha to Unicode | Done, waiting on a native reader's check of 100 sample lines |
 | Unicode to Nudi and Baraha | Done |
+| Akruti to Unicode and back | Done in the library, checked on 908,075 glyphs from 35 documents; a Kannada reader's check of 125 lines is pending |
 | Test corpus | 207 lines from 31 government pages of 2002 in [corpus/](corpus/); a Kannada reader's check is pending |
 | Editor page that runs in the browser, with no upload | Built, not deployed: [web/](web/) |
 | Command-line tool for TXT, HTML, DOCX and PDF | Done; PDF to Unicode only |
@@ -74,6 +75,17 @@ assert!(converted.unknown.is_empty());
   - English text set in the same font is converted too, so pass only the legacy-font runs.
 
 Run `cargo run --example nudi -- file.txt` to convert a Windows-1252 text file.
+
+Other layouts go through `legacy::to_unicode` and `legacy::from_unicode` with a `Layout`. `Layout::Akruti` covers AkrutiKndPadma and its weights, used in Karnataka Acts of 2001 to 2003:
+
+```rust
+use kannadi::legacy::{to_unicode, Layout, Options};
+
+let converted = to_unicode("dâ}â", Layout::Akruti, &Options::default());
+assert_eq!(converted.text, "ಕನ");
+```
+
+The Akruti table was derived from the fonts embedded in public PDFs and checked against the pages; [docs/akruti.md](docs/akruti.md) has the method and results. The command-line tool and the editor page read Nudi and Baraha only for now.
 
 `legacy::unicode_to_nudi` goes the other way, for documents that must still be printed in a legacy font:
 

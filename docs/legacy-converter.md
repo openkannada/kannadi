@@ -1,6 +1,6 @@
 # Legacy converter design
 
-Status: Nudi and Baraha to Unicode and Unicode to Nudi and Baraha are implemented in `crates/kannadi/src/legacy/`, with the table in `crates/kannadi/data/nudi.tsv`. DOCX and HTML input are still design. What can be built legally for Shree-Lipi and Akruti is in [shree-lipi.md](shree-lipi.md).
+Status: Nudi and Baraha to Unicode and Unicode to Nudi and Baraha are implemented in `crates/kannadi/src/legacy/`, with the table in `crates/kannadi/data/nudi.tsv`. Akruti uses the same engine with `crates/kannadi/data/akruti.tsv`; see [akruti.md](akruti.md). The sources for Shree-Lipi are in [shree-lipi.md](shree-lipi.md).
 
 ## The problem
 
@@ -89,12 +89,12 @@ The consonant shape is a letter glyph that already carries the sign (ಕಿ, ಮ
 ## Public API
 
 ```rust
-pub fn nudi_to_unicode(text: &str, options: &Options) -> Conversion; // text, unknown, malformed
-pub fn unicode_to_nudi(text: &str) -> Encoding;                     // text, unencodable
+pub fn to_unicode(text: &str, layout: Layout, options: &Options) -> Conversion; // text, unknown, malformed
+pub fn from_unicode(text: &str, layout: Layout) -> Encoding;                    // text, unencodable
 pub fn decode_windows_1252(bytes: &[u8]) -> String;
 ```
 
-Nudi and Baraha ANSI share 1 layout, so there is 1 table and no font parameter yet. A second layout, such as Shree-Lipi, would add a table and a parameter.
+Nudi and Baraha ANSI share 1 layout, `Layout::Nudi`; `nudi_to_unicode` and `unicode_to_nudi` are the same calls with that layout. Each layout has its own table in `data/`, parsed once per direction. A new layout is a table and an entry in `Layout`.
 
 ## Testing
 

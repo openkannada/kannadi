@@ -1,5 +1,8 @@
 use kannadi::chars::{class, Class};
-use kannadi::legacy::{nudi_syllable_starts, nudi_to_unicode, unicode_to_nudi, Options};
+use kannadi::legacy::{
+    from_unicode, nudi_syllable_starts, nudi_to_unicode, syllable_starts, to_unicode,
+    unicode_to_nudi, Layout, Options,
+};
 use kannadi::{aksharas, from_latin, modernize, normalize, numerals, split, to_latin, Scheme};
 use proptest::prelude::*;
 use unicode_normalization::UnicodeNormalization;
@@ -52,11 +55,53 @@ fn nudi_word() -> impl Strategy<Value = String> {
     word(vowels, "ಾಿೀುೂೃೆೇೈೊೋೌ್", vec!['ಂ', 'ಃ'])
 }
 
-fn word(vowels: Vec<char>, signs: &str, vowel_marks: Vec<char>) -> impl Strategy<Value = String> {
-    let consonants: Vec<char> = ('\u{0C95}'..='\u{0CB9}')
+/// Well-formed words using only what the Akruti layout has glyphs for: no ಙ, ಱ
+/// or ೞ, ಝ only as a subscript, and no ಞ with ಿ or ೀ.
+fn akruti_word() -> impl Strategy<Value = String> {
+    let vowels = ('\u{0C85}'..='\u{0CE1}')
+        .filter(|&c| class(c) == Class::Vowel && !matches!(c, 'ಌ' | 'ೡ'))
+        .collect();
+    let consonants = consonants()
+        .into_iter()
+        .filter(|c| !matches!(c, 'ಙ' | 'ಱ' | 'ೞ'))
+        .collect();
+    word_of(consonants, vowels, "ಾಿೀುೂೃೆೇೈೊೋೌ್", vec!['ಂ', 'ಃ']).prop_filter(
+        "a letter Akruti has no glyph for",
+        |w| {
+            aksharas(w).all(|a| {
+                // The consonant that carries the syllable follows an arkavattu ರ್.
+                let text = a
+                    .text
+                    .strip_prefix("ರ್")
+                    .filter(|t| !t.is_empty())
+                    .unwrap_or(a.text);
+                match text.chars().next() {
+                    Some('ಝ') => false,
+                    Some('ಞ') => !text.contains(['ಿ', 'ೀ']),
+                    _ => true,
+                }
+            })
+        },
+    )
+}
+
+fn consonants() -> Vec<char> {
+    ('\u{0C95}'..='\u{0CB9}')
         .chain(['\u{0CDE}'])
         .filter(|&c| class(c) == Class::Consonant)
-        .collect();
+        .collect()
+}
+
+fn word(vowels: Vec<char>, signs: &str, vowel_marks: Vec<char>) -> impl Strategy<Value = String> {
+    word_of(consonants(), vowels, signs, vowel_marks)
+}
+
+fn word_of(
+    consonants: Vec<char>,
+    vowels: Vec<char>,
+    signs: &str,
+    vowel_marks: Vec<char>,
+) -> impl Strategy<Value = String> {
     let signs: Vec<char> = signs.chars().collect();
     let cons = prop::sample::select(consonants);
     let cluster = (
@@ -177,14 +222,29 @@ proptest! {
     }
 
     #[test]
-    fn nudi_clean_encodings_roundtrip(s in kannada_text()) {
-        let encoded = unicode_to_nudi(&s);
-        if encoded.is_clean() {
-            let keep_zeros = Options { zero_as_anusvara: false, ..Options::default() };
-            let back = nudi_to_unicode(&encoded.text, &keep_zeros);
-            prop_assert!(back.is_clean(), "{:?} from {:?}", back, encoded.text);
-            let expected: String = numerals::to_ascii_digits(&s).nfc().collect();
-            prop_assert_eq!(back.text, expected);
+    fn akruti_roundtrip_words(
+        words in prop::collection::vec(akruti_word(), 1..4),
+        number in "[೧-೯]{0,3}",
+    ) {
+        let text = format!("{} {number}", words.join(" "));
+        let encoded = from_unicode(&text, Layout::Akruti);
+        prop_assert!(encoded.is_clean(), "{:?}", encoded);
+        let back = to_unicode(&encoded.text, Layout::Akruti, &Options::default());
+        prop_assert!(back.is_clean(), "{:?} from {:?}", back, encoded.text);
+        prop_assert_eq!(back.text, text);
+    }
+
+    #[test]
+    fn clean_encodings_roundtrip(s in kannada_text()) {
+        for layout in Layout::ALL {
+            let encoded = from_unicode(&s, layout);
+            if encoded.is_clean() {
+                let keep_zeros = Options { zero_as_anusvara: false, ..Options::default() };
+                let back = to_unicode(&encoded.text, layout, &keep_zeros);
+                prop_assert!(back.is_clean(), "{}: {:?} from {:?}", layout, back, encoded.text);
+                let expected: String = numerals::to_ascii_digits(&s).nfc().collect();
+                prop_assert_eq!(back.text, expected, "{}", layout);
+            }
         }
     }
 
@@ -208,32 +268,36 @@ proptest! {
     }
 
     #[test]
-    fn nudi_converts_the_same_split_anywhere_it_allows(
+    fn converts_the_same_split_anywhere_it_allows(
         bytes in prop::collection::vec(any::<u8>(), 0..60),
         cuts in prop::collection::vec(any::<prop::sample::Index>(), 0..6),
     ) {
         let legacy = kannadi::legacy::decode_windows_1252(&bytes);
-        let starts = nudi_syllable_starts(&legacy);
-        let mut at: Vec<usize> = match starts.len() {
-            0 => Vec::new(),
-            n => cuts.iter().map(|c| starts[c.index(n)]).collect(),
-        };
-        at.extend([0, legacy.len()]);
-        at.sort_unstable();
-        at.dedup();
-        let options = Options { zero_as_anusvara: false, ..Options::default() };
-        let whole = nudi_to_unicode(&legacy, &options);
-        let pieces: Vec<_> = at.windows(2).map(|w| nudi_to_unicode(&legacy[w[0]..w[1]], &options)).collect();
-        prop_assert_eq!(pieces.iter().map(|p| p.text.as_str()).collect::<String>(), whole.text);
-        prop_assert_eq!(pieces.iter().map(|p| p.unknown.len()).sum::<usize>(), whole.unknown.len());
-        prop_assert_eq!(pieces.iter().map(|p| p.malformed.len()).sum::<usize>(), whole.malformed.len());
+        for layout in Layout::ALL {
+            let starts = syllable_starts(&legacy, layout);
+            let mut at: Vec<usize> = match starts.len() {
+                0 => Vec::new(),
+                n => cuts.iter().map(|c| starts[c.index(n)]).collect(),
+            };
+            at.extend([0, legacy.len()]);
+            at.sort_unstable();
+            at.dedup();
+            let options = Options { zero_as_anusvara: false, ..Options::default() };
+            let whole = to_unicode(&legacy, layout, &options);
+            let pieces: Vec<_> = at.windows(2).map(|w| to_unicode(&legacy[w[0]..w[1]], layout, &options)).collect();
+            prop_assert_eq!(pieces.iter().map(|p| p.text.as_str()).collect::<String>(), whole.text, "{}", layout);
+            prop_assert_eq!(pieces.iter().map(|p| p.unknown.len()).sum::<usize>(), whole.unknown.len(), "{}", layout);
+            prop_assert_eq!(pieces.iter().map(|p| p.malformed.len()).sum::<usize>(), whole.malformed.len(), "{}", layout);
+        }
     }
 
     #[test]
-    fn nudi_reports_point_at_their_characters(s in kannada_text()) {
-        let encoded = unicode_to_nudi(&s);
-        for u in &encoded.unencodable {
-            prop_assert_eq!(s[u.offset..].chars().next(), Some(u.character));
+    fn reports_point_at_their_characters(s in kannada_text()) {
+        for layout in Layout::ALL {
+            let encoded = from_unicode(&s, layout);
+            for u in &encoded.unencodable {
+                prop_assert_eq!(s[u.offset..].chars().next(), Some(u.character));
+            }
         }
     }
 
