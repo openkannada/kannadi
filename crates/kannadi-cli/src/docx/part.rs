@@ -11,7 +11,7 @@ use crate::edits::{apply, overlap};
 use crate::report::Row;
 
 use super::scan::{scan, Element, Paragraph, Piece, Properties, Run};
-use super::styles::Styles;
+use super::styles::{FontSetting, Styles};
 use super::xml;
 
 const BOM: &str = "\u{FEFF}";
@@ -44,7 +44,7 @@ pub fn convert_part(
                 source,
                 paragraph,
                 settings,
-                layout: layouts[group[0].0].unwrap_or(settings.layout),
+                layout: layouts[group[0].0].unwrap_or(settings.text_layout),
                 location: &location,
             };
             let fallback = !paragraph.reported || paragraph.runs[group[0].0].fallback;
@@ -339,13 +339,13 @@ fn layout(run: &Run, paragraph: &Paragraph, styles: &Styles) -> Option<Layout> {
     let p = run.properties.as_ref();
     let character = || {
         p.and_then(|p| p.style.as_deref())
-            .and_then(|s| styles.legacy(s))
+            .map_or(FontSetting::Inherit, |s| styles.font(s))
     };
-    p.and_then(|p| p.legacy)
+    p.map_or(FontSetting::Inherit, |p| p.font)
         .or_else(character)
         .or_else(|| styles.paragraph(paragraph.style.as_deref()))
         .or_else(|| styles.document_default())
-        .flatten()
+        .layout()
 }
 
 fn add_rows(rows: &mut Vec<Row>, location: &str, issues: &[Issue]) {

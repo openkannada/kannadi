@@ -9,7 +9,7 @@ use quick_xml::Reader;
 
 use crate::convert::Fonts;
 
-use super::styles::{legacy_font, Setting};
+use super::styles::{font_setting, FontSetting};
 use super::xml::attr;
 
 #[derive(Debug, Default)]
@@ -58,7 +58,7 @@ pub struct Properties {
     pub style_element: Option<Element>,
     pub fonts: Option<Element>,
     /// What the run's own `w:rFonts` says.
-    pub legacy: Setting,
+    pub font: FontSetting,
     pub bold: Option<Element>,
     pub bold_cs: Option<Element>,
     pub italic: Option<Element>,
@@ -249,9 +249,11 @@ impl Scanner<'_> {
                 }
             }
             name => {
-                let legacy = (name == "w:rFonts")
-                    .then(|| legacy_font(e, self.fonts))
-                    .flatten();
+                let font = if name == "w:rFonts" {
+                    font_setting(e, self.fonts)
+                } else {
+                    FontSetting::Inherit
+                };
                 let style = (name == "w:rStyle").then(|| attr(e, "w:val")).flatten();
                 let Some(p) = self.property() else { return };
                 let slot = match name {
@@ -260,7 +262,7 @@ impl Scanner<'_> {
                         &mut p.style_element
                     }
                     "w:rFonts" => {
-                        p.legacy = legacy;
+                        p.font = font;
                         &mut p.fonts
                     }
                     "w:b" => &mut p.bold,

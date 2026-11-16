@@ -14,7 +14,7 @@ pub struct Settings {
     pub fonts: Fonts,
     /// The layout of text files read as legacy text, and of all text `to-nudi`
     /// writes.
-    pub layout: Layout,
+    pub text_layout: Layout,
 }
 
 impl Settings {
@@ -22,7 +22,7 @@ impl Settings {
         Settings {
             direction,
             fonts: Fonts::default(),
-            layout: Layout::Nudi,
+            text_layout: Layout::Nudi,
         }
     }
 }
@@ -311,6 +311,13 @@ mod tests {
         );
         assert_eq!(c.issues[1].detail, "glyph F1");
         assert_eq!(c.issues[1].context, "ಕ\u{F1}");
+    }
+
+    #[test]
+    fn issue_context_is_read_in_the_layout() {
+        let c = convert("dâ}â ¡", Layout::Akruti, &to_unicode_settings());
+        assert_eq!(c.issues[0].kind, Kind::UnknownGlyph);
+        assert_eq!(c.issues[0].context, "ಕನ ¡");
     }
 
     #[test]

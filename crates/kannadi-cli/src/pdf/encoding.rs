@@ -280,10 +280,11 @@ pub fn differences(
     Some(table)
 }
 
-/// Codes by string byte for a font named as legacy whose `Differences` list
-/// renames its glyphs `G<n>`, as Acrobat Distiller does when it converts a
-/// TrueType font: the glyph named `G112` is the font's code 112. Other bytes keep
-/// their own code. `None` if no glyph has such a name.
+/// Codes by string byte for a font named as legacy whose codes were renumbered
+/// from below 32 and whose `Differences` list names its glyphs `G<n>`, as Acrobat
+/// Distiller does when it converts the Akruti TrueType fonts: there the glyph
+/// named `G112` is the font's code 112. Other bytes keep their own code. `None`
+/// if the list starts at 32 or above, or no glyph has such a name.
 pub fn glyph_codes(doc: &Document, font: &Dictionary) -> Option<Vec<char>> {
     let encoding = resolve(doc, font.get(b"Encoding").ok()?)?.as_dict().ok()?;
     let list = resolve(doc, encoding.get(b"Differences").ok()?)?;
@@ -295,9 +296,14 @@ pub fn glyph_codes(doc: &Document, font: &Dictionary) -> Option<Vec<char>> {
                 .unwrap_or('\u{FFFD}')
         })
         .collect();
+    let items = list.as_array().ok()?;
+    let renumbered = matches!(items.first(), Some(Object::Integer(n)) if *n < 32);
+    if !renumbered {
+        return None;
+    }
     let mut found = false;
     let mut code = 0usize;
-    for item in list.as_array().ok()? {
+    for item in items {
         match item {
             Object::Integer(n) => code = usize::try_from(*n).unwrap_or(256),
             Object::Name(name) => {

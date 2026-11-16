@@ -76,9 +76,9 @@ struct Common {
     #[arg(long, value_name = "NAME")]
     font: Option<String>,
     /// Also treat this font as a legacy font, in the layout after `=` if given
-    /// (`"My Font=akruti"`). Repeat for more.
-    #[arg(long, value_name = "NAME[=LAYOUT]")]
-    legacy_font: Vec<String>,
+    /// (`"My Font=akruti"`), or else the --layout one. Repeat for more.
+    #[arg(long, value_name = "NAME[=LAYOUT]", value_parser = parse_legacy_font)]
+    legacy_font: Vec<(String, Option<Layout>)>,
 }
 
 fn main() -> ExitCode {
@@ -98,19 +98,7 @@ fn main() -> ExitCode {
         }
         Command::ToNudi { common } => (common, Direction::ToNudi, Layout::Nudi),
     };
-    let mut settings = Settings::new(direction);
-    settings.layout = layout;
-    if let Some(font) = &common.font {
-        match direction {
-            Direction::ToUnicode(_) => settings.fonts.unicode.clone_from(font),
-            Direction::ToNudi => settings.fonts.legacy.clone_from(font),
-        }
-    }
-    settings.fonts.extra_legacy = common
-        .legacy_font
-        .iter()
-        .map(|f| legacy_font(f, layout))
-        .collect();
+    let settings = settings(&common, direction, layout);
     match run(&common, &settings) {
         Ok(Outcome { failed: true, .. }) => ExitCode::from(2),
         Ok(Outcome { issues: true, .. }) if common.strict => ExitCode::from(1),
@@ -122,20 +110,34 @@ fn main() -> ExitCode {
     }
 }
 
+/// The settings the command line asks for; `layout` is the --layout value.
+fn settings(common: &Common, direction: Direction, layout: Layout) -> Settings {
+    let mut settings = Settings::new(direction);
+    settings.text_layout = layout;
+    if let Some(font) = &common.font {
+        match direction {
+            Direction::ToUnicode(_) => settings.fonts.unicode.clone_from(font),
+            Direction::ToNudi => settings.fonts.legacy.clone_from(font),
+        }
+    }
+    settings.fonts.extra_legacy = common
+        .legacy_font
+        .iter()
+        .map(|(name, named)| (name.clone(), named.unwrap_or(layout)))
+        .collect();
+    settings
+}
+
 fn parse_layout(name: &str) -> Result<Layout, String> {
     name.parse()
         .map_err(|e: kannadi::legacy::UnknownLayout| e.to_string())
 }
 
-/// A `--legacy-font` value: the name, and the layout after its last `=` if that
-/// names one, or else `default`.
-fn legacy_font(value: &str, default: Layout) -> (String, Layout) {
+/// A `--legacy-font` value: the name, and the layout after its last `=`, if any.
+fn parse_legacy_font(value: &str) -> Result<(String, Option<Layout>), String> {
     match value.rsplit_once('=') {
-        Some((name, layout)) => match layout.parse() {
-            Ok(layout) => (name.to_string(), layout),
-            Err(_) => (value.to_string(), default),
-        },
-        None => (value.to_string(), default),
+        Some((name, layout)) => Ok((name.to_string(), Some(parse_layout(layout)?))),
+        None => Ok((value.to_string(), None)),
     }
 }
 
@@ -213,16 +215,42 @@ mod tests {
     #[test]
     fn added_fonts_may_name_their_layout() {
         assert_eq!(
-            legacy_font("My Font=akruti", Layout::Nudi),
-            ("My Font".to_string(), Layout::Akruti)
+            parse_legacy_font("My Font=akruti"),
+            Ok(("My Font".to_string(), Some(Layout::Akruti)))
         );
         assert_eq!(
-            legacy_font("My Font", Layout::Akruti),
-            ("My Font".to_string(), Layout::Akruti)
+            parse_legacy_font("My Font"),
+            Ok(("My Font".to_string(), None))
         );
+        assert!(parse_legacy_font("My Font=akrti").is_err());
+    }
+
+    #[test]
+    fn the_layout_option_reaches_text_files_and_added_fonts() {
+        let cli = Cli::parse_from([
+            "kannadi",
+            "to-unicode",
+            "in",
+            "--out",
+            "out",
+            "--layout",
+            "akruti",
+            "--legacy-font",
+            "A",
+            "--legacy-font",
+            "B=nudi",
+        ]);
+        let Command::ToUnicode { common, layout, .. } = cli.command else {
+            panic!("to-unicode")
+        };
+        let s = settings(&common, Direction::ToUnicode(Options::default()), layout);
+        assert_eq!(s.text_layout, Layout::Akruti);
         assert_eq!(
-            legacy_font("A=B", Layout::Nudi),
-            ("A=B".to_string(), Layout::Nudi)
+            s.fonts.extra_legacy,
+            [
+                ("A".to_string(), Layout::Akruti),
+                ("B".to_string(), Layout::Nudi)
+            ]
         );
     }
 }

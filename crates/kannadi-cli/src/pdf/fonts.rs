@@ -145,7 +145,10 @@ impl Fonts {
                         && mapped.flawless()
                         && looks_legacy(&font.mapped)
                         && !looks_legacy(&font.text));
-                if raw.clean() || (raw.short() && !renumbered && !mapped_usable) {
+                // Akruti draws letters at codes renumbered text uses for symbols, so
+                // short text that reads with no problems is taken as it is.
+                let raw_usable = raw.short() && (raw.flawless() || !renumbered);
+                if raw.clean() || (raw_usable && !mapped_usable) {
                     Verdict::Legacy(Source::Raw)
                 } else if mapped_usable {
                     Verdict::Legacy(Source::Mapped)

@@ -12,7 +12,7 @@ mod reader;
 mod widths;
 
 use anyhow::{bail, Context, Result};
-use kannadi::legacy::{syllable_starts, Layout, Options};
+use kannadi::legacy::{syllable_starts, to_unicode, Layout, Options};
 use lopdf::{Document, Object};
 
 use crate::convert::{convert, Direction, Issue, Kind, Settings};
@@ -155,10 +155,12 @@ impl<'a> LineWriter<'a> {
         };
         for piece in line {
             let Piece::Text { font, raw, mapped } = piece else {
-                space(&mut gap, &mut legacy, &mut out);
                 gap = true;
                 continue;
             };
+            if raw.is_empty() && mapped.as_deref().is_none_or(str::is_empty) {
+                continue;
+            }
             let font = &self.fonts.fonts[*font];
             match font.verdict {
                 Verdict::Legacy(source) => {
@@ -167,8 +169,7 @@ impl<'a> LineWriter<'a> {
                         _ => raw,
                     };
                     let font_reading = (font.layout(), font.kannada_digits);
-                    if font_reading == reading && gap && !starts_syllable(&legacy, text, reading.0)
-                    {
+                    if font_reading == reading && gap && inside_syllable(&legacy, text, reading.0) {
                         gap = false;
                     }
                     if font_reading != reading {
@@ -196,14 +197,19 @@ impl<'a> LineWriter<'a> {
     }
 }
 
-/// Whether `next`, written after `legacy`, starts a syllable. A gap the page
-/// leaves before a sign or subscript is spacing between glyphs, not a word space.
-fn starts_syllable(legacy: &str, next: &str, layout: Layout) -> bool {
-    if legacy.is_empty() || next.is_empty() {
-        return true;
-    }
-    let joined = format!("{legacy}{next}");
-    syllable_starts(&joined, layout).contains(&legacy.len())
+/// Whether a gap the page leaves between `legacy` and `next` falls inside a
+/// syllable: a space there would leave more problems than none, as before a sign
+/// or subscript. Only the last syllable of `legacy` is converted again.
+fn inside_syllable(legacy: &str, next: &str, layout: Layout) -> bool {
+    let Some(&last) = syllable_starts(legacy, layout).last() else {
+        return false;
+    };
+    let tail = &legacy[last..];
+    let problems = |text: &str| {
+        let c = to_unicode(text, layout, &Options::default());
+        c.unknown.len() + c.malformed.len()
+    };
+    problems(&format!("{tail} {next}")) > problems(&format!("{tail}{next}"))
 }
 
 fn add_rows(report: &mut Report, location: &str, issues: &[Issue]) {
@@ -739,6 +745,46 @@ endcmap\nCMapName currentdict /CMap defineresource pop\nend\nend\n";
         let (text, report) = run(&pdf(vec![("F1", simple_font("AkrutiKndPadma"))], content));
         assert_eq!(text, "ಕನ ಕ\n");
         assert!(report.rows.is_empty(), "{:?}", report.rows);
+    }
+
+    #[test]
+    fn a_gap_before_a_spacing_glyph_is_a_word_space() {
+        let content = b"BT /F1 12 Tf 72 700 Td (d\xE2) Tj 30 0 Td (<}\xE2) Tj ET";
+        let (text, _) = run(&pdf(vec![("F1", simple_font("AkrutiKndPadma"))], content));
+        assert_eq!(text, "ಕ ನ\n");
+    }
+
+    #[test]
+    fn several_gaps_and_empty_strings_make_1_gap() {
+        let content =
+            b"BT /F1 12 Tf 72 700 Td [(d) -300 () -300 (\xE2}\xE2) -300 -300 (d\xE2)] TJ ET";
+        let (text, report) = run(&pdf(vec![("F1", simple_font("AkrutiKndPadma"))], content));
+        assert_eq!(text, "ಕನ ಕ\n");
+        assert!(report.rows.is_empty(), "{:?}", report.rows);
+    }
+
+    #[test]
+    fn short_text_in_a_named_font_reads_though_it_has_symbol_codes() {
+        // ದಿನಾಂಕ ಪತ್ರ ದಾನ: Akruti draws ದ, ನ and ಪ at { } ~.
+        let short = b"\xAC}\xD6\xAAd\xE2 ~\xE2y\xE2Z {\xD6}\xE2";
+        let (text, report) = run(&pdf(
+            vec![("F1", simple_font("AkrutiKndPadmaBold"))],
+            &shown("F1", short),
+        ));
+        assert_eq!(text, "ದಿನಾಂಕ ಪತ್ರ ದಾನ\n");
+        assert!(report.rows.is_empty(), "{:?}", report.rows);
+    }
+
+    #[test]
+    fn glyph_names_keep_their_codes_unless_the_list_renumbers_them() {
+        let mut font = simple_font("Nudi 01 e");
+        let differences = vec![Object::Integer(80), Object::Name(b"G3".to_vec())];
+        font.set(
+            "Encoding",
+            dictionary! { "Type" => "Encoding", "Differences" => differences },
+        );
+        let (text, _) = run(&pdf(vec![("F1", font)], &shown("F1", KANNADA)));
+        assert_eq!(text, "ಕನ್ನಡ\n");
     }
 
     #[test]

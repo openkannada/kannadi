@@ -11,7 +11,7 @@ use crate::report::{Report, Row};
 /// unencodable.
 pub fn convert_file(bytes: &[u8], settings: &Settings) -> Result<(Vec<u8>, Report)> {
     let text = read_text(bytes, settings.direction)?;
-    let converted = convert(&text, settings.layout, settings);
+    let converted = convert(&text, settings.text_layout, settings);
     let rows = converted
         .issues
         .iter()
@@ -98,7 +98,7 @@ mod tests {
     #[test]
     fn text_files_are_read_in_the_layout_asked_for() {
         let mut settings = to_unicode();
-        settings.layout = kannadi::legacy::Layout::Akruti;
+        settings.text_layout = kannadi::legacy::Layout::Akruti;
         let (out, report) = convert_file(b"d\xE2}\xE2", &settings).unwrap();
         assert_eq!(String::from_utf8(out).unwrap(), "ಕನ");
         assert!(report.is_empty());

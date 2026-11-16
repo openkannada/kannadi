@@ -277,7 +277,7 @@ impl Walker<'_> {
             self.out.push_str(&source[last..start]);
             let converted = convert(
                 &decoded.text[run.clone()],
-                self.settings.layout,
+                self.settings.text_layout,
                 self.settings,
             );
             let line = self.line + source[..start].matches('\n').count();
@@ -373,6 +373,13 @@ mod tests {
             out.contains("<font face=\"Noto Sans Kannada\">ಕ</font>"),
             "{out}"
         );
+    }
+
+    #[test]
+    fn elements_inherit_the_layout_of_their_parent() {
+        let out =
+            to_unicode("<div style=\"font-family:AkrutiKndPadma\"><p>d&#226;}&#226;</p></div>");
+        assert!(out.contains("<p>ಕನ</p>"), "{out}");
     }
 
     #[test]
