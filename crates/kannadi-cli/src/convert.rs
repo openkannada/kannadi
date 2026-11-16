@@ -68,6 +68,9 @@ pub enum Kind {
     UnknownGlyph,
     Malformed,
     Unencodable,
+    /// Text left out because it cannot be read, such as a PDF font whose glyph
+    /// codes were renumbered.
+    NotConverted,
 }
 
 impl Kind {
@@ -76,6 +79,7 @@ impl Kind {
             Kind::UnknownGlyph => "unknown glyph",
             Kind::Malformed => "malformed syllable",
             Kind::Unencodable => "unencodable",
+            Kind::NotConverted => "part not converted",
         }
     }
 
@@ -84,6 +88,7 @@ impl Kind {
             Kind::UnknownGlyph => "unknown glyphs",
             Kind::Malformed => "malformed syllables",
             Kind::Unencodable => "unencodable characters",
+            Kind::NotConverted => "parts not converted",
         }
     }
 }
