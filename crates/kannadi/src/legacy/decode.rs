@@ -82,7 +82,11 @@ pub fn to_unicode(text: &str, layout: Layout, options: &Options) -> Conversion {
     let mut writer = Writer::with_capacity(text.len() * 2);
     let mut i = 0;
     while i < chars.len() {
-        let Some((entry, len)) = table.longest_match(chars[i..].iter().map(|&(_, c)| c)) else {
+        // A sequence that starts with a space joins the syllable before it, if any.
+        let matched = table
+            .longest_match(chars[i..].iter().map(|&(_, c)| c))
+            .filter(|_| !chars[i].1.is_whitespace() || writer.in_syllable());
+        let Some((entry, len)) = matched else {
             let starts_syllable = matches!(
                 table.longest_match(chars[i + 1..].iter().map(|&(_, c)| c)),
                 Some((Entry::Letter(_) | Entry::Base(_), _))
@@ -147,15 +151,20 @@ pub fn nudi_syllable_starts(text: &str) -> Vec<usize> {
 }
 
 fn table(layout: Layout) -> &'static Lookup<Entry> {
-    static TABLES: [OnceLock<Lookup<Entry>>; Layout::ALL.len()] =
-        [OnceLock::new(), OnceLock::new()];
-    TABLES[layout.index()].get_or_init(|| {
-        let mut lookup = Lookup::new();
-        for row in rows(layout) {
-            lookup.insert(row.key, row.entry);
-        }
-        lookup
-    })
+    static TABLES: OnceLock<Vec<Lookup<Entry>>> = OnceLock::new();
+    let tables = TABLES.get_or_init(|| {
+        Layout::ALL
+            .iter()
+            .map(|&layout| {
+                let mut lookup = Lookup::new();
+                for row in rows(layout) {
+                    lookup.insert(row.key, row.entry);
+                }
+                lookup
+            })
+            .collect()
+    });
+    &tables[layout.index()]
 }
 
 /// Builds the output and both reports in 1 pass.
@@ -197,6 +206,10 @@ impl Writer {
         }
     }
 
+    fn in_syllable(&self) -> bool {
+        self.syllable.is_some()
+    }
+
     fn start(&mut self, letter: &str, needs_sign: bool) {
         self.flush();
         self.syllable = Some(Syllable::new(letter, needs_sign));
@@ -209,17 +222,12 @@ impl Writer {
             Entry::Sign(sign) if !sign.is_empty() => self.out.push_str(sign),
             Entry::Mod(m) => self.out.push(*m),
             Entry::Virama => self.out.push(VIRAMA),
-            Entry::Ottu(c) => {
-                self.out.push(VIRAMA);
-                self.out.push(*c);
-            }
-            Entry::Subscripts(cs) => {
-                for c in cs.chars() {
-                    if class(c) == Class::Consonant {
-                        self.out.push(VIRAMA);
-                    }
+            Entry::Ottu(consonants, sign) => {
+                for &c in consonants {
+                    self.out.push(VIRAMA);
                     self.out.push(c);
                 }
+                self.out.extend(sign);
             }
             _ => {
                 self.report(glyphs);
@@ -319,18 +327,11 @@ impl Syllable {
                 self.signs.push_str(sign);
                 true
             }
-            Entry::Ottu(c) => {
-                self.ottus.push(*c);
-                true
-            }
-            Entry::Subscripts(cs) => {
-                for c in cs.chars() {
-                    if class(c) == Class::Consonant {
-                        self.ottus.push(c);
-                    } else {
-                        self.signed = true;
-                        self.signs.push(c);
-                    }
+            Entry::Ottu(consonants, sign) => {
+                self.ottus.extend(consonants);
+                if let Some(sign) = sign {
+                    self.signed = true;
+                    self.signs.push(*sign);
                 }
                 true
             }
@@ -607,6 +608,43 @@ mod tests {
             akruti(&[0xC9, 0xD6, 0x64, 0xE2, 0x5F, 0x20, 0x58]).text,
             "ಸಾಕ್ಷ್ಯ"
         );
+        assert_eq!(akruti(&[0x64, 0xE2, 0x5F, 0x20, 0x57]).text, "ಕ್ಷ್ಮ");
         assert_eq!(akruti(&[0x79, 0xE2, 0x20, 0x79, 0xE2]).text, "ತ ತ");
+    }
+
+    #[test]
+    fn a_space_before_a_sign_is_kept_with_no_syllable_before_it() {
+        assert_eq!(akruti(&[0x2E, 0x20, 0xBD]).text, ". ೃ");
+        assert_eq!(akruti(&[0x31, 0x20, 0x58]).text, "1 ್ಯ");
+        assert_eq!(akruti(&[0x20, 0xBD]).text, " ೃ");
+    }
+
+    #[test]
+    fn the_no_break_space_is_a_space() {
+        assert_eq!(akruti(&[0x64, 0xE2, 0xA0, 0x64, 0xE2]).text, "ಕ\u{A0}ಕ");
+        assert_eq!(akruti(&[0x64, 0xE2, 0x5F, 0xA0, 0x58]).text, "ಕ್ಷ್ಯ");
+    }
+
+    /// Every row of every table reads without an unknown glyph: letters and
+    /// literals alone, the rest after a consonant.
+    #[test]
+    fn every_table_row_reads() {
+        for layout in Layout::ALL {
+            let carrier = super::super::from_unicode("ಪ", layout).text;
+            for row in rows(layout) {
+                let input = match row.entry {
+                    Entry::Letter(_) | Entry::Base(_) | Entry::Literal(_) | Entry::Ignore => {
+                        row.key.clone()
+                    }
+                    _ => format!("{carrier}{}", row.key),
+                };
+                let c = to_unicode(&input, layout, &Options::default());
+                assert!(c.unknown.is_empty(), "{layout} {:?}: {c:?}", row.key);
+                if let Entry::Letter(value) | Entry::Literal(value) = &row.entry {
+                    let expected: String = value.nfc().collect();
+                    assert_eq!(c.text, expected, "{layout} {:?}", row.key);
+                }
+            }
+        }
     }
 }

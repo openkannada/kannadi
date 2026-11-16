@@ -20,7 +20,7 @@ node --test web/test/units.mjs                          # page modules
 python3 web/serve.py 8000                               # serve web/dist locally
 cargo run --example nudi -- file.txt                    # convert a legacy text file
 cargo run -p kannadi-cli -- to-unicode docs/ --out out/ # batch convert
-cd tools/fontqa && uv run pytest && uv run ruff check . # font shaping tests (Python)
+cd tools/fontqa && uv run pytest && uv run ruff check . ../glyphdraft # font shaping tests (Python)
 ```
 
 CI runs these with `--locked`, apart from the example. A change is ready when they pass. `web/build.sh` needs the `wasm32-unknown-unknown` target and `wasm-bindgen-cli` at the `wasm-bindgen` version in `Cargo.lock`.
@@ -80,14 +80,15 @@ web/
   test/units.mjs      tests the page modules in Node, with no WebAssembly
 tools/fontqa/         Python: HarfBuzz shaping tests for Kannada fonts, results,
                       and fixes for font tables; see its README
+tools/glyphdraft/     FontForge Python: drafts U+0CDC, U+0CDD, U+0CF3 into an .sfd
 corpus/               benchmark lines from real documents, with a data card
 docs/                 design notes, corpus plan, prior art
 ```
 
 Principles:
 
-- **Tables are data and engines are generic.** Scheme spellings and glyph layouts live in tables. A new transliteration scheme needs a table and an entry in the `Scheme` enum. A new legacy font layout needs a table and an entry in the `Layout` enum. Keep scheme-specific behavior as fields on the table.
-- **Lossless by default.** Transliteration round-trips Kannada text exactly. When the converter cannot place a glyph, it reports it. Nothing is dropped silently, except spacing glyphs, which carry no text.
+- **Tables are data and engines are generic.** Scheme spellings and glyph layouts live in tables. A new transliteration scheme needs a table and an entry in the `Scheme` enum. A new legacy font layout needs a table in `data/`, a variant in `Layout` with its name, and its file in `table.rs`. Keep scheme-specific behavior as fields on the table.
+- **Lossless by default.** Transliteration round-trips Kannada text exactly. When the converter cannot place a glyph, it reports it. Nothing is dropped silently, except spacing glyphs, which carry no text, and spaces a table marks as typed before a sign.
 - **Small modules with 1 job each.** Shared behavior goes in 1 place; do not copy code between modules.
 - **No abstraction before it earns its place.** Add a trait when a second implementation exists.
 

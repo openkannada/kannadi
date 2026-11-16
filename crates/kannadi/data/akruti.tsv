@@ -1,8 +1,7 @@
 # Akruti Kannada glyph table: AkrutiKndPadma and its Bold, Demi and Demib weights,
 # which share 1 layout.
 #
-# Same format and kinds as nudi.tsv; codes are Windows-1252 bytes. An ottu row with
-# several consonants is 1 glyph that draws them all, and may end in a vowel sign.
+# The format is described in src/legacy/table.rs. Codes are Windows-1252 bytes.
 #
 # Derived from documents, as no code page is published. The glyphs were rendered
 # from the Akruti fonts embedded in public Karnataka PDFs: the full
@@ -12,14 +11,14 @@
 # highlights bh2002k.pdf (kar.nic.in/finance/bud2002-kan/), whose codes are the
 # bytes the page shows. Each glyph was identified by eye and matched against
 # glyphs shaped with HarfBuzz from Kannada Sangam MN and Noto Sans Kannada, then
-# checked in context: 14,999 lines of Akruti text in 33 Acts and Ordinances of 2001
-# to 2003 and the budget PDF, all fetched from the Internet Archive, were converted
-# and every unknown glyph and malformed syllable was read against the page image.
-# Bold and Demi draw the same letter at every code. docs/akruti.md has the method
-# and results.
+# checked in context: 16,857 lines of Akruti text in 33 Acts and Ordinances of 2001
+# to 2003 and the 2002 budget highlights and speech, all fetched from the Internet
+# Archive, were converted and every unknown glyph and malformed syllable was read
+# against the page image. Bold and Demi draw the same letter at every code.
+# docs/akruti.md has the method and results.
 #
 # Codes the fonts have but no document used are left out, and are reported as
-# unknown: 2A, 6A, A1, A2, A3, A6, A7, A8, B4, BF, E0, E1, E3, E9, EC, ED, F0.
+# unknown: 2A, 6A, A1, A2, A3, A6, A7, A8, B4, BF, E0, E1, E3, EC, ED, F0.
 # Vowels
 25	letter	ಅ
 41	letter	ಆ
@@ -119,8 +118,8 @@ DE	letter	ಶ್ರೀ
 6E B3	letter	ೠ
 C0 C3	base	ಮ
 CC C3	base	ಯ
-C6 B3	letter	ಮೀ
-CE B3	letter	ಯೀ
+C6 B3	letter	ಮೀ	read
+CE B3	letter	ಯೀ	read
 # Vowel signs. E2 is the head stroke for the inherent a.
 E2	sign
 D6	sign	ಾ
@@ -133,13 +132,16 @@ EA	sign	ೆ
 A9	sign	ೕ
 F4	sign	ೖ
 F1	sign	ೌ
-# Typists often put a space before ೃ, ೖ and the subscript ಯ, which draw under the
-# glyph before them. The space is not text.
-20 BD	sign	ೃ
-20 F4	sign	ೖ
-20 58	ottu	ಯ
+# Typists often put a space (20, or the no-break space A0) before ೃ, ೖ and the
+# subscripts ಯ and ಮ, which draw under the glyph before them. After a syllable, the space
+# is not text.
+20 BD	sign	ೃ	read
+20 F4	sign	ೖ	read
+20 58	ottu	ಯ	read
+20 57	ottu	ಮ	read
+A0 58	ottu	ಯ	read
 # ೆ with the ೃ glyph under it reads as ೈ: ವೆೃರ್ is typed for ವೈರ್.
-EA BD	sign	ೈ
+EA BD	sign	ೈ	read
 D2	sign	್
 # Modifiers
 AA	mod	ಂ
@@ -196,7 +198,6 @@ CB	arka
 2D	ignore
 3C	ignore
 3E	ignore
-A0	ignore
 A4	ignore
 F7	ignore
 # Punctuation and digits
@@ -205,6 +206,7 @@ F7	ignore
 A5	literal	-
 F5	literal	—
 F6	literal	–
+E9	literal	।
 81	literal	೧
 82	literal	೨
 83	literal	೩

@@ -55,17 +55,34 @@ fn nudi_word() -> impl Strategy<Value = String> {
     word(vowels, "ಾಿೀುೂೃೆೇೈೊೋೌ್", vec!['ಂ', 'ಃ'])
 }
 
-/// Well-formed words using only the letters the Akruti layout has glyphs for: it has
-/// none for ಙ, ಝ, ಱ and ೞ, and none for ಞ with ಿ.
+/// Well-formed words using only what the Akruti layout has glyphs for: no ಙ, ಱ
+/// or ೞ, ಝ only as a subscript, and no ಞ with ಿ or ೀ.
 fn akruti_word() -> impl Strategy<Value = String> {
     let vowels = ('\u{0C85}'..='\u{0CE1}')
         .filter(|&c| class(c) == Class::Vowel && !matches!(c, 'ಌ' | 'ೡ'))
         .collect();
     let consonants = consonants()
         .into_iter()
-        .filter(|c| !matches!(c, 'ಙ' | 'ಝ' | 'ಞ' | 'ಱ' | 'ೞ'))
+        .filter(|c| !matches!(c, 'ಙ' | 'ಱ' | 'ೞ'))
         .collect();
-    word_of(consonants, vowels, "ಾಿೀುೂೃೆೇೈೊೋೌ್", vec!['ಂ', 'ಃ'])
+    word_of(consonants, vowels, "ಾಿೀುೂೃೆೇೈೊೋೌ್", vec!['ಂ', 'ಃ']).prop_filter(
+        "a letter Akruti has no glyph for",
+        |w| {
+            aksharas(w).all(|a| {
+                // The consonant that carries the syllable follows an arkavattu ರ್.
+                let text = a
+                    .text
+                    .strip_prefix("ರ್")
+                    .filter(|t| !t.is_empty())
+                    .unwrap_or(a.text);
+                match text.chars().next() {
+                    Some('ಝ') => false,
+                    Some('ಞ') => !text.contains(['ಿ', 'ೀ']),
+                    _ => true,
+                }
+            })
+        },
+    )
 }
 
 fn consonants() -> Vec<char> {
@@ -205,8 +222,11 @@ proptest! {
     }
 
     #[test]
-    fn akruti_roundtrip_words(words in prop::collection::vec(akruti_word(), 1..4)) {
-        let text = words.join(" ");
+    fn akruti_roundtrip_words(
+        words in prop::collection::vec(akruti_word(), 1..4),
+        number in "[೧-೯]{0,3}",
+    ) {
+        let text = format!("{} {number}", words.join(" "));
         let encoded = from_unicode(&text, Layout::Akruti);
         prop_assert!(encoded.is_clean(), "{:?}", encoded);
         let back = to_unicode(&encoded.text, Layout::Akruti, &Options::default());
