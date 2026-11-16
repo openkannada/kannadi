@@ -671,6 +671,7 @@ mod tests {
     #[test]
     fn spaces_are_written_as_spaces_where_a_sign_may_follow_one() {
         assert_eq!(akruti("ಕ ಕ"), [0x64, 0xE2, 0x20, 0x64, 0xE2]);
+        assert_eq!(akruti("ಕ\u{A0}ಕ"), [0x64, 0xE2, 0xA0, 0x64, 0xE2]);
     }
 
     #[test]

@@ -199,8 +199,7 @@ CB	arka
 3E	ignore
 A4	ignore
 F7	ignore
-# Punctuation, digits and the no-break space
-A0	literal	 
+# Punctuation and digits
 27	literal	’
 60	literal	‘
 A5	literal	-
