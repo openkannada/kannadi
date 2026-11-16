@@ -37,7 +37,6 @@ pub fn convert_part(
             .iter()
             .map(|r| is_legacy(r, paragraph, styles))
             .collect();
-        let mut paragraph_rows = Vec::new();
         let location = format!("{name}, paragraph {}", paragraph.number);
         let mut converted = vec![false; paragraph.runs.len()];
         for group in groups(paragraph, &legacy, to_unicode) {
@@ -47,15 +46,16 @@ pub fn convert_part(
                 settings,
                 location: &location,
             };
-            edit.group(&group, &mut edits, &mut paragraph_rows);
+            let fallback = !paragraph.reported || paragraph.runs[group[0].0].fallback;
+            let group_rows = if fallback {
+                &mut fallback_rows
+            } else {
+                &mut *rows
+            };
+            edit.group(&group, &mut edits, group_rows);
             for &(run, _) in &group {
                 converted[run] = true;
             }
-        }
-        if paragraph.reported {
-            rows.extend(paragraph_rows);
-        } else {
-            fallback_rows.extend(paragraph_rows);
         }
         if to_unicode {
             let runs = paragraph.runs.iter().zip(&converted).filter(|(_, &c)| c);

@@ -349,6 +349,13 @@ mod tests {
         assert_eq!(xml.matches(">ಕ").count(), 2, "{xml}");
         assert_eq!(report.rows.len(), 1, "{:?}", report.rows);
         assert_eq!(report.rows[0].kind, Kind::UnknownGlyph);
+        let same = format!(
+            "<w:p><mc:AlternateContent><mc:Choice>{}</mc:Choice><mc:Fallback>{}</mc:Fallback></mc:AlternateContent></w:p>",
+            branch("PÀ\u{F1}"),
+            branch("PÀ\u{F1}")
+        );
+        let (_, report) = run(&docx(&same, None), to_unicode());
+        assert_eq!(report.rows.len(), 1, "{:?}", report.rows);
     }
 
     #[test]

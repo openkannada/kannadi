@@ -34,6 +34,9 @@ pub struct Run {
     /// Where the innermost tracked change or alternative-content branch around
     /// the run starts. Text never moves between runs with different contexts.
     pub context: Option<usize>,
+    /// In the fallback branch of alternative content, whose problems the main
+    /// branch already reports.
+    pub fallback: bool,
 }
 
 /// An element in a run's properties, with its attributes as written.
@@ -215,10 +218,12 @@ impl Scanner<'_> {
             "w:r" if self.parent().is_some_and(|p| RUN_PARENTS.contains(&p)) => {
                 let depth = self.names.len();
                 let context = self.contexts.last().map(|&(_, start)| start);
+                let fallback = self.fallback > 0;
                 self.runs.push(Run {
                     content_start: span.end,
                     depth,
                     context,
+                    fallback,
                     ..Run::default()
                 });
             }
