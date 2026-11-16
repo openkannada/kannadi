@@ -373,8 +373,9 @@ pub fn phonetic_key(word: &str, level: &str) -> Result<String, JsError> {
     Ok(kannadi::phonetic::key(word, level.parse()?))
 }
 
-/// The key of a word typed in Latin letters, comparable with [`phonetic_key`] at the
-/// same level. See [`kannadi::phonetic::latin_key()`].
+/// The key of a word typed in Latin letters, comparable with [`phonetic_key`] at
+/// "medium" or "broad" level; "narrow" gives the medium key. See
+/// [`kannadi::phonetic::latin_key()`].
 ///
 /// # Errors
 ///

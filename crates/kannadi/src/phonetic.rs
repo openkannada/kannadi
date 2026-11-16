@@ -7,10 +7,12 @@
 //! maps a word to a string of sound classes, so that spellings that sound alike
 //! share a key. There are 3 keys, from strict to loose:
 //!
-//! - [`Level::Narrow`] folds aspiration, vowel length, doubled consonants, and a
-//!   nasal before a stop written as ಂ or as a letter. ಸಂಬಂಧ and ಸಮ್ಬಂದ match.
-//! - [`Level::Medium`] also folds retroflex with dental, ಳ with ಲ, the 3
-//!   sibilants, ಜ with ಝ and ಫ with ಪ. ನಿರ್ದಿಷ್ಟ and ನಿರ್ಧಿಸ್ಟ match.
+//! - [`Level::Narrow`] folds aspiration (ಜ with ಝ and ಫ with ಪ too), vowel length,
+//!   doubled consonants, and a nasal before a stop written as ಂ or as a letter.
+//!   ಸಂಬಂಧ and ಸಮ್ಬಂದ match.
+//! - [`Level::Medium`] also folds retroflex with dental, ಳ with ಲ and the 3
+//!   sibilants, and reads a nasal before a sibilant or ಹ as n. ನಿರ್ದಿಷ್ಟ and
+//!   ನಿರ್ಧಿಸ್ಟ match.
 //! - [`Level::Broad`] keeps only the consonants and a leading vowel. ನಿರ್ದಿಷ್ಟ
 //!   and ನಿರ್ದೇಶ, which differ in more than spelling, both start `nrd`.
 //!
@@ -19,26 +21,52 @@
 //! exact match above a key match.
 //!
 //! Latin input ([`latin_key`]) gets the medium and broad keys: "neeru" matches
-//! ನೀರು at medium level, and "nirdishta" matches ನಿರ್ದಿಷ್ಟ at broad level. The
-//! keys are plain ASCII.
+//! ನೀರು at medium level, and "nirdishta" matches ನಿರ್ದಿಷ್ಟ at broad level.
+//! Compare a Latin key with [`key`] at medium or broad level; Latin has no
+//! narrow key. The keys are plain ASCII.
+//!
+//! A key covers 1 word: split phrases into words first. Text with no letters
+//! of the key's script, such as digits or punctuation, gets an empty key, which
+//! a search should skip.
+
+use std::fmt;
+use std::str::FromStr;
 
 /// How much a key folds. See the module documentation.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum Level {
     /// Folds aspiration, vowel length, doubled consonants and nasals before stops.
     Narrow,
-    /// Also folds retroflex with dental, ಳ with ಲ, the sibilants, ಜ with ಝ and ಫ with ಪ.
+    /// Also folds retroflex with dental, ಳ with ಲ and the sibilants, and reads a
+    /// nasal before a sibilant or ಹ as n.
     Medium,
     /// Keeps only the consonants and a leading vowel.
     Broad,
 }
 
-impl std::str::FromStr for Level {
+impl Level {
+    /// The level's name, which [`str::parse`] reads back.
+    pub fn name(self) -> &'static str {
+        match self {
+            Level::Narrow => "narrow",
+            Level::Medium => "medium",
+            Level::Broad => "broad",
+        }
+    }
+}
+
+impl fmt::Display for Level {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(self.name())
+    }
+}
+
+impl FromStr for Level {
     type Err = UnknownLevel;
 
-    /// Parses "narrow", "medium" or "broad".
+    /// Parses "narrow", "medium" or "broad", in any case.
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
+        match s.to_ascii_lowercase().as_str() {
             "narrow" => Ok(Self::Narrow),
             "medium" => Ok(Self::Medium),
             "broad" => Ok(Self::Broad),
@@ -51,11 +79,11 @@ impl std::str::FromStr for Level {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct UnknownLevel(pub String);
 
-impl std::fmt::Display for UnknownLevel {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl fmt::Display for UnknownLevel {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
-            "unknown key level {:?}: use narrow, medium or broad",
+            "unknown level {:?}; expected narrow, medium or broad",
             self.0
         )
     }
@@ -365,8 +393,9 @@ const LATIN: &[(&str, &str)] = &[
     ("h", "h"),
 ];
 
-/// The key of a word typed in Latin letters, comparable with the same level's key of a
-/// Kannada word. Latin does not mark retroflex consonants, so the narrow key is the medium one.
+/// The key of a word typed in Latin letters, comparable with [`key`] at medium or
+/// broad level. Loose spellings do not mark retroflex consonants, so narrow gives the
+/// medium key, which does not match a narrow Kannada key.
 pub fn latin_key(text: &str, level: Level) -> String {
     let lower = text.to_lowercase();
     let mut rest = lower.as_str();
@@ -442,8 +471,19 @@ mod tests {
 
     #[test]
     fn levels_parse_by_name() {
-        assert_eq!("medium".parse(), Ok(Level::Medium));
+        for level in [Level::Narrow, Level::Medium, Level::Broad] {
+            assert_eq!(level.name().parse(), Ok(level));
+            assert_eq!(level.to_string(), level.name());
+        }
+        assert_eq!("Medium".parse(), Ok(Level::Medium));
         assert_eq!("wide".parse::<Level>(), Err(UnknownLevel("wide".into())));
+    }
+
+    #[test]
+    fn text_with_no_letters_has_an_empty_key() {
+        assert_eq!(key("123 ೧೨", Level::Medium), "");
+        assert_eq!(latin_key("ನಮಸ್ಕಾರ", Level::Medium), "");
+        assert_eq!(latin_key("", Level::Broad), "");
     }
 
     #[test]
