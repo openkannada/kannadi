@@ -414,11 +414,21 @@ endcmap\nCMapName currentdict /CMap defineresource pop\nend\nend\n";
     }
 
     #[test]
-    fn short_text_that_does_not_convert_is_kept() {
-        let content = b"BT /F1 12 Tf 72 700 Td (\x95 \x95 \x95 \x95) Tj ET";
-        let (text, report) = run(&pdf(vec![("F1", simple_font("ABCDEF+F1"))], content));
-        assert_eq!(text, "\u{2022} \u{2022} \u{2022} \u{2022}\n");
-        assert!(report.is_empty(), "{:?}", report.rows);
+    fn short_text_that_does_not_convert_cleanly_is_kept() {
+        for (shown, kept) in [
+            (
+                &b"\x95 \x95 \x95 \x95"[..],
+                "\u{2022} \u{2022} \u{2022} \u{2022}",
+            ),
+            (b"\xC1\xC1 \xC1\xC1", "\u{C1}\u{C1} \u{C1}\u{C1}"),
+        ] {
+            let mut content = b"BT /F1 12 Tf 72 700 Td (".to_vec();
+            content.extend_from_slice(shown);
+            content.extend_from_slice(b") Tj ET");
+            let (text, report) = run(&pdf(vec![("F1", simple_font("ABCDEF+F1"))], &content));
+            assert_eq!(text, format!("{kept}\n"));
+            assert!(report.is_empty(), "{:?}", report.rows);
+        }
     }
 
     #[test]
