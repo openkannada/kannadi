@@ -1,6 +1,8 @@
 //! The benchmark corpus in `corpus/` converts to its expected text in both
 //! directions. It is read from the repository at test time.
 
+use std::collections::HashSet;
+
 use kannadi::legacy::{decode_windows_1252, nudi_to_unicode, unicode_to_nudi, Options};
 
 struct Line {
@@ -12,7 +14,7 @@ struct Line {
 
 fn corpus() -> Vec<Line> {
     let path = concat!(env!("CARGO_MANIFEST_DIR"), "/../../corpus/nudi-2002.tsv");
-    let source = std::fs::read_to_string(path).expect("corpus/nudi-2002.tsv");
+    let source = std::fs::read_to_string(path).expect(path);
     source
         .lines()
         .filter(|l| !l.is_empty() && !l.starts_with('#'))
@@ -23,12 +25,19 @@ fn corpus() -> Vec<Line> {
                 .split_whitespace()
                 .map(|h| u8::from_str_radix(h, 16).expect("hex"))
                 .collect();
-            Line {
+            let line = Line {
                 id: cols[0].to_string(),
                 status: cols[1].to_string(),
                 legacy: decode_windows_1252(&bytes),
                 unicode: cols[4].to_string(),
-            }
+            };
+            let status = line.status.as_str();
+            assert!(
+                matches!(status, "verified" | "pending" | "unchecked"),
+                "{}",
+                line.id
+            );
+            line
         })
         .collect()
 }
@@ -36,24 +45,22 @@ fn corpus() -> Vec<Line> {
 #[test]
 fn every_line_converts_to_its_expected_text() {
     let lines = corpus();
-    assert!(lines.len() >= 200);
+    assert_eq!(lines.len(), 207);
+    let ids: HashSet<&str> = lines.iter().map(|l| l.id.as_str()).collect();
+    assert_eq!(ids.len(), lines.len(), "ids must be unique");
     for line in &lines {
-        assert!(
-            matches!(line.status.as_str(), "verified" | "pending" | "unchecked"),
-            "{}",
-            line.id
-        );
         let converted = nudi_to_unicode(&line.legacy, &Options::default());
         assert_eq!(converted.text, line.unicode, "line {}", line.id);
     }
 }
 
+/// Lines 103 and 166 keep typing habits the encoder does not copy: a dead
+/// consonant typed as its own syllable, and an extra spacing glyph.
 #[test]
-fn most_lines_encode_back_as_typed() {
-    let lines = corpus();
-    let same = lines
-        .iter()
-        .filter(|l| unicode_to_nudi(&l.unicode).text == l.legacy)
-        .count();
-    assert!(same * 10 >= lines.len() * 9, "{same} of {}", lines.len());
+fn lines_encode_back_as_typed() {
+    for line in corpus() {
+        let typed = unicode_to_nudi(&line.unicode).text == line.legacy;
+        let habit = matches!(line.id.as_str(), "103" | "166");
+        assert_eq!(typed, !habit, "line {} ({})", line.id, line.status);
+    }
 }

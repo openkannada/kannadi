@@ -21,24 +21,30 @@ struct Tally {
 }
 
 fn main() -> std::io::Result<()> {
+    let default = concat!(env!("CARGO_MANIFEST_DIR"), "/../../corpus/nudi-2002.tsv");
     let path = std::env::args()
         .nth(1)
-        .unwrap_or_else(|| "corpus/nudi-2002.tsv".to_string());
-    let source = std::fs::read_to_string(path)?;
+        .unwrap_or_else(|| default.to_string());
+    let source = std::fs::read_to_string(&path)
+        .map_err(|e| std::io::Error::new(e.kind(), format!("{path}: {e}")))?;
     let mut tallies: BTreeMap<String, Tally> = BTreeMap::new();
     for row in source
         .lines()
         .filter(|l| !l.is_empty() && !l.starts_with('#'))
     {
         let cols: Vec<&str> = row.split('\t').collect();
-        let [_, status, _, hex, expected, ..] = cols[..] else {
+        let [id, status, _, hex, expected, ..] = cols[..] else {
             eprintln!("skipping a row with {} columns", cols.len());
             continue;
         };
-        let bytes: Vec<u8> = hex
+        let Ok(bytes) = hex
             .split_whitespace()
-            .filter_map(|h| u8::from_str_radix(h, 16).ok())
-            .collect();
+            .map(|h| u8::from_str_radix(h, 16))
+            .collect::<Result<Vec<u8>, _>>()
+        else {
+            eprintln!("skipping line {id}: its glyph codes are not hex");
+            continue;
+        };
         let legacy = decode_windows_1252(&bytes);
         let converted = nudi_to_unicode(&legacy, &Options::default());
         let expected_aksharas = kannadi::split(expected);
@@ -51,6 +57,7 @@ fn main() -> std::io::Result<()> {
         t.encoded_as_typed += usize::from(unicode_to_nudi(expected).text == legacy);
     }
     println!("status     lines  exact  akshara error rate  flagged  encoded as typed");
+    println!("{}", "-".repeat(73));
     for (status, t) in &tallies {
         let rate = 100.0 * t.errors as f64 / t.aksharas.max(1) as f64;
         println!(
