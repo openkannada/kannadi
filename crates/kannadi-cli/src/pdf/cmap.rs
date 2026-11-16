@@ -227,5 +227,14 @@ mod tests {
     fn dictionaries_are_not_read_as_codes() {
         let cmap = CMap::parse(b"<< /Registry (Adobe) >> beginbfchar <41> <0042> endbfchar");
         assert_eq!(cmap.decode(b"A"), "B");
+        let found = tokens("<</A <0041>>>");
+        let hex: Vec<&Vec<u8>> = found
+            .iter()
+            .filter_map(|t| match t {
+                Token::Hex(h) => Some(h),
+                _ => None,
+            })
+            .collect();
+        assert_eq!(hex, [&vec![0x00, 0x41]], "{found:?}");
     }
 }
