@@ -2,6 +2,8 @@
 
 use lopdf::{Dictionary, Document, Object};
 
+use super::resolve;
+
 /// Glyph advances in thousandths of the font size.
 #[derive(Debug)]
 pub enum Widths {
@@ -17,19 +19,15 @@ pub enum Widths {
 }
 
 impl Widths {
-    pub fn of(doc: &Document, font: &Dictionary) -> Self {
-        let resolve = |o: &Object| match o {
-            Object::Reference(id) => doc.get_object(*id).ok().cloned(),
-            other => Some(other.clone()),
+    pub fn of<'a>(doc: &'a Document, font: &'a Dictionary) -> Self {
+        let entry = |dict: &'a Dictionary, key: &[u8]| -> Option<&'a Object> {
+            resolve(doc, dict.get(key).ok()?)
         };
         let subtype = font.get(b"Subtype").and_then(Object::as_name).ok();
         if subtype != Some(b"Type0".as_slice()) {
             let first = font.get(b"FirstChar").ok().and_then(number).unwrap_or(0.0);
-            let widths = font
-                .get(b"Widths")
-                .ok()
-                .and_then(resolve)
-                .and_then(|o| o.as_array().ok().cloned())
+            let widths = entry(font, b"Widths")
+                .and_then(|o| o.as_array().ok())
                 .map(|a| a.iter().filter_map(number).collect())
                 .unwrap_or_default();
             return Widths::Simple {
@@ -37,27 +35,19 @@ impl Widths {
                 widths,
             };
         }
-        let descendant = font
-            .get(b"DescendantFonts")
-            .ok()
-            .and_then(resolve)
-            .and_then(|o| o.as_array().ok().and_then(|a| a.first().cloned()))
-            .and_then(|o| resolve(&o))
-            .and_then(|o| o.as_dict().ok().cloned())
-            .unwrap_or_default();
+        let descendant = entry(font, b"DescendantFonts")
+            .and_then(|o| o.as_array().ok()?.first())
+            .and_then(|o| resolve(doc, o)?.as_dict().ok());
         let default = descendant
-            .get(b"DW")
-            .ok()
+            .and_then(|d| d.get(b"DW").ok())
             .and_then(number)
             .unwrap_or(1000.0);
         let list = descendant
-            .get(b"W")
-            .ok()
-            .and_then(resolve)
-            .and_then(|o| o.as_array().ok().cloned())
-            .unwrap_or_default();
+            .and_then(|d| entry(d, b"W"))
+            .and_then(|o| o.as_array().ok())
+            .map_or(&[][..], Vec::as_slice);
         Widths::Cid {
-            ranges: cid_ranges(&list, resolve),
+            ranges: cid_ranges(list, |o| resolve(doc, o)),
             default,
         }
     }
@@ -88,9 +78,9 @@ impl Widths {
 }
 
 /// The `W` array as ranges. CIDs are 2 bytes, so anything above 0xFFFF is dropped.
-fn cid_ranges(
-    list: &[Object],
-    resolve: impl Fn(&Object) -> Option<Object>,
+fn cid_ranges<'a>(
+    list: &'a [Object],
+    resolve: impl Fn(&'a Object) -> Option<&'a Object>,
 ) -> Vec<(u32, u32, f32)> {
     let cid = |o: &Object| {
         number(o)
@@ -130,9 +120,7 @@ fn cid_ranges(
 }
 
 fn number(o: &Object) -> Option<f32> {
-    o.as_float()
-        .ok()
-        .or_else(|| o.as_i64().ok().map(|n| n as f32))
+    o.as_float().ok()
 }
 
 #[cfg(test)]
@@ -152,7 +140,7 @@ mod tests {
             Object::Integer(9),
         ];
         let widths = Widths::Cid {
-            ranges: cid_ranges(&list, |o| Some(o.clone())),
+            ranges: cid_ranges(&list, Some),
             default: 1000.0,
         };
         assert_eq!(

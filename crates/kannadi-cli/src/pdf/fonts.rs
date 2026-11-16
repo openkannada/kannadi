@@ -9,7 +9,9 @@ use lopdf::{Dictionary, Document, Object};
 use crate::convert::Settings;
 use crate::fonts::has_kannada_digits;
 
+use super::cmap::CMap;
 use super::widths::Widths;
+use super::{resolve, LIMIT};
 
 pub const RENUMBERED: &str = "named as a Nudi or Baraha font, but its glyph codes do not follow \
      the layout and its character map does not help; the PDF maker may have renumbered them";
@@ -44,7 +46,7 @@ pub struct Font {
     /// The raw reading of all text shown in the font.
     text: String,
     /// The ToUnicode reading, for a 1-byte font named as legacy that has a map.
-    mapped: Option<String>,
+    mapped: String,
     pub verdict: Verdict,
 }
 
@@ -56,16 +58,12 @@ pub struct Fonts {
     by_key: HashMap<(String, u64), usize>,
     /// By the address of the font's dictionary, which lives as long as the PDF.
     widths: HashMap<usize, Rc<Widths>>,
+    /// By the address of the font's dictionary.
+    cmaps: HashMap<usize, Option<Rc<CMap>>>,
 }
 
 impl Fonts {
-    pub fn index(
-        &mut self,
-        doc: &Document,
-        dict: &Dictionary,
-        settings: &Settings,
-        mapped: bool,
-    ) -> usize {
+    pub fn index(&mut self, doc: &Document, dict: &Dictionary, settings: &Settings) -> usize {
         let key = font_key(doc, dict);
         if let Some(&i) = self.by_key.get(&key) {
             return i;
@@ -80,7 +78,7 @@ impl Fonts {
             kannada_digits: has_kannada_digits(plain),
             name,
             text: String::new(),
-            mapped: mapped.then(String::new),
+            mapped: String::new(),
             verdict: Verdict::Other,
         });
         self.by_key.insert(key, self.fonts.len() - 1);
@@ -100,37 +98,56 @@ impl Fonts {
         )
     }
 
+    /// The font's ToUnicode map, read once per document.
+    pub fn cmap(&mut self, doc: &Document, dict: &Dictionary) -> Option<Rc<CMap>> {
+        let key = std::ptr::from_ref(dict) as usize;
+        self.cmaps
+            .entry(key)
+            .or_insert_with(|| {
+                let stream = resolve(doc, dict.get(b"ToUnicode").ok()?)?
+                    .as_stream()
+                    .ok()?;
+                let bytes = stream.decompressed_content_with_limit(LIMIT).ok()?;
+                Some(Rc::new(CMap::parse(&bytes))).filter(|m| !m.is_empty())
+            })
+            .clone()
+    }
+
     pub fn add_text(&mut self, index: usize, raw: &str, mapped: Option<&str>) {
         let font = &mut self.fonts[index];
         font.text.push_str(raw);
-        if let (Some(all), Some(text)) = (font.mapped.as_mut(), mapped) {
-            all.push_str(text);
+        if let Some(text) = mapped {
+            font.mapped.push_str(text);
         }
     }
 
     /// Decides which fonts hold legacy text, once all their text is known.
     pub fn decide(&mut self) {
         for font in &mut self.fonts {
-            let raw = judge(&font.text);
+            let raw = Judgment::of(&font.text);
             let renumbered = looks_renumbered(&font.text);
-            let mapped_clean = font
-                .mapped
-                .as_deref()
-                .is_some_and(|m| judge(m) == Judged::Clean);
             font.verdict = if font.named_legacy {
-                let raw_usable = raw == Judged::Clean
-                    || (raw == Judged::TooShort && !renumbered && !mapped_clean);
-                if raw_usable {
+                let mapped = Judgment::of(&font.mapped);
+                // Short text: the map wins when only its reading looks like legacy codes.
+                let mapped_usable = mapped.clean()
+                    || (mapped.short()
+                        && mapped.flawless()
+                        && looks_legacy(&font.mapped)
+                        && !looks_legacy(&font.text));
+                if raw.clean() || (raw.short() && !renumbered && !mapped_usable) {
                     Verdict::Legacy(Source::Raw)
-                } else if mapped_clean {
+                } else if mapped_usable {
                     Verdict::Legacy(Source::Mapped)
                 } else {
                     Verdict::Unreadable(RENUMBERED)
                 }
             } else if looks_legacy(&font.text) {
-                match raw {
-                    Judged::Unclean => Verdict::Unreadable(OTHER_LAYOUT),
-                    _ => Verdict::Legacy(Source::Raw),
+                if raw.clean() || (raw.short() && raw.flawless()) {
+                    Verdict::Legacy(Source::Raw)
+                } else if raw.short() {
+                    Verdict::Other
+                } else {
+                    Verdict::Unreadable(OTHER_LAYOUT)
                 }
             } else if font.custom_codes && renumbered {
                 Verdict::Unreadable(RENUMBERED_SUBSET)
@@ -150,12 +167,9 @@ impl Fonts {
 
 /// Whether a simple font's encoding has a `Differences` list.
 fn has_differences(doc: &Document, dict: &Dictionary) -> bool {
-    let encoding = match dict.get(b"Encoding") {
-        Ok(Object::Reference(id)) => doc.get_object(*id).ok(),
-        Ok(other) => Some(other),
-        Err(_) => None,
-    };
-    encoding
+    dict.get(b"Encoding")
+        .ok()
+        .and_then(|e| resolve(doc, e))
         .and_then(|e| e.as_dict().ok())
         .is_some_and(|d| d.get(b"Differences").is_ok())
 }
@@ -169,15 +183,12 @@ fn font_key(doc: &Document, dict: &Dictionary) -> (String, u64) {
         .and_then(Object::as_name)
         .map(|n| String::from_utf8_lossy(n).to_string())
         .unwrap_or_default();
-    let resolve = |o: &Object| match o {
-        Object::Reference(id) => doc.get_object(*id).ok().cloned(),
-        other => Some(other.clone()),
-    };
+    let entry = |key: &[u8]| dict.get(key).ok().and_then(|o| resolve(doc, o));
     let mut hasher = std::collections::hash_map::DefaultHasher::new();
-    for entry in [&b"Subtype"[..], b"Encoding", b"FontDescriptor"] {
-        format!("{:?}", dict.get(entry).ok().and_then(resolve)).hash(&mut hasher);
+    for key in [&b"Subtype"[..], b"Encoding", b"FontDescriptor"] {
+        format!("{:?}", entry(key)).hash(&mut hasher);
     }
-    if let Some(Object::Stream(s)) = dict.get(b"ToUnicode").ok().and_then(resolve) {
+    if let Some(Object::Stream(s)) = entry(b"ToUnicode") {
         s.content.hash(&mut hasher);
     }
     (name, hasher.finish())
@@ -192,23 +203,34 @@ pub fn plain_name(name: &str) -> &str {
     name.split(',').next().unwrap_or(name)
 }
 
-#[derive(Debug, PartialEq, Eq)]
-enum Judged {
-    /// Problems in at most 1 syllable in 10.
-    Clean,
-    Unclean,
-    /// Fewer than 10 syllables.
-    TooShort,
+/// How a font's text converts as Nudi.
+struct Judgment {
+    syllables: usize,
+    problems: usize,
 }
 
-fn judge(text: &str) -> Judged {
-    let converted = nudi_to_unicode(text, &Options::default());
-    let syllables = kannadi::count_aksharas(&converted.text);
-    let problems = converted.unknown.len() + converted.malformed.len();
-    match syllables {
-        0..=9 => Judged::TooShort,
-        _ if problems * 10 <= syllables => Judged::Clean,
-        _ => Judged::Unclean,
+impl Judgment {
+    fn of(text: &str) -> Self {
+        let converted = nudi_to_unicode(text, &Options::default());
+        Judgment {
+            syllables: kannadi::count_aksharas(&converted.text),
+            problems: converted.unknown.len() + converted.malformed.len(),
+        }
+    }
+
+    /// Fewer than 10 syllables: too little text to judge by its problem rate.
+    fn short(&self) -> bool {
+        self.syllables < 10
+    }
+
+    /// At least 10 syllables, with problems in at most 1 in 10.
+    fn clean(&self) -> bool {
+        !self.short() && self.problems * 10 <= self.syllables
+    }
+
+    /// Some syllables and no problems.
+    fn flawless(&self) -> bool {
+        self.syllables > 0 && self.problems == 0
     }
 }
 

@@ -7,7 +7,7 @@ use std::rc::Rc;
 use anyhow::{Context, Result};
 use kannadi::legacy::decode_windows_1252;
 use lopdf::content::{Content, Operation};
-use lopdf::{Dictionary, Document, Encoding, Object};
+use lopdf::{Dictionary, Document, Encoding, Object, Stream};
 
 use crate::convert::Settings;
 
@@ -15,12 +15,14 @@ use super::cmap::CMap;
 use super::encoding::differences;
 use super::fonts::Fonts;
 use super::widths::Widths;
-
-/// The most a single page or font stream may decompress to.
-pub const LIMIT: usize = 64 << 20;
+use super::{resolve, LIMIT};
 
 /// Forms may draw other forms; deeper nesting is taken as a loop.
 const MAX_FORM_DEPTH: usize = 8;
+
+/// The most operations 1 page may run, counting each time a form is drawn, so
+/// forms that draw each other many times cannot hang the reader.
+const MAX_OPERATIONS: usize = 1_000_000;
 
 /// Text shown in 1 font, or a space the layout implies.
 #[derive(Debug)]
@@ -66,22 +68,24 @@ pub fn read_page(
         fonts,
         settings,
         page_fonts: HashMap::new(),
+        forms: HashMap::new(),
         lines: vec![Vec::new()],
         pen: Pen::default(),
         current: None,
         saved: Vec::new(),
         lost: 0,
+        operations_left: MAX_OPERATIONS,
     };
-    reader.walk(&content, &resources, 0)?;
+    let content = Content::decode(&content).context("reading the page's content")?;
+    reader.walk(&content.operations, &resources, 0)?;
     Ok(Page {
         lines: reader.lines,
         lost: reader.lost,
     })
 }
 
-/// A form XObject's content, its own resources and its matrix.
 struct Form<'d> {
-    content: Vec<u8>,
+    operations: Vec<Operation>,
     resources: Option<&'d Dictionary>,
     matrix: Matrix,
 }
@@ -164,7 +168,7 @@ struct Pen {
     y: f32,
     /// Where the last string ended, within this text object and line.
     end: Option<f32>,
-    /// The current transformation matrix, from text space to the page.
+    /// The current transformation matrix, from user space to the page.
     ctm: Matrix,
     /// The baseline of the last string shown, on the page.
     last_y: Option<f32>,
@@ -245,19 +249,31 @@ struct PageReader<'d, 'f> {
     settings: &'f Settings,
     /// By the address of the font's dictionary, since forms may reuse a name.
     page_fonts: HashMap<usize, PageFont<'d>>,
+    /// Decoded forms by the address of their stream; `None` for a stream that is
+    /// not a readable form.
+    forms: HashMap<usize, Option<Rc<Form<'d>>>>,
     lines: Vec<Line>,
     pen: Pen,
     current: Option<&'d Dictionary>,
     /// Fonts, sizes and transformations saved by `q`, restored by `Q`.
     saved: Vec<(Option<&'d Dictionary>, f32, Matrix)>,
     lost: usize,
+    operations_left: usize,
 }
 
 impl<'d> PageReader<'d, '_> {
     /// Reads a content stream drawn with `resources`, and the forms it draws.
-    fn walk(&mut self, content: &[u8], resources: &[&'d Dictionary], depth: usize) -> Result<()> {
-        let content = Content::decode(content).context("reading the page's content")?;
-        for op in &content.operations {
+    fn walk(
+        &mut self,
+        operations: &[Operation],
+        resources: &[&'d Dictionary],
+        depth: usize,
+    ) -> Result<()> {
+        self.operations_left = self
+            .operations_left
+            .checked_sub(operations.len())
+            .context("the page draws too many operations; its forms may draw each other")?;
+        for op in operations {
             let number = |i: usize| op.operands.get(i).and_then(|o| o.as_float().ok());
             let name = || op.operands.first().and_then(|o| o.as_name().ok());
             match op.operator.as_str() {
@@ -292,10 +308,13 @@ impl<'d> PageReader<'d, '_> {
                     if let Some(form) = name().and_then(|n| self.form(resources, n)) {
                         let mut inner: Vec<&Dictionary> = form.resources.into_iter().collect();
                         inner.extend_from_slice(resources);
-                        let ctm = self.pen.ctm;
+                        // A form is drawn inside its own `q` and `Q`.
+                        let (font, size, ctm) = (self.current, self.pen.size, self.pen.ctm);
+                        let saved = std::mem::take(&mut self.saved);
                         self.pen.ctm = form.matrix.then(ctm);
-                        let walked = self.walk(&form.content, &inner, depth + 1);
-                        self.pen.ctm = ctm;
+                        let walked = self.walk(&form.operations, &inner, depth + 1);
+                        (self.current, self.pen.size, self.pen.ctm) = (font, size, ctm);
+                        self.saved = saved;
                         walked?;
                     }
                 }
@@ -325,46 +344,23 @@ impl<'d> PageReader<'d, '_> {
         name: &[u8],
     ) -> Option<&'d Dictionary> {
         resources.iter().find_map(|r| {
-            let entries = self.resolve(r.get(category).ok()?)?.as_dict().ok()?;
-            self.resolve(entries.get(name).ok()?)?.as_dict().ok()
+            let entries = resolve(self.doc, r.get(category).ok()?)?.as_dict().ok()?;
+            resolve(self.doc, entries.get(name).ok()?)?.as_dict().ok()
         })
     }
 
-    /// A form XObject's decoded content and its own resources.
-    fn form(&self, resources: &[&'d Dictionary], name: &[u8]) -> Option<Form<'d>> {
+    /// A form XObject by its name in `resources`, decoded once per page.
+    fn form(&mut self, resources: &[&'d Dictionary], name: &[u8]) -> Option<Rc<Form<'d>>> {
+        let doc = self.doc;
         let stream = resources.iter().find_map(|r| {
-            let entries = self.resolve(r.get(b"XObject").ok()?)?.as_dict().ok()?;
-            self.resolve(entries.get(name).ok()?)?.as_stream().ok()
+            let entries = resolve(doc, r.get(b"XObject").ok()?)?.as_dict().ok()?;
+            resolve(doc, entries.get(name).ok()?)?.as_stream().ok()
         })?;
-        if stream.dict.get(b"Subtype").and_then(Object::as_name).ok() != Some(b"Form".as_slice()) {
-            return None;
-        }
-        let resources = stream
-            .dict
-            .get(b"Resources")
-            .ok()
-            .and_then(|o| self.resolve(o))
-            .and_then(|o| o.as_dict().ok());
-        let matrix = stream
-            .dict
-            .get(b"Matrix")
-            .ok()
-            .and_then(|o| self.resolve(o))
-            .and_then(|o| o.as_array().ok())
-            .and_then(|a| Matrix::from_operands(a))
-            .unwrap_or(Matrix::IDENTITY);
-        Some(Form {
-            content: stream.decompressed_content_with_limit(LIMIT).ok()?,
-            resources,
-            matrix,
-        })
-    }
-
-    fn resolve(&self, object: &'d Object) -> Option<&'d Object> {
-        match object {
-            Object::Reference(id) => self.doc.get_object(*id).ok(),
-            other => Some(other),
-        }
+        let key = std::ptr::from_ref(stream) as usize;
+        self.forms
+            .entry(key)
+            .or_insert_with(|| decode_form(doc, stream).map(Rc::new))
+            .clone()
     }
 
     fn page_font(&mut self, dict: &'d Dictionary) -> &PageFont<'d> {
@@ -376,35 +372,26 @@ impl<'d> PageReader<'d, '_> {
                 .get(b"Subtype")
                 .and_then(Object::as_name)
                 .is_ok_and(|s| s != b"Type0");
-            let cmap = dict
-                .get(b"ToUnicode")
-                .ok()
-                .and_then(|o| match o {
-                    Object::Reference(id) => doc.get_object(*id).ok(),
-                    other => Some(other),
-                })
-                .and_then(|o| o.as_stream().ok())
-                .and_then(|s| s.decompressed_content_with_limit(LIMIT).ok())
-                .map(|bytes| CMap::parse(&bytes))
-                .filter(|m| !m.is_empty());
-            let named = settings.fonts.is_legacy(super::fonts::plain_name(
-                &dict
-                    .get(b"BaseFont")
-                    .and_then(Object::as_name)
-                    .map(|n| String::from_utf8_lossy(n).to_string())
-                    .unwrap_or_default(),
-            ));
-            let mapped = simple && named && cmap.is_some();
-            let index = fonts.index(doc, dict, settings, mapped);
+            let index = fonts.index(doc, dict, settings);
             let raw_codes = simple && fonts.is_named_legacy(index);
+            let encoding = dict.get_font_encoding_with_limit(doc, LIMIT).ok();
+            let by_lopdf = |b: u8| {
+                let text = Document::decode_text(encoding.as_ref()?, &[b]).ok()?;
+                let mut chars = text.chars();
+                chars.next().filter(|_| chars.next().is_none())
+            };
             PageFont {
                 index,
                 raw_codes,
                 table: (simple && !raw_codes)
-                    .then(|| differences(doc, dict))
+                    .then(|| differences(doc, dict, by_lopdf))
                     .flatten(),
-                encoding: dict.get_font_encoding_with_limit(doc, LIMIT).ok(),
-                cmap: cmap.filter(|_| mapped).map(Rc::new),
+                encoding,
+                cmap: if raw_codes {
+                    fonts.cmap(doc, dict)
+                } else {
+                    None
+                },
                 widths: fonts.widths(doc, dict),
             }
         })
@@ -460,6 +447,22 @@ impl<'d> PageReader<'d, '_> {
             line.push(piece);
         }
     }
+}
+
+fn decode_form<'d>(doc: &'d Document, stream: &'d Stream) -> Option<Form<'d>> {
+    if stream.dict.get(b"Subtype").and_then(Object::as_name).ok() != Some(b"Form".as_slice()) {
+        return None;
+    }
+    let entry = |key: &[u8]| stream.dict.get(key).ok().and_then(|o| resolve(doc, o));
+    let content = stream.decompressed_content_with_limit(LIMIT).ok()?;
+    Some(Form {
+        operations: Content::decode(&content).ok()?.operations,
+        resources: entry(b"Resources").and_then(|o| o.as_dict().ok()),
+        matrix: entry(b"Matrix")
+            .and_then(|o| o.as_array().ok())
+            .and_then(|a| Matrix::from_operands(a))
+            .unwrap_or(Matrix::IDENTITY),
+    })
 }
 
 enum Shown<'a> {

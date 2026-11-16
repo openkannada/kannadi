@@ -8,17 +8,27 @@ use std::collections::HashMap;
 #[derive(Debug, Default)]
 pub struct CMap {
     map: HashMap<Vec<u8>, String>,
-    lengths: Vec<usize>,
+    /// Whether some code is `n + 1` bytes long, by `n`.
+    lengths: [bool; 4],
+    /// How many more entries the map may take.
+    room: usize,
 }
 
 /// The most codes 1 `bfrange` may cover; codes are at most 2 bytes in practice.
 const MAX_RANGE: u32 = 0x1_0000;
 
+/// The most entries a map may take in all, counting repeats, so a small hostile
+/// map cannot take gigabytes or minutes.
+const MAX_ENTRIES: usize = 0x2_0000;
+
 impl CMap {
     pub fn parse(source: &[u8]) -> Self {
         let text = String::from_utf8_lossy(source);
         let tokens = tokens(&text);
-        let mut cmap = CMap::default();
+        let mut cmap = CMap {
+            room: MAX_ENTRIES,
+            ..CMap::default()
+        };
         let mut i = 0;
         while i < tokens.len() {
             match tokens[i] {
@@ -53,8 +63,6 @@ impl CMap {
                 _ => i += 1,
             }
         }
-        cmap.lengths.sort_unstable();
-        cmap.lengths.dedup();
         cmap
     }
 
@@ -68,7 +76,7 @@ impl CMap {
         let mut out = String::new();
         let mut i = 0;
         while i < bytes.len() {
-            let hit = self.lengths.iter().rev().find_map(|&n| {
+            let hit = (1..=4).rev().filter(|n| self.lengths[n - 1]).find_map(|n| {
                 let code = bytes.get(i..i + n)?;
                 self.map.get(code).map(|s| (s, n))
             });
@@ -86,11 +94,17 @@ impl CMap {
         out
     }
 
-    fn insert(&mut self, code: Vec<u8>, text: String) {
+    /// Adds an entry, and says whether the map has room for more.
+    fn insert(&mut self, code: Vec<u8>, text: String) -> bool {
+        if self.room == 0 {
+            return false;
+        }
         if (1..=4).contains(&code.len()) {
-            self.lengths.push(code.len());
+            self.room -= 1;
+            self.lengths[code.len() - 1] = true;
             self.map.insert(code, text);
         }
+        true
     }
 
     fn range(&mut self, lo: &[u8], hi: &[u8], dst: impl Fn(u32) -> Option<String>) {
@@ -101,7 +115,9 @@ impl CMap {
             let Some(text) = dst(k) else { break };
             let mut code = lo.to_vec();
             add(&mut code, k);
-            self.insert(code, text);
+            if !self.insert(code, text) {
+                break;
+            }
         }
     }
 }
@@ -117,7 +133,9 @@ fn tokens(text: &str) -> Vec<Token<'_>> {
     let mut out = Vec::new();
     let mut rest = text;
     while let Some(c) = rest.chars().next() {
-        if c == '<' && !rest.starts_with("<<") {
+        if rest.starts_with("<<") || rest.starts_with(">>") {
+            rest = &rest[2..];
+        } else if c == '<' {
             let end = rest.find('>').unwrap_or(rest.len());
             out.push(Token::Hex(hex(&rest[1..end])));
             rest = &rest[(end + 1).min(rest.len())..];
@@ -196,5 +214,18 @@ mod tests {
             CMap::parse(b"beginbfrange <00000000> <FFFFFFFF> <0041> endbfrange beginbfchar <0001");
         assert_eq!(cmap.decode(b"\x00\x00\x00\x00"), "A");
         assert!(CMap::parse(b"").is_empty());
+    }
+
+    #[test]
+    fn a_map_takes_a_bounded_number_of_entries() {
+        let source = b"beginbfrange <00010000> <0001FFFF> <0041> <00020000> <0002FFFF> <0041> \
+            <00030000> <0003FFFF> <0041> endbfrange";
+        assert_eq!(CMap::parse(source).map.len(), MAX_ENTRIES);
+    }
+
+    #[test]
+    fn dictionaries_are_not_read_as_codes() {
+        let cmap = CMap::parse(b"<< /Registry (Adobe) >> beginbfchar <41> <0042> endbfchar");
+        assert_eq!(cmap.decode(b"A"), "B");
     }
 }

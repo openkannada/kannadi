@@ -13,12 +13,23 @@ mod widths;
 
 use anyhow::{bail, Context, Result};
 use kannadi::legacy::Options;
-use lopdf::Document;
+use lopdf::{Document, Object};
 
 use crate::convert::{convert, Direction, Issue, Kind, Settings};
 use crate::report::{Report, Row};
 use fonts::{Fonts, Source, Verdict};
-use reader::{read_page, Piece, LIMIT};
+use reader::{read_page, Piece};
+
+/// The most a single page or font stream may decompress to.
+const LIMIT: usize = 64 << 20;
+
+/// The object a reference points to, or the object itself.
+fn resolve<'a>(doc: &'a Document, object: &'a Object) -> Option<&'a Object> {
+    match object {
+        Object::Reference(id) => doc.get_object(*id).ok(),
+        other => Some(other),
+    }
+}
 
 pub fn convert_file(bytes: &[u8], settings: &Settings) -> Result<(Vec<u8>, Report)> {
     convert_with_limit(bytes, settings, LIMIT)
@@ -389,14 +400,48 @@ endcmap\nCMapName currentdict /CMap defineresource pop\nend\nend\n";
         // Codes from ! up, mapped back to the Nudi codes of ಕನ್ನಡ by ToUnicode.
         let cmap = b"/CMapName //ABCDEF+Nudi01k def\nbegincmap\n\
             5 beginbfchar\n<21> <0050>\n<22> <00C0>\n<23> <00A3>\n<24> <00DF>\n<25> <0071>\nendbfchar\nendcmap\n";
-        let mut doc = Document::with_version("1.5");
-        let map = doc.add_object(Stream::new(dictionary! {}, cmap.to_vec()));
-        let mut font = simple_font("ABCDEF+Nudi01k");
-        font.set("ToUnicode", map);
-        let content = format!("BT /F1 12 Tf 72 700 Td ({}) Tj ET", "!\"#\"$%\" ".repeat(4));
-        let (text, report) = run(&pdf_with_objects(doc, vec![font], content.as_bytes()));
-        assert_eq!(text, format!("{}\n", "ಕನ್ನಡ ".repeat(4).trim_end()));
+        for words in [4, 1] {
+            let mut doc = Document::with_version("1.5");
+            let map = doc.add_object(Stream::new(dictionary! {}, cmap.to_vec()));
+            let mut font = simple_font("ABCDEF+Nudi01k");
+            font.set("ToUnicode", map);
+            let shown = "!\"#\"$%\" ".repeat(words);
+            let content = format!("BT /F1 12 Tf 72 700 Td ({shown}) Tj ET");
+            let (text, report) = run(&pdf_with_objects(doc, vec![font], content.as_bytes()));
+            assert_eq!(text, format!("{}\n", "ಕನ್ನಡ ".repeat(words).trim_end()));
+            assert!(report.is_empty(), "{:?}", report.rows);
+        }
+    }
+
+    #[test]
+    fn short_text_that_does_not_convert_is_kept() {
+        let content = b"BT /F1 12 Tf 72 700 Td (\x95 \x95 \x95 \x95) Tj ET";
+        let (text, report) = run(&pdf(vec![("F1", simple_font("ABCDEF+F1"))], content));
+        assert_eq!(text, "\u{2022} \u{2022} \u{2022} \u{2022}\n");
         assert!(report.is_empty(), "{:?}", report.rows);
+    }
+
+    #[test]
+    fn glyph_names_are_read_on_the_right_base() {
+        let with_base = |base: Option<&str>| {
+            let mut encoding = dictionary! {
+                "Differences" => vec![Object::Integer(65), Object::Name(b"fi".to_vec())],
+            };
+            if let Some(base) = base {
+                encoding.set("BaseEncoding", base);
+            }
+            let mut font = simple_font("Arial");
+            font.set("Encoding", encoding);
+            font
+        };
+        let content = b"BT /F1 12 Tf 72 700 Td (A\x8E) Tj ET";
+        let (text, _) = run(&pdf(vec![("F1", with_base(None))], content));
+        assert_eq!(text, "\u{FB01}\u{17D}\n");
+        let (text, _) = run(&pdf(
+            vec![("F1", with_base(Some("MacRomanEncoding")))],
+            content,
+        ));
+        assert_eq!(text, "\u{FB01}\u{E9}\n");
     }
 
     #[test]
@@ -405,7 +450,7 @@ endcmap\nCMapName currentdict /CMap defineresource pop\nend\nend\n";
         let differences = vec![Object::Integer(1), Object::Name(b"c129".to_vec())];
         font.set(
             "Encoding",
-            dictionary! { "BaseEncoding" => "WinAnsiEncoding", "Differences" => differences },
+            dictionary! { "BaseEncoding" => Object::Name(b"WinAnsiEncoding".to_vec()), "Differences" => differences },
         );
         let content = b"BT /F1 12 Tf 72 700 Td (\xA8s\xC1U\xC0 \xA8s\xC1U\xC0) Tj ET";
         let (text, report) = run(&pdf(vec![("F1", font)], content));
@@ -449,6 +494,69 @@ endcmap\nCMapName currentdict /CMap defineresource pop\nend\nend\n";
         let content = b"BT 72 700 Td (lost) Tj /Missing 12 Tf (also lost) Tj ET";
         let (text, report) = run(&pdf(vec![("F1", simple_font("Arial"))], content));
         assert_eq!(text, "\n");
+        assert_eq!(report.rows[0].location, "page 1");
+        assert_eq!(report.rows[0].kind, Kind::NotConverted);
+    }
+
+    /// A page with fonts F1 and F2 that draws form `/X`, whose own font F3 is
+    /// Arial.
+    fn page_with_form(page: &[u8], form: &[u8], form_references_itself: bool) -> Vec<u8> {
+        let mut doc = Document::with_version("1.5");
+        let nudi = doc.add_object(simple_font("BRHKannada"));
+        let arial = doc.add_object(simple_font("Arial"));
+        let form_id = doc.new_object_id();
+        let mut form_resources = dictionary! { "Font" => dictionary! { "F3" => arial } };
+        if form_references_itself {
+            form_resources.set("XObject", dictionary! { "X" => form_id });
+        }
+        doc.objects.insert(
+            form_id,
+            Object::Stream(Stream::new(
+                dictionary! { "Type" => "XObject", "Subtype" => "Form", "Resources" => form_resources },
+                form.to_vec(),
+            )),
+        );
+        let pages = doc.new_object_id();
+        let contents = doc.add_object(Stream::new(dictionary! {}, page.to_vec()));
+        let page = doc.add_object(dictionary! {
+            "Type" => "Page", "Parent" => pages, "Contents" => contents,
+            "Resources" => dictionary! {
+                "Font" => dictionary! { "F1" => nudi, "F2" => arial },
+                "XObject" => dictionary! { "X" => form_id },
+            },
+        });
+        doc.objects.insert(
+            pages,
+            Object::Dictionary(
+                dictionary! { "Type" => "Pages", "Kids" => vec![page.into()], "Count" => 1 },
+            ),
+        );
+        let catalog = doc.add_object(dictionary! { "Type" => "Catalog", "Pages" => pages });
+        doc.trailer.set("Root", catalog);
+        let mut bytes = Vec::new();
+        doc.save_to(&mut bytes).unwrap();
+        bytes
+    }
+
+    #[test]
+    fn a_form_keeps_its_font_to_itself() {
+        let page = b"BT /F1 12 Tf ET /X Do BT 72 600 Td (P\xC0) Tj ET";
+        let form = b"BT /F3 12 Tf 72 650 Td (x) Tj ET";
+        let (text, _) = run(&page_with_form(page, form, false));
+        assert_eq!(text, "x\nಕ\n");
+    }
+
+    #[test]
+    fn a_form_cannot_restore_the_state_the_page_saved() {
+        let page = b"BT /F1 12 Tf ET q BT /F2 12 Tf ET /X Do Q BT 72 600 Td (P\xC0) Tj ET";
+        let (text, _) = run(&page_with_form(page, b"Q", false));
+        assert_eq!(text, "ಕ\n");
+    }
+
+    #[test]
+    fn forms_that_draw_each_other_many_times_stop() {
+        let form = b"/X Do ".repeat(20);
+        let (_, report) = run(&page_with_form(b"/X Do", &form, true));
         assert_eq!(report.rows[0].location, "page 1");
         assert_eq!(report.rows[0].kind, Kind::NotConverted);
     }
@@ -551,7 +659,7 @@ endcmap\nCMapName currentdict /CMap defineresource pop\nend\nend\n";
     }
 
     #[test]
-    fn a_font_saved_by_q_is_restored_by_q() {
+    fn a_font_saved_by_q_comes_back_after_the_restore() {
         let mut content = b"BT /F2 12 Tf ET q BT /F1 12 Tf 1 0 0 1 72 650 Tm (x) Tj ET Q \
                             BT 1 0 0 1 72 600 Tm ("
             .to_vec();
