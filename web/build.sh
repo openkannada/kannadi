@@ -25,5 +25,5 @@ rm -rf "$out"
 mkdir -p "$out"
 wasm-bindgen --target web --no-typescript --out-dir "$out/pkg" \
   "${CARGO_TARGET_DIR:-$root/target}/wasm32-unknown-unknown/wasm/kannadi_wasm.wasm"
-cp "$root"/web/src/* "$out/"
+cp -R "$root"/web/src/. "$out/"
 echo "Built $out ($(wc -c < "$out/pkg/kannadi_wasm_bg.wasm" | tr -d ' ') bytes of wasm)"
