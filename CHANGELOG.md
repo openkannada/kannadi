@@ -23,6 +23,7 @@ Command-line tool (`kannadi-cli`):
 - HTML: converts only text set in a legacy font, found from `style`, `<style>` rules and `<font face>`.
 - DOCX: converts only runs in a legacy font, following run, character and paragraph styles.
 - PDF: extracts text and converts text in legacy fonts, including fonts renumbered behind a ToUnicode map.
+- Akruti in every format: font names give each run's layout in HTML, DOCX and PDF; `to-unicode --layout akruti` for text files; `--legacy-font "NAME=akruti"`. In PDFs, glyph names `G<n>` in renumbered lists are read as code n, fonts with hidden names are judged in each layout, and a gap that would break a syllable adds no space.
 
 Editor page and bindings:
 
