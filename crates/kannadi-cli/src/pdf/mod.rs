@@ -430,6 +430,14 @@ endcmap\nCMapName currentdict /CMap defineresource pop\nend\nend\n";
     }
 
     #[test]
+    fn line_breaks_are_measured_on_the_page() {
+        let content = b"0.05 0 0 0.05 0 0 cm BT /F1 240 Tf 1440 14000 Td (P\xC0) Tj \
+            0 -300 Td (P\xC0) Tj ET";
+        let (text, _) = run(&pdf(vec![("F1", simple_font("BRHKannada"))], content));
+        assert_eq!(text, "ಕ\nಕ\n");
+    }
+
+    #[test]
     fn short_legacy_text_in_an_unknown_font_is_converted() {
         let content = b"BT /F1 12 Tf 72 700 Td (\xA8s\xC1U\xC0) Tj ET";
         let (text, _) = run(&pdf(vec![("F1", simple_font("CIDFont+F1"))], content));
