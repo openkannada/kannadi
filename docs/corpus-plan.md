@@ -1,5 +1,7 @@
 # Legacy test corpus plan
 
+Status: the first tier 2 set is in [corpus/](../corpus/README.md): 207 lines from 31 Karnataka government pages of 2002. It keeps 1 line per row in a TSV, with the source URL on each row, in place of the per-document folders below, because every source is a short excerpt. Tier 1 is not started.
+
 The legacy converter is only as good as its test documents. This plan comes before any converter code.
 
 ## What each fixture holds
