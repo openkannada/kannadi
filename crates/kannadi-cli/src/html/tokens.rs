@@ -53,6 +53,8 @@ pub struct Attr<'a> {
     /// empty range just after the name.
     pub span: Range<usize>,
     pub quote: Option<char>,
+    /// Written with `=`, even if the value is empty.
+    pub assigned: bool,
 }
 
 impl Tag<'_> {
@@ -62,6 +64,9 @@ impl Tag<'_> {
 }
 
 pub fn tokenize(html: &str) -> Vec<Token<'_>> {
+    if html.is_empty() {
+        return Vec::new();
+    }
     let mut tokens = Vec::new();
     let mut pos = 0;
     let mut text_start = 0;
@@ -163,7 +168,8 @@ fn parse_tag(html: &str, at: usize) -> Tag<'_> {
         while j < bytes.len() && is_space(bytes[j]) {
             j += 1;
         }
-        let (span, quote) = if j < bytes.len() && bytes[j] == b'=' {
+        let assigned = j < bytes.len() && bytes[j] == b'=';
+        let (span, quote) = if assigned {
             j += 1;
             while j < bytes.len() && is_space(bytes[j]) {
                 j += 1;
@@ -192,6 +198,7 @@ fn parse_tag(html: &str, at: usize) -> Tag<'_> {
             value: &html[span.clone()],
             span: span.start - at..span.end - at,
             quote,
+            assigned,
         });
     }
     Tag {

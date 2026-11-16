@@ -65,7 +65,7 @@ impl Rules {
                 .split(',')
                 .filter_map(|s| Selector::parse(s.trim()))
             {
-                self.rules.push((selector, family.to_string()));
+                self.rules.push((selector, family.clone()));
             }
         }
     }
@@ -83,22 +83,60 @@ impl Rules {
     }
 }
 
-/// The value of the last `font-family` declaration in a declaration block, if it
-/// names fonts. `inherit`, `initial`, `unset` and an empty value name none.
-pub fn font_family(block: &str) -> Option<&str> {
+/// What a `font-family` value asks for.
+#[derive(Debug, PartialEq, Eq)]
+pub enum Family<'a> {
+    Named(&'a str),
+    /// `inherit` and `unset`: the parent's font.
+    Inherit,
+    /// `initial` and `revert`: the browser's default font.
+    Initial,
+}
+
+impl<'a> Family<'a> {
+    pub fn of(value: &'a str) -> Self {
+        let bare = value.trim().trim_end_matches("!important").trim();
+        if ["inherit", "unset"]
+            .iter()
+            .any(|k| bare.eq_ignore_ascii_case(k))
+        {
+            Family::Inherit
+        } else if ["initial", "revert"]
+            .iter()
+            .any(|k| bare.eq_ignore_ascii_case(k))
+        {
+            Family::Initial
+        } else {
+            Family::Named(value)
+        }
+    }
+}
+
+/// The value of the last `font-family` declaration in a declaration block, with
+/// comments removed. An empty value counts as no declaration.
+pub fn font_family(block: &str) -> Option<String> {
     let value = declarations(block)
         .filter(|(name, _)| {
-            block[name.clone()]
+            without_comments(&block[name.clone()])
                 .trim()
                 .eq_ignore_ascii_case("font-family")
         })
         .last()
-        .map(|(_, value)| block[value].trim())?;
-    let bare = value.trim_end_matches("!important").trim();
-    let keyword = ["inherit", "initial", "unset", "revert"]
-        .iter()
-        .any(|k| bare.eq_ignore_ascii_case(k));
-    (!bare.is_empty() && !keyword).then_some(value)
+        .map(|(_, value)| without_comments(&block[value]).trim().to_string())?;
+    (!value.is_empty()).then_some(value)
+}
+
+fn without_comments(text: &str) -> String {
+    let mut out = String::with_capacity(text.len());
+    let mut rest = text;
+    while let Some(start) = rest.find("/*") {
+        out.push_str(&rest[..start]);
+        rest = rest[start + 2..]
+            .find("*/")
+            .map_or("", |e| &rest[start + 2 + e + 2..]);
+    }
+    out.push_str(rest);
+    out
 }
 
 /// `css` with every `font-family` value passed through `replace`. `css` is a
@@ -117,7 +155,10 @@ pub fn rewrite_font_families(
     for body in bodies {
         for (name, value) in declarations(&css[body.clone()]) {
             let name = body.start + name.start..body.start + name.end;
-            if css[name].trim().eq_ignore_ascii_case("font-family") {
+            if without_comments(&css[name])
+                .trim()
+                .eq_ignore_ascii_case("font-family")
+            {
                 let value = body.start + value.start..body.start + value.end;
                 edits.push((value.clone(), replace(&css[value])));
             }
@@ -209,14 +250,16 @@ mod tests {
 
     #[test]
     fn declarations_and_rewrites() {
-        assert_eq!(
-            font_family("color:red; FONT-FAMILY: 'BRH Kannada'"),
-            Some("'BRH Kannada'")
-        );
-        assert_eq!(font_family("font-family:\"A;B\""), Some("\"A;B\""));
-        assert_eq!(font_family("font-size:10pt"), None);
-        assert_eq!(font_family("font-family: inherit"), None);
-        assert_eq!(font_family("font-family:"), None);
+        let family = |b: &str| font_family(b);
+        let quoted = family("color:red; FONT-FAMILY: 'BRH Kannada'");
+        assert_eq!(quoted.as_deref(), Some("'BRH Kannada'"));
+        assert_eq!(family("font-family:\"A;B\"").as_deref(), Some("\"A;B\""));
+        assert_eq!(family("/* x */font-family:/* y */ B").as_deref(), Some("B"));
+        assert_eq!(family("font-size:10pt"), None);
+        assert_eq!(family("font-family:"), None);
+        assert_eq!(Family::of("inherit"), Family::Inherit);
+        assert_eq!(Family::of(" Initial "), Family::Initial);
+        assert_eq!(Family::of("Arial"), Family::Named("Arial"));
         let css = "p{font-family:\"A;B\";mso-font-family:x} q{font-family: C}";
         let out = rewrite_font_families(css, true, |v| format!("[{v}]"));
         assert_eq!(

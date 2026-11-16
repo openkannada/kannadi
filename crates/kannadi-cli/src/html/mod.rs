@@ -21,8 +21,11 @@ use crate::txt::read_text;
 use tokens::{tokenize, Attr, RawKind, Tag, Token};
 
 pub fn convert_file(bytes: &[u8], settings: &Settings) -> Result<(Vec<u8>, Report)> {
+    let bom = [&b"\xEF\xBB\xBF"[..], b"\xFF\xFE", b"\xFE\xFF"]
+        .iter()
+        .any(|m| bytes.starts_with(m));
     let html = match declared_charset(bytes) {
-        Some(Charset::Windows1252) => decode_windows_1252(bytes),
+        Some(Charset::Windows1252) if !bom => decode_windows_1252(bytes),
         _ => read_text(bytes, settings.direction)?,
     };
     let mut walker = Walker {
@@ -49,16 +52,22 @@ enum Charset {
     Other,
 }
 
-/// The charset a `<meta>` in the first 1024 bytes declares. Browsers read
-/// ISO-8859-1 and US-ASCII pages as Windows-1252.
+/// The charset a `<meta>` in the first 1024 bytes declares, ignoring comments and
+/// scripts. Browsers read ISO-8859-1 and US-ASCII pages as Windows-1252.
 fn declared_charset(bytes: &[u8]) -> Option<Charset> {
-    let head = String::from_utf8_lossy(&bytes[..bytes.len().min(1024)]).to_ascii_lowercase();
-    let at = head.find("charset=")? + "charset=".len();
-    let name: String = head[at..]
-        .trim_start_matches(['"', '\''])
-        .chars()
-        .take_while(|c| c.is_ascii_alphanumeric() || *c == '-' || *c == '_')
-        .collect();
+    let head = String::from_utf8_lossy(&bytes[..bytes.len().min(1024)]);
+    let name = tokenize(&head).into_iter().find_map(|token| match token {
+        Token::Tag(tag) if tag.name == "meta" && !tag.closing => {
+            if let Some(a) = tag.attr("charset") {
+                return Some(a.value.trim().to_ascii_lowercase());
+            }
+            let content = tag.attr("content")?.value.to_ascii_lowercase();
+            let at = content.find("charset=")? + "charset=".len();
+            let name = content[at..].split([';', ' ']).next().unwrap_or_default();
+            Some(name.trim().to_string())
+        }
+        _ => None,
+    })?;
     let latin = ["windows-1252", "iso-8859-1", "latin1", "us-ascii", "cp1252"];
     Some(if latin.contains(&name.as_str()) {
         Charset::Windows1252
@@ -173,12 +182,13 @@ impl Walker<'_> {
         let family = style
             .as_deref()
             .and_then(css::font_family)
-            .map(str::to_string)
             .or_else(|| self.rules.family(&tag.name, &classes).map(str::to_string))
             .or(face.clone());
-        let legacy = match family {
-            Some(f) => self.settings.fonts.is_legacy(first_family(&f)),
-            None => self.stack.last().is_some_and(|o| o.legacy),
+        let inherited = self.stack.last().is_some_and(|o| o.legacy);
+        let legacy = match family.as_deref().map(css::Family::of) {
+            Some(css::Family::Named(f)) => self.settings.fonts.is_legacy(first_family(f)),
+            Some(css::Family::Initial) => false,
+            Some(css::Family::Inherit) | None => inherited,
         };
 
         let mut edits: Vec<(Range<usize>, String)> = Vec::new();
@@ -316,7 +326,7 @@ fn attribute_edit(a: &Attr, value: &str) -> (Range<usize>, String) {
 /// The edit that makes a `<meta>` declare UTF-8, if it declares a charset.
 fn charset_edit(tag: &Tag) -> Option<(Range<usize>, String)> {
     if let Some(a) = tag.attr("charset") {
-        let bare = a.span.is_empty() && a.quote.is_none();
+        let bare = !a.assigned;
         let value = if bare { "=\"utf-8\"" } else { "utf-8" };
         return Some((a.span.clone(), value.to_string()));
     }
@@ -453,6 +463,23 @@ mod tests {
     }
 
     #[test]
+    fn charset_comes_from_real_meta_tags_and_a_bom_wins() {
+        let html = "<!-- charset=windows-1252 --><meta charset=utf-8><p style=\"font-family:BRH Kannada\">PÀ ಕ</p>";
+        assert!(to_unicode(html).contains(">ಕ ಕ</p>"));
+        let bom = "\u{FEFF}<meta charset=windows-1252><p style=\"font-family:BRH Kannada\">PÀ</p>";
+        assert!(to_unicode(bom).contains(">ಕ</p>"));
+    }
+
+    #[test]
+    fn initial_resets_the_font_and_comments_are_skipped() {
+        let html = "<style>.k{/* note */font-family:BRH Kannada}</style><p class=k>PÀ</p>\
+                    <div style=\"font-family:BRH Kannada\"><span style=\"font-family:initial\">English</span></div>";
+        let out = to_unicode(html);
+        assert!(out.contains("<p class=k>ಕ</p>"), "{out}");
+        assert!(out.contains(">English</span>"), "{out}");
+    }
+
+    #[test]
     fn charset_declarations_are_kept_valid() {
         let doctype = to_unicode("<!DOCTYPE html><p>x</p>");
         assert!(
@@ -460,6 +487,7 @@ mod tests {
             "{doctype}"
         );
         assert!(to_unicode("<meta charset>").starts_with("<meta charset=\"utf-8\">"));
+        assert!(to_unicode("<meta charset=>").starts_with("<meta charset=utf-8>"));
         assert!(to_unicode("<meta charset='iso-8859-1'>").starts_with("<meta charset='utf-8'>"));
     }
 

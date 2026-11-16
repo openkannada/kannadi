@@ -92,8 +92,10 @@ pub fn decode(text: &str) -> Decoded {
         let rest = &text[i..];
         let reference = rest
             .strip_prefix('&')
-            .and_then(|r| r.get(..r.len().min(32)))
-            .and_then(|r| r.find(';').map(|e| &r[..e]))
+            .and_then(|r| {
+                let window = &r.as_bytes()[..r.len().min(32)];
+                window.iter().position(|&b| b == b';').map(|e| &r[..e])
+            })
             .and_then(|name| lookup(name).map(|c| (c, name.len() + 2)));
         let (c, len) = reference.unwrap_or_else(|| {
             let c = rest.chars().next().unwrap_or_default();
@@ -153,6 +155,8 @@ mod tests {
         assert_eq!(d.source_offset(d.text.len()), source.len());
         assert_eq!(decode("a & b &unknown; &#;").text, "a & b &unknown; &#;");
         assert_eq!(decode("&#99999999;&").text, "&#99999999;&");
+        let near_multibyte = format!("&#3221;{}", "ಕ".repeat(10));
+        assert_eq!(decode(&near_multibyte).text, "ಕ".repeat(11));
     }
 
     #[test]
