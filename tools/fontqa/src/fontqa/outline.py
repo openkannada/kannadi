@@ -38,8 +38,7 @@ def polygons(path: pathops.Path, steps: int) -> list[list[tuple[float, float]]]:
             last = pts[0]
         elif op == "qCurveTo":
             if pts[-1] is None:
-                # A closed TrueType contour with no on-curve point: it starts between the
-                # last and first off-curve points, and comes with no moveTo.
+                # A TrueType contour with no on-curve point starts between its last and first.
                 last = _mid(pts[-2], pts[0])
                 current, pts = [last], (*pts[:-1], last)
             for ctrl, end in decomposeQuadraticSegment(pts):

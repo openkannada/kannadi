@@ -3,14 +3,12 @@
 Coordinates are in units of the skeleton height: y 0 is the center of the bottom stroke and
 y 1 the center of the top stroke. x uses the same unit, measured in a design whose ಅ (U+0C85)
 has the ink aspect ASPECT_A, so fonts with wider or narrower letters get wider or narrower
-drafts. Each piece is stroked on its own; pieces meet at sharp corners.
+drafts. Each piece is stroked on its own with round caps, which overlap where pieces meet.
 """
 
 ASPECT_A = 1.372
 
-# U+0CDC KANNADA ARCHAIC SHRII, traced from the representative glyph in L2/22-006 (image pixels:
-# top 133, bottom 407, left 111) and revised after a second opinion from Codex. 2 pieces, split
-# at the sharp waist of the inner 3.
+# U+0CDC KANNADA ARCHAIC SHRII, traced from the representative glyph in L2/22-006.
 ARCHAIC_SHRII = (
     (
         (0.328, 0.544),
@@ -42,11 +40,10 @@ ARCHAIC_SHRII = (
     ),
 )
 
-# The inner 3 is drawn lighter than the bowl so its 2 small recesses stay open.
+# The inner 3 is lighter than the bowl so its recesses stay open.
 ARCHAIC_SHRII_WEIGHTS = (0.7, 1.0)
 
-# U+0CDD KANNADA LETTER NAKAARA POLLU, after the Unicode code chart: an epsilon whose top
-# stroke runs on to the right. 2 pieces, split at the cusp that points right at mid height.
+# U+0CDD KANNADA LETTER NAKAARA POLLU, after the Unicode code chart.
 NAKAARA_POLLU = (
     (
         (1.000, 1.000),
@@ -69,10 +66,7 @@ NAKAARA_POLLU = (
 )
 NAKAARA_POLLU_WEIGHTS = (1.0, 1.0)
 
-# U+0CF3 KANNADA SIGN COMBINING ANUSVARA ABOVE RIGHT is built from the font's own ಂ (U+0C82):
-# scaled by RING_SCALE, with its bottom at RING_BOTTOM of the x-height and a mean stroke width
-# RING_WEIGHT of the anusvara's. Noto Sans Kannada Regular's ring is 0.85 of its ಂ and 0.88 of
-# its consonants.
+# U+0CF3 is the font's ಂ scaled, raised and emboldened, in Noto Sans Kannada Regular's proportions.
 RING_SCALE = 0.49
 RING_BOTTOM = 0.83
 RING_WEIGHT = 0.9

@@ -11,7 +11,7 @@ codepoints are U+0CDC, U+0CDD and U+0CF3. A glyph that already has ink is left a
 from __future__ import annotations
 
 import json
-import statistics
+import math
 import sys
 from pathlib import Path
 
@@ -20,7 +20,6 @@ import fontforge
 sys.path.insert(0, str(Path(__file__).parent))
 import skeletons  # noqa: E402
 
-CONSONANTS = [cp for cp in range(0x0C95, 0x0CBA) if cp not in (0x0CA9, 0x0CB4)]
 LETTER_A = 0x0C85
 LETTER_KA = 0x0C95
 ANUSVARA = 0x0C82
@@ -41,7 +40,10 @@ def catmull_rom(points):
 
 
 class InkPen:
-    """Area and perimeter of what a layer draws, with curves cut into straight pieces."""
+    """Area and perimeter of what a layer draws, with curves cut into straight pieces.
+
+    FontForge's Python has no fontTools or pathops, so this repeats fontqa.outline's flattening.
+    """
 
     STEPS = 8
 
@@ -113,22 +115,31 @@ def mean_stroke_width(layer):
 
 def without_short_segments(contour, min_length):
     """The contour without on-curve points closer than min_length to the previous one, and
-    without their handles."""
+    without their incoming handles; the closing segment is checked too."""
     keep, last = [], None
     for p in contour:
-        if p.on_curve and last is not None and abs(p.x - last.x) + abs(p.y - last.y) < min_length:
+        if p.on_curve and last is not None and _near(p, last, min_length):
             while keep and not keep[-1].on_curve:
                 keep.pop()
             continue
         keep.append(p)
         if p.on_curve:
             last = p
+    on_curve = [p for p in keep if p.on_curve]
+    if contour.closed and len(on_curve) > 2 and _near(on_curve[-1], on_curve[0], min_length):
+        while not keep[-1].on_curve:
+            keep.pop()
+        keep.pop()
     out = fontforge.contour()
     out.is_quadratic = contour.is_quadratic
     for p in keep:
         out += p
     out.closed = contour.closed
     return out
+
+
+def _near(a, b, distance):
+    return abs(a.x - b.x) + abs(a.y - b.y) < distance
 
 
 def glyph_for(font, codepoint):
@@ -139,7 +150,7 @@ def glyph_for(font, codepoint):
 
 
 def has_ink(glyph):
-    return glyph is not None and len(glyph.foreground) > 0
+    return glyph is not None and (len(glyph.foreground) > 0 or len(glyph.references) > 0)
 
 
 def bounds(glyph):
@@ -161,11 +172,7 @@ class Drafter:
         ka = glyph_for(font, LETTER_KA)
         self.lsb = ka.left_side_bearing
         self.rsb = ka.width - bounds(ka)[2]
-        self.weight = statistics.median(
-            mean_stroke_width(g.foreground)
-            for g in (glyph_for(font, cp) for cp in CONSONANTS)
-            if has_ink(g)
-        )
+        self.weight = measure["weight"]
 
     def stroked(self, glyph, pieces, weights, rounds=4):
         """Stroke skeleton pieces with an elliptical nib in the stems' proportion, scaled over a
@@ -190,7 +197,7 @@ class Drafter:
                 contour.cubicTo(c1, c2, end)
             line = fontforge.layer()
             line += contour
-            line.stroke("elliptical", nib_height * weight, self.vstem * scale * weight, 90)
+            line.stroke("elliptical", nib_height * weight, self.vstem * scale * weight, math.pi / 2)
             ink += line
         glyph.foreground = ink
         self.clean(glyph)
@@ -210,7 +217,8 @@ class Drafter:
             self.clean(glyph)
             added += target - mean_stroke_width(glyph.foreground)
         _, ymin, _, _ = bounds(glyph)
-        glyph.transform((1, 0, 0, 1, 0, self.top * skeletons.RING_BOTTOM - ymin))
+        bottom = self.bottom + skeletons.RING_BOTTOM * (self.top - self.bottom)
+        glyph.transform((1, 0, 0, 1, 0, round(bottom - ymin)))
         glyph.glyphclass = source.glyphclass
 
     @staticmethod
@@ -228,7 +236,7 @@ class Drafter:
 
     def space(self, glyph, lsb, rsb):
         xmin, _, xmax, _ = bounds(glyph)
-        glyph.transform((1, 0, 0, 1, lsb - xmin, 0))
+        glyph.transform((1, 0, 0, 1, round(lsb - xmin), 0))
         glyph.width = round(lsb + (xmax - xmin) + rsb)
 
     def draft(self, codepoint):

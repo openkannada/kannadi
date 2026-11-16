@@ -196,21 +196,23 @@ def _rec_glyph(rec):
 
 
 def drafted_font(path, cf3=None, cdd=None):
-    """3 ring consonants, plus a ring U+0CF3 high up and a C-shaped U+0CDD, unless replaced."""
-    rings = {name: ring(stem=60, stroke=50) for name in ("ka", "kha", "ga")}
+    """Ring consonants, ಅ and ಂ, a raised ring U+0CF3 and a C-shaped U+0CDD, unless replaced."""
     c_shape = box(0, 0, 400, 50) + box(0, 450, 400, 500) + box(0, 0, 60, 500)
     glyphs = {
         ".notdef": box(0, 0, 400, 500),
-        **rings,
-        "uni0CF3": cf3 if cf3 is not None else ring(y=420, w=200, h=200),
+        **{name: ring() for name in ("ka", "kha", "ga")},
+        "a": ring(w=600),
+        "anusvara": ring(),
+        "uni0CF3": cf3 if cf3 is not None else ring(y=415, w=200, h=245),
         "uni0CDD": cdd if cdd is not None else c_shape,
     }
+    cmap = {0x0C95: "ka", 0x0C96: "kha", 0x0C97: "ga", 0x0C85: "a", 0x0C82: "anusvara"}
+    cmap |= {0x0CF3: "uni0CF3", 0x0CDD: "uni0CDD"}
     fb = FontBuilder(1000, isTTF=True)
     fb.setupGlyphOrder(list(glyphs))
-    cmap = {0x0C95: "ka", 0x0C96: "kha", 0x0C97: "ga", 0x0CF3: "uni0CF3", 0x0CDD: "uni0CDD"}
     fb.setupCharacterMap(cmap)
     fb.setupGlyf({n: _rec_glyph(_cw(r)) for n, r in glyphs.items()})
-    fb.setupHorizontalMetrics({n: (500, 0) for n in glyphs})
+    fb.setupHorizontalMetrics({n: (700, 0) for n in glyphs})
     fb.setupHorizontalHeader(ascent=800, descent=-200)
     fb.setupNameTable({"familyName": "Drafts", "styleName": "Regular"})
     fb.setupOS2()
@@ -242,8 +244,21 @@ def test_gate_glyph_passes_matching_drafts(tmp_path):
         assert all(r.passed for r in results), [r.detail for r in results]
 
 
+def test_gate_glyph_catches_a_full_size_ring_on_the_baseline(tmp_path):
+    face = Face(drafted_font(tmp_path / "d.ttf", cf3=ring()))
+    failed = {r.name for r in gate_glyph(face, 0x0CF3, measure(face)) if not r.passed}
+    assert "ring" in failed
+
+
+def test_gate_glyph_catches_a_draft_3_times_too_wide(tmp_path):
+    wide = box(0, 0, 1200, 50) + box(0, 450, 1200, 500) + box(0, 0, 60, 500)
+    face = Face(drafted_font(tmp_path / "d.ttf", cdd=wide))
+    failed = {r.name for r in gate_glyph(face, 0x0CDD, measure(face)) if not r.passed}
+    assert "aspect" in failed
+
+
 def test_gate_glyph_catches_a_filled_ring_and_a_missing_glyph(tmp_path):
-    face = Face(drafted_font(tmp_path / "d.ttf", cf3=box(0, 420, 200, 620)))
+    face = Face(drafted_font(tmp_path / "d.ttf", cf3=box(0, 415, 200, 660)))
     ref = measure(face)
     failed = {r.name for r in gate_glyph(face, 0x0CF3, ref) if not r.passed}
     assert {"weight", "contours"} <= failed

@@ -106,11 +106,12 @@ jobs:
         working-directory: tools/fontqa
       - name: Draft into a synthetic font and gate the result
         run: |
-          set -e
+          set -eo pipefail
           out="$RUNNER_TEMP/draft"
           mkdir -p "$out"
           fontforge -lang=py -script tools/glyphdraft/make_test_font.py "$out/t.sfd" "$out/t.ttf"
           (cd tools/fontqa && uv run fontqa measure "$out/t.ttf") > "$out/measure.json"
-          fontforge -lang=py -script tools/glyphdraft/draft.py "$out/t.sfd" "$out/measure.json"
+          fontforge -lang=py -script tools/glyphdraft/draft.py "$out/t.sfd" "$out/measure.json" 2>&1 | tee "$out/draft.log"
+          ! grep -q "Internal Error" "$out/draft.log"
           fontforge -lang=py -c 'import fontforge, sys; fontforge.open(sys.argv[1]).generate(sys.argv[2])' "$out/t.sfd" "$out/drafted.ttf"
           cd tools/fontqa && uv run fontqa gate "$out/drafted.ttf"

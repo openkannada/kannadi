@@ -72,7 +72,13 @@ The composed signs are drafts. A Kannada reader checks the proof sheet before th
 - `gate_compatible`: the same contours, points and contour directions in every master of a variable font;
 - `gate_shaping`: no test string fails that passed before, `indistinct` included.
 
-`gate_glyph` runs the outline gates that suit 1 drafted character (`DRAFT_TARGETS`): U+0CDC, U+0CDD and U+0CF3. Scanline stems do not suit U+0CDD and U+0CF3, whose rows cut curves at a slant, so those get the weight gate only. Noto Sans Kannada's own U+0CDD and U+0CF3 pass.
+`gate_glyph` runs the outline gates that suit 1 drafted character (`DRAFT_TARGETS`): U+0CDC, U+0CDD and U+0CF3.
+
+- Scanline stems do not suit U+0CDD and U+0CF3, whose rows cut curves at a slant, so those get the weight gate instead.
+- `gate_aspect` holds U+0CDC and U+0CDD to Noto Sans Kannada Regular's width relative to ಅ, within 20%.
+- `gate_ring` holds U+0CF3 to 0.49 of ಂ's height, within 15%, with its bottom at 0.83 of the x-height.
+
+Noto Sans Kannada's own U+0CDD and U+0CF3 pass.
 
 From the command line:
 
@@ -90,8 +96,9 @@ Passing the gates means a draft is well formed and in proportion. It does not me
     # build the font, then
     uv run fontqa gate Font.ttf
 
-- U+0CDC and U+0CDD are skeletons (`skeletons.py`) stroked with an elliptical nib in the proportion of the font's stems. The nib is rescaled over 4 rounds until the mean stroke width matches the consonants'. Height follows the consonants' edges and width follows the font's ಅ.
+- U+0CDC and U+0CDD are skeletons (`skeletons.py`) stroked with an elliptical nib in the proportion of the font's stems. The nib is rescaled over 4 rounds until the mean stroke width matches the consonants' weight from `fontqa measure`. Height follows the consonants' edges and width follows the font's ಅ.
 - U+0CF3 is the font's own ಂ, scaled to 0.49, emboldened back to 0.9 of the ಂ's stroke width, with its bottom at 0.83 of the x-height.
-- A glyph that already has ink is left alone.
+- A glyph that already has ink or references is left alone.
+- FontForge can print `Internal Error (overlap)` while removing overlaps in a real font; the gates decide whether the result is usable. The CI run on the synthetic font fails on such errors.
 
 The drafts are a starting point for a reader to judge, not finished design.

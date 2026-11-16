@@ -121,29 +121,35 @@ class Target:
     """What a drafted glyph must look like.
 
     holes: counters after overlap removal. on_baseline: the body spans baseline to x-height.
-    scanline: stems and strokes are measured along rows and columns; off for shapes made of
-    curves and horizontal bars, whose rows cut strokes at a slant.
+    scanline: stems and strokes are measured along rows and columns; off for shapes whose rows
+    cut curves at a slant. aspect_to_a: ink width over height, relative to the font's ಅ.
+    ring: a raised ring sized from the font's ಂ.
     """
 
     holes: int
     on_baseline: bool
     scanline: bool
+    aspect_to_a: float | None = None
+    ring: bool = False
 
 
+# Proportions are Noto Sans Kannada Regular's.
 DRAFT_TARGETS = {
-    0x0CDC: Target(holes=1, on_baseline=True, scanline=True),
-    0x0CDD: Target(holes=0, on_baseline=True, scanline=False),
-    0x0CF3: Target(holes=1, on_baseline=False, scanline=False),
+    0x0CDC: Target(holes=1, on_baseline=True, scanline=True, aspect_to_a=0.90),
+    0x0CDD: Target(holes=0, on_baseline=True, scanline=False, aspect_to_a=0.71),
+    0x0CF3: Target(holes=1, on_baseline=False, scanline=False, ring=True),
 }
+RING_HEIGHT, RING_BOTTOM = 0.49, 0.83
+LETTER_A, ANUSVARA = 0x0C85, 0x0C82
 
 
 def gate_glyph(face: Face, codepoint: int, ref: Strokes) -> list[GateResult]:
-    """The stroke, vertical and contour gates for 1 drafted glyph in a built font."""
+    """The outline gates that suit 1 drafted glyph in a built font."""
     name = face.cmap.get(codepoint)
     if name is None:
         return [GateResult("present", False, "no glyph in the cmap")]
     target = DRAFT_TARGETS[codepoint]
-    path = face.outline(face.tt.getGlyphOrder().index(name))
+    path = _outline(face, codepoint)
     pen = RecordingPen()
     face.tt.getGlyphSet()[name].draw(pen)
     results = [gate_weight(path, ref)]
@@ -151,10 +157,46 @@ def gate_glyph(face: Face, codepoint: int, ref: Strokes) -> list[GateResult]:
         results.append(gate_strokes(path, ref))
     if target.on_baseline:
         results.append(gate_vertical(path, ref))
+    if target.aspect_to_a is not None:
+        results.append(gate_aspect(path, _outline(face, LETTER_A), target.aspect_to_a))
+    if target.ring:
+        results.append(gate_ring(path, _outline(face, ANUSVARA), ref))
     results.append(
         gate_contours(pen.value, outer_sign=outer_sign(face.tt), expected_holes=target.holes)
     )
     return results
+
+
+def _outline(face: Face, codepoint: int) -> pathops.Path:
+    return face.outline(face.tt.getGlyphOrder().index(face.cmap[codepoint]))
+
+
+def _aspect(path: pathops.Path) -> float:
+    x0, y0, x1, y1 = path.bounds
+    return (x1 - x0) / (y1 - y0) if y1 > y0 else 0.0
+
+
+def gate_aspect(
+    draft: pathops.Path, letter_a: pathops.Path, expected: float, tolerance: float = 0.2
+) -> GateResult:
+    """Width over height, relative to ಅ's, within a share of the expected ratio."""
+    ratio = _aspect(draft) / _aspect(letter_a)
+    ok = _rel(ratio, expected) <= tolerance
+    return GateResult("aspect", ok, f"width to ಅ {ratio:.2f} vs {expected:.2f}")
+
+
+def gate_ring(
+    draft: pathops.Path, anusvara: pathops.Path, ref: Strokes, tolerance: float = 0.15
+) -> GateResult:
+    """A ring RING_HEIGHT of ಂ's height, with its bottom at RING_BOTTOM of the x-height."""
+    _, y0, _, y1 = draft.bounds
+    _, a0, _, a1 = anusvara.bounds
+    height = (y1 - y0) / (a1 - a0)
+    x_height = ref.top - ref.bottom
+    bottom = (y0 - ref.bottom) / x_height
+    ok = _rel(height, RING_HEIGHT) <= tolerance and abs(bottom - RING_BOTTOM) <= 0.05
+    detail = f"height to ಂ {height:.2f} vs {RING_HEIGHT}, bottom {bottom:.2f} vs {RING_BOTTOM}"
+    return GateResult("ring", ok, detail)
 
 
 def gate_strokes(draft: pathops.Path, ref: Strokes, tolerance: float = 0.15) -> GateResult:
