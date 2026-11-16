@@ -1,7 +1,6 @@
 // Content of each page the site build writes. FAQ entries marked `shared`
 // appear on several pages; their JSON-LD is written on the home page only. Strings are trusted HTML from
 // this file; FAQ answers are also sent as plain text in the FAQPage JSON-LD.
-// Search volumes (India, monthly, DataForSEO, 2026-11-15) are noted per page.
 
 const UNICODE_TO_NUDI = {
   shared: true,

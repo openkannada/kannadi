@@ -1,13 +1,13 @@
 [package]
 name = "kannadi-cli"
-description = "Batch converter for Kannada documents typed in Nudi and Baraha ANSI fonts"
+description = "Batch converter for Kannada documents typed in Nudi, Baraha ANSI and Akruti fonts"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
 authors.workspace = true
 publish = false
-rust-version = "1.88"
+rust-version = "1.89"
 
 [[bin]]
 name = "kannadi"

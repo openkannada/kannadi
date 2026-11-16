@@ -3,10 +3,12 @@
 """
 
 import sys
+from pathlib import Path
 
 import fontforge
 
-CONSONANTS = [cp for cp in range(0x0C95, 0x0CBA) if cp not in (0x0CA9, 0x0CB4)]
+sys.path.insert(0, str(Path(__file__).parent))
+from draft import CONSONANTS  # noqa: E402
 
 
 def ring(glyph, width, height, stroke):

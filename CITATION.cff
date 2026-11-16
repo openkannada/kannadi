@@ -7,7 +7,8 @@ authors:
     given-names: Prasad
     website: "https://prasad.tech"
 repository-code: "https://github.com/prasadus92/kannadi"
-url: "https://prasad.tech"
+url: "https://github.com/prasadus92/kannadi"
+abstract: "Converts Kannada text typed in the legacy Nudi, Baraha and Akruti font encodings to Unicode and back, with reports of every glyph it cannot place. Also segments text into aksharas, normalizes it, and transliterates between Kannada and ISO 15919, IAST and Baraha. A Rust library, a command-line tool that converts folders of TXT, HTML, DOCX and PDF files, and an in-browser editor."
 license: MIT
 version: 0.1.0
 keywords:

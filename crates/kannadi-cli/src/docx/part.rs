@@ -4,14 +4,14 @@ use std::ops::Range;
 
 use anyhow::{bail, Result};
 use kannadi::akshara::aksharas;
-use kannadi::legacy::nudi_syllable_starts;
+use kannadi::legacy::{syllable_starts, Layout};
 
 use crate::convert::{convert, kannada_runs, Direction, Issue, Settings};
 use crate::edits::{apply, overlap};
 use crate::report::Row;
 
 use super::scan::{scan, Element, Paragraph, Piece, Properties, Run};
-use super::styles::Styles;
+use super::styles::{FontSetting, Styles};
 use super::xml;
 
 const BOM: &str = "\u{FEFF}";
@@ -32,18 +32,19 @@ pub fn convert_part(
     let mut edits = Vec::new();
     let mut fallback_rows = Vec::new();
     for paragraph in &scan(source, &settings.fonts)? {
-        let legacy: Vec<bool> = paragraph
+        let layouts: Vec<Option<Layout>> = paragraph
             .runs
             .iter()
-            .map(|r| is_legacy(r, paragraph, styles))
+            .map(|r| layout(r, paragraph, styles))
             .collect();
         let location = format!("{name}, paragraph {}", paragraph.number);
         let mut converted = vec![false; paragraph.runs.len()];
-        for group in groups(paragraph, &legacy, to_unicode) {
+        for group in groups(paragraph, &layouts, to_unicode) {
             let edit = Edit {
                 source,
                 paragraph,
                 settings,
+                layout: layouts[group[0].0].unwrap_or(settings.text_layout),
                 location: &location,
             };
             let fallback = !paragraph.reported || paragraph.runs[group[0].0].fallback;
@@ -85,19 +86,27 @@ pub fn convert_part(
     Ok(Some(format!("{bom}{}", apply(source, edits))))
 }
 
-/// Runs of consecutive text pieces whose runs are `wanted` legacy or not, split at
-/// tabs, breaks, runs of the other kind, and the edges of tracked changes and
-/// alternative content. Each item is (run index, piece index).
-fn groups(paragraph: &Paragraph, legacy: &[bool], wanted: bool) -> Vec<Vec<(usize, usize)>> {
+/// Runs of consecutive text pieces whose runs are in a legacy font, when `legacy`,
+/// or in no legacy font, split at tabs, breaks, runs of another layout or kind,
+/// and the edges of tracked changes and alternative content. Each item is (run
+/// index, piece index).
+fn groups(
+    paragraph: &Paragraph,
+    layouts: &[Option<Layout>],
+    legacy: bool,
+) -> Vec<Vec<(usize, usize)>> {
     let mut groups = Vec::new();
     let mut current = Vec::new();
     let mut context = None;
+    let mut layout = None;
     for (r, run) in paragraph.runs.iter().enumerate() {
-        if legacy[r] != wanted || run.context != context {
+        let wanted = layouts[r].is_some() == legacy;
+        if !wanted || run.context != context || layouts[r] != layout {
             groups.push(std::mem::take(&mut current));
             context = run.context;
+            layout = layouts[r];
         }
-        if legacy[r] != wanted {
+        if !wanted {
             continue;
         }
         for (p, piece) in run.pieces.iter().enumerate() {
@@ -117,6 +126,8 @@ struct Edit<'a> {
     source: &'a str,
     paragraph: &'a Paragraph,
     settings: &'a Settings,
+    /// The layout the group is read in, or written in.
+    layout: Layout,
     location: &'a str,
 }
 
@@ -145,13 +156,13 @@ impl Edit<'_> {
             .iter()
             .map(|(_, _, _, c)| xml::decode(&self.source[(*c).clone()]))
             .collect();
-        let texts = rebalance(&originals, self.settings.direction);
+        let texts = rebalance(&originals, self.settings.direction, self.layout);
         for ((run, element, tag, content), (text, original)) in
             pieces.iter().zip(texts.iter().zip(&originals))
         {
             let new = match self.settings.direction {
                 Direction::ToUnicode(_) => {
-                    let converted = convert(text, self.settings);
+                    let converted = convert(text, self.layout, self.settings);
                     add_rows(rows, self.location, &converted.issues);
                     xml::escape(&converted.text)
                 }
@@ -190,7 +201,7 @@ impl Edit<'_> {
         let mut out = String::new();
         let mut last = 0;
         for range in runs {
-            let converted = convert(&text[range.clone()], self.settings);
+            let converted = convert(&text[range.clone()], self.layout, self.settings);
             add_rows(rows, self.location, &converted.issues);
             out.push_str(&xml::escape(&text[last..range.start]));
             out.push_str(&format!("{close}<w:r>{legacy}{open}"));
@@ -206,10 +217,10 @@ impl Edit<'_> {
 /// Moves the text at each piece boundary that falls inside a syllable to the
 /// piece where the syllable starts, so no syllable is split across runs. Legacy
 /// text is also never split next to a digit zero, which may be a typed ಂ.
-fn rebalance(texts: &[String], direction: Direction) -> Vec<String> {
+fn rebalance(texts: &[String], direction: Direction, layout: Layout) -> Vec<String> {
     let joined = texts.concat();
     let starts: Vec<usize> = match direction {
-        Direction::ToUnicode(_) => nudi_syllable_starts(&joined)
+        Direction::ToUnicode(_) => syllable_starts(&joined, layout)
             .into_iter()
             .filter(|&s| !joined[..s].ends_with('0') && !joined[s..].starts_with('0'))
             .collect(),
@@ -321,20 +332,20 @@ fn rewrite(source: &str, p: &Properties, edits: Vec<(Range<usize>, String)>) -> 
     apply(&source[p.span.clone()], edits)
 }
 
-/// Whether a run is set in a legacy font: by its own fonts, then its character
+/// The layout of a run set in a legacy font: by its own fonts, then its character
 /// style, then its paragraph style or the default paragraph style, then the
 /// document defaults.
-fn is_legacy(run: &Run, paragraph: &Paragraph, styles: &Styles) -> bool {
+fn layout(run: &Run, paragraph: &Paragraph, styles: &Styles) -> Option<Layout> {
     let p = run.properties.as_ref();
     let character = || {
         p.and_then(|p| p.style.as_deref())
-            .and_then(|s| styles.legacy(s))
+            .map_or(FontSetting::Inherit, |s| styles.font(s))
     };
-    p.and_then(|p| p.legacy)
+    p.map_or(FontSetting::Inherit, |p| p.font)
         .or_else(character)
         .or_else(|| styles.paragraph(paragraph.style.as_deref()))
         .or_else(|| styles.document_default())
-        .unwrap_or(false)
+        .layout()
 }
 
 fn add_rows(rows: &mut Vec<Row>, location: &str, issues: &[Issue]) {

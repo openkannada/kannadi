@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kannada font shaping</title>
+<meta name="description" content="How {families} open Kannada fonts shape {cases} test strings in HarfBuzz.">
+<style>
+:root {{ color-scheme: light dark; --bg: #fff; --fg: #111; --muted: #666; --line: #ddd; --bad: #b3261e; --row: #f6f6f6; }}
+@media (prefers-color-scheme: dark) {{
+  :root {{ --bg: #111; --fg: #eee; --muted: #aaa; --line: #333; --bad: #ff8a80; --row: #1b1b1b; }}
+}}
+body {{ background: var(--bg); color: var(--fg); margin: 0;
+  font: 15px/1.5 system-ui, -apple-system, "Segoe UI", "Noto Sans Kannada", sans-serif; }}
+main {{ max-width: 1200px; margin: 0 auto; padding: 24px 16px 48px; }}
+h1 {{ font-size: 26px; margin: 0 0 8px; }}
+p {{ margin: 0 0 12px; }}
+.lede {{ color: var(--muted); max-width: 70ch; }}
+.stats {{ display: flex; flex-wrap: wrap; gap: 24px; margin: 16px 0; }}
+.stats b {{ display: block; font-size: 24px; }}
+input {{ font: inherit; padding: 6px 8px; border: 1px solid var(--line); background: var(--bg);
+  color: var(--fg); width: min(320px, 100%); margin-bottom: 12px; }}
+.wrap {{ overflow-x: auto; }}
+table {{ border-collapse: collapse; width: 100%; font-size: 14px; }}
+th, td {{ border-bottom: 1px solid var(--line); padding: 6px 8px; text-align: left;
+  vertical-align: top; }}
+thead th {{ white-space: nowrap; }}
+thead button {{ font: inherit; font-weight: 600; color: inherit; background: none; border: 0;
+  padding: 0; cursor: pointer; text-align: inherit; }}
+.sr {{ position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }}
+td[data-num], th[data-num] {{ text-align: right; font-variant-numeric: tabular-nums; }}
+tbody tr:nth-child(even) {{ background: var(--row); }}
+.bad {{ color: var(--bad); font-weight: 600; }}
+.new > span {{ font-size: 18px; padding: 0 3px; }}
+.new .no {{ color: var(--bad); text-decoration: line-through; }}
+details p {{ font-weight: 400; margin: 6px 0; }}
+details span {{ font-size: 18px; margin-right: 8px; }}
+summary {{ cursor: pointer; }}
+footer {{ color: var(--muted); margin-top: 24px; font-size: 13px; }}
+</style>
+</head>
+<body>
+<main>
+<h1>Kannada font shaping</h1>
+<p class="lede">How {families} open Kannada fonts shape {cases} test strings in HarfBuzz: every
+consonant with every vowel sign, every 2-consonant cluster, the arkavattu, and rare characters.
+A string fails when it shapes to a missing glyph or a dotted circle, forms no conjunct or
+arkavattu, has marks that collide, or draws the same as a different string.</p>
+<div class="stats">
+<div><b>{families}</b>fonts</div><div><b>{faces}</b>faces</div><div><b>{cases}</b>strings</div>
+<div><b>{clean}</b>faces with no failure</div>
+</div>
+<label for="q">Filter by name or license</label><br>
+<input id="q" type="search" placeholder="Noto, OFL, Gubbi">
+<div class="wrap">
+<table id="t">
+<thead><tr><th scope=col><button>Face</button></th><th scope=col><button>Version</button></th>
+<th scope=col><button>License</button></th>
+<th scope=col data-num><button>Failing strings</button></th>{heads}
+<th scope=col>New characters</th><th scope=col><button>knd2</button></th></tr></thead>
+<tbody>
+{rows}
+</tbody>
+</table>
+</div>
+<footer>Open a face for example strings; use a column heading to sort. New characters are
+U+0CDC, U+0CDD and U+0CF3; struck through means missing. knd2 is new-order OpenType shaping.
+Built by kannadi fontqa from results/summary.csv; the method and data card are in the results
+folder.</footer>
+</main>
+<script>
+const rows = [...document.querySelectorAll("#t tbody tr")];
+document.getElementById("q").addEventListener("input", (e) => {{
+  const q = e.target.value.toLowerCase();
+  rows.forEach((r) => {{ r.hidden = q && !r.dataset.search.includes(q); }});
+}});
+const heads = [...document.querySelectorAll("#t thead th")];
+heads.forEach((th, i) => {{
+  const button = th.querySelector("button");
+  if (!button) return;
+  button.addEventListener("click", () => {{
+    const num = th.hasAttribute("data-num");
+    const key = (r) => r.children[i].textContent.replace(/,/g, "");
+    const asc = th.getAttribute("aria-sort") !== "ascending";
+    heads.forEach((h) => h.removeAttribute("aria-sort"));
+    th.setAttribute("aria-sort", asc ? "ascending" : "descending");
+    rows.sort((a, b) => {{
+      const x = key(a), y = key(b);
+      const d = num ? Number(x) - Number(y) : x.localeCompare(y);
+      return asc ? d : -d;
+    }});
+    const body = document.querySelector("#t tbody");
+    rows.forEach((r) => body.appendChild(r));
+  }});
+}});
+</script>
+</body>
+</html>

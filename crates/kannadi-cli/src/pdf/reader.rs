@@ -12,7 +12,7 @@ use lopdf::{Dictionary, Document, Encoding, Object, Stream};
 use crate::convert::Settings;
 
 use super::cmap::CMap;
-use super::encoding::differences;
+use super::encoding::{differences, glyph_codes};
 use super::fonts::Fonts;
 use super::widths::Widths;
 use super::{resolve, LIMIT};
@@ -136,7 +136,8 @@ struct PageFont<'d> {
     index: usize,
     /// 1-byte fonts named as legacy: their bytes are the glyph codes.
     raw_codes: bool,
-    /// Characters by code, for other 1-byte fonts with a `Differences` list.
+    /// Characters by code: for other 1-byte fonts with a `Differences` list, and
+    /// for legacy fonts whose list names glyphs by their code.
     table: Option<Vec<char>>,
     encoding: Option<Encoding<'d>>,
     cmap: Option<Rc<CMap>>,
@@ -145,11 +146,11 @@ struct PageFont<'d> {
 
 impl PageFont<'_> {
     fn raw(&self, bytes: &[u8]) -> String {
-        if self.raw_codes {
-            return decode_windows_1252(bytes);
-        }
         if let Some(table) = &self.table {
             return bytes.iter().map(|&b| table[usize::from(b)]).collect();
+        }
+        if self.raw_codes {
+            return decode_windows_1252(bytes);
         }
         self.encoding
             .as_ref()
@@ -383,9 +384,13 @@ impl<'d> PageReader<'d, '_> {
             PageFont {
                 index,
                 raw_codes,
-                table: (simple && !raw_codes)
-                    .then(|| differences(doc, dict, by_lopdf))
-                    .flatten(),
+                table: if raw_codes {
+                    glyph_codes(doc, dict)
+                } else if simple {
+                    differences(doc, dict, by_lopdf)
+                } else {
+                    None
+                },
                 encoding,
                 cmap: if raw_codes {
                     fonts.cmap(doc, dict)
