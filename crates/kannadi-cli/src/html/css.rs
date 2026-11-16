@@ -87,9 +87,10 @@ impl Rules {
 #[derive(Debug, PartialEq, Eq)]
 pub enum Family<'a> {
     Named(&'a str),
-    /// `inherit` and `unset`: the parent's font.
+    /// `inherit`, `unset` and `revert`: the parent's font, since `font-family` is
+    /// inherited and a page's styles are the only author styles read here.
     Inherit,
-    /// `initial` and `revert`: the browser's default font.
+    /// `initial`: the browser's default font.
     Initial,
 }
 
