@@ -43,6 +43,7 @@ crates/kannadi/
     decode.rs         to Unicode: a Writer builds the output and the reports;
                       a Syllable decides what it can accept
     encode.rs         from Unicode: each akshara written in storage order
+    fonts.rs          font names: each font's layout, Shree-Lipi, Kannada digits
   data/nudi.tsv       the Nudi and Baraha ANSI glyph table, as data
   data/akruti.tsv     the Akruti glyph table
   tests/              golden fixtures, property tests, differential test
@@ -51,7 +52,7 @@ crates/kannadi-cli/   the `kannadi` binary: batch conversion of files and folder
   src/files.rs        which files to convert and where each one goes
   src/convert.rs      1 piece of text in either direction, with its issues
   src/report.rs       the per-file report
-  src/fonts.rs        which font names are legacy fonts, and in which layout
+  src/fonts.rs        names added with --legacy-font, and font-family lists
   src/edits.rs        rewriting a document by byte ranges
   src/txt.rs          plain text files
   src/html/           HTML: a small tokenizer, CSS font rules, character references

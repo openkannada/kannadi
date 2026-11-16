@@ -57,6 +57,10 @@ export function fixes(text, start, end) {
 }
 
 export const bestLayout = wasm.bestLayout;
+/** The layout of 1 font name, such as "nudi" for "BRH Kannada", or null. */
+export const fontLayout = (name) => wasm.fontLayout(name) ?? null;
+export const isLegacyFont = wasm.isLegacyFont;
+export const drawsKannadaDigits = wasm.drawsKannadaDigits;
 export const transliterate = wasm.transliterate;
 export const normalize = wasm.normalize;
 export const modernize = wasm.modernize;

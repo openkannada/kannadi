@@ -42,12 +42,12 @@ function fontOf(attrs) {
 }
 
 /** The layout of a legacy font in the Latin slots, or false. */
-function legacyRunFont(attrs) {
-  return legacyLayout(attrs["w:ascii"]) ?? legacyLayout(attrs["w:hAnsi"]) ?? false;
+function legacyRunFont(attrs, fontLayout) {
+  return legacyLayout(attrs["w:ascii"], fontLayout) ?? legacyLayout(attrs["w:hAnsi"], fontLayout) ?? false;
 }
 
 /** Style id to {font, basedOn}, plus the document default font under "". */
-function readStyles(xml) {
+function readStyles(xml, fontLayout) {
   const styles = new Map();
   if (!xml) return styles;
   let current = null;
@@ -67,7 +67,7 @@ function readStyles(xml) {
       current.basedOn = t.attrs["w:val"];
     } else if (t.name === "w:rFonts" && current && !t.close) {
       current.font = fontOf(t.attrs);
-      current.legacy = legacyRunFont(t.attrs);
+      current.legacy = legacyRunFont(t.attrs, fontLayout);
     }
   }
   return styles;
@@ -87,14 +87,16 @@ function styleLegacy(styles, id) {
 /**
  * Reads the paragraphs of a DOCX file as segments, each marked with the layout
  * of the legacy font its run is set in, or false.
+ * @param {Uint8Array} bytes
+ * @param {(name: string) => string | null} fontLayout the layout of 1 font name
  * @returns {Promise<{text: string, legacy: false | string}[]>}
  */
-export async function readDocx(bytes) {
+export async function readDocx(bytes, fontLayout) {
   const entries = await readZip(bytes, ["word/document.xml", "word/styles.xml"]);
   const documentXml = entries.get("word/document.xml");
   if (!documentXml) throw new Error("This file has no Word document inside.");
   const decoder = new TextDecoder();
-  const styles = readStyles(entries.has("word/styles.xml") ? decoder.decode(entries.get("word/styles.xml")) : "");
+  const styles = readStyles(entries.has("word/styles.xml") ? decoder.decode(entries.get("word/styles.xml")) : "", fontLayout);
   const defaultLegacy = styles.get("")?.legacy ?? false;
 
   const segments = [];
@@ -149,7 +151,7 @@ export async function readDocx(bytes) {
         if (run) run.style = t.attrs["w:val"];
         break;
       case "w:rFonts":
-        if (run && !inParagraphProps && fontOf(t.attrs)) run.legacy = legacyRunFont(t.attrs);
+        if (run && !inParagraphProps && fontOf(t.attrs)) run.legacy = legacyRunFont(t.attrs, fontLayout);
         break;
       case "w:t":
         inText = !t.close && !t.empty;

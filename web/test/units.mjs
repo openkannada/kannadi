@@ -11,7 +11,6 @@ import {
   countWords,
   diff,
   escapeMarkup,
-  isLegacyFont,
   joinSegments,
   legacyLayout,
   resolveAuto,
@@ -36,15 +35,19 @@ test("legacy text is told apart from English and Unicode Kannada", () => {
   assert.ok(!looksLegacy(""));
 });
 
-test("legacy font names", () => {
-  for (const f of ["BRH Kannada", "Nudi 01 e", "'Nudi Akshar'", "Baraha Kan", "Arial, BRH Kannada"]) assert.ok(isLegacyFont(f), f);
-  for (const f of ["Arial", "Nirmala UI", "NudiUni01e", "Nudi Unicode 01", "Tunga", undefined, null]) assert.ok(!isLegacyFont(f), f);
-  assert.equal(legacyLayout("BRH Kannada"), "nudi");
-  assert.equal(legacyLayout("AkrutiKndPadmaDemi"), "akruti");
-  assert.equal(legacyLayout("'Akruti Knd Padma', serif"), "akruti");
-  assert.equal(legacyLayout("Arial, Nudi 01 e"), "nudi");
-  assert.equal(legacyLayout("AkrutiKndPadmini"), null);
-  assert.equal(legacyLayout("Arial"), null);
+// The page gets 1-name rules from the crate; these tests use a stand-in.
+// Like the crate, it ignores quotes.
+const fontLayout = (name) => {
+  const bare = name.replace(/['"]/g, "");
+  return /^(nudi \d|brh kannada)/i.test(bare) ? "nudi" : /^akruti/i.test(bare) ? "akruti" : null;
+};
+
+test("font-family lists give the layout of their first legacy family", () => {
+  assert.equal(legacyLayout("BRH Kannada", fontLayout), "nudi");
+  assert.equal(legacyLayout("Arial, Nudi 01 e", fontLayout), "nudi");
+  assert.equal(legacyLayout(" AkrutiKndPadmaDemi , serif", fontLayout), "akruti");
+  assert.equal(legacyLayout("Arial", fontLayout), null);
+  assert.equal(legacyLayout(undefined, fontLayout), null);
 });
 
 test("diff finds the single edit", () => {
@@ -75,7 +78,7 @@ test("plain text that needs no conversion is kept exactly", () => {
   const convert = () => assert.fail("nothing to convert");
   const bestLayout = () => assert.fail("nothing to judge");
   for (const text of ["    indented code\n\n\n\nend ", "ಕನ್ನಡ  ನಾಡು\r\n\t", " "]) {
-    assert.deepEqual(pasted("", text, { convert, bestLayout }), { text, unknown: [], converted: 0, layouts: [] });
+    assert.deepEqual(pasted("", text, { convert, bestLayout, fontLayout }), { text, unknown: [], converted: 0, layouts: [] });
   }
 });
 
@@ -168,7 +171,7 @@ const el = (tag, attrs = {}, ...kids) => ({
   classList: (attrs.class ?? "").split(" ").filter(Boolean),
 });
 const page = (css, body) => ({ body, querySelectorAll: () => [{ textContent: css }] });
-const fontOf = (css, body) => htmlSegments(page(css, el("body", {}, body))).find((s) => s.text.trim()).legacy;
+const fontOf = (css, body) => htmlSegments(page(css, el("body", {}, body)), fontLayout).find((s) => s.text.trim()).legacy;
 
 test("html text takes the font of the last class rule, and a page-wide plain font leaves it to its looks", () => {
   const text = "PÀ£ÀßqÀ £ÁqÀÄ";
@@ -198,7 +201,7 @@ test("zip round trip", async () => {
 
 test("docx round trip keeps lines and tabs", async () => {
   const text = "ಕನ್ನಡ ನಾಡು\n\nಸಾಲು 2\tಟ್ಯಾಬ್ <&> \"x\"\u0007";
-  const segments = await readDocx(await writeDocx(text));
+  const segments = await readDocx(await writeDocx(text), fontLayout);
   assert.ok(segments.every((s) => !s.legacy));
   assert.equal(segments.map((s) => s.text).join(""), text.replace("\u0007", ""));
 });
@@ -216,7 +219,7 @@ async function docx(body, styles = "") {
 
 test("docx runs carry the layout of their font", async () => {
   const body = `<w:p>${run("PÀ", "Nudi 01 e")}${run("dâ}â", "AkrutiKndPadmaDemi")}${run("Hi", "Arial")}</w:p>`;
-  assert.deepEqual(await readDocx(await docx(body, "")), [
+  assert.deepEqual(await readDocx(await docx(body, ""), fontLayout), [
     { text: "PÀ", legacy: "nudi" },
     { text: "dâ}â", legacy: "akruti" },
     { text: "Hi", legacy: false },
@@ -234,7 +237,7 @@ test("docx runs are legacy by run font, character style, paragraph style or defa
     `<w:p><w:pPr><w:pStyle w:val="Kan"/><w:rPr><w:rFonts w:ascii="Arial"/></w:rPr></w:pPr>${run("¤ÃqÀÄ")}` +
     `<w:r><w:rPr><w:rStyle w:val="Eng"/></w:rPr><w:t>Eng</w:t></w:r><w:r><w:tab/></w:r></w:p>` +
     `<w:p>${run("Times &amp; more")}<w:r><w:br/></w:r></w:p>`;
-  const segments = await readDocx(await docx(body, styles));
+  const segments = await readDocx(await docx(body, styles), fontLayout);
   assert.deepEqual(segments, [
     { text: "English ", legacy: false },
     { text: "PÀ£À", legacy: "nudi" },
@@ -255,7 +258,7 @@ test("docx text boxes are read once and keep the outer paragraph", async () => {
     "<mc:Fallback><w:pict><w:txbxContent><w:p><w:r><w:t>BOX</w:t></w:r></w:p></w:txbxContent></w:pict></mc:Fallback></mc:AlternateContent>";
   const body = `<w:p><w:pPr><w:pStyle w:val="Kan"/></w:pPr>${run("PÀ")}<w:r>${box}</w:r>${run("£À")}</w:p>`;
   const styles = '<w:style w:styleId="Kan"><w:rPr><w:rFonts w:ascii="BRH Kannada"/></w:rPr></w:style>';
-  const segments = await readDocx(await docx(body, styles));
+  const segments = await readDocx(await docx(body, styles), fontLayout);
   assert.equal(segments.map((s) => s.text).join(""), "PÀ\nBOX\n£À");
   assert.deepEqual(
     segments.filter((s) => s.legacy).map((s) => s.text),
@@ -266,7 +269,7 @@ test("docx text boxes are read once and keep the outer paragraph", async () => {
 test("docx tracked format changes and bad character references", async () => {
   const tracked =
     '<w:r><w:rPr><w:rFonts w:ascii="BRH Kannada"/><w:rPrChange><w:rPr><w:rFonts w:ascii="Arial"/></w:rPr></w:rPrChange></w:rPr><w:t>PÀ</w:t></w:r>';
-  const segments = await readDocx(await docx(`<w:p>${tracked}${run("&#x110000;&#65;")}</w:p>`));
+  const segments = await readDocx(await docx(`<w:p>${tracked}${run("&#x110000;&#65;")}</w:p>`), fontLayout);
   assert.deepEqual(segments, [
     { text: "PÀ", legacy: "nudi" },
     { text: "\uFFFDA", legacy: false },
@@ -279,7 +282,7 @@ test("zip reads only the parts asked for", async () => {
 });
 
 test("a docx with no document part is refused", async () => {
-  await assert.rejects(readDocx(await writeZip([["x.xml", "<x/>"]])), /no Word document/);
+  await assert.rejects(readDocx(await writeZip([["x.xml", "<x/>"]]), fontLayout), /no Word document/);
 });
 
 /** Stands in for DocEditor: a string with a caret. */

@@ -30,7 +30,7 @@ function parseHtml(html) {
  * such as body{font-family:Arial} leaves text with no other font to be judged
  * by how it looks.
  */
-function legacySelectors(doc) {
+function legacySelectors(doc, fontLayout) {
   const classes = new Map();
   const tags = new Map();
   let order = 0;
@@ -39,7 +39,7 @@ function legacySelectors(doc) {
     for (const [, selectors, body] of css.matchAll(/([^{}@]+)\{([^}]*)\}/g)) {
       const family = body.match(FONT_FAMILY)?.[1];
       if (!family) continue;
-      const font = { layout: legacyLayout(family) ?? false, order: order++ };
+      const font = { layout: legacyLayout(family, fontLayout) ?? false, order: order++ };
       for (const selector of selectors.split(",")) {
         const [, tag, cls] = selector.trim().match(/^([a-z0-9]*)(?:\.([\w-]+))?$/i) ?? [];
         if (cls) classes.set(cls, font);
@@ -51,10 +51,10 @@ function legacySelectors(doc) {
 }
 
 /** The layout of the legacy font an element sets, false for another font, or null for none. */
-function elementFont(el, selectors) {
-  if (el.tagName === "FONT" && el.hasAttribute("face")) return legacyLayout(el.getAttribute("face")) ?? false;
+function elementFont(el, selectors, fontLayout) {
+  if (el.tagName === "FONT" && el.hasAttribute("face")) return legacyLayout(el.getAttribute("face"), fontLayout) ?? false;
   const family = el.getAttribute(STYLE)?.match(FONT_FAMILY)?.[1];
-  if (family) return legacyLayout(family) ?? false;
+  if (family) return legacyLayout(family, fontLayout) ?? false;
   const byClass = [...el.classList]
     .map((c) => selectors.classes.get(c))
     .filter(Boolean)
@@ -72,8 +72,8 @@ const byLooks = (text) => (looksLegacy(text) ? "auto" : false);
  * is judged by whether it looks like legacy glyph codes.
  * @param {Document} doc
  */
-export function htmlSegments(doc) {
-  const selectors = legacySelectors(doc);
+export function htmlSegments(doc, fontLayout) {
+  const selectors = legacySelectors(doc, fontLayout);
   const segments = [];
   let fontsSeen = false;
   const last = () => segments[segments.length - 1];
@@ -95,7 +95,7 @@ export function htmlSegments(doc) {
       lineBreak(true);
       return;
     }
-    const own = elementFont(node, selectors);
+    const own = elementFont(node, selectors, fontLayout);
     if (own !== null) fontsSeen = true;
     const font = own ?? inherited;
     const block = BLOCK.has(node.tagName);
@@ -123,14 +123,14 @@ export function htmlSegments(doc) {
  * @param {{convert: Function, bestLayout: Function, decodeWindows1252: Function}} kannadi
  * @returns {Promise<{text: string, unknown: number[], converted: number, layouts: string[]}>}
  */
-export async function openFile(file, { convert, bestLayout, decodeWindows1252 }) {
+export async function openFile(file, { convert, bestLayout, fontLayout, decodeWindows1252 }) {
   const join = (segments) => joinSegments(resolveAuto(segments, bestLayout), convert);
   const bytes = new Uint8Array(await file.arrayBuffer());
   const name = file.name.toLowerCase();
-  if (name.endsWith(".docx")) return join(await readDocx(bytes));
+  if (name.endsWith(".docx")) return join(await readDocx(bytes, fontLayout));
   const text = decodeBytes(bytes, decodeWindows1252);
   if (name.endsWith(".html") || name.endsWith(".htm") || /^\s*<(!doctype|html)/i.test(text)) {
-    return join(htmlSegments(parseHtml(text)));
+    return join(htmlSegments(parseHtml(text), fontLayout));
   }
   return join([{ text, legacy: byLooks(text) }]);
 }
@@ -139,10 +139,10 @@ export async function openFile(file, { convert, bestLayout, decodeWindows1252 })
  * Pasted clipboard data as editor text.
  * @param {{convert: Function, bestLayout: Function}} kannadi
  */
-export function pasted(html, plain, { convert, bestLayout }) {
+export function pasted(html, plain, { convert, bestLayout, fontLayout }) {
   const join = (segments) => joinSegments(resolveAuto(segments, bestLayout), convert);
   if (html) {
-    const segments = htmlSegments(parseHtml(html));
+    const segments = htmlSegments(parseHtml(html), fontLayout);
     if (segments.some((s) => s.legacy)) return join(segments);
   }
   return join([{ text: plain, legacy: byLooks(plain) }]);

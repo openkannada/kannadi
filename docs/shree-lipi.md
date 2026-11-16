@@ -1,6 +1,6 @@
 # Shree-Lipi and Akruti: sources and method
 
-Status: checked on 16 November 2026. Akruti is built: see [akruti.md](akruti.md). No converter for Shree-Lipi exists yet. Nothing here is legal advice; whether a layout table derived as described below may carry rights in India has not been researched and is unresolved.
+Status: checked on 16 November 2026. Akruti is built: see [akruti.md](akruti.md). No converter for Shree-Lipi exists yet. The rules below say how layout tables are derived. They record the maintainer's decision of 16 November 2026 and are not legal advice.
 
 ## Summary
 
@@ -9,12 +9,16 @@ Status: checked on 16 November 2026. Akruti is built: see [akruti.md](akruti.md)
 - Akruti (`AkrutiKndPadma`) appears with its real font name in public Karnataka PDFs. It is a separate layout from Nudi and needs its own table. Its sources are confirmed, so it can start before Shree-Lipi.
 - Asking Modular Infotech to publish the Shree-Lipi code page under an open license would avoid derivation. That is a decision for the maintainer.
 
-## Rules for this work
+## Rules for deriving a layout table
 
+- A table maps each glyph code to the Kannada it draws. That mapping is factual data, so it may be derived by rendering a font, whether the font is installed or embedded in a public document, and by reading the font's glyph names and encodings.
+- Font programs, and glyph outlines extracted from them, are never committed or redistributed. Only the table is.
+- Each table's header records how it was derived: the fonts and documents, and the method. See `crates/kannadi/data/nudi.tsv` and `crates/kannadi/data/akruti.tsv`.
 - Do not download Shree-Lipi or Akruti font files from any source other than the vendor.
-- Fonts embedded in a public document may be rendered, and their glyph names and encodings read, to identify which letter each code draws (the maintainer's decision, 16 November 2026). The fonts, their outlines and their files are never committed or redistributed; a table records only the code and the letter.
 - Do not copy tables from other converters (see [prior-art.md](prior-art.md)).
 - Keep only short excerpts of source documents, with their URLs, as for the Nudi fixtures.
+
+These rules are about building tables. At run time, the `kannadi` tool reads the ToUnicode maps, `Differences` lists and other font data in the user's own file to convert it; that is a separate matter and is always allowed.
 
 For background: typeface designs are generally not protected by copyright in the US, while font software can be, and US design patents can cover letterforms ([overview](https://en.wikipedia.org/wiki/Intellectual_property_protection_of_typefaces), [Fordham IPLJ](https://fordhamiplj.org/2021/12/11/open-type-questions-issues-in-copyright-law-and-protecting-typeface-design/)). Product names such as Shree-Lipi are trademarks and are used here only to name the layout.
 

@@ -82,7 +82,12 @@ function plural(n, one, many) {
 const convert = (text, layout = "auto") =>
   kannadi.convertLegacy(text, { zeroAsAnusvara: settings.zero, kannadaDigits: settings.digits, layout });
 
-const io = { convert, bestLayout: kannadi.bestLayout, decodeWindows1252: kannadi.decodeWindows1252 };
+const io = {
+  convert,
+  bestLayout: kannadi.bestLayout,
+  fontLayout: kannadi.fontLayout,
+  decodeWindows1252: kannadi.decodeWindows1252,
+};
 
 /** "Nudi or Baraha", "Akruti", or both, for the layouts a result was read in. */
 function layoutNames(layouts = []) {

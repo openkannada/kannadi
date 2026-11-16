@@ -4,12 +4,6 @@
 const LEGACY_CHAR = /[¡-ÿŒœŠšŸŽžƒˆ˜–—‘-„†-•…‰‹›€™]/gu;
 const KANNADA_CHAR = /[ಀ-೿]/gu;
 const NON_SPACE = /\S/gu;
-// Legacy font families and their layouts. Nudi's Unicode fonts carry "Uni" in
-// their names.
-const LEGACY_FONTS = [
-  [/^(?!.*uni)\s*['"]?(nudi|brh\b|baraha)/i, "nudi"],
-  [/^\s*['"]?akruti\s*knd\s*padma/i, "akruti"],
-];
 
 const count = (text, pattern) => (text.match(pattern) || []).length;
 
@@ -27,20 +21,18 @@ export function looksLegacy(text) {
 
 /**
  * The layout of the first legacy family in a font-family list, such as "nudi"
- * for "BRH Kannada" or "akruti" for "AkrutiKndPadma", or null.
+ * for "Arial, BRH Kannada", or null. `fontLayout` gives the layout of 1 font
+ * name; the page passes the crate's rule from kannadi.js.
+ * @param {string | null | undefined} family
+ * @param {(name: string) => string | null} fontLayout
  */
-export function legacyLayout(family) {
+export function legacyLayout(family, fontLayout) {
   if (typeof family !== "string") return null;
   for (const f of family.split(",")) {
-    const found = LEGACY_FONTS.find(([pattern]) => pattern.test(f.trim()));
-    if (found) return found[1];
+    const layout = fontLayout(f.trim());
+    if (layout) return layout;
   }
   return null;
-}
-
-/** True for a legacy font family name, such as "BRH Kannada". */
-export function isLegacyFont(family) {
-  return legacyLayout(family) !== null;
 }
 
 /**

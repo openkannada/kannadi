@@ -225,7 +225,7 @@ fn add_rows(report: &mut Report, location: &str, issues: &[Issue]) {
 
 #[cfg(test)]
 mod tests {
-    use super::fonts::{OTHER_LAYOUT, RENUMBERED};
+    use super::fonts::{NO_TABLE, OTHER_LAYOUT, RENUMBERED};
     use super::*;
     use kannadi::legacy::Options;
     use lopdf::{dictionary, Dictionary, Object, Stream};
@@ -708,6 +708,16 @@ endcmap\nCMapName currentdict /CMap defineresource pop\nend\nend\n";
         content.extend_from_slice(bytes);
         content.extend_from_slice(b") Tj ET");
         content
+    }
+
+    #[test]
+    fn a_legacy_font_with_no_table_is_reported_and_left_out() {
+        let (text, report) = run(&pdf(
+            vec![("F1", simple_font("ABCDEF+Shree-Kan-0850"))],
+            &shown("F1", b"\xC3\xDC\xE3\xB1\xDC\xF1\xDD\xC3\xDD"),
+        ));
+        assert_eq!(text, "\n");
+        assert_eq!(report.rows[0].detail, NO_TABLE);
     }
 
     #[test]
