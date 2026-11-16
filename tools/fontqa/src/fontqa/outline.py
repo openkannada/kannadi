@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import pathops
+from fontTools.pens.basePen import decomposeQuadraticSegment, decomposeSuperBezierSegment
 from fontTools.pens.recordingPen import replayRecording
 
 
@@ -35,15 +36,45 @@ def polygons(path: pathops.Path, steps: int) -> list[list[tuple[float, float]]]:
         elif op == "lineTo":
             current.append(pts[0])
             last = pts[0]
-        elif op in ("curveTo", "qCurveTo"):
-            ctrl = [last, *pts]
-            current += [_bezier(ctrl, i / steps) for i in range(1, steps + 1)]
-            last = pts[-1]
+        elif op == "qCurveTo":
+            if pts[-1] is None:
+                # A closed TrueType contour with no on-curve point: it starts between the
+                # last and first off-curve points, and comes with no moveTo.
+                last = _mid(pts[-2], pts[0])
+                current, pts = [last], (*pts[:-1], last)
+            for ctrl, end in decomposeQuadraticSegment(pts):
+                current += _flatten((last, ctrl, end), steps)
+                last = end
+        elif op == "curveTo":
+            for c1, c2, end in decomposeSuperBezierSegment(pts):
+                current += _flatten((last, c1, c2, end), steps)
+                last = end
         elif op in ("closePath", "endPath"):
             if len(current) > 2:
                 polys.append(current)
             current = []
     return polys
+
+
+def mean_stroke_width(path: pathops.Path) -> float:
+    """Mean stroke width of an outline: 2 x area / perimeter, close for long thin strokes."""
+    flat = pathops.Path(path)
+    flat.convertConicsToQuads()
+    perimeter = 0.0
+    for contour in polygons(flat, steps=8):
+        perimeter += sum(
+            ((x1 - x0) ** 2 + (y1 - y0) ** 2) ** 0.5
+            for (x0, y0), (x1, y1) in zip(contour, contour[1:] + contour[:1], strict=True)
+        )
+    return 2 * abs(flat.area) / perimeter if perimeter else 0.0
+
+
+def _mid(a, b):
+    return ((a[0] + b[0]) / 2, (a[1] + b[1]) / 2)
+
+
+def _flatten(ctrl, steps):
+    return [_bezier(ctrl, i / steps) for i in range(1, steps + 1)]
 
 
 def _bezier(ctrl, t):
