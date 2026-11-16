@@ -96,9 +96,29 @@ Passing the gates means a draft is well formed and in proportion. It does not me
     # build the font, then
     uv run fontqa gate Font.ttf
 
-- U+0CDC and U+0CDD are skeletons (`skeletons.py`) stroked with an elliptical nib in the proportion of the font's stems. The nib is rescaled over 4 rounds until the mean stroke width matches the consonants' weight from `fontqa measure`. Height follows the consonants' edges and width follows the font's ಅ.
+- U+0CDC and U+0CDD are skeletons (`skeletons.py`) stroked with an elliptical nib in the proportion of the font's stems. The nib is rescaled over 4 rounds until the mean stroke width matches the consonants' weight from `fontqa measure`. Height follows the consonants' edges, width follows the font's ಅ, and the side bearings are the consonants' medians.
 - U+0CF3 is the font's own ಂ, scaled to 0.49, emboldened back to 0.9 of the ಂ's stroke width, with its bottom at 0.83 of the x-height.
 - A glyph that already has ink or references is left alone.
 - FontForge can print `Internal Error (overlap)` while removing overlaps in a real font; the gates decide whether the result is usable. The CI run on the synthetic font fails on such errors.
 
 The drafts are a starting point for a reader to judge, not finished design.
+
+## Exports
+
+`uv run fontqa export` writes the test strings for other tools to `exports/`:
+
+- `fontbakery/kannada-fontqa-forbidden.json`: FontBakery `shaping/forbidden`; no string may shape to `.notdef` or a dotted circle.
+- `fontbakery/kannada-fontqa-forbidden-rare.json`: the same for the rare characters (U+0CDC, U+0CDD, U+0CF3 and others), apart so a font can adopt the common tests first.
+- `fontbakery/kannada-fontqa-collisions.json`: FontBakery `shaping/collides`, collidoscope on strings with marks.
+- `fontbakery/fontbakery.yml`: the configuration that points FontBakery at that folder:
+
+      fontbakery check-googlefonts --config fontbakery.yml -c shaping/forbidden -c shaping/collides FONT.ttf
+
+  This needs `fontbakery[googlefonts,shaping]`. Run it from the `exports/fontbakery` folder.
+- `shaperglot/kn_Knda.toml`: Shaperglot `ShapingDiffers` checks in the format of its `manual_checks.toml`: each cluster must shape differently with its conjunct features (`akhn`, `rphf`, `blwf`, `half`, `pstf`, `cjct`) off, and each ra + virama + consonant with `rphf` off. Shaperglot compares the whole output, so pairs with a joiner would always differ.
+
+The exports cover missing glyphs, dotted circles, collisions, conjuncts and the arkavattu. Only fontqa itself checks indistinct strings. Draft upstream texts are in `drafts/`.
+
+## Dashboard
+
+`uv run fontqa dashboard` builds `results/dashboard/index.html` from `results/summary.csv` and `results/fonts/`: 1 self-contained page with a sortable, filterable row per face, failure counts, example strings, new-character coverage and `knd2` support. It is built, not deployed.

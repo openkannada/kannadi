@@ -39,6 +39,7 @@ Font tools:
 
 - `tools/fontqa`: HarfBuzz shaping tests for Kannada fonts, results for 41 fonts (146 faces) with a data card, proof sheets, and fixes for broken `knd2` tables, broken `morx` tables and missing ೄ, ೢ and ೣ. `measure` and `gate` commands, and a mean stroke width gate.
 - `tools/glyphdraft`: drafts U+0CDC, U+0CDD and U+0CF3 into a FontForge source, matched to the font's stems, weight, heights and spacing.
+- fontqa `export`: the test strings as FontBakery shaping tests (forbidden glyphs, rare characters apart, collisions) and Shaperglot `kn_Knda` checks (conjuncts, arkavattu), with draft upstream texts. fontqa `dashboard`: a static coverage page built from the results.
 
 Project:
 
@@ -48,3 +49,4 @@ Project:
 
 - fontqa outline flattening: a TrueType quadratic with several off-curve points is split at its implied on-curve points, and a closed contour with no on-curve point is read. Stroke measurements on TrueType fonts were slightly off before.
 - fontqa manifest: Navilu is OFL-1.1 with Reserved Font Name Navilu, not GPL.
+- glyphdraft: side bearings come from the median of the font's consonants, not from KA, whose bearings can be an outlier.
