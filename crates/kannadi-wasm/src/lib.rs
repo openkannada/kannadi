@@ -240,6 +240,70 @@ fn byte_offset(text: &str, unit: u32) -> Option<usize> {
     (units == unit).then_some(text.len())
 }
 
+/// The result of [`unicode_to_nudi`].
+#[wasm_bindgen]
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct Encoding {
+    text: String,
+    unencodable: Vec<u32>,
+    malformed: Vec<u32>,
+}
+
+#[wasm_bindgen]
+impl Encoding {
+    /// The glyph codes as Windows-1252 characters. Characters that could not be
+    /// encoded are kept as they were.
+    #[wasm_bindgen(getter)]
+    pub fn text(&self) -> String {
+        self.text.clone()
+    }
+
+    /// Offsets in the input of characters with no glyph in the layout, ascending.
+    #[wasm_bindgen(getter)]
+    pub fn unencodable(&self) -> Vec<u32> {
+        self.unencodable.clone()
+    }
+
+    /// Ranges of the input that are not valid aksharas, as `[start0, end0, ...]`.
+    #[wasm_bindgen(getter)]
+    pub fn malformed(&self) -> Vec<u32> {
+        self.malformed.clone()
+    }
+}
+
+/// Converts Unicode Kannada to Nudi and Baraha ANSI glyph codes.
+/// See [`legacy::unicode_to_nudi`].
+#[wasm_bindgen(js_name = unicodeToNudi)]
+pub fn unicode_to_nudi(text: &str) -> Encoding {
+    let encoded = legacy::unicode_to_nudi(text);
+    let mut input = Utf16Cursor::new(text);
+    let unencodable = encoded
+        .unencodable
+        .iter()
+        .map(|u| input.at(u.offset))
+        .collect();
+    let mut input = Utf16Cursor::new(text);
+    let malformed = encoded
+        .malformed
+        .iter()
+        .flat_map(|r| [input.at(r.start), input.at(r.end)])
+        .collect();
+    Encoding {
+        text: encoded.text,
+        unencodable,
+        malformed,
+    }
+}
+
+/// Encodes text as Windows-1252 bytes, for a legacy text file. A character with
+/// no Windows-1252 byte becomes `?`.
+#[wasm_bindgen(js_name = encodeWindows1252)]
+pub fn encode_windows_1252(text: &str) -> Vec<u8> {
+    text.chars()
+        .map(|c| legacy::windows_1252_byte(c).unwrap_or(b'?'))
+        .collect()
+}
+
 /// Decodes the bytes of a legacy text file. See [`legacy::decode_windows_1252`].
 #[wasm_bindgen(js_name = decodeWindows1252)]
 pub fn decode_windows_1252(bytes: &[u8]) -> String {
@@ -410,6 +474,27 @@ mod tests {
     fn counts_and_modernizes() {
         assert_eq!(count_aksharas("ಕನ್ನಡ ನಾಡು, 2026"), 5);
         assert_eq!(modernize("ಬಾೞ್"), "ಬಾಳ್");
+    }
+
+    #[test]
+    fn encodes_to_nudi_with_utf16_reports() {
+        let e = unicode_to_nudi("ಕನ್ನಡ");
+        assert_eq!(e.text(), "PÀ£ÀßqÀ");
+        assert!(e.unencodable().is_empty() && e.malformed().is_empty());
+
+        let text = "𝔸ಕ A";
+        let e = unicode_to_nudi(text);
+        let units: Vec<u16> = text.encode_utf16().collect();
+        let marked: Vec<u16> = e.unencodable().iter().map(|&o| units[o as usize]).collect();
+        assert!(marked.contains(&u16::from(b'A')), "{marked:?}");
+    }
+
+    #[test]
+    fn nudi_text_round_trips_through_windows_1252_bytes() {
+        let nudi = unicode_to_nudi("ಸರ್ಕಾರಿ ಶಾಲೆ").text();
+        let bytes = encode_windows_1252(&nudi);
+        assert_eq!(decode_windows_1252(&bytes), nudi);
+        assert_eq!(encode_windows_1252("ಕ€"), [b'?', 0x80]);
     }
 
     #[test]

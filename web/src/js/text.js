@@ -150,6 +150,25 @@ export function escapeMarkup(text) {
   return text.replace(/[<>&"]/g, (c) => MARKUP[c]);
 }
 
+/**
+ * What a Unicode to Nudi conversion could not write, in 1 or 2 sentences.
+ * `questionMarks` counts characters a Nudi text file had to write as "?".
+ */
+export function nudiNotes(unencodable, malformed, questionMarks = 0) {
+  const kept = unencodable - questionMarks;
+  return [
+    kept ? `${plural(kept, "character has", "characters have")} no Nudi glyph and stayed as typed.` : "",
+    questionMarks ? `${plural(questionMarks, "character has", "characters have")} no byte in a Nudi text file and became ?.` : "",
+    malformed ? `${plural(malformed, "syllable is", "syllables are")} malformed and may not read back the same.` : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+}
+
+function plural(n, one, many) {
+  return `${n.toLocaleString("en-IN")} ${n === 1 ? one : many}`;
+}
+
 /** Words separated by white space. */
 export function countWords(text) {
   return count(text, /\S+/gu);

@@ -5,33 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="no-referrer">
-<title>Kannada editor and Nudi to Unicode converter</title>
-<meta name="description" content="Free Kannada editor in your browser. Convert Nudi and Baraha to Unicode, fix every unknown glyph inline, type Kannada with English letters, and save as Word, HTML or text. Nothing is uploaded.">
+<!-- page:head -->
+<!-- /page:head -->
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" content="#0c4a36">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Kannada editor and Nudi to Unicode converter">
-<meta property="og:description" content="Convert Nudi and Baraha to Unicode, fix unknown glyphs inline, type Kannada with English letters, and save as Word, HTML or text. Runs in your browser.">
-<meta name="twitter:card" content="summary">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="preload" href="fonts/noto-sans-kannada-kannada-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="style.css">
 <link rel="modulepreload" href="pkg/kannadi_wasm.js">
 <script type="module" src="js/main.js"></script>
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "SoftwareApplication",
-  "name": "kannadi Kannada editor",
-  "description": "Converts Kannada text typed in Nudi and Baraha ANSI fonts to Unicode in the browser, shows unknown glyphs and malformed syllables inline with fixes, and types Kannada with Baraha or ISO 15919 letters.",
-  "applicationCategory": "UtilitiesApplication",
-  "operatingSystem": "Any",
-  "inLanguage": ["en", "kn"],
-  "isAccessibleForFree": true,
-  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "INR" },
-  "author": { "@type": "Person", "name": "Prasad Subrahmanya", "url": "https://prasad.tech" }
-}
-</script>
 </head>
 <body>
 <!--
@@ -71,7 +53,9 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
         <button type="button" data-export="docx">Word document <small>.docx</small></button>
         <button type="button" data-export="txt">Plain text <small>.txt</small></button>
         <button type="button" data-export="html">Web page <small>.html</small></button>
+        <button type="button" data-export="nudi">Nudi text <small>.txt</small></button>
         <button type="button" id="copy">Copy all</button>
+        <button type="button" id="copy-nudi">Copy as Nudi</button>
       </div>
     </details>
     <button type="button" class="plate icon" id="theme" aria-label="Theme: auto. Change theme" data-theme="auto">
@@ -111,15 +95,16 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
 
 <main>
   <div class="intro">
-    <h1>Kannada editor and Nudi to Unicode converter</h1>
-    <p>Nudi to Unicode conversion turns Kannada text typed in the old Nudi or Baraha fonts into standard Unicode Kannada, which phones, websites and search engines can read. This editor does it in your browser, marks every glyph it could not convert, and uploads nothing.</p>
+<!-- page:intro -->
+<!-- /page:intro -->
   </div>
 
   <div class="workspace">
     <section class="sheet" aria-label="Document">
       <div id="doc" class="doc" role="textbox" aria-multiline="true" aria-label="Document text" aria-describedby="empty" lang="kn" spellcheck="false" autocapitalize="off"></div>
       <div id="empty" class="empty">
-        <p class="empty-lead">Paste Nudi or Baraha text, open a TXT, Word or HTML file, or start typing.</p>
+<!-- page:lead -->
+<!-- /page:lead -->
         <ol class="empty-steps">
           <li>Pasted Nudi and Baraha text turns into Unicode by itself.</li>
           <li>Red marks a glyph that could not be converted. Amber marks a broken syllable. Select one to fix it.</li>
@@ -153,32 +138,8 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
   </footer>
 
   <div class="prose">
-    <section aria-labelledby="how-heading">
-      <h2 id="how-heading">How to convert Nudi to Unicode</h2>
-      <ol>
-        <li>Open your file with <b>Open</b>, or copy the text from Word and paste it into the sheet. Word files keep their fonts, so only the text set in Nudi or Baraha fonts is converted.</li>
-        <li>Check the marks. Red is a glyph with no Kannada letter. Amber is a sign that cannot form a syllable. Select a mark, or press <kbd>F8</kbd>, and pick a fix.</li>
-        <li>Choose <b>Save</b> and pick Word, plain text or web page.</li>
-      </ol>
-    </section>
-
-    <section aria-labelledby="faq-heading">
-      <h2 id="faq-heading">Questions</h2>
-      <h3>Is my text uploaded?</h3>
-      <p>No. The converter is compiled to WebAssembly and runs on your device. The page loads its own files and makes no other network requests. It sets no cookies and has no analytics. Your last document is kept in this browser's storage so it is still here when you come back.</p>
-      <h3>Which fonts does it convert?</h3>
-      <p>Nudi fonts up to version 5, and Baraha ANSI fonts such as BRH Kannada. Text that already shows as Kannada letters is Unicode and needs no conversion.</p>
-      <h3>Can it convert Unicode to Nudi?</h3>
-      <p>Not yet. A Unicode to Nudi converter is coming.</p>
-      <h3>How do I type Kannada with an English keyboard?</h3>
-      <p>Choose <b>Baraha letters</b> and type words the way they sound: <kbd>kannaDa</kbd> gives <span lang="kn">ಕನ್ನಡ</span>, <kbd>nADu</kbd> gives <span lang="kn">ನಾಡು</span>. Capital letters give long vowels and retroflex sounds. Press <kbd>Esc</kbd> to keep a word in English letters.</p>
-      <h3>What do Normalize and Modernize do?</h3>
-      <p>Normalize joins vowel signs typed in 2 parts and removes doubled marks, so text that looks the same also searches the same. Modernize changes the Old Kannada letters <span lang="kn">ೞ ಱ ೝ</span> to <span lang="kn">ಳ ರ ನ್</span>.</p>
-      <h3>How accurate is it?</h3>
-      <p>Every glyph it cannot place is marked, and every syllable that is not valid Kannada is marked. A measured error rate on a checked set of real documents will be published when that test set is ready.</p>
-      <h3>Who made this?</h3>
-      <p>It is built on <a href="https://github.com/prasadus92/kannadi">kannadi</a>, an open-source Rust library for Kannada text by Prasad Subrahmanya, released under the MIT license. The fonts are Noto Sans Kannada and Noto Serif Kannada, under the SIL Open Font License.</p>
-    </section>
+<!-- page:prose -->
+<!-- /page:prose -->
   </div>
 </main>
 
