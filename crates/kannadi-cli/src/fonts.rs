@@ -21,8 +21,8 @@ pub fn layout(font: &str, extra: &[(String, Layout)]) -> Option<Layout> {
     if let Some(rest) = key.strip_prefix("brh") {
         return (!BRH_OTHER_SCRIPTS.iter().any(|s| rest.starts_with(s))).then_some(Layout::Nudi);
     }
-    if let Some(rest) = key.strip_prefix("akrutikndpadma") {
-        return (!rest.starts_with("ini")).then_some(Layout::Akruti);
+    if key.starts_with("akrutikndpadma") {
+        return Some(Layout::Akruti);
     }
     let rest = key.strip_prefix("nudi")?;
     let numbered = rest.len() >= 3 && rest[..2].bytes().all(|b| b.is_ascii_digit());

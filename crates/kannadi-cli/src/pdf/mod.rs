@@ -216,7 +216,7 @@ fn add_rows(report: &mut Report, location: &str, issues: &[Issue]) {
 mod tests {
     use super::fonts::{OTHER_LAYOUT, RENUMBERED};
     use super::*;
-    use kannadi::legacy::{syllable_starts, Layout, Options};
+    use kannadi::legacy::Options;
     use lopdf::{dictionary, Dictionary, Object, Stream};
 
     /// A 1-page PDF with the given fonts and content stream.
