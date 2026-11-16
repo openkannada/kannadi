@@ -17,7 +17,7 @@ mod decode;
 mod encode;
 mod table;
 
-pub use decode::{nudi_to_unicode, Conversion, Options, Unknown};
+pub use decode::{nudi_syllable_starts, nudi_to_unicode, Conversion, Options, Unknown};
 pub use encode::{unicode_to_nudi, Encoding, Unencodable};
 
 /// Decodes Windows-1252 bytes, the encoding legacy Kannada text files use.
