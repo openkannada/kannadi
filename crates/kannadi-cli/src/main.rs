@@ -1,6 +1,7 @@
 //! `kannadi`: converts folders of documents between Nudi or Baraha ANSI and Unicode.
 
 mod convert;
+mod edits;
 mod files;
 mod fonts;
 mod html;

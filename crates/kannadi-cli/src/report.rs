@@ -3,7 +3,7 @@
 use std::fmt::Write as _;
 use std::path::{Path, PathBuf};
 
-use crate::convert::Kind;
+use crate::convert::{Issue, Kind};
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Row {
@@ -11,6 +11,17 @@ pub struct Row {
     pub kind: Kind,
     pub detail: String,
     pub context: String,
+}
+
+impl Row {
+    pub fn new(location: String, issue: &Issue) -> Self {
+        Row {
+            location,
+            kind: issue.kind,
+            detail: issue.detail.clone(),
+            context: issue.context.clone(),
+        }
+    }
 }
 
 #[derive(Debug, Default)]

@@ -48,6 +48,19 @@ impl Fonts {
     pub fn is_legacy(&self, font: &str) -> bool {
         crate::fonts::is_legacy(font, &self.extra_legacy)
     }
+
+    /// A `font-family` list with each legacy family replaced by the Unicode font,
+    /// in `quote` marks when given. A trailing `!important` is kept.
+    pub fn unicode_family(&self, list: &str, quote: Option<char>) -> String {
+        let trimmed = list.trim_end();
+        let (families, important) = match trimmed.strip_suffix("!important") {
+            Some(rest) => (rest.trim_end(), &list[rest.trim_end().len()..]),
+            None => (list, ""),
+        };
+        let replaced =
+            crate::fonts::replace_legacy(families, &self.unicode, quote, &self.extra_legacy);
+        format!("{replaced}{important}")
+    }
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]

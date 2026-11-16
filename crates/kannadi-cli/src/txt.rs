@@ -14,13 +14,8 @@ pub fn convert_file(bytes: &[u8], settings: &Settings) -> Result<(Vec<u8>, Repor
     let converted = convert(&text, settings);
     let rows = converted
         .issues
-        .into_iter()
-        .map(|issue| Row {
-            location: format!("line {}", issue.line),
-            kind: issue.kind,
-            detail: issue.detail,
-            context: issue.context,
-        })
+        .iter()
+        .map(|issue| Row::new(format!("line {}", issue.line), issue))
         .collect();
     let out = match settings.direction {
         Direction::ToUnicode(_) => converted.text.into_bytes(),

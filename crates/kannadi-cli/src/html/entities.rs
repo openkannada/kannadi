@@ -17,8 +17,9 @@ const LATIN_1: [&str; 96] = [
     "uuml", "yacute", "thorn", "yuml",
 ];
 
-/// Names for the other characters Windows-1252 has, and the 5 XML ones.
-const OTHER: [(&str, char); 32] = [
+/// Names for the other characters Windows-1252 has, the 5 XML ones, and the
+/// spaces and joiners Kannada text uses.
+const OTHER: [(&str, char); 39] = [
     ("amp", '&'),
     ("lt", '<'),
     ("gt", '>'),
@@ -51,33 +52,57 @@ const OTHER: [(&str, char); 32] = [
     ("oelig", 'œ'),
     ("zcaron", 'ž'),
     ("Yuml", 'Ÿ'),
+    ("zwnj", '\u{200C}'),
+    ("zwj", '\u{200D}'),
+    ("ensp", '\u{2002}'),
+    ("emsp", '\u{2003}'),
+    ("thinsp", '\u{2009}'),
+    ("lrm", '\u{200E}'),
+    ("rlm", '\u{200F}'),
 ];
 
-/// `text` with character references replaced. Unknown references stay as written.
-/// Numeric references to 128 to 159 mean the Windows-1252 characters, as browsers
-/// read them.
-pub fn decode(text: &str) -> String {
-    let mut out = String::with_capacity(text.len());
-    let mut rest = text;
-    while let Some(amp) = rest.find('&') {
-        out.push_str(&rest[..amp]);
-        rest = &rest[amp..];
-        let reference = rest[1..]
-            .find(';')
-            .filter(|&e| e <= 10)
-            .map(|e| &rest[1..1 + e]);
-        match reference.and_then(lookup) {
-            Some(c) => {
-                out.push(c);
-                rest = &rest[reference.map_or(0, str::len) + 2..];
-            }
-            None => {
-                out.push('&');
-                rest = &rest[1..];
-            }
+/// Text with character references decoded, mapped back to its source.
+pub struct Decoded {
+    pub text: String,
+    /// For each character of `text`: its byte offset there and in the source.
+    starts: Vec<(usize, usize)>,
+    source_len: usize,
+}
+
+impl Decoded {
+    /// The source offset where the character at byte `at` of `text` starts.
+    pub fn source_offset(&self, at: usize) -> usize {
+        match self.starts.binary_search_by_key(&at, |&(t, _)| t) {
+            Ok(i) => self.starts[i].1,
+            Err(_) => self.source_len,
         }
     }
-    out.push_str(rest);
+}
+
+/// `text` with references replaced. Unknown references stay as written. Numeric
+/// references to 128 to 159 mean the Windows-1252 characters, as browsers read them.
+pub fn decode(text: &str) -> Decoded {
+    let mut out = Decoded {
+        text: String::with_capacity(text.len()),
+        starts: Vec::with_capacity(text.len()),
+        source_len: text.len(),
+    };
+    let mut i = 0;
+    while i < text.len() {
+        let rest = &text[i..];
+        let reference = rest
+            .strip_prefix('&')
+            .and_then(|r| r.get(..r.len().min(32)))
+            .and_then(|r| r.find(';').map(|e| &r[..e]))
+            .and_then(|name| lookup(name).map(|c| (c, name.len() + 2)));
+        let (c, len) = reference.unwrap_or_else(|| {
+            let c = rest.chars().next().unwrap_or_default();
+            (c, c.len_utf8())
+        });
+        out.starts.push((out.text.len(), i));
+        out.text.push(c);
+        i += len;
+    }
     out
 }
 
@@ -98,14 +123,16 @@ fn lookup(name: &str) -> Option<char> {
     OTHER.iter().find(|(n, _)| *n == name).map(|&(_, c)| c)
 }
 
-/// `text` with `&`, `<` and `>` escaped.
-pub fn escape(text: &str) -> String {
+/// `text` escaped for element content, or for an attribute value in `quote` marks.
+pub fn escape(text: &str, quote: Option<char>) -> String {
     let mut out = String::with_capacity(text.len());
     for c in text.chars() {
         match c {
             '&' => out.push_str("&amp;"),
-            '<' => out.push_str("&lt;"),
-            '>' => out.push_str("&gt;"),
+            '<' if quote.is_none() => out.push_str("&lt;"),
+            '>' if quote.is_none() => out.push_str("&gt;"),
+            '"' if quote == Some('"') => out.push_str("&quot;"),
+            '\'' if quote == Some('\'') => out.push_str("&#39;"),
             _ => out.push(c),
         }
     }
@@ -117,17 +144,21 @@ mod tests {
     use super::*;
 
     #[test]
-    fn references_decode() {
-        assert_eq!(
-            decode("P&Agrave;&#163;&#xC0;&#134; &amp;&nbsp;"),
-            "PÀ£À† &\u{A0}"
-        );
-        assert_eq!(decode("a & b &unknown; &#;"), "a & b &unknown; &#;");
-        assert_eq!(decode("&yuml;&dagger;"), "ÿ†");
+    fn references_decode_and_map_back() {
+        let source = "P&Agrave;&#163;&#xC0;&#134; &amp;&nbsp;&zwnj;";
+        let d = decode(source);
+        assert_eq!(d.text, "PÀ£À† &\u{A0}\u{200C}");
+        assert_eq!(d.source_offset(1), 1);
+        assert_eq!(d.source_offset(3), 9);
+        assert_eq!(d.source_offset(d.text.len()), source.len());
+        assert_eq!(decode("a & b &unknown; &#;").text, "a & b &unknown; &#;");
+        assert_eq!(decode("&#99999999;&").text, "&#99999999;&");
     }
 
     #[test]
-    fn escape_is_minimal() {
-        assert_eq!(escape("a<b>&c\u{A0}"), "a&lt;b&gt;&amp;c\u{A0}");
+    fn escapes_suit_the_context() {
+        assert_eq!(escape("a<b>&c\u{A0}", None), "a&lt;b&gt;&amp;c\u{A0}");
+        assert_eq!(escape("'A' \"B\"", Some('"')), "'A' &quot;B&quot;");
+        assert_eq!(escape("'A'", Some('\'')), "&#39;A&#39;");
     }
 }
