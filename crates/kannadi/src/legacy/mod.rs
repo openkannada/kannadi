@@ -18,8 +18,8 @@ mod encode;
 mod table;
 
 pub use decode::{
-    nudi_syllable_starts, nudi_to_unicode, syllable_starts, to_unicode, Conversion, Options,
-    Unknown,
+    best_layout, nudi_syllable_starts, nudi_to_unicode, syllable_starts, to_unicode, Conversion,
+    Options, Unknown,
 };
 pub use encode::{from_unicode, unicode_to_nudi, Encoding, Unencodable};
 

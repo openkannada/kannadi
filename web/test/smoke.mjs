@@ -29,6 +29,10 @@ assert.equal(withUnknown.unknown.length, 2);
 for (const at of withUnknown.unknown) assert.equal(withUnknown.text[at], "õ");
 
 assert.equal(kannadi.convertLegacy("1956", { kannadaDigits: true }).text, "೧೯೫೬");
+assert.equal(kannadi.convertLegacy("dâ}â", { layout: "akruti" }).text, "ಕನ");
+assert.equal(kannadi.convertLegacy("dâ}â").text, "ಕನ");
+assert.equal(kannadi.convertLegacy(NUDI).text, UNICODE);
+assert.throws(() => kannadi.convertLegacy("PÀ", { layout: "klingon" }), /unknown layout/);
 assert.equal(kannadi.convertLegacy("¥ÁægÀ0¨sÀ").text, "ಪ್ರಾರಂಭ");
 assert.equal(kannadi.convertLegacy("¥ÁægÀ0¨sÀ", { zeroAsAnusvara: false }).text, "ಪ್ರಾರ0ಭ");
 
@@ -58,7 +62,11 @@ assert.deepEqual(mixed.unencodable.map((o) => "ಕ A"[o]), ["A"]);
 assert.equal(kannadi.decodeWindows1252(kannadi.encodeWindows1252(NUDI)), NUDI);
 
 // Opening files end to end, with the real converter.
-const io = { convert: (t) => kannadi.convertLegacy(t), decodeWindows1252: kannadi.decodeWindows1252 };
+const io = {
+  convert: (t, layout) => kannadi.convertLegacy(t, { layout }),
+  bestLayout: kannadi.bestLayout,
+  decodeWindows1252: kannadi.decodeWindows1252,
+};
 const bytes = new Uint8Array([...NUDI].map((c) => c.charCodeAt(0) < 256 ? c.charCodeAt(0) : 0x3f));
 const txt = await openFile(new File([bytes], "page.txt"), io);
 assert.equal(txt.text, UNICODE);
@@ -76,6 +84,21 @@ const docx = await writeZip([
 const opened = await openFile(new File([docx], "report.docx"), io);
 assert.equal(opened.text, `Report: ${UNICODE} õ`);
 assert.deepEqual(opened.unknown, [opened.text.indexOf("õ")]);
+assert.deepEqual(opened.layouts, ["nudi"]);
+
+// A short Akruti run reads cleanly as Nudi too; its font decides.
+const akrutiDocx = await writeZip([
+  [
+    "word/document.xml",
+    `<w:document ${W}><w:body><w:p><w:r><w:rPr><w:rFonts w:ascii="AkrutiKndPadmaDemi"/></w:rPr>` +
+      "<w:t>Eyâpâ</w:t></w:r></w:p></w:body></w:document>",
+  ],
+]);
+const akruti = await openFile(new File([akrutiDocx], "act.docx"), io);
+assert.equal(akruti.text, "ಇತರ");
+assert.deepEqual(akruti.layouts, ["akruti"]);
+assert.equal(kannadi.convertLegacy("Eyâpâ").text, "ಇತರ");
+assert.equal(kannadi.convertLegacy("%zâÀÖ").text, "ಅಥವಾ");
 
 // Every page references only files the build produced, from its own folder.
 const { PAGES } = await import(pathToFileURL(resolve(dirname(fileURLToPath(import.meta.url)), "../site/pages.mjs")).href);

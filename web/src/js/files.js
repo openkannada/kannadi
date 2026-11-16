@@ -1,7 +1,7 @@
 // Opening TXT, HTML and DOCX files as editor text, and saving the editor text
 // as TXT, HTML or DOCX.
 import { readDocx, writeDocx } from "./docx.js";
-import { decodeBytes, escapeMarkup, isLegacyFont, joinSegments, looksLegacy } from "./text.js";
+import { decodeBytes, escapeMarkup, joinSegments, legacyLayout, looksLegacy, resolveAuto } from "./text.js";
 
 const BLOCK = new Set([
   "ADDRESS", "ARTICLE", "ASIDE", "BLOCKQUOTE", "DD", "DIV", "DL", "DT", "FIGCAPTION", "FIGURE", "FOOTER",
@@ -23,33 +23,47 @@ function parseHtml(html) {
   return new DOMParser().parseFromString(renamed, "text/html");
 }
 
-/** Class names and tag names that style rules in the page set in a legacy font. */
+/**
+ * The font that style rules in the page give class names and tag names: the
+ * layout of a legacy font or false, and the rule's place in the page, since a
+ * later rule wins. Tag rules count only for legacy fonts, so a page-wide rule
+ * such as body{font-family:Arial} leaves text with no other font to be judged
+ * by how it looks.
+ */
 function legacySelectors(doc) {
-  const classes = new Set();
-  const tags = new Set();
+  const classes = new Map();
+  const tags = new Map();
+  let order = 0;
   for (const style of doc.querySelectorAll(`textarea[${STYLE}]`)) {
     const css = style.textContent.replace(/\/\*[\s\S]*?\*\//g, "").replace(/<!--|-->/g, "");
     for (const [, selectors, body] of css.matchAll(/([^{}@]+)\{([^}]*)\}/g)) {
       const family = body.match(FONT_FAMILY)?.[1];
-      if (!isLegacyFont(family)) continue;
+      if (!family) continue;
+      const font = { layout: legacyLayout(family) ?? false, order: order++ };
       for (const selector of selectors.split(",")) {
         const [, tag, cls] = selector.trim().match(/^([a-z0-9]*)(?:\.([\w-]+))?$/i) ?? [];
-        if (cls) classes.add(cls);
-        else if (tag) tags.add(tag.toUpperCase());
+        if (cls) classes.set(cls, font);
+        else if (tag && font.layout) tags.set(tag.toUpperCase(), font);
       }
     }
   }
   return { classes, tags };
 }
 
+/** The layout of the legacy font an element sets, false for another font, or null for none. */
 function elementFont(el, selectors) {
-  if (el.tagName === "FONT" && el.hasAttribute("face")) return isLegacyFont(el.getAttribute("face"));
+  if (el.tagName === "FONT" && el.hasAttribute("face")) return legacyLayout(el.getAttribute("face")) ?? false;
   const family = el.getAttribute(STYLE)?.match(FONT_FAMILY)?.[1];
-  if (family) return isLegacyFont(family);
-  if ([...el.classList].some((c) => selectors.classes.has(c))) return true;
-  if (selectors.tags.has(el.tagName)) return true;
-  return null;
+  if (family) return legacyLayout(family) ?? false;
+  const byClass = [...el.classList]
+    .map((c) => selectors.classes.get(c))
+    .filter(Boolean)
+    .sort((a, b) => b.order - a.order)[0];
+  return (byClass ?? selectors.tags.get(el.tagName))?.layout ?? null;
 }
+
+/** "auto" for text that looks like legacy glyph codes in an unknown font, else false. */
+const byLooks = (text) => (looksLegacy(text) ? "auto" : false);
 
 /**
  * Reads an HTML document as segments, 1 block per line, with white space
@@ -97,38 +111,41 @@ export function htmlSegments(doc) {
     const lines = segments.map((s) => s.text).join("").split("\n");
     return lines.flatMap((line, i) => [
       ...(i ? [{ text: "\n", legacy: false }] : []),
-      { text: line, legacy: looksLegacy(line) },
+      { text: line, legacy: byLooks(line) },
     ]);
   }
-  return segments.map(({ text, font }) => ({ text, legacy: font === true || (font === null && looksLegacy(text)) }));
+  return segments.map(({ text, font }) => ({ text, legacy: font === null ? byLooks(text) : font }));
 }
 
 /**
  * Opens a file as editor text.
  * @param {File} file
- * @param {{convert: Function, decodeWindows1252: Function}} kannadi
- * @returns {Promise<{text: string, unknown: number[], converted: number}>}
+ * @param {{convert: Function, bestLayout: Function, decodeWindows1252: Function}} kannadi
+ * @returns {Promise<{text: string, unknown: number[], converted: number, layouts: string[]}>}
  */
-export async function openFile(file, { convert, decodeWindows1252 }) {
+export async function openFile(file, { convert, bestLayout, decodeWindows1252 }) {
+  const join = (segments) => joinSegments(resolveAuto(segments, bestLayout), convert);
   const bytes = new Uint8Array(await file.arrayBuffer());
   const name = file.name.toLowerCase();
-  if (name.endsWith(".docx")) {
-    return joinSegments(await readDocx(bytes), convert);
-  }
+  if (name.endsWith(".docx")) return join(await readDocx(bytes));
   const text = decodeBytes(bytes, decodeWindows1252);
   if (name.endsWith(".html") || name.endsWith(".htm") || /^\s*<(!doctype|html)/i.test(text)) {
-    return joinSegments(htmlSegments(parseHtml(text)), convert);
+    return join(htmlSegments(parseHtml(text)));
   }
-  return joinSegments([{ text, legacy: looksLegacy(text) }], convert);
+  return join([{ text, legacy: byLooks(text) }]);
 }
 
-/** Pasted clipboard data as editor text. */
-export function pasted(html, plain, convert) {
+/**
+ * Pasted clipboard data as editor text.
+ * @param {{convert: Function, bestLayout: Function}} kannadi
+ */
+export function pasted(html, plain, { convert, bestLayout }) {
+  const join = (segments) => joinSegments(resolveAuto(segments, bestLayout), convert);
   if (html) {
     const segments = htmlSegments(parseHtml(html));
-    if (segments.some((s) => s.legacy)) return joinSegments(segments, convert);
+    if (segments.some((s) => s.legacy)) return join(segments);
   }
-  return joinSegments([{ text: plain, legacy: looksLegacy(plain) }], convert);
+  return join([{ text: plain, legacy: byLooks(plain) }]);
 }
 
 const HTML_TEMPLATE = (title, body) => `<!doctype html>

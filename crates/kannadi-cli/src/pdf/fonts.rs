@@ -3,7 +3,7 @@
 use std::collections::HashMap;
 use std::rc::Rc;
 
-use kannadi::legacy::{to_unicode, windows_1252_byte, Layout, Options};
+use kannadi::legacy::{best_layout, to_unicode, windows_1252_byte, Layout, Options};
 use lopdf::{Dictionary, Document, Object};
 
 use crate::convert::Settings;
@@ -156,12 +156,10 @@ impl Fonts {
                     Verdict::Unreadable(RENUMBERED)
                 }
             } else if looks_legacy(&font.text) {
-                let readable = |j: &Judgment| j.clean() || (j.short() && j.flawless());
-                let found = Layout::ALL
-                    .into_iter()
-                    .find(|&l| readable(&Judgment::of(&font.text, l)));
-                if let Some(found) = found {
-                    font.read_as = found;
+                let best = best_layout(&font.text);
+                let judged = Judgment::of(&font.text, best);
+                if judged.clean() || (judged.short() && judged.flawless()) {
+                    font.read_as = best;
                     Verdict::Legacy(Source::Raw)
                 } else if raw.short() {
                     Verdict::Other

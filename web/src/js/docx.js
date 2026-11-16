@@ -1,6 +1,6 @@
 // DOCX to text segments, and text to DOCX. Only the main document text is
 // read: headers, footers, notes, images and formatting are left out.
-import { escapeMarkup, isLegacyFont } from "./text.js";
+import { escapeMarkup, legacyLayout } from "./text.js";
 import { readZip, writeZip } from "./zip.js";
 
 const SKIPPED = new Set(["mc:Fallback", "w:rPrChange", "w:pPrChange"]);
@@ -41,8 +41,9 @@ function fontOf(attrs) {
   return attrs["w:ascii"] || attrs["w:hAnsi"] || null;
 }
 
+/** The layout of a legacy font in the Latin slots, or false. */
 function legacyRunFont(attrs) {
-  return isLegacyFont(attrs["w:ascii"]) || isLegacyFont(attrs["w:hAnsi"]);
+  return legacyLayout(attrs["w:ascii"]) ?? legacyLayout(attrs["w:hAnsi"]) ?? false;
 }
 
 /** Style id to {font, basedOn}, plus the document default font under "". */
@@ -72,7 +73,7 @@ function readStyles(xml) {
   return styles;
 }
 
-/** True if the style, or a style it is based on, uses a legacy font; null if none sets a font. */
+/** The layout if the style, or a style it is based on, uses a legacy font, false if another font; null if none sets a font. */
 function styleLegacy(styles, id) {
   for (let seen = 0; id && seen < 20; seen++) {
     const style = styles.get(id);
@@ -84,9 +85,9 @@ function styleLegacy(styles, id) {
 }
 
 /**
- * Reads the paragraphs of a DOCX file as segments, each marked legacy when its
- * run is set in a Nudi or Baraha font.
- * @returns {Promise<{text: string, legacy: boolean}[]>}
+ * Reads the paragraphs of a DOCX file as segments, each marked with the layout
+ * of the legacy font its run is set in, or false.
+ * @returns {Promise<{text: string, legacy: false | string}[]>}
  */
 export async function readDocx(bytes) {
   const entries = await readZip(bytes, ["word/document.xml", "word/styles.xml"]);
