@@ -49,4 +49,4 @@ uv run fontqa run
 
 ## License
 
-The dataset is MIT licensed, like the rest of this repository.
+The test strings, scripts and computed results are MIT licensed, like the rest of this repository. The font names, versions and copyright strings recorded from each font belong to their owners and are kept only to identify the font tested.
