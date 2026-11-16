@@ -1,6 +1,6 @@
 # Shree-Lipi and Akruti: sources and method
 
-Status: research only, checked on 16 November 2026. No converter for these layouts exists in this crate yet. Nothing here is legal advice; whether a layout table derived as described below may carry rights in India has not been researched and is unresolved.
+Status: checked on 16 November 2026. Akruti is built: see [akruti.md](akruti.md). No converter for Shree-Lipi exists yet. Nothing here is legal advice; whether a layout table derived as described below may carry rights in India has not been researched and is unresolved.
 
 ## Summary
 
@@ -12,7 +12,7 @@ Status: research only, checked on 16 November 2026. No converter for these layou
 ## Rules for this work
 
 - Do not download Shree-Lipi or Akruti font files from any source other than the vendor.
-- Do not extract, read or redistribute the font programs embedded in PDFs, including their encodings, glyph names and character maps.
+- Fonts embedded in a public document may be rendered, and their glyph names and encodings read, to identify which letter each code draws (the maintainer's decision, 16 November 2026). The fonts, their outlines and their files are never committed or redistributed; a table records only the code and the letter.
 - Do not copy tables from other converters (see [prior-art.md](prior-art.md)).
 - Keep only short excerpts of source documents, with their URLs, as for the Nudi fixtures.
 
@@ -51,23 +51,22 @@ Akruti text does not decode with the Nudi table. On page 1 of `bh2002k.pdf`, the
 
 These are test inputs for PDF text extraction.
 
-## How a table would be derived
+## How a table is derived
 
-`nudi.tsv` was built differently: from the Nudi 01 e font file itself, by rendering each glyph and matching it against a Unicode font. That route needs a licensed copy of the font. For Shree-Lipi and Akruti, this method uses documents only:
+The Akruti table was built this way, and Shree-Lipi will follow it. [akruti.md](akruti.md) has the details.
 
 1. Collect public PDFs whose font names, as `pdffonts` lists them, identify the layout.
-2. Take the glyph codes only from the strings the page's text operators show (`Tj`, `TJ`), the same bytes any text extractor reads. Do not read the embedded font's encoding, glyph names or character map.
-3. Find the letter each code draws from a paired Unicode text of the same document, or from a Kannada reader reading the page as any PDF viewer renders it. For the dpal Acts, no paired Unicode text has been found yet, so a reader is needed.
-4. Record each entry with the document and page it was read from. A second Kannada reader checks every entry, and the check is recorded.
-5. Store the result as a new table in the format of `data/nudi.tsv`. The decoder and encoder are driven by the table, but `table.rs` loads only `nudi.tsv` today, so a second layout also needs a font parameter on the public API.
-6. Build a golden fixture from short excerpts with source URLs, and report accuracy per document as for Nudi.
+2. Render each glyph of the embedded fonts and identify it, with glyphs shaped by HarfBuzz from Unicode Kannada fonts as a second opinion.
+3. Convert every document, and read each unknown glyph and malformed syllable against the rendered page.
+4. Store the result as a table in the format of `data/nudi.tsv`, with its sources in the header, and add the layout to `Layout`.
+5. Build a golden fixture from short excerpts with source URLs, read against the page, and report accuracy per document and per font.
 
-A table built this way covers the codes that appear in the collected documents. Rare conjunct glyphs may stay unknown; the converter reports them.
+A table covers the codes that appear in the collected documents. Rare conjunct glyphs may stay unknown; the converter reports them.
 
-A table is ready when every code seen in the collected documents has a checked entry or is marked unknown, and the golden fixture has at least 100 lines from 3 or more documents that convert with no differences.
+A table is ready when every code seen in the collected documents has a checked entry or is marked unknown, and the golden fixture has at least 100 lines from 3 or more documents that convert with no differences. A Kannada reader's check of the fixture is still to be done for Akruti.
 
 ## Decisions for the maintainer
 
 1. Whether to ask Modular Infotech to publish the Shree-Lipi code page under an open license, such as CC0 for the data. The research found `support@modular-infotech.com` as a contact; it was not contacted. Modular offers its own conversion tool, so it may decline.
-2. Whether to start with Akruti. The first documents would be the 4 Acts listed above and `bh2002k.pdf`. It needs a Kannada reader for step 3 and a second reader for step 4.
+2. A Kannada reader's check of the 125 Akruti fixture lines.
 3. Where to look for Shree-Lipi documents with real font names. Candidates are publishers' and newspapers' PDF archives from before 2010, and university question papers.

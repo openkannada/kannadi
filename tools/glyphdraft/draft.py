@@ -53,19 +53,19 @@ class InkPen:
         self.perimeter = 0.0
         self._points = []
 
-    def moveTo(self, p):  # noqa: N802
+    def moveTo(self, p):
         self._points = [p]
 
-    def lineTo(self, p):  # noqa: N802
+    def lineTo(self, p):
         self._points.append(p)
 
-    def curveTo(self, *pts):  # noqa: N802
+    def curveTo(self, *pts):
         start = self._points[-1]
         for c1, c2, end in zip(pts[0::3], pts[1::3], pts[2::3], strict=True):
             self._curve((start, c1, c2, end))
             start = end
 
-    def qCurveTo(self, *pts):  # noqa: N802
+    def qCurveTo(self, *pts):
         if pts[-1] is None:
             start = _mid(pts[-2], pts[0])
             self._points = [start]
@@ -80,14 +80,14 @@ class InkPen:
     def _curve(self, ctrl):
         self._points += [_bezier(ctrl, i / self.STEPS) for i in range(1, self.STEPS + 1)]
 
-    def closePath(self):  # noqa: N802
+    def closePath(self):
         pts = self._points
         for (x0, y0), (x1, y1) in zip(pts, pts[1:] + pts[:1], strict=True):
             self.area += (x0 * y1 - x1 * y0) / 2
             self.perimeter += ((x1 - x0) ** 2 + (y1 - y0) ** 2) ** 0.5
         self._points = []
 
-    endPath = closePath  # noqa: N815
+    endPath = closePath
 
 
 def _mid(a, b):
