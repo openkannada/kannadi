@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import json
 import math
+import statistics
 import sys
 from pathlib import Path
 
@@ -21,7 +22,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 import skeletons  # noqa: E402
 
 LETTER_A = 0x0C85
-LETTER_KA = 0x0C95
+CONSONANTS = [cp for cp in range(0x0C95, 0x0CBA) if cp not in (0x0CA9, 0x0CB4)]
 ANUSVARA = 0x0C82
 DEFAULT = (0x0CDC, 0x0CDD, 0x0CF3)
 
@@ -52,19 +53,19 @@ class InkPen:
         self.perimeter = 0.0
         self._points = []
 
-    def moveTo(self, p):  # noqa: N802
+    def moveTo(self, p):
         self._points = [p]
 
-    def lineTo(self, p):  # noqa: N802
+    def lineTo(self, p):
         self._points.append(p)
 
-    def curveTo(self, *pts):  # noqa: N802
+    def curveTo(self, *pts):
         start = self._points[-1]
         for c1, c2, end in zip(pts[0::3], pts[1::3], pts[2::3], strict=True):
             self._curve((start, c1, c2, end))
             start = end
 
-    def qCurveTo(self, *pts):  # noqa: N802
+    def qCurveTo(self, *pts):
         if pts[-1] is None:
             start = _mid(pts[-2], pts[0])
             self._points = [start]
@@ -79,14 +80,14 @@ class InkPen:
     def _curve(self, ctrl):
         self._points += [_bezier(ctrl, i / self.STEPS) for i in range(1, self.STEPS + 1)]
 
-    def closePath(self):  # noqa: N802
+    def closePath(self):
         pts = self._points
         for (x0, y0), (x1, y1) in zip(pts, pts[1:] + pts[:1], strict=True):
             self.area += (x0 * y1 - x1 * y0) / 2
             self.perimeter += ((x1 - x0) ** 2 + (y1 - y0) ** 2) ** 0.5
         self._points = []
 
-    endPath = closePath  # noqa: N815
+    endPath = closePath
 
 
 def _mid(a, b):
@@ -169,9 +170,9 @@ class Drafter:
         self.top = measure["top"]
         a = bounds(glyph_for(font, LETTER_A))
         self.aspect = (a[2] - a[0]) / (a[3] - a[1])
-        ka = glyph_for(font, LETTER_KA)
-        self.lsb = ka.left_side_bearing
-        self.rsb = ka.width - bounds(ka)[2]
+        consonants = [g for g in (glyph_for(font, cp) for cp in CONSONANTS) if has_ink(g)]
+        self.lsb = statistics.median(g.left_side_bearing for g in consonants)
+        self.rsb = statistics.median(g.width - bounds(g)[2] for g in consonants)
         self.weight = measure["weight"]
 
     def stroked(self, glyph, pieces, weights, rounds=4):

@@ -10,7 +10,7 @@ from pathlib import Path
 
 from fontTools.ttLib import TTFont
 
-from . import compose, fixes
+from . import compose, dashboard, export, fixes
 from . import fetch as fetching
 from .checks import FAILURES, mark_indistinct, run_case
 from .gates import DRAFT_TARGETS, gate_glyph, measure
@@ -78,6 +78,13 @@ def main(argv: list[str] | None = None) -> int:
         help="hex codepoints, from: " + " ".join(f"{cp:04X}" for cp in DRAFT_TARGETS),
     )
 
+    e = sub.add_parser("export", help="write the test strings for FontBakery and Shaperglot")
+    e.add_argument("--out", type=Path, default=HERE / "exports")
+
+    d = sub.add_parser("dashboard", help="build the static coverage page from the results")
+    d.add_argument("--results", type=Path, default=HERE / "results")
+    d.add_argument("--out", type=Path, default=HERE / "results" / "dashboard")
+
     sub.add_parser("cases", help="print the test strings as CSV").add_argument(
         "--out", type=Path, default=Path("/dev/stdout")
     )
@@ -90,6 +97,8 @@ def main(argv: list[str] | None = None) -> int:
         "fix": cmd_fix,
         "measure": cmd_measure,
         "gate": cmd_gate,
+        "export": cmd_export,
+        "dashboard": cmd_dashboard,
         "cases": cmd_cases,
     }[args.cmd](args)
 
@@ -217,6 +226,31 @@ def cmd_gate(args) -> int:
             verdict = "pass" if result.passed else "FAIL"
             print(f"U+{cp:04X} {result.name}: {verdict}: {result.detail}")
     return 1 if failed else 0
+
+
+def cmd_export(args) -> int:
+    cases = all_cases()
+    bakery = args.out / "fontbakery"
+    bakery.mkdir(parents=True, exist_ok=True)
+    common = [c for c in cases if c.group != "rare"]
+    rare = [c for c in cases if c.group == "rare"]
+    for name, data in (
+        ("kannada-fontqa-forbidden.json", export.fontbakery_forbidden(common)),
+        ("kannada-fontqa-forbidden-rare.json", export.fontbakery_forbidden(rare)),
+        ("kannada-fontqa-collisions.json", export.fontbakery_collisions(cases)),
+    ):
+        (bakery / name).write_text(json.dumps(data, ensure_ascii=False, indent=1) + "\n")
+    (bakery / "fontbakery.yml").write_text("shaping:\n  test_directory: .\n")
+    glot = args.out / "shaperglot"
+    glot.mkdir(parents=True, exist_ok=True)
+    (glot / "kn_Knda.toml").write_text(export.shaperglot_checks(cases))
+    print(f"wrote {bakery} and {glot}")
+    return 0
+
+
+def cmd_dashboard(args) -> int:
+    print(f"wrote {dashboard.build(args.results, args.out)}")
+    return 0
 
 
 def cmd_cases(args) -> int:
