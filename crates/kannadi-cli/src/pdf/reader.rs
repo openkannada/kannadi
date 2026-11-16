@@ -43,14 +43,16 @@ pub struct Page {
     pub lost: usize,
 }
 
+/// Reads 1 page whose content streams decompress to at most `limit` bytes.
 pub fn read_page(
     doc: &Document,
     page: lopdf::ObjectId,
     fonts: &mut Fonts,
     settings: &Settings,
+    limit: usize,
 ) -> Result<Page> {
     let content = doc
-        .get_page_content_with_limit(page, LIMIT)
+        .get_page_content_with_limit(page, limit)
         .context("reading the page")?;
     let (inline, inherited) = doc.get_page_resources(page).unwrap_or_default();
     let mut resources: Vec<&Dictionary> = inline.into_iter().collect();

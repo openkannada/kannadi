@@ -18,9 +18,17 @@ use lopdf::Document;
 use crate::convert::{convert, Direction, Issue, Kind, Settings};
 use crate::report::{Report, Row};
 use fonts::{Fonts, Source, Verdict};
-use reader::{read_page, Piece};
+use reader::{read_page, Piece, LIMIT};
 
 pub fn convert_file(bytes: &[u8], settings: &Settings) -> Result<(Vec<u8>, Report)> {
+    convert_with_limit(bytes, settings, LIMIT)
+}
+
+fn convert_with_limit(
+    bytes: &[u8],
+    settings: &Settings,
+    page_limit: usize,
+) -> Result<(Vec<u8>, Report)> {
     let Direction::ToUnicode(options) = settings.direction else {
         bail!("PDF files can only be converted to Unicode");
     };
@@ -29,7 +37,7 @@ pub fn convert_file(bytes: &[u8], settings: &Settings) -> Result<(Vec<u8>, Repor
     let mut report = Report::default();
     let mut pages = Vec::new();
     for (number, id) in doc.get_pages() {
-        match read_page(&doc, id, &mut fonts, settings) {
+        match read_page(&doc, id, &mut fonts, settings, page_limit) {
             Ok(page) => {
                 if page.lost > 0 {
                     report.rows.push(not_converted(
@@ -433,6 +441,42 @@ endcmap\nCMapName currentdict /CMap defineresource pop\nend\nend\n";
         let content = b"BT 72 700 Td (lost) Tj /Missing 12 Tf (also lost) Tj ET";
         let (text, report) = run(&pdf(vec![("F1", simple_font("Arial"))], content));
         assert_eq!(text, "\n");
+        assert_eq!(report.rows[0].location, "page 1");
+        assert_eq!(report.rows[0].kind, Kind::NotConverted);
+    }
+
+    #[test]
+    fn a_page_that_cannot_be_read_is_reported_and_the_rest_converted() {
+        let mut doc = Document::with_version("1.5");
+        let font = doc.add_object(simple_font("BRHKannada"));
+        let pages = doc.new_object_id();
+        let broken = doc.add_object(Stream::new(dictionary! {}, vec![b' '; 100]));
+        let fine = doc.add_object(Stream::new(
+            dictionary! {},
+            b"BT /F1 12 Tf 72 700 Td (P\xC0) Tj ET".to_vec(),
+        ));
+        let kids: Vec<Object> = [broken, fine]
+            .into_iter()
+            .map(|contents| {
+                doc.add_object(dictionary! {
+                    "Type" => "Page", "Parent" => pages, "Contents" => contents,
+                    "Resources" => dictionary! { "Font" => dictionary! { "F1" => font } },
+                })
+                .into()
+            })
+            .collect();
+        doc.objects.insert(
+            pages,
+            Object::Dictionary(dictionary! { "Type" => "Pages", "Kids" => kids, "Count" => 2 }),
+        );
+        let catalog = doc.add_object(dictionary! { "Type" => "Catalog", "Pages" => pages });
+        doc.trailer.set("Root", catalog);
+        let mut bytes = Vec::new();
+        doc.save_to(&mut bytes).unwrap();
+        let settings = Settings::new(Direction::ToUnicode(Options::default()));
+        let (text, report) = convert_with_limit(&bytes, &settings, 50).unwrap();
+        assert_eq!(String::from_utf8(text).unwrap(), "\u{c}ಕ\n");
+        assert_eq!(report.rows.len(), 1, "{:?}", report.rows);
         assert_eq!(report.rows[0].location, "page 1");
         assert_eq!(report.rows[0].kind, Kind::NotConverted);
     }
