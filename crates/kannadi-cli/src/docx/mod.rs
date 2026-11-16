@@ -310,14 +310,45 @@ mod tests {
 
     #[test]
     fn text_box_fallback_copies_are_converted_but_not_reported_twice() {
-        let box_text = format!("<w:p><w:r><w:rPr>{NUDI}</w:rPr><w:t>P</w:t></w:r></w:p>");
-        let body = format!(
-            "<w:p><w:r><mc:AlternateContent><mc:Choice><w:txbxContent>{box_text}</w:txbxContent></mc:Choice>\
-             <mc:Fallback><w:txbxContent>{box_text}</w:txbxContent></mc:Fallback></mc:AlternateContent></w:r></w:p>"
-        );
-        let (_, report) = run(&docx(&body, None), to_unicode());
+        let box_text = |text: &str| {
+            format!("<w:txbxContent><w:p><w:r><w:rPr>{NUDI}</w:rPr><w:t>{text}</w:t></w:r></w:p></w:txbxContent>")
+        };
+        let text_box = |choice: &str, fallback: &str| {
+            format!(
+                "<w:p><w:r><mc:AlternateContent><mc:Choice>{}</mc:Choice>\
+                 <mc:Fallback>{}</mc:Fallback></mc:AlternateContent></w:r></w:p>",
+                box_text(choice),
+                box_text(fallback)
+            )
+        };
+        let (_, report) = run(&docx(&text_box("P", "P"), None), to_unicode());
         assert_eq!(report.rows.len(), 1, "{:?}", report.rows);
         assert_eq!(report.rows[0].location, "word/document.xml, paragraph 2");
+        let (_, report) = run(&docx(&text_box("PÀ", "PÀ\u{F1}"), None), to_unicode());
+        assert_eq!(report.rows.len(), 1, "{:?}", report.rows);
+        assert_eq!(report.rows[0].kind, Kind::UnknownGlyph);
+    }
+
+    #[test]
+    fn text_never_moves_across_revisions_or_branches() {
+        let body = format!(
+            "<w:p><w:r><w:rPr>{NUDI}</w:rPr><w:t>PÀ</w:t></w:r>\
+             <w:del w:id=\"1\"><w:r><w:rPr>{NUDI}</w:rPr><w:delText>A</w:delText></w:r></w:del></w:p>"
+        );
+        let (xml, _) = run(&docx(&body, None), to_unicode());
+        assert!(xml.contains(">ಕ</w:t>"), "{xml}");
+        assert!(xml.contains(">ಂ</w:delText>"), "{xml}");
+
+        let branch = |text: &str| format!("<w:r><w:rPr>{NUDI}</w:rPr><w:t>{text}</w:t></w:r>");
+        let body = format!(
+            "<w:p><mc:AlternateContent><mc:Choice>{}</mc:Choice><mc:Fallback>{}</mc:Fallback></mc:AlternateContent></w:p>",
+            branch("PÀ"),
+            branch("PÀ\u{F1}")
+        );
+        let (xml, report) = run(&docx(&body, None), to_unicode());
+        assert_eq!(xml.matches(">ಕ").count(), 2, "{xml}");
+        assert_eq!(report.rows.len(), 1, "{:?}", report.rows);
+        assert_eq!(report.rows[0].kind, Kind::UnknownGlyph);
     }
 
     #[test]

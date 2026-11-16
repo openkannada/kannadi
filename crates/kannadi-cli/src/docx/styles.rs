@@ -35,6 +35,15 @@ impl Styles {
         loop {
             match reader.read_event()? {
                 Event::Eof => break,
+                Event::Empty(e) if e.name().as_ref() == "w:style" => {
+                    let id = attr(&e, "w:styleId").unwrap_or_default();
+                    let paragraph = attr(&e, "w:type").as_deref() == Some("paragraph");
+                    let default = attr(&e, "w:default");
+                    if paragraph && matches!(default.as_deref(), Some("1" | "true" | "on")) {
+                        styles.default_paragraph = Some(id.clone());
+                    }
+                    styles.styles.insert(id, Style::default());
+                }
                 Event::Start(e) | Event::Empty(e) => match e.name().as_ref() {
                     "w:docDefaults" => in_defaults = true,
                     "w:style" => {
@@ -139,6 +148,7 @@ mod tests {
         <w:style w:type="paragraph" w:styleId="Heading1"><w:basedOn w:val="Normal"/></w:style>
         <w:style w:type="paragraph" w:styleId="English"><w:basedOn w:val="Normal"/><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/></w:rPr></w:style>
         <w:style w:type="character" w:styleId="Loop"><w:basedOn w:val="Loop"/></w:style>
+        <w:style w:type="paragraph" w:styleId="Plain"/>
     </w:styles>"#;
 
     #[test]
@@ -169,6 +179,7 @@ mod tests {
         assert_eq!(styles.paragraph(None), Some(true));
         assert_eq!(styles.paragraph(Some("Gone")), Some(true));
         assert_eq!(styles.paragraph(Some("English")), Some(false));
+        assert_eq!(styles.paragraph(Some("Plain")), None);
         assert_eq!(styles.document_default(), Some(false));
     }
 }

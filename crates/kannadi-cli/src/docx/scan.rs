@@ -31,6 +31,9 @@ pub struct Run {
     pub pieces: Vec<Piece>,
     /// How many elements enclose the `w:r`.
     depth: usize,
+    /// Where the innermost tracked change or alternative-content branch around
+    /// the run starts. Text never moves between runs with different contexts.
+    pub context: Option<usize>,
 }
 
 /// An element in a run's properties, with its attributes as written.
@@ -73,8 +76,21 @@ pub enum Piece {
     Break,
 }
 
+/// Elements that hold 1 version of some text: a tracked change, or a branch of
+/// alternative content.
+const CONTEXTS: [&str; 6] = [
+    "w:ins",
+    "w:del",
+    "w:moveTo",
+    "w:moveFrom",
+    "mc:Choice",
+    "mc:Fallback",
+];
+
 /// Elements whose children can be runs.
-const RUN_PARENTS: [&str; 12] = [
+const RUN_PARENTS: [&str; 14] = [
+    "mc:Choice",
+    "mc:Fallback",
     "w:p",
     "w:hyperlink",
     "w:ins",
@@ -100,6 +116,7 @@ pub fn scan(source: &str, fonts: &Fonts) -> Result<Vec<Paragraph>> {
         count: 0,
         fallback: 0,
         text: None,
+        contexts: Vec::new(),
     };
     let mut reader = Reader::from_str(source);
     loop {
@@ -138,6 +155,8 @@ struct Scanner<'f> {
     fallback: usize,
     /// The open `w:t`: its name, its start tag and where its content starts.
     text: Option<(&'static str, Range<usize>, usize)>,
+    /// Open elements from [`CONTEXTS`]: their depth and start.
+    contexts: Vec<(usize, usize)>,
 }
 
 impl Scanner<'_> {
@@ -171,7 +190,11 @@ impl Scanner<'_> {
             span: span.clone(),
             attributes: e.attributes_raw().to_string(),
         };
-        match e.name().as_ref() {
+        let name = e.name().as_ref().to_string();
+        if !empty && CONTEXTS.contains(&name.as_str()) {
+            self.contexts.push((self.names.len(), span.start));
+        }
+        match name.as_str() {
             "mc:Fallback" if !empty => self.fallback += 1,
             "w:p" => {
                 let reported = self.fallback == 0;
@@ -191,9 +214,11 @@ impl Scanner<'_> {
             }
             "w:r" if self.parent().is_some_and(|p| RUN_PARENTS.contains(&p)) => {
                 let depth = self.names.len();
+                let context = self.contexts.last().map(|&(_, start)| start);
                 self.runs.push(Run {
                     content_start: span.end,
                     depth,
+                    context,
                     ..Run::default()
                 });
             }
@@ -248,6 +273,10 @@ impl Scanner<'_> {
 
     /// Ends the element named `name`, whose end tag runs from `start` to `end`.
     fn close(&mut self, name: &str, start: usize, end: usize) {
+        let depth = self.names.len();
+        if start != end && self.contexts.last().is_some_and(|&(d, _)| d == depth) {
+            self.contexts.pop();
+        }
         match name {
             "mc:Fallback" if start != end => self.fallback = self.fallback.saturating_sub(1),
             "w:t" | "w:delText" => {

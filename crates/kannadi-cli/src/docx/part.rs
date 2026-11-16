@@ -30,6 +30,7 @@ pub fn convert_part(
     };
     let to_unicode = matches!(settings.direction, Direction::ToUnicode(_));
     let mut edits = Vec::new();
+    let mut fallback_rows = Vec::new();
     for paragraph in &scan(source, &settings.fonts)? {
         let legacy: Vec<bool> = paragraph
             .runs
@@ -53,6 +54,8 @@ pub fn convert_part(
         }
         if paragraph.reported {
             rows.extend(paragraph_rows);
+        } else {
+            fallback_rows.extend(paragraph_rows);
         }
         if to_unicode {
             let runs = paragraph.runs.iter().zip(&converted).filter(|(_, &c)| c);
@@ -66,6 +69,13 @@ pub fn convert_part(
             }
         }
     }
+    let same =
+        |a: &Row, b: &Row| a.kind == b.kind && a.detail == b.detail && a.context == b.context;
+    let only_in_fallback: Vec<Row> = fallback_rows
+        .into_iter()
+        .filter(|f| !rows.iter().any(|r| same(r, f)))
+        .collect();
+    rows.extend(only_in_fallback);
     if edits.is_empty() {
         return Ok(None);
     }
@@ -76,13 +86,18 @@ pub fn convert_part(
 }
 
 /// Runs of consecutive text pieces whose runs are `wanted` legacy or not, split at
-/// tabs, breaks and runs of the other kind. Each item is (run index, piece index).
+/// tabs, breaks, runs of the other kind, and the edges of tracked changes and
+/// alternative content. Each item is (run index, piece index).
 fn groups(paragraph: &Paragraph, legacy: &[bool], wanted: bool) -> Vec<Vec<(usize, usize)>> {
     let mut groups = Vec::new();
     let mut current = Vec::new();
+    let mut context = None;
     for (r, run) in paragraph.runs.iter().enumerate() {
-        if legacy[r] != wanted {
+        if legacy[r] != wanted || run.context != context {
             groups.push(std::mem::take(&mut current));
+            context = run.context;
+        }
+        if legacy[r] != wanted {
             continue;
         }
         for (p, piece) in run.pieces.iter().enumerate() {
