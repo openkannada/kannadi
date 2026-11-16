@@ -82,7 +82,7 @@ The consonant shape is a letter glyph that already carries the sign (ಕಿ, ಮ
 
 | Format | How legacy text is found | Notes |
 |---|---|---|
-| TXT | The user names the font family, such as `--from nudi` | Detection may come later: score the share of characters in the glyph ranges. |
+| TXT | The whole file is read as legacy text in the layout the command names | Automatic detection is not done. |
 | HTML | `font-family` in styles, and `<font face>` | The font declaration is changed to a Unicode Kannada font. |
 | DOCX | Run properties `w:rFonts` | Only legacy-font runs change. Styles and layout stay. |
 
@@ -106,6 +106,6 @@ Nudi and Baraha ANSI share 1 layout, `Layout::Nudi`; `nudi_to_unicode` and `unic
 
 ## Open questions
 
-1. Which Nudi and Baraha font versions appear in real documents, and how much their layouts differ.
+1. Which other legacy layouts appear in real documents. So far, Nudi and Baraha ANSI fonts share 1 layout, and Akruti has its own.
 2. Whether Word 97 DOC files are common enough to read directly, or whether users should save as DOCX first.
 3. Whether TXT input needs automatic font detection in version 1.

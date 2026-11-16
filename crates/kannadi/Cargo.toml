@@ -1,6 +1,6 @@
 [package]
 name = "kannadi"
-description = "Kannada text tools: akshara segmentation, normalization, transliteration (ISO 15919, IAST, Baraha) and numerals, with Old Kannada support"
+description = "Convert Kannada text in legacy Nudi, Baraha and Akruti fonts to Unicode and back; akshara segmentation, normalization, transliteration and numerals"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
@@ -8,7 +8,8 @@ license.workspace = true
 repository.workspace = true
 authors.workspace = true
 readme = "../../README.md"
-keywords = ["kannada", "transliteration", "unicode", "indic", "akshara"]
+keywords = ["kannada", "nudi", "unicode", "transliteration", "indic"]
+exclude = ["tests/corpus.rs", "examples/corpus.rs"]
 categories = ["text-processing", "internationalization"]
 
 [dependencies]

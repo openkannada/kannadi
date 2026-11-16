@@ -55,6 +55,8 @@ jobs:
       - uses: actions/checkout@v7
       - uses: dtolnay/rust-toolchain@1.75
       - run: cargo check -p kannadi --lib --locked
+      - uses: dtolnay/rust-toolchain@1.88
+      - run: cargo +1.88 check -p kannadi-cli --locked
 
   wasm-and-page:
     runs-on: ubuntu-latest
