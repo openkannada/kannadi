@@ -8,7 +8,7 @@ use crate::akshara::{aksharas, Akshara, AksharaKind};
 use crate::chars::{class, Class, VIRAMA};
 use crate::numerals::to_ascii_digit;
 
-use super::table::{rows, source, Entry, Prefer};
+use super::table::{file_name, rows, Entry, Prefer};
 use super::{is_passthrough, unaspirated, windows_1252_byte, Layout};
 
 /// A character [`from_unicode`] could not encode.
@@ -51,10 +51,10 @@ impl Encoding {
 ///
 /// When the result [`is_clean`](Encoding::is_clean),
 /// [`to_unicode`](super::to_unicode) gives back the NFC form of the input.
-/// Kannada digits are written as ASCII digits, which the `k` variants of the Nudi
-/// fonts draw as Kannada digits. A digit zero written between 2 letters reads back
-/// as ಂ unless [`Options::zero_as_anusvara`](super::Options::zero_as_anusvara) is
-/// off.
+/// Kannada digits are written with the layout's glyphs for them. A layout with
+/// none, such as Nudi, gets ASCII digits, which the `k` variants of the Nudi fonts
+/// draw as Kannada digits. A digit zero written between 2 letters reads back as ಂ
+/// unless [`Options::zero_as_anusvara`](super::Options::zero_as_anusvara) is off.
 ///
 /// ```
 /// use kannadi::legacy::{from_unicode, Layout};
@@ -150,71 +150,76 @@ struct Glyphs {
     aspirate: Vec<Choice>,
     mods: HashMap<char, String>,
     literals: HashMap<char, String>,
+    /// The layout has glyphs for Kannada digits, so ASCII digits would show as
+    /// Latin digits.
+    kannada_digits: bool,
     /// First characters of all glyph codes; anything else passes through decoding.
     key_starts: HashSet<char>,
 }
 
 fn glyphs(layout: Layout) -> &'static Glyphs {
-    static GLYPHS: [OnceLock<Glyphs>; Layout::ALL.len()] = [OnceLock::new(), OnceLock::new()];
-    GLYPHS[layout.index()].get_or_init(|| {
-        let file = source(layout).0;
-        let mut g = Glyphs::default();
-        for row in rows(layout) {
-            if is_read_only(&row.key) {
-                continue;
-            }
-            g.key_starts.extend(row.key.chars().next());
-            let choice = Choice {
-                key: row.key,
-                prefer: row.prefer,
-            };
-            let choosable = matches!(
-                row.entry,
-                Entry::Sign(ref s) if !s.is_empty()
-            ) || matches!(
-                row.entry,
-                Entry::Virama | Entry::Ottu(_) | Entry::Arka | Entry::Aspirate
-            );
-            assert!(
-                choosable || choice.prefer == Prefer::Otherwise,
-                "{file}: a preference on {:?} has no effect",
-                row.entry
-            );
-            match row.entry {
-                Entry::Letter(l) => {
-                    g.letters.entry(l.nfd().collect()).or_insert(choice.key);
-                }
-                Entry::Base(b) => {
-                    let c = single(&b, file);
-                    g.bases.entry(c).or_insert(choice.key);
-                }
-                Entry::Sign(s) if s.is_empty() => {
-                    if g.head_stroke.is_empty() {
-                        g.head_stroke = choice.key;
-                    }
-                }
-                Entry::Sign(s) => g.signs.entry(single(&s, file)).or_default().push(choice),
-                Entry::Virama => g.signs.entry(VIRAMA).or_default().push(choice),
-                Entry::Ottu(c) => g.ottus.entry(c).or_default().push(choice),
-                Entry::Arka => g.arka.push(choice),
-                Entry::Aspirate => g.aspirate.push(choice),
-                Entry::Mod(m) => {
-                    g.mods.entry(m).or_insert(choice.key);
-                }
-                Entry::Literal(l) => {
-                    g.literals.entry(single(&l, file)).or_insert(choice.key);
-                }
-                Entry::Subscripts(_) | Entry::Ignore => {}
-            }
-        }
-        g
-    })
+    static GLYPHS: OnceLock<Vec<Glyphs>> = OnceLock::new();
+    let all = GLYPHS.get_or_init(|| Layout::ALL.iter().map(|&l| build(l)).collect());
+    &all[layout.index()]
 }
 
-/// A glyph sequence that starts with a space, such as a sign typed after a space,
-/// is a way of typing that is read but never written.
-fn is_read_only(key: &str) -> bool {
-    key.len() > 1 && key.starts_with(' ')
+/// Indexes a layout's table by meaning.
+fn build(layout: Layout) -> Glyphs {
+    let file = file_name(layout);
+    let mut g = Glyphs::default();
+    for row in rows(layout) {
+        if row.prefer == Prefer::Read {
+            continue;
+        }
+        g.key_starts.extend(row.key.chars().next());
+        let choice = Choice {
+            key: row.key,
+            prefer: row.prefer,
+        };
+        let choosable = matches!(
+            row.entry,
+            Entry::Sign(ref s) if !s.is_empty()
+        ) || matches!(
+            row.entry,
+            Entry::Virama | Entry::Ottu(..) | Entry::Arka | Entry::Aspirate
+        );
+        assert!(
+            choosable || choice.prefer == Prefer::Otherwise,
+            "{file}: a preference on {:?} has no effect",
+            row.entry
+        );
+        match row.entry {
+            Entry::Letter(l) => {
+                g.letters.entry(l.nfd().collect()).or_insert(choice.key);
+            }
+            Entry::Base(b) => {
+                let c = single(&b, file);
+                g.bases.entry(c).or_insert(choice.key);
+            }
+            Entry::Sign(s) if s.is_empty() => {
+                if g.head_stroke.is_empty() {
+                    g.head_stroke = choice.key;
+                }
+            }
+            Entry::Sign(s) => g.signs.entry(single(&s, file)).or_default().push(choice),
+            Entry::Virama => g.signs.entry(VIRAMA).or_default().push(choice),
+            Entry::Ottu(consonants, None) if consonants.len() == 1 => {
+                g.ottus.entry(consonants[0]).or_default().push(choice);
+            }
+            Entry::Arka => g.arka.push(choice),
+            Entry::Aspirate => g.aspirate.push(choice),
+            Entry::Mod(m) => {
+                g.mods.entry(m).or_insert(choice.key);
+            }
+            Entry::Literal(l) => {
+                let c = single(&l, file);
+                g.kannada_digits |= class(c) == Class::Digit && !c.is_ascii();
+                g.literals.entry(c).or_insert(choice.key);
+            }
+            Entry::Ottu(..) | Entry::Ignore => {}
+        }
+    }
+    g
 }
 
 fn single(value: &str, file: &str) -> char {
@@ -239,7 +244,7 @@ struct Context<'a> {
 /// The glyph to write: the first whose preference holds, or else the first with none.
 fn choose<'a>(choices: &'a [Choice], context: &Context) -> Option<&'a str> {
     let holds = |p: &Prefer| match p {
-        Prefer::Otherwise => false,
+        Prefer::Otherwise | Prefer::Read => false,
         Prefer::On(cs) => context.consonant.is_some_and(|c| cs.contains(c)),
         Prefer::With(cs) => context.signs.iter().any(|&s| cs.contains(s)),
         Prefer::AfterOttu => context.after_ottu,
@@ -331,7 +336,7 @@ impl Writer<'_> {
         let unwritable: Vec<usize> = before[used..]
             .iter()
             .chain(&after)
-            .filter(|&&(_, c)| choose_sign(self.glyphs, c, &context).is_none())
+            .filter(|&&(_, c)| !self.glyphs.signs.contains_key(&c))
             .map(|&(i, _)| i)
             .collect();
         let mut reported = Vec::new();
@@ -426,7 +431,11 @@ impl Writer<'_> {
             after_ottu: false,
         };
         match class(c) {
-            Class::Digit => self.out.push(to_ascii_digit(c)),
+            Class::Digit => match g.literals.get(&c) {
+                Some(key) => self.out.push_str(key),
+                None if g.kannada_digits => self.unencodable(offset, c),
+                None => self.out.push(to_ascii_digit(c)),
+            },
             Class::Vowel => {
                 let key = g.letters.get(&c.nfd().collect::<String>());
                 self.write(key.map(String::as_str), offset, c);
@@ -696,5 +705,14 @@ mod tests {
             }]
         );
         assert_eq!(e.text, "qೀ");
+    }
+
+    #[test]
+    fn kannada_digits_use_the_layout_glyphs() {
+        assert_eq!(akruti("೧೨೯"), [0x81, 0x82, 0x89]);
+        let zero = from_unicode("೧೦", Layout::Akruti);
+        assert_eq!(zero.unencodable.len(), 1);
+        assert_eq!(zero.unencodable[0].character, '೦');
+        assert_eq!(encode("೧೦"), [0x31, 0x30]);
     }
 }

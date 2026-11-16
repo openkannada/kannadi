@@ -12,7 +12,7 @@ Status: checked on 16 November 2026. Akruti is built: see [akruti.md](akruti.md)
 ## Rules for this work
 
 - Do not download Shree-Lipi or Akruti font files from any source other than the vendor.
-- Fonts embedded in a public document may be rendered to identify which letter each code draws (the maintainer's decision, 16 November 2026). The fonts, their outlines and their files are never committed or redistributed; a table records only the code and the letter.
+- Fonts embedded in a public document may be rendered, and their glyph names and encodings read, to identify which letter each code draws (the maintainer's decision, 16 November 2026). The fonts, their outlines and their files are never committed or redistributed; a table records only the code and the letter.
 - Do not copy tables from other converters (see [prior-art.md](prior-art.md)).
 - Keep only short excerpts of source documents, with their URLs, as for the Nudi fixtures.
 

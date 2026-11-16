@@ -1,7 +1,4 @@
-use kannadi::legacy::{
-    decode_windows_1252, from_unicode, nudi_to_unicode, to_unicode, unicode_to_nudi, Layout,
-    Options,
-};
+use kannadi::legacy::{decode_windows_1252, from_unicode, to_unicode, Layout, Options};
 
 /// The golden fixture of each layout, with the fewest rows it must have.
 const FIXTURES: [(Layout, &str, usize); 2] = [
@@ -62,31 +59,33 @@ fn document_words_round_trip() {
 /// digit zero are skipped: typists used 0 for ಂ, which the encoder writes as ಂ.
 #[test]
 fn government_pages_encode_as_typed() {
-    let rows = include_str!("fixtures/nudi.tsv")
-        .lines()
-        .filter(|l| !l.is_empty() && !l.starts_with('#'));
-    let mut count = 0;
-    for row in rows {
-        let bytes: Vec<u8> = row
-            .split('\t')
-            .next()
-            .unwrap()
-            .split_whitespace()
-            .map(|h| u8::from_str_radix(h, 16).unwrap())
-            .collect();
-        for typed in decode_windows_1252(&bytes).split(' ') {
-            let unicode = nudi_to_unicode(typed, &Options::default());
-            if typed.contains('0') || !unicode.is_clean() {
+    let (same, total) = typed_back(Layout::Nudi);
+    assert_eq!(same, total);
+    assert!(total >= 80);
+}
+
+/// Akruti typists stored some letters in more than 1 way, such as the arkavattu
+/// before or after ೕ, so most fixture words, not all, encode as typed.
+#[test]
+fn most_akruti_words_encode_as_typed() {
+    let (same, total) = typed_back(Layout::Akruti);
+    assert!(total >= 500, "{total}");
+    assert!(same * 100 >= total * 95, "{same} of {total}");
+}
+
+/// How many clean fixture words encode back to the bytes typed, of how many.
+fn typed_back(layout: Layout) -> (usize, usize) {
+    let fixture = FIXTURES.iter().find(|f| f.0 == layout).unwrap().1;
+    let (mut same, mut total) = (0, 0);
+    for (legacy, _, _) in rows(fixture) {
+        for typed in legacy.split(' ') {
+            let unicode = to_unicode(typed, layout, &Options::default());
+            if typed.is_empty() || typed.contains('0') || !unicode.is_clean() {
                 continue;
             }
-            assert_eq!(
-                unicode_to_nudi(&unicode.text).text,
-                typed,
-                "{}",
-                unicode.text
-            );
-            count += 1;
+            total += 1;
+            same += usize::from(from_unicode(&unicode.text, layout).text == typed);
         }
     }
-    assert!(count >= 80);
+    (same, total)
 }

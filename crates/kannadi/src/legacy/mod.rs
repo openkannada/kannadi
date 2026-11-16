@@ -28,6 +28,7 @@ use std::str::FromStr;
 
 /// A legacy font glyph layout: which glyph each code draws.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum Layout {
     /// Nudi 01 e to Nudi 05, Nudi Akshara and Baraha's BRH fonts for Kannada.
     Nudi,
@@ -82,11 +83,13 @@ impl FromStr for Layout {
 
     /// Reads a layout name, ignoring case. `baraha` is the Nudi layout.
     fn from_str(name: &str) -> Result<Self, Self::Err> {
-        match name.to_ascii_lowercase().as_str() {
-            "nudi" | "baraha" => Ok(Layout::Nudi),
-            "akruti" => Ok(Layout::Akruti),
-            _ => Err(UnknownLayout(name.to_string())),
+        if name.eq_ignore_ascii_case("baraha") {
+            return Ok(Layout::Nudi);
         }
+        Layout::ALL
+            .into_iter()
+            .find(|l| l.name().eq_ignore_ascii_case(name))
+            .ok_or_else(|| UnknownLayout(name.to_string()))
     }
 }
 

@@ -1,8 +1,7 @@
 # Akruti Kannada glyph table: AkrutiKndPadma and its Bold, Demi and Demib weights,
 # which share 1 layout.
 #
-# Same format and kinds as nudi.tsv; codes are Windows-1252 bytes. An ottu row with
-# several consonants is 1 glyph that draws them all, and may end in a vowel sign.
+# The format is described in src/legacy/table.rs. Codes are Windows-1252 bytes.
 #
 # Derived from documents, as no code page is published. The glyphs were rendered
 # from the Akruti fonts embedded in public Karnataka PDFs: the full
@@ -119,8 +118,8 @@ DE	letter	ಶ್ರೀ
 6E B3	letter	ೠ
 C0 C3	base	ಮ
 CC C3	base	ಯ
-C6 B3	letter	ಮೀ
-CE B3	letter	ಯೀ
+C6 B3	letter	ಮೀ	read
+CE B3	letter	ಯೀ	read
 # Vowel signs. E2 is the head stroke for the inherent a.
 E2	sign
 D6	sign	ಾ
@@ -133,13 +132,15 @@ EA	sign	ೆ
 A9	sign	ೕ
 F4	sign	ೖ
 F1	sign	ೌ
-# Typists often put a space before ೃ, ೖ and the subscript ಯ, which draw under the
-# glyph before them. The space is not text.
-20 BD	sign	ೃ
-20 F4	sign	ೖ
-20 58	ottu	ಯ
+# Typists often put a space (20, or the no-break space A0) before ೃ, ೖ and the
+# subscript ಯ, which draw under the glyph before them. After a syllable, the space
+# is not text.
+20 BD	sign	ೃ	read
+20 F4	sign	ೖ	read
+20 58	ottu	ಯ	read
+A0 58	ottu	ಯ	read
 # ೆ with the ೃ glyph under it reads as ೈ: ವೆೃರ್ is typed for ವೈರ್.
-EA BD	sign	ೈ
+EA BD	sign	ೈ	read
 D2	sign	್
 # Modifiers
 AA	mod	ಂ
@@ -196,10 +197,10 @@ CB	arka
 2D	ignore
 3C	ignore
 3E	ignore
-A0	ignore
 A4	ignore
 F7	ignore
-# Punctuation and digits
+# Punctuation, digits and the no-break space
+A0	literal	 
 27	literal	’
 60	literal	‘
 A5	literal	-

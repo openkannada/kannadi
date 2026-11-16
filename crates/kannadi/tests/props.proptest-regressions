@@ -10,3 +10,4 @@ cc 7845d0147036e1b48d815725e7de0a1574f58887efc3283f7a43f72177fc44d0 # shrinks to
 cc bac5211bfd81a43c14df2e6b034620048af6c5a549748bf13eca90bb74ef203e # shrinks to s = "ಝ\u{cc0}"
 cc 13b0529dd0a7e1a101f7307bdc7dcd375a6e920c46423787341011552c50fdb1 # shrinks to words = ["ಞ\u{ccd}ಕ\u{cbf}"]
 cc 9ffc3fb470f0a5e3e3d20e8729e349fb7e3514787373dc6fb3bc21ace1f560dc # shrinks to s = "’’"
+cc 808ef6ca766879022cd1729141856bb8577b6a7a8c9c42fbf72074c8db24e72b # shrinks to words = ["ರ\u{ccd}ಝ"]

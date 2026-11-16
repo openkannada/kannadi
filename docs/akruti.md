@@ -6,7 +6,7 @@ Status: `Layout::Akruti` converts text in AkrutiKndPadma and its Bold, Demi and 
 
 Akruti stores Kannada the way Nudi does: a consonant shape, then the head stroke or a vowel sign, then subscripts, then the arkavattu. The codes are different. The head stroke is E2, ಾ is D6, ೆ is EA, the length mark ೕ is A9, the virama is D2 and the arkavattu is CB. ಮ is ವ plus a tail (C0 E2 B0), and ಯ is a base of its own with the same tail. A few glyphs draw 2 subscripts at once, such as ್ಟ್ರ (E5), or a subscript with its vowel sign, such as ್ಕೃ (AF).
 
-Typists often put a space before ೃ, ೖ and the subscript ಯ, which draw under the glyph before them: ಸಂಸ್ಕ ೃತಿ. The table reads a space followed by one of these as part of the syllable before it. They also typed ೆ followed by ೃ for ೈ (ವೆೃರ್ for ವೈರ್), which looks the same on the page; the table reads it as ೈ.
+Typists often put a space, or the no-break space A0, before ೃ, ೖ and the subscript ಯ, which draw under the glyph before them: ಸಂಸ್ಕ ೃತಿ. After a syllable, the table reads the space and the sign as part of that syllable. With no syllable before it, the space is kept and the sign is reported. They also typed ೆ followed by ೃ for ೈ (ವೆೃರ್ for ವೈರ್), which looks the same on the page; the table reads it as ೈ.
 
 ## Sources
 
@@ -32,21 +32,21 @@ Glyphs the fonts have but no document used are left out of the table. They are l
 | Documents with Akruti text | 34: 33 Acts and Ordinances of 2001 to 2003, and the 2002 budget highlights |
 | Text lines and glyphs | 14,999 lines, 807,491 glyphs |
 | Unknown glyphs | 5 |
-| Malformed syllables | 17 |
+| Malformed syllables | 19 |
 | Fixture lines read against the page image | 125 lines from 5 documents, all equal |
-| Words that encode back to the bytes typed | 82,885 of 83,816 (98.9%) |
+| Words that encode back to the bytes typed | 82,910 of 83,813 (98.9%) |
 
 By font, over the same text:
 
 | Font | Documents | Glyphs | Unknown | Malformed |
 |---|---|---|---|---|
-| AkrutiKndPadmaDemi | 34 | 766,835 | 5 | 17 |
+| AkrutiKndPadmaDemi | 34 | 766,835 | 5 | 20 |
 | AkrutiKndPadmaBold | 31 | 23,849 | 0 | 0 |
 | AkrutiKndPadmaDemib | 11 | 12,546 | 0 | 0 |
 | AkrutiKndPadmaDemii | 23 | 4,176 | 0 | 0 |
 | AkrutiKndPadmaBoldi | 6 | 84 | 0 | 0 |
 
-Unknown and malformed counts are per line of text as the PDF draws it. A space the page leaves by moving the text, with no space character, is counted as a space.
+Unknown and malformed counts are per line of text as the PDF draws it. By font, each font's text is converted on its own, so a syllable split between 2 weights counts in neither. A space the page leaves by moving the text, with no space character, is counted as a space.
 
 The remaining unknown glyphs and malformed syllables were read against the page. They are the source's own errors, such as a stray subscript, a doubled ಮ tail, a mahaprana mark on ಾ, ೃ typed for ೖ, ು typed before ೂ, and ೃ carried to the next line, or a syllable split by the PDF across 2 lines.
 
@@ -59,5 +59,7 @@ The fixture is [akruti.tsv](../crates/kannadi/tests/fixtures/akruti.tsv): 125 li
 - Unicode cannot tell an explicit virama from a conjunct without ZWNJ. ಆರ್ಡಿನೆನ್ಸ್ ಗಳ typed with a visible virama reads back as ಆರ್ಡಿನೆನ್ಸ್ಗಳ.
 - The encoder writes the arkavattu after the length mark ೕ; typists of these Acts stored it before. Both read back the same.
 - The encoder writes each subscript on its own; it does not use the glyphs that draw 2 at once.
-- Akruti has no glyphs for ಙ, ಝ, ಱ and ೞ, and none for ಞ with ಿ.
+- Akruti has no glyphs for ಙ, ಱ, ೞ, ಌ, ೡ, ೄ or ೦. ಝ has only a subscript, and ಞ has no form with ಿ. These are reported as unencodable.
+- Kannada digits ೧ to ೯ are written with Akruti's digit glyphs (81 to 89). ASCII digits in Akruti text are Latin digits on the page and read as ASCII.
+- ೆ typed with ೃ for ೈ is read for consonants with a head stroke, as in ವೆೃರ್. The documents show no ಮೈ or ಯೈ typed that way, so those are not read.
 - Only AkrutiKndPadma was seen in documents. Other Akruti Kannada fonts may use other layouts.
