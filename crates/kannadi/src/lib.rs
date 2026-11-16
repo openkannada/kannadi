@@ -24,6 +24,7 @@ pub mod legacy;
 mod lookup;
 pub mod normalize;
 pub mod numerals;
+pub mod phonetic;
 pub mod translit;
 
 pub use akshara::{aksharas, count_aksharas, split, Akshara, AksharaKind, Aksharas};

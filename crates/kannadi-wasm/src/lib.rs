@@ -362,6 +362,28 @@ pub fn transliterate(text: &str, from: &str, to: &str) -> Result<String, JsError
     Ok(kannadi::transliterate(text, from, to))
 }
 
+/// The sound-alike key of a Kannada word at "narrow", "medium" or "broad" level.
+/// See [`kannadi::phonetic::key()`].
+///
+/// # Errors
+///
+/// Throws if the level is not recognized.
+#[wasm_bindgen(js_name = phoneticKey)]
+pub fn phonetic_key(word: &str, level: &str) -> Result<String, JsError> {
+    Ok(kannadi::phonetic::key(word, level.parse()?))
+}
+
+/// The key of a word typed in Latin letters, comparable with [`phonetic_key`] at the
+/// same level. See [`kannadi::phonetic::latin_key()`].
+///
+/// # Errors
+///
+/// Throws if the level is not recognized.
+#[wasm_bindgen(js_name = latinKey)]
+pub fn latin_key(text: &str, level: &str) -> Result<String, JsError> {
+    Ok(kannadi::phonetic::latin_key(text, level.parse()?))
+}
+
 /// Makes equal-looking Kannada text compare equal. See [`kannadi::normalize()`].
 #[wasm_bindgen]
 pub fn normalize(text: &str) -> String {
@@ -408,6 +430,14 @@ impl<'a> Utf16Cursor<'a> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn loose_latin_meets_the_kannada_word_at_medium_level() {
+        let word = phonetic_key("ನಮಸ್ಕಾರ", "medium").unwrap();
+        assert_eq!(latin_key("namaskara", "medium").unwrap(), word);
+        assert_eq!(latin_key("namaskAra", "medium").unwrap(), word);
+        assert_eq!(latin_key("neeru", "medium").unwrap(), phonetic_key("ನೀರು", "medium").unwrap());
+    }
 
     #[test]
     fn cursor_counts_utf16_units() {
