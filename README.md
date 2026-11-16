@@ -45,6 +45,7 @@ Version 0.1, in development.
 | Normalization and Old Kannada modernization | Done |
 | Transliteration: ISO 15919, IAST, Baraha phonetic | Done |
 | Kannada numerals | Done |
+| Sound-alike keys for fuzzy search and loose Latin typing | Done |
 | Nudi and Baraha to Unicode | Done, waiting on a native reader's check of 100 sample lines |
 | Unicode to Nudi and Baraha | Done |
 | Akruti to Unicode and back | Done in the library, the command-line tool and the editor page, checked on 908,075 glyphs from 35 documents; a Kannada reader's check of 125 lines is pending |
@@ -233,6 +234,7 @@ The crate is split into small modules, each with 1 job:
 | `akshara` | Splits text into aksharas |
 | `normalize` | Unicode NFC plus Kannada fixes; Old Kannada modernization |
 | `numerals` | Kannada digits: conversion, formatting, parsing |
+| `phonetic` | Sound-alike keys for Kannada words and loose Latin spellings |
 | `translit` | 1 engine that romanizes and parses, driven by a table per scheme |
 | `legacy` | Converts Nudi and Baraha glyph sequences to Unicode syllables and back, driven by the glyph table in `data/nudi.tsv` |
 

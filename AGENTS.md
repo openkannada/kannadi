@@ -35,6 +35,7 @@ crates/kannadi/
   src/akshara.rs      segmentation into aksharas (uses chars)
   src/normalize.rs    NFC plus Kannada fixes; Old Kannada modernization
   src/numerals.rs     Kannada digits: conversion, formatting, parsing
+  src/phonetic.rs     sound-alike keys for Kannada words and loose Latin spellings
   src/translit/       Kannada to and from ISO 15919, IAST, Baraha
     schemes.rs        the scheme tables, as data
     mod.rs            1 engine for all schemes: romanize and parse

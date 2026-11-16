@@ -6,6 +6,7 @@
 //! - [`transliterate()`]: Kannada to and from ISO 15919, IAST and Baraha phonetic.
 //! - [`numerals`]: Kannada digits.
 //! - [`legacy`]: legacy font text (Nudi, Baraha, Akruti) to and from Unicode.
+//! - [`phonetic`]: sound-alike keys for fuzzy search and loose Latin typing.
 //!
 //! ```
 //! use kannadi::{transliterate, Scheme};
@@ -24,6 +25,7 @@ pub mod legacy;
 mod lookup;
 pub mod normalize;
 pub mod numerals;
+pub mod phonetic;
 pub mod translit;
 
 pub use akshara::{aksharas, count_aksharas, split, Akshara, AksharaKind, Aksharas};
