@@ -22,7 +22,7 @@ Version 0.1, in development.
 | Unicode to Nudi and Baraha | Done |
 | Verified test corpus | Planned: [docs/corpus-plan.md](docs/corpus-plan.md) |
 | Editor page that runs in the browser, with no upload | Built, not deployed: [web/](web/) |
-| Command-line tool for TXT, HTML and DOCX | Planned |
+| Command-line tool for TXT, HTML and DOCX | TXT done; HTML and DOCX next |
 | Shaping tests for Kannada fonts, with results for 41 fonts | Done: [tools/fontqa](tools/fontqa) |
 
 ## Example
@@ -109,6 +109,22 @@ python3 web/serve.py 8000
 ```
 
 `web/dist` is a plain folder of static files that any static host can serve. `web/serve.py` is only for local testing: the standard `python3 -m http.server` drops some of the page's parallel requests. `node --test web/test/units.mjs` tests the page modules, and `node web/test/smoke.mjs` checks the built package.
+
+## Command-line tool
+
+The `kannadi` binary in `crates/kannadi-cli` converts files and folders in both directions:
+
+```sh
+cargo install --path crates/kannadi-cli
+kannadi to-unicode old-orders/ --out converted/
+kannadi to-nudi letter.txt --out for-printing/ --strict
+```
+
+- A file goes to `OUT/<file name>`. A folder goes to `OUT/<folder name>/`, with its subfolders kept. Hidden files, files already under `OUT`, and symbolic links to folders are skipped. The tool stops before writing anything if an output would overwrite any input or 2 inputs would share an output; paths are compared with links and `..` resolved, ignoring case.
+- Text files with a UTF-16 or UTF-8 byte order mark, or valid UTF-8, are read as such. Other legacy text files are read as Windows-1252. Unicode output is UTF-8. Nudi output is Windows-1252, with `?` for each character that has no glyph; those characters are in the report.
+- When a file has unknown glyphs, malformed syllables or unencodable characters, the tool writes `FILE.report.tsv` next to the output: the line, the problem, and up to 30 characters of Unicode text on each side. Rows are in line order. A clean run removes an old report.
+- `--strict` exits with status 1 if any file has a problem. Errors, such as an unreadable file or folder, exit with status 2; the other files are still converted.
+- `to-unicode` takes `--kannada-digits` and `--keep-zeros`, the same settings as `legacy::Options`.
 
 ## Segmentation
 
