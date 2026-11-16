@@ -362,68 +362,159 @@ fn read_page(
     fonts: &mut Fonts,
     settings: &Settings,
 ) -> Result<Vec<Line>> {
-    let resources = doc.get_page_fonts(page).unwrap_or_default();
     let content = doc
         .get_page_content_with_limit(page, LIMIT)
         .context("reading a page")?;
-    let content = Content::decode(&content).context("reading a page's content")?;
-    let mut page_fonts: HashMap<Vec<u8>, PageFont> = HashMap::new();
-    let mut lines: Vec<Line> = vec![Vec::new()];
-    let mut current: Option<Vec<u8>> = None;
-    let mut pen = Pen {
-        scale: 1.0,
-        ..Pen::default()
+    let (inline, inherited) = doc.get_page_resources(page).unwrap_or_default();
+    let mut resources: Vec<&Dictionary> = inline.into_iter().collect();
+    resources.extend(
+        inherited
+            .iter()
+            .filter_map(|&id| doc.get_dictionary(id).ok()),
+    );
+    let mut reader = PageReader {
+        doc,
+        fonts,
+        settings,
+        page_fonts: HashMap::new(),
+        lines: vec![Vec::new()],
+        pen: Pen {
+            scale: 1.0,
+            ..Pen::default()
+        },
+        current: None,
     };
-    for op in &content.operations {
-        let number = |i: usize| op.operands.get(i).and_then(|o| o.as_float().ok());
-        let mut break_line = false;
-        match op.operator.as_str() {
-            "Tf" => {
-                current = op
-                    .operands
-                    .first()
-                    .and_then(|o| o.as_name().ok())
-                    .map(<[u8]>::to_vec);
-                pen.size = number(1).unwrap_or(pen.size);
+    reader.walk(&content, &resources, 0)?;
+    Ok(reader.lines)
+}
+
+/// Forms may draw other forms; deeper nesting is taken as a loop.
+const MAX_FORM_DEPTH: usize = 8;
+
+struct PageReader<'d, 'f> {
+    doc: &'d Document,
+    fonts: &'f mut Fonts,
+    settings: &'f Settings,
+    /// Fonts by their dictionary's address, since forms may reuse a name.
+    page_fonts: HashMap<usize, PageFont<'d>>,
+    lines: Vec<Line>,
+    pen: Pen,
+    current: Option<&'d Dictionary>,
+}
+
+impl<'d> PageReader<'d, '_> {
+    /// Reads a content stream drawn with `resources`, and the forms it draws.
+    fn walk(&mut self, content: &[u8], resources: &[&'d Dictionary], depth: usize) -> Result<()> {
+        let content = Content::decode(content).context("reading a page's content")?;
+        for op in &content.operations {
+            let number = |i: usize| op.operands.get(i).and_then(|o| o.as_float().ok());
+            let name = || op.operands.first().and_then(|o| o.as_name().ok());
+            let mut break_line = false;
+            match op.operator.as_str() {
+                "Tf" => {
+                    self.current = name().and_then(|n| self.resource(resources, b"Font", n));
+                    self.pen.size = number(1).unwrap_or(self.pen.size);
+                }
+                "Td" | "TD" => {
+                    break_line = self
+                        .pen
+                        .move_by(number(0).unwrap_or(0.0), number(1).unwrap_or(0.0))
+                }
+                "Tm" => {
+                    let (a, e, f) = (number(0), number(4), number(5));
+                    break_line = self
+                        .pen
+                        .set(a.unwrap_or(1.0), e.unwrap_or(0.0), f.unwrap_or(0.0));
+                }
+                "T*" | "'" | "\"" => break_line = true,
+                "BT" => self.pen.end = None,
+                "Do" if depth < MAX_FORM_DEPTH => {
+                    if let Some(form) = name().and_then(|n| self.form(resources, n)) {
+                        let (content, own) = form;
+                        let mut inner = own.into_iter().collect::<Vec<_>>();
+                        inner.extend_from_slice(resources);
+                        self.walk(&content, &inner, depth + 1)?;
+                    }
+                }
+                _ => {}
             }
-            "Td" | "TD" => {
-                break_line = pen.move_by(number(0).unwrap_or(0.0), number(1).unwrap_or(0.0))
+            if break_line {
+                new_line(&mut self.lines);
+                self.pen.end = None;
             }
-            "Tm" => {
-                let (a, e, f) = (number(0), number(4), number(5));
-                break_line = pen.set(a.unwrap_or(1.0), e.unwrap_or(0.0), f.unwrap_or(0.0));
+            if matches!(op.operator.as_str(), "Tj" | "TJ" | "'" | "\"") {
+                self.show(op);
             }
-            "T*" | "'" | "\"" => break_line = true,
-            "BT" => pen.end = None,
-            _ => {}
         }
-        if break_line {
-            new_line(&mut lines);
-            pen.end = None;
+        Ok(())
+    }
+
+    /// A named entry in a resource category, such as a font, from the innermost
+    /// resources that have it.
+    fn resource(
+        &self,
+        resources: &[&'d Dictionary],
+        category: &[u8],
+        name: &[u8],
+    ) -> Option<&'d Dictionary> {
+        resources.iter().find_map(|r| {
+            let entries = self.resolve(r.get(category).ok()?)?.as_dict().ok()?;
+            self.resolve(entries.get(name).ok()?)?.as_dict().ok()
+        })
+    }
+
+    /// A form XObject's decoded content and its own resources.
+    fn form(
+        &self,
+        resources: &[&'d Dictionary],
+        name: &[u8],
+    ) -> Option<(Vec<u8>, Option<&'d Dictionary>)> {
+        let stream = resources.iter().find_map(|r| {
+            let entries = self.resolve(r.get(b"XObject").ok()?)?.as_dict().ok()?;
+            self.resolve(entries.get(name).ok()?)?.as_stream().ok()
+        })?;
+        if stream.dict.get(b"Subtype").and_then(Object::as_name).ok() != Some(b"Form".as_slice()) {
+            return None;
         }
-        if !matches!(op.operator.as_str(), "Tj" | "TJ" | "'" | "\"") {
-            continue;
+        let content = stream.decompressed_content_with_limit(LIMIT).ok()?;
+        let own = stream
+            .dict
+            .get(b"Resources")
+            .ok()
+            .and_then(|o| self.resolve(o))
+            .and_then(|o| o.as_dict().ok());
+        Some((content, own))
+    }
+
+    fn resolve(&self, object: &'d Object) -> Option<&'d Object> {
+        match object {
+            Object::Reference(id) => self.doc.get_object(*id).ok(),
+            other => Some(other),
         }
-        let Some(name) = &current else { continue };
-        let Some(&dict) = resources.get(name) else {
-            continue;
-        };
-        let font = page_fonts
-            .entry(name.clone())
+    }
+
+    fn show(&mut self, op: &lopdf::content::Operation) {
+        let Some(dict) = self.current else { return };
+        let key = std::ptr::from_ref(dict) as usize;
+        let (doc, settings) = (self.doc, self.settings);
+        let fonts = &mut *self.fonts;
+        let font = self
+            .page_fonts
+            .entry(key)
             .or_insert_with(|| page_font(doc, dict, fonts, settings));
         for item in shown(op) {
-            let line = lines.last_mut().expect("a line is always open");
+            let line = self.lines.last_mut().expect("a line is always open");
             match item {
                 Shown::Adjust(n) => {
                     if n < -200.0 {
                         line.push(Piece::Space);
                     }
-                    pen.advance(-n);
+                    self.pen.advance(-n);
                 }
                 Shown::Bytes(bytes) => {
-                    if pen.gap() {
+                    if self.pen.gap() {
                         line.push(Piece::Space);
-                        fonts.fonts[font.index].text.push(' ');
+                        self.fonts.fonts[font.index].text.push(' ');
                     }
                     let text = if font.raw_codes {
                         decode_windows_1252(bytes)
@@ -433,17 +524,16 @@ fn read_page(
                             .and_then(|e| Document::decode_text(e, bytes).ok())
                             .unwrap_or_else(|| decode_windows_1252(bytes))
                     };
-                    fonts.fonts[font.index].text.push_str(&text);
+                    self.fonts.fonts[font.index].text.push_str(&text);
                     line.push(Piece::Text {
                         font: font.index,
                         text,
                     });
-                    pen.advance(font.widths.advance(bytes));
+                    self.pen.advance(font.widths.advance(bytes));
                 }
             }
         }
     }
-    Ok(lines)
 }
 
 fn page_font<'d>(
@@ -691,6 +781,40 @@ endcmap\nCMapName currentdict /CMap defineresource pop\nend\nend\n";
             "Encoding" => "Identity-H", "DescendantFonts" => vec![d.into()], "ToUnicode" => t,
         };
         (doc, font)
+    }
+
+    #[test]
+    fn text_in_forms_is_read() {
+        let mut doc = Document::with_version("1.5");
+        let font = doc.add_object(simple_font("BRHKannada"));
+        let mut form_text = b"BT /K 12 Tf 72 700 Td (".to_vec();
+        form_text.extend_from_slice(KANNADA);
+        form_text.extend_from_slice(b") Tj ET");
+        let form = doc.add_object(Stream::new(
+            dictionary! {
+                "Type" => "XObject", "Subtype" => "Form",
+                "Resources" => dictionary! { "Font" => dictionary! { "K" => font } },
+            },
+            form_text,
+        ));
+        let pages = doc.new_object_id();
+        let contents = doc.add_object(Stream::new(dictionary! {}, b"/X1 Do /X1 Do".to_vec()));
+        let page = doc.add_object(dictionary! {
+            "Type" => "Page", "Parent" => pages, "Contents" => contents,
+            "Resources" => dictionary! { "XObject" => dictionary! { "X1" => form } },
+        });
+        doc.objects.insert(
+            pages,
+            Object::Dictionary(
+                dictionary! { "Type" => "Pages", "Kids" => vec![page.into()], "Count" => 1 },
+            ),
+        );
+        let catalog = doc.add_object(dictionary! { "Type" => "Catalog", "Pages" => pages });
+        doc.trailer.set("Root", catalog);
+        let mut bytes = Vec::new();
+        doc.save_to(&mut bytes).unwrap();
+        let (text, _) = run(&bytes);
+        assert_eq!(text, "ಕನ್ನಡ\nಕನ್ನಡ\n");
     }
 
     #[test]
