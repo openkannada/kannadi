@@ -4,6 +4,7 @@
 
 ### Added
 
+- fontqa `export`: the test strings as FontBakery shaping tests (forbidden glyphs, collisions) and Shaperglot `kn_Knda` checks (conjuncts, arkavattu), with draft upstream texts. fontqa `dashboard`: a static coverage page built from the results.
 - `tools/glyphdraft`: drafts U+0CDC, U+0CDD and U+0CF3 into a FontForge source, matched to the font's stems, weight, heights and spacing. fontqa `measure` and `gate` commands, and a mean stroke width gate.
 - Akshara segmentation (`aksharas`, `split`, `count_aksharas`), including conjuncts, nukta, ZWJ and ZWNJ after a virama, and Old Kannada letters.
 - Normalization (`normalize`): NFC, look-alike vowel letters, repeated marks. `fix_zero_as_anusvara` for converted and scanned text.
@@ -27,4 +28,5 @@
 ### Fixed
 
 - fontqa outline flattening: a TrueType quadratic with several off-curve points is split at its implied on-curve points, and a closed contour with no on-curve point is read. Stroke measurements on TrueType fonts were slightly off before.
+- glyphdraft: side bearings come from the median of the font's consonants, not from KA, whose bearings can be an outlier.
 - fontqa manifest: Navilu is OFL-1.1 with Reserved Font Name Navilu, not GPL.

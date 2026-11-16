@@ -1,0 +1,8489 @@
+{
+ "configuration": {
+  "comment": "Kannada strings from kannadi fontqa, checked for mark collisions.",
+  "collidoscope": {
+   "bases": false,
+   "marks": true,
+   "faraway": false,
+   "area": 3
+  }
+ },
+ "tests": [
+  {
+   "input": "ಕಾ",
+   "comment": "syl-0C95-0CBE"
+  },
+  {
+   "input": "ಕಿ",
+   "comment": "syl-0C95-0CBF"
+  },
+  {
+   "input": "ಕೀ",
+   "comment": "syl-0C95-0CC0"
+  },
+  {
+   "input": "ಕು",
+   "comment": "syl-0C95-0CC1"
+  },
+  {
+   "input": "ಕೂ",
+   "comment": "syl-0C95-0CC2"
+  },
+  {
+   "input": "ಕೃ",
+   "comment": "syl-0C95-0CC3"
+  },
+  {
+   "input": "ಕೄ",
+   "comment": "syl-0C95-0CC4"
+  },
+  {
+   "input": "ಕೆ",
+   "comment": "syl-0C95-0CC6"
+  },
+  {
+   "input": "ಕೇ",
+   "comment": "syl-0C95-0CC7"
+  },
+  {
+   "input": "ಕೈ",
+   "comment": "syl-0C95-0CC8"
+  },
+  {
+   "input": "ಕೊ",
+   "comment": "syl-0C95-0CCA"
+  },
+  {
+   "input": "ಕೋ",
+   "comment": "syl-0C95-0CCB"
+  },
+  {
+   "input": "ಕೌ",
+   "comment": "syl-0C95-0CCC"
+  },
+  {
+   "input": "ಕೢ",
+   "comment": "syl-0C95-0CE2"
+  },
+  {
+   "input": "ಕೣ",
+   "comment": "syl-0C95-0CE3"
+  },
+  {
+   "input": "ಕ್",
+   "comment": "syl-0C95-0CCD"
+  },
+  {
+   "input": "ಕಂ",
+   "comment": "syl-0C95-0C82"
+  },
+  {
+   "input": "ಕಃ",
+   "comment": "syl-0C95-0C83"
+  },
+  {
+   "input": "ಖಾ",
+   "comment": "syl-0C96-0CBE"
+  },
+  {
+   "input": "ಖಿ",
+   "comment": "syl-0C96-0CBF"
+  },
+  {
+   "input": "ಖೀ",
+   "comment": "syl-0C96-0CC0"
+  },
+  {
+   "input": "ಖು",
+   "comment": "syl-0C96-0CC1"
+  },
+  {
+   "input": "ಖೂ",
+   "comment": "syl-0C96-0CC2"
+  },
+  {
+   "input": "ಖೃ",
+   "comment": "syl-0C96-0CC3"
+  },
+  {
+   "input": "ಖೄ",
+   "comment": "syl-0C96-0CC4"
+  },
+  {
+   "input": "ಖೆ",
+   "comment": "syl-0C96-0CC6"
+  },
+  {
+   "input": "ಖೇ",
+   "comment": "syl-0C96-0CC7"
+  },
+  {
+   "input": "ಖೈ",
+   "comment": "syl-0C96-0CC8"
+  },
+  {
+   "input": "ಖೊ",
+   "comment": "syl-0C96-0CCA"
+  },
+  {
+   "input": "ಖೋ",
+   "comment": "syl-0C96-0CCB"
+  },
+  {
+   "input": "ಖೌ",
+   "comment": "syl-0C96-0CCC"
+  },
+  {
+   "input": "ಖೢ",
+   "comment": "syl-0C96-0CE2"
+  },
+  {
+   "input": "ಖೣ",
+   "comment": "syl-0C96-0CE3"
+  },
+  {
+   "input": "ಖ್",
+   "comment": "syl-0C96-0CCD"
+  },
+  {
+   "input": "ಖಂ",
+   "comment": "syl-0C96-0C82"
+  },
+  {
+   "input": "ಖಃ",
+   "comment": "syl-0C96-0C83"
+  },
+  {
+   "input": "ಗಾ",
+   "comment": "syl-0C97-0CBE"
+  },
+  {
+   "input": "ಗಿ",
+   "comment": "syl-0C97-0CBF"
+  },
+  {
+   "input": "ಗೀ",
+   "comment": "syl-0C97-0CC0"
+  },
+  {
+   "input": "ಗು",
+   "comment": "syl-0C97-0CC1"
+  },
+  {
+   "input": "ಗೂ",
+   "comment": "syl-0C97-0CC2"
+  },
+  {
+   "input": "ಗೃ",
+   "comment": "syl-0C97-0CC3"
+  },
+  {
+   "input": "ಗೄ",
+   "comment": "syl-0C97-0CC4"
+  },
+  {
+   "input": "ಗೆ",
+   "comment": "syl-0C97-0CC6"
+  },
+  {
+   "input": "ಗೇ",
+   "comment": "syl-0C97-0CC7"
+  },
+  {
+   "input": "ಗೈ",
+   "comment": "syl-0C97-0CC8"
+  },
+  {
+   "input": "ಗೊ",
+   "comment": "syl-0C97-0CCA"
+  },
+  {
+   "input": "ಗೋ",
+   "comment": "syl-0C97-0CCB"
+  },
+  {
+   "input": "ಗೌ",
+   "comment": "syl-0C97-0CCC"
+  },
+  {
+   "input": "ಗೢ",
+   "comment": "syl-0C97-0CE2"
+  },
+  {
+   "input": "ಗೣ",
+   "comment": "syl-0C97-0CE3"
+  },
+  {
+   "input": "ಗ್",
+   "comment": "syl-0C97-0CCD"
+  },
+  {
+   "input": "ಗಂ",
+   "comment": "syl-0C97-0C82"
+  },
+  {
+   "input": "ಗಃ",
+   "comment": "syl-0C97-0C83"
+  },
+  {
+   "input": "ಘಾ",
+   "comment": "syl-0C98-0CBE"
+  },
+  {
+   "input": "ಘಿ",
+   "comment": "syl-0C98-0CBF"
+  },
+  {
+   "input": "ಘೀ",
+   "comment": "syl-0C98-0CC0"
+  },
+  {
+   "input": "ಘು",
+   "comment": "syl-0C98-0CC1"
+  },
+  {
+   "input": "ಘೂ",
+   "comment": "syl-0C98-0CC2"
+  },
+  {
+   "input": "ಘೃ",
+   "comment": "syl-0C98-0CC3"
+  },
+  {
+   "input": "ಘೄ",
+   "comment": "syl-0C98-0CC4"
+  },
+  {
+   "input": "ಘೆ",
+   "comment": "syl-0C98-0CC6"
+  },
+  {
+   "input": "ಘೇ",
+   "comment": "syl-0C98-0CC7"
+  },
+  {
+   "input": "ಘೈ",
+   "comment": "syl-0C98-0CC8"
+  },
+  {
+   "input": "ಘೊ",
+   "comment": "syl-0C98-0CCA"
+  },
+  {
+   "input": "ಘೋ",
+   "comment": "syl-0C98-0CCB"
+  },
+  {
+   "input": "ಘೌ",
+   "comment": "syl-0C98-0CCC"
+  },
+  {
+   "input": "ಘೢ",
+   "comment": "syl-0C98-0CE2"
+  },
+  {
+   "input": "ಘೣ",
+   "comment": "syl-0C98-0CE3"
+  },
+  {
+   "input": "ಘ್",
+   "comment": "syl-0C98-0CCD"
+  },
+  {
+   "input": "ಘಂ",
+   "comment": "syl-0C98-0C82"
+  },
+  {
+   "input": "ಘಃ",
+   "comment": "syl-0C98-0C83"
+  },
+  {
+   "input": "ಙಾ",
+   "comment": "syl-0C99-0CBE"
+  },
+  {
+   "input": "ಙಿ",
+   "comment": "syl-0C99-0CBF"
+  },
+  {
+   "input": "ಙೀ",
+   "comment": "syl-0C99-0CC0"
+  },
+  {
+   "input": "ಙು",
+   "comment": "syl-0C99-0CC1"
+  },
+  {
+   "input": "ಙೂ",
+   "comment": "syl-0C99-0CC2"
+  },
+  {
+   "input": "ಙೃ",
+   "comment": "syl-0C99-0CC3"
+  },
+  {
+   "input": "ಙೄ",
+   "comment": "syl-0C99-0CC4"
+  },
+  {
+   "input": "ಙೆ",
+   "comment": "syl-0C99-0CC6"
+  },
+  {
+   "input": "ಙೇ",
+   "comment": "syl-0C99-0CC7"
+  },
+  {
+   "input": "ಙೈ",
+   "comment": "syl-0C99-0CC8"
+  },
+  {
+   "input": "ಙೊ",
+   "comment": "syl-0C99-0CCA"
+  },
+  {
+   "input": "ಙೋ",
+   "comment": "syl-0C99-0CCB"
+  },
+  {
+   "input": "ಙೌ",
+   "comment": "syl-0C99-0CCC"
+  },
+  {
+   "input": "ಙೢ",
+   "comment": "syl-0C99-0CE2"
+  },
+  {
+   "input": "ಙೣ",
+   "comment": "syl-0C99-0CE3"
+  },
+  {
+   "input": "ಙ್",
+   "comment": "syl-0C99-0CCD"
+  },
+  {
+   "input": "ಙಂ",
+   "comment": "syl-0C99-0C82"
+  },
+  {
+   "input": "ಙಃ",
+   "comment": "syl-0C99-0C83"
+  },
+  {
+   "input": "ಚಾ",
+   "comment": "syl-0C9A-0CBE"
+  },
+  {
+   "input": "ಚಿ",
+   "comment": "syl-0C9A-0CBF"
+  },
+  {
+   "input": "ಚೀ",
+   "comment": "syl-0C9A-0CC0"
+  },
+  {
+   "input": "ಚು",
+   "comment": "syl-0C9A-0CC1"
+  },
+  {
+   "input": "ಚೂ",
+   "comment": "syl-0C9A-0CC2"
+  },
+  {
+   "input": "ಚೃ",
+   "comment": "syl-0C9A-0CC3"
+  },
+  {
+   "input": "ಚೄ",
+   "comment": "syl-0C9A-0CC4"
+  },
+  {
+   "input": "ಚೆ",
+   "comment": "syl-0C9A-0CC6"
+  },
+  {
+   "input": "ಚೇ",
+   "comment": "syl-0C9A-0CC7"
+  },
+  {
+   "input": "ಚೈ",
+   "comment": "syl-0C9A-0CC8"
+  },
+  {
+   "input": "ಚೊ",
+   "comment": "syl-0C9A-0CCA"
+  },
+  {
+   "input": "ಚೋ",
+   "comment": "syl-0C9A-0CCB"
+  },
+  {
+   "input": "ಚೌ",
+   "comment": "syl-0C9A-0CCC"
+  },
+  {
+   "input": "ಚೢ",
+   "comment": "syl-0C9A-0CE2"
+  },
+  {
+   "input": "ಚೣ",
+   "comment": "syl-0C9A-0CE3"
+  },
+  {
+   "input": "ಚ್",
+   "comment": "syl-0C9A-0CCD"
+  },
+  {
+   "input": "ಚಂ",
+   "comment": "syl-0C9A-0C82"
+  },
+  {
+   "input": "ಚಃ",
+   "comment": "syl-0C9A-0C83"
+  },
+  {
+   "input": "ಛಾ",
+   "comment": "syl-0C9B-0CBE"
+  },
+  {
+   "input": "ಛಿ",
+   "comment": "syl-0C9B-0CBF"
+  },
+  {
+   "input": "ಛೀ",
+   "comment": "syl-0C9B-0CC0"
+  },
+  {
+   "input": "ಛು",
+   "comment": "syl-0C9B-0CC1"
+  },
+  {
+   "input": "ಛೂ",
+   "comment": "syl-0C9B-0CC2"
+  },
+  {
+   "input": "ಛೃ",
+   "comment": "syl-0C9B-0CC3"
+  },
+  {
+   "input": "ಛೄ",
+   "comment": "syl-0C9B-0CC4"
+  },
+  {
+   "input": "ಛೆ",
+   "comment": "syl-0C9B-0CC6"
+  },
+  {
+   "input": "ಛೇ",
+   "comment": "syl-0C9B-0CC7"
+  },
+  {
+   "input": "ಛೈ",
+   "comment": "syl-0C9B-0CC8"
+  },
+  {
+   "input": "ಛೊ",
+   "comment": "syl-0C9B-0CCA"
+  },
+  {
+   "input": "ಛೋ",
+   "comment": "syl-0C9B-0CCB"
+  },
+  {
+   "input": "ಛೌ",
+   "comment": "syl-0C9B-0CCC"
+  },
+  {
+   "input": "ಛೢ",
+   "comment": "syl-0C9B-0CE2"
+  },
+  {
+   "input": "ಛೣ",
+   "comment": "syl-0C9B-0CE3"
+  },
+  {
+   "input": "ಛ್",
+   "comment": "syl-0C9B-0CCD"
+  },
+  {
+   "input": "ಛಂ",
+   "comment": "syl-0C9B-0C82"
+  },
+  {
+   "input": "ಛಃ",
+   "comment": "syl-0C9B-0C83"
+  },
+  {
+   "input": "ಜಾ",
+   "comment": "syl-0C9C-0CBE"
+  },
+  {
+   "input": "ಜಿ",
+   "comment": "syl-0C9C-0CBF"
+  },
+  {
+   "input": "ಜೀ",
+   "comment": "syl-0C9C-0CC0"
+  },
+  {
+   "input": "ಜು",
+   "comment": "syl-0C9C-0CC1"
+  },
+  {
+   "input": "ಜೂ",
+   "comment": "syl-0C9C-0CC2"
+  },
+  {
+   "input": "ಜೃ",
+   "comment": "syl-0C9C-0CC3"
+  },
+  {
+   "input": "ಜೄ",
+   "comment": "syl-0C9C-0CC4"
+  },
+  {
+   "input": "ಜೆ",
+   "comment": "syl-0C9C-0CC6"
+  },
+  {
+   "input": "ಜೇ",
+   "comment": "syl-0C9C-0CC7"
+  },
+  {
+   "input": "ಜೈ",
+   "comment": "syl-0C9C-0CC8"
+  },
+  {
+   "input": "ಜೊ",
+   "comment": "syl-0C9C-0CCA"
+  },
+  {
+   "input": "ಜೋ",
+   "comment": "syl-0C9C-0CCB"
+  },
+  {
+   "input": "ಜೌ",
+   "comment": "syl-0C9C-0CCC"
+  },
+  {
+   "input": "ಜೢ",
+   "comment": "syl-0C9C-0CE2"
+  },
+  {
+   "input": "ಜೣ",
+   "comment": "syl-0C9C-0CE3"
+  },
+  {
+   "input": "ಜ್",
+   "comment": "syl-0C9C-0CCD"
+  },
+  {
+   "input": "ಜಂ",
+   "comment": "syl-0C9C-0C82"
+  },
+  {
+   "input": "ಜಃ",
+   "comment": "syl-0C9C-0C83"
+  },
+  {
+   "input": "ಝಾ",
+   "comment": "syl-0C9D-0CBE"
+  },
+  {
+   "input": "ಝಿ",
+   "comment": "syl-0C9D-0CBF"
+  },
+  {
+   "input": "ಝೀ",
+   "comment": "syl-0C9D-0CC0"
+  },
+  {
+   "input": "ಝು",
+   "comment": "syl-0C9D-0CC1"
+  },
+  {
+   "input": "ಝೂ",
+   "comment": "syl-0C9D-0CC2"
+  },
+  {
+   "input": "ಝೃ",
+   "comment": "syl-0C9D-0CC3"
+  },
+  {
+   "input": "ಝೄ",
+   "comment": "syl-0C9D-0CC4"
+  },
+  {
+   "input": "ಝೆ",
+   "comment": "syl-0C9D-0CC6"
+  },
+  {
+   "input": "ಝೇ",
+   "comment": "syl-0C9D-0CC7"
+  },
+  {
+   "input": "ಝೈ",
+   "comment": "syl-0C9D-0CC8"
+  },
+  {
+   "input": "ಝೊ",
+   "comment": "syl-0C9D-0CCA"
+  },
+  {
+   "input": "ಝೋ",
+   "comment": "syl-0C9D-0CCB"
+  },
+  {
+   "input": "ಝೌ",
+   "comment": "syl-0C9D-0CCC"
+  },
+  {
+   "input": "ಝೢ",
+   "comment": "syl-0C9D-0CE2"
+  },
+  {
+   "input": "ಝೣ",
+   "comment": "syl-0C9D-0CE3"
+  },
+  {
+   "input": "ಝ್",
+   "comment": "syl-0C9D-0CCD"
+  },
+  {
+   "input": "ಝಂ",
+   "comment": "syl-0C9D-0C82"
+  },
+  {
+   "input": "ಝಃ",
+   "comment": "syl-0C9D-0C83"
+  },
+  {
+   "input": "ಞಾ",
+   "comment": "syl-0C9E-0CBE"
+  },
+  {
+   "input": "ಞಿ",
+   "comment": "syl-0C9E-0CBF"
+  },
+  {
+   "input": "ಞೀ",
+   "comment": "syl-0C9E-0CC0"
+  },
+  {
+   "input": "ಞು",
+   "comment": "syl-0C9E-0CC1"
+  },
+  {
+   "input": "ಞೂ",
+   "comment": "syl-0C9E-0CC2"
+  },
+  {
+   "input": "ಞೃ",
+   "comment": "syl-0C9E-0CC3"
+  },
+  {
+   "input": "ಞೄ",
+   "comment": "syl-0C9E-0CC4"
+  },
+  {
+   "input": "ಞೆ",
+   "comment": "syl-0C9E-0CC6"
+  },
+  {
+   "input": "ಞೇ",
+   "comment": "syl-0C9E-0CC7"
+  },
+  {
+   "input": "ಞೈ",
+   "comment": "syl-0C9E-0CC8"
+  },
+  {
+   "input": "ಞೊ",
+   "comment": "syl-0C9E-0CCA"
+  },
+  {
+   "input": "ಞೋ",
+   "comment": "syl-0C9E-0CCB"
+  },
+  {
+   "input": "ಞೌ",
+   "comment": "syl-0C9E-0CCC"
+  },
+  {
+   "input": "ಞೢ",
+   "comment": "syl-0C9E-0CE2"
+  },
+  {
+   "input": "ಞೣ",
+   "comment": "syl-0C9E-0CE3"
+  },
+  {
+   "input": "ಞ್",
+   "comment": "syl-0C9E-0CCD"
+  },
+  {
+   "input": "ಞಂ",
+   "comment": "syl-0C9E-0C82"
+  },
+  {
+   "input": "ಞಃ",
+   "comment": "syl-0C9E-0C83"
+  },
+  {
+   "input": "ಟಾ",
+   "comment": "syl-0C9F-0CBE"
+  },
+  {
+   "input": "ಟಿ",
+   "comment": "syl-0C9F-0CBF"
+  },
+  {
+   "input": "ಟೀ",
+   "comment": "syl-0C9F-0CC0"
+  },
+  {
+   "input": "ಟು",
+   "comment": "syl-0C9F-0CC1"
+  },
+  {
+   "input": "ಟೂ",
+   "comment": "syl-0C9F-0CC2"
+  },
+  {
+   "input": "ಟೃ",
+   "comment": "syl-0C9F-0CC3"
+  },
+  {
+   "input": "ಟೄ",
+   "comment": "syl-0C9F-0CC4"
+  },
+  {
+   "input": "ಟೆ",
+   "comment": "syl-0C9F-0CC6"
+  },
+  {
+   "input": "ಟೇ",
+   "comment": "syl-0C9F-0CC7"
+  },
+  {
+   "input": "ಟೈ",
+   "comment": "syl-0C9F-0CC8"
+  },
+  {
+   "input": "ಟೊ",
+   "comment": "syl-0C9F-0CCA"
+  },
+  {
+   "input": "ಟೋ",
+   "comment": "syl-0C9F-0CCB"
+  },
+  {
+   "input": "ಟೌ",
+   "comment": "syl-0C9F-0CCC"
+  },
+  {
+   "input": "ಟೢ",
+   "comment": "syl-0C9F-0CE2"
+  },
+  {
+   "input": "ಟೣ",
+   "comment": "syl-0C9F-0CE3"
+  },
+  {
+   "input": "ಟ್",
+   "comment": "syl-0C9F-0CCD"
+  },
+  {
+   "input": "ಟಂ",
+   "comment": "syl-0C9F-0C82"
+  },
+  {
+   "input": "ಟಃ",
+   "comment": "syl-0C9F-0C83"
+  },
+  {
+   "input": "ಠಾ",
+   "comment": "syl-0CA0-0CBE"
+  },
+  {
+   "input": "ಠಿ",
+   "comment": "syl-0CA0-0CBF"
+  },
+  {
+   "input": "ಠೀ",
+   "comment": "syl-0CA0-0CC0"
+  },
+  {
+   "input": "ಠು",
+   "comment": "syl-0CA0-0CC1"
+  },
+  {
+   "input": "ಠೂ",
+   "comment": "syl-0CA0-0CC2"
+  },
+  {
+   "input": "ಠೃ",
+   "comment": "syl-0CA0-0CC3"
+  },
+  {
+   "input": "ಠೄ",
+   "comment": "syl-0CA0-0CC4"
+  },
+  {
+   "input": "ಠೆ",
+   "comment": "syl-0CA0-0CC6"
+  },
+  {
+   "input": "ಠೇ",
+   "comment": "syl-0CA0-0CC7"
+  },
+  {
+   "input": "ಠೈ",
+   "comment": "syl-0CA0-0CC8"
+  },
+  {
+   "input": "ಠೊ",
+   "comment": "syl-0CA0-0CCA"
+  },
+  {
+   "input": "ಠೋ",
+   "comment": "syl-0CA0-0CCB"
+  },
+  {
+   "input": "ಠೌ",
+   "comment": "syl-0CA0-0CCC"
+  },
+  {
+   "input": "ಠೢ",
+   "comment": "syl-0CA0-0CE2"
+  },
+  {
+   "input": "ಠೣ",
+   "comment": "syl-0CA0-0CE3"
+  },
+  {
+   "input": "ಠ್",
+   "comment": "syl-0CA0-0CCD"
+  },
+  {
+   "input": "ಠಂ",
+   "comment": "syl-0CA0-0C82"
+  },
+  {
+   "input": "ಠಃ",
+   "comment": "syl-0CA0-0C83"
+  },
+  {
+   "input": "ಡಾ",
+   "comment": "syl-0CA1-0CBE"
+  },
+  {
+   "input": "ಡಿ",
+   "comment": "syl-0CA1-0CBF"
+  },
+  {
+   "input": "ಡೀ",
+   "comment": "syl-0CA1-0CC0"
+  },
+  {
+   "input": "ಡು",
+   "comment": "syl-0CA1-0CC1"
+  },
+  {
+   "input": "ಡೂ",
+   "comment": "syl-0CA1-0CC2"
+  },
+  {
+   "input": "ಡೃ",
+   "comment": "syl-0CA1-0CC3"
+  },
+  {
+   "input": "ಡೄ",
+   "comment": "syl-0CA1-0CC4"
+  },
+  {
+   "input": "ಡೆ",
+   "comment": "syl-0CA1-0CC6"
+  },
+  {
+   "input": "ಡೇ",
+   "comment": "syl-0CA1-0CC7"
+  },
+  {
+   "input": "ಡೈ",
+   "comment": "syl-0CA1-0CC8"
+  },
+  {
+   "input": "ಡೊ",
+   "comment": "syl-0CA1-0CCA"
+  },
+  {
+   "input": "ಡೋ",
+   "comment": "syl-0CA1-0CCB"
+  },
+  {
+   "input": "ಡೌ",
+   "comment": "syl-0CA1-0CCC"
+  },
+  {
+   "input": "ಡೢ",
+   "comment": "syl-0CA1-0CE2"
+  },
+  {
+   "input": "ಡೣ",
+   "comment": "syl-0CA1-0CE3"
+  },
+  {
+   "input": "ಡ್",
+   "comment": "syl-0CA1-0CCD"
+  },
+  {
+   "input": "ಡಂ",
+   "comment": "syl-0CA1-0C82"
+  },
+  {
+   "input": "ಡಃ",
+   "comment": "syl-0CA1-0C83"
+  },
+  {
+   "input": "ಢಾ",
+   "comment": "syl-0CA2-0CBE"
+  },
+  {
+   "input": "ಢಿ",
+   "comment": "syl-0CA2-0CBF"
+  },
+  {
+   "input": "ಢೀ",
+   "comment": "syl-0CA2-0CC0"
+  },
+  {
+   "input": "ಢು",
+   "comment": "syl-0CA2-0CC1"
+  },
+  {
+   "input": "ಢೂ",
+   "comment": "syl-0CA2-0CC2"
+  },
+  {
+   "input": "ಢೃ",
+   "comment": "syl-0CA2-0CC3"
+  },
+  {
+   "input": "ಢೄ",
+   "comment": "syl-0CA2-0CC4"
+  },
+  {
+   "input": "ಢೆ",
+   "comment": "syl-0CA2-0CC6"
+  },
+  {
+   "input": "ಢೇ",
+   "comment": "syl-0CA2-0CC7"
+  },
+  {
+   "input": "ಢೈ",
+   "comment": "syl-0CA2-0CC8"
+  },
+  {
+   "input": "ಢೊ",
+   "comment": "syl-0CA2-0CCA"
+  },
+  {
+   "input": "ಢೋ",
+   "comment": "syl-0CA2-0CCB"
+  },
+  {
+   "input": "ಢೌ",
+   "comment": "syl-0CA2-0CCC"
+  },
+  {
+   "input": "ಢೢ",
+   "comment": "syl-0CA2-0CE2"
+  },
+  {
+   "input": "ಢೣ",
+   "comment": "syl-0CA2-0CE3"
+  },
+  {
+   "input": "ಢ್",
+   "comment": "syl-0CA2-0CCD"
+  },
+  {
+   "input": "ಢಂ",
+   "comment": "syl-0CA2-0C82"
+  },
+  {
+   "input": "ಢಃ",
+   "comment": "syl-0CA2-0C83"
+  },
+  {
+   "input": "ಣಾ",
+   "comment": "syl-0CA3-0CBE"
+  },
+  {
+   "input": "ಣಿ",
+   "comment": "syl-0CA3-0CBF"
+  },
+  {
+   "input": "ಣೀ",
+   "comment": "syl-0CA3-0CC0"
+  },
+  {
+   "input": "ಣು",
+   "comment": "syl-0CA3-0CC1"
+  },
+  {
+   "input": "ಣೂ",
+   "comment": "syl-0CA3-0CC2"
+  },
+  {
+   "input": "ಣೃ",
+   "comment": "syl-0CA3-0CC3"
+  },
+  {
+   "input": "ಣೄ",
+   "comment": "syl-0CA3-0CC4"
+  },
+  {
+   "input": "ಣೆ",
+   "comment": "syl-0CA3-0CC6"
+  },
+  {
+   "input": "ಣೇ",
+   "comment": "syl-0CA3-0CC7"
+  },
+  {
+   "input": "ಣೈ",
+   "comment": "syl-0CA3-0CC8"
+  },
+  {
+   "input": "ಣೊ",
+   "comment": "syl-0CA3-0CCA"
+  },
+  {
+   "input": "ಣೋ",
+   "comment": "syl-0CA3-0CCB"
+  },
+  {
+   "input": "ಣೌ",
+   "comment": "syl-0CA3-0CCC"
+  },
+  {
+   "input": "ಣೢ",
+   "comment": "syl-0CA3-0CE2"
+  },
+  {
+   "input": "ಣೣ",
+   "comment": "syl-0CA3-0CE3"
+  },
+  {
+   "input": "ಣ್",
+   "comment": "syl-0CA3-0CCD"
+  },
+  {
+   "input": "ಣಂ",
+   "comment": "syl-0CA3-0C82"
+  },
+  {
+   "input": "ಣಃ",
+   "comment": "syl-0CA3-0C83"
+  },
+  {
+   "input": "ತಾ",
+   "comment": "syl-0CA4-0CBE"
+  },
+  {
+   "input": "ತಿ",
+   "comment": "syl-0CA4-0CBF"
+  },
+  {
+   "input": "ತೀ",
+   "comment": "syl-0CA4-0CC0"
+  },
+  {
+   "input": "ತು",
+   "comment": "syl-0CA4-0CC1"
+  },
+  {
+   "input": "ತೂ",
+   "comment": "syl-0CA4-0CC2"
+  },
+  {
+   "input": "ತೃ",
+   "comment": "syl-0CA4-0CC3"
+  },
+  {
+   "input": "ತೄ",
+   "comment": "syl-0CA4-0CC4"
+  },
+  {
+   "input": "ತೆ",
+   "comment": "syl-0CA4-0CC6"
+  },
+  {
+   "input": "ತೇ",
+   "comment": "syl-0CA4-0CC7"
+  },
+  {
+   "input": "ತೈ",
+   "comment": "syl-0CA4-0CC8"
+  },
+  {
+   "input": "ತೊ",
+   "comment": "syl-0CA4-0CCA"
+  },
+  {
+   "input": "ತೋ",
+   "comment": "syl-0CA4-0CCB"
+  },
+  {
+   "input": "ತೌ",
+   "comment": "syl-0CA4-0CCC"
+  },
+  {
+   "input": "ತೢ",
+   "comment": "syl-0CA4-0CE2"
+  },
+  {
+   "input": "ತೣ",
+   "comment": "syl-0CA4-0CE3"
+  },
+  {
+   "input": "ತ್",
+   "comment": "syl-0CA4-0CCD"
+  },
+  {
+   "input": "ತಂ",
+   "comment": "syl-0CA4-0C82"
+  },
+  {
+   "input": "ತಃ",
+   "comment": "syl-0CA4-0C83"
+  },
+  {
+   "input": "ಥಾ",
+   "comment": "syl-0CA5-0CBE"
+  },
+  {
+   "input": "ಥಿ",
+   "comment": "syl-0CA5-0CBF"
+  },
+  {
+   "input": "ಥೀ",
+   "comment": "syl-0CA5-0CC0"
+  },
+  {
+   "input": "ಥು",
+   "comment": "syl-0CA5-0CC1"
+  },
+  {
+   "input": "ಥೂ",
+   "comment": "syl-0CA5-0CC2"
+  },
+  {
+   "input": "ಥೃ",
+   "comment": "syl-0CA5-0CC3"
+  },
+  {
+   "input": "ಥೄ",
+   "comment": "syl-0CA5-0CC4"
+  },
+  {
+   "input": "ಥೆ",
+   "comment": "syl-0CA5-0CC6"
+  },
+  {
+   "input": "ಥೇ",
+   "comment": "syl-0CA5-0CC7"
+  },
+  {
+   "input": "ಥೈ",
+   "comment": "syl-0CA5-0CC8"
+  },
+  {
+   "input": "ಥೊ",
+   "comment": "syl-0CA5-0CCA"
+  },
+  {
+   "input": "ಥೋ",
+   "comment": "syl-0CA5-0CCB"
+  },
+  {
+   "input": "ಥೌ",
+   "comment": "syl-0CA5-0CCC"
+  },
+  {
+   "input": "ಥೢ",
+   "comment": "syl-0CA5-0CE2"
+  },
+  {
+   "input": "ಥೣ",
+   "comment": "syl-0CA5-0CE3"
+  },
+  {
+   "input": "ಥ್",
+   "comment": "syl-0CA5-0CCD"
+  },
+  {
+   "input": "ಥಂ",
+   "comment": "syl-0CA5-0C82"
+  },
+  {
+   "input": "ಥಃ",
+   "comment": "syl-0CA5-0C83"
+  },
+  {
+   "input": "ದಾ",
+   "comment": "syl-0CA6-0CBE"
+  },
+  {
+   "input": "ದಿ",
+   "comment": "syl-0CA6-0CBF"
+  },
+  {
+   "input": "ದೀ",
+   "comment": "syl-0CA6-0CC0"
+  },
+  {
+   "input": "ದು",
+   "comment": "syl-0CA6-0CC1"
+  },
+  {
+   "input": "ದೂ",
+   "comment": "syl-0CA6-0CC2"
+  },
+  {
+   "input": "ದೃ",
+   "comment": "syl-0CA6-0CC3"
+  },
+  {
+   "input": "ದೄ",
+   "comment": "syl-0CA6-0CC4"
+  },
+  {
+   "input": "ದೆ",
+   "comment": "syl-0CA6-0CC6"
+  },
+  {
+   "input": "ದೇ",
+   "comment": "syl-0CA6-0CC7"
+  },
+  {
+   "input": "ದೈ",
+   "comment": "syl-0CA6-0CC8"
+  },
+  {
+   "input": "ದೊ",
+   "comment": "syl-0CA6-0CCA"
+  },
+  {
+   "input": "ದೋ",
+   "comment": "syl-0CA6-0CCB"
+  },
+  {
+   "input": "ದೌ",
+   "comment": "syl-0CA6-0CCC"
+  },
+  {
+   "input": "ದೢ",
+   "comment": "syl-0CA6-0CE2"
+  },
+  {
+   "input": "ದೣ",
+   "comment": "syl-0CA6-0CE3"
+  },
+  {
+   "input": "ದ್",
+   "comment": "syl-0CA6-0CCD"
+  },
+  {
+   "input": "ದಂ",
+   "comment": "syl-0CA6-0C82"
+  },
+  {
+   "input": "ದಃ",
+   "comment": "syl-0CA6-0C83"
+  },
+  {
+   "input": "ಧಾ",
+   "comment": "syl-0CA7-0CBE"
+  },
+  {
+   "input": "ಧಿ",
+   "comment": "syl-0CA7-0CBF"
+  },
+  {
+   "input": "ಧೀ",
+   "comment": "syl-0CA7-0CC0"
+  },
+  {
+   "input": "ಧು",
+   "comment": "syl-0CA7-0CC1"
+  },
+  {
+   "input": "ಧೂ",
+   "comment": "syl-0CA7-0CC2"
+  },
+  {
+   "input": "ಧೃ",
+   "comment": "syl-0CA7-0CC3"
+  },
+  {
+   "input": "ಧೄ",
+   "comment": "syl-0CA7-0CC4"
+  },
+  {
+   "input": "ಧೆ",
+   "comment": "syl-0CA7-0CC6"
+  },
+  {
+   "input": "ಧೇ",
+   "comment": "syl-0CA7-0CC7"
+  },
+  {
+   "input": "ಧೈ",
+   "comment": "syl-0CA7-0CC8"
+  },
+  {
+   "input": "ಧೊ",
+   "comment": "syl-0CA7-0CCA"
+  },
+  {
+   "input": "ಧೋ",
+   "comment": "syl-0CA7-0CCB"
+  },
+  {
+   "input": "ಧೌ",
+   "comment": "syl-0CA7-0CCC"
+  },
+  {
+   "input": "ಧೢ",
+   "comment": "syl-0CA7-0CE2"
+  },
+  {
+   "input": "ಧೣ",
+   "comment": "syl-0CA7-0CE3"
+  },
+  {
+   "input": "ಧ್",
+   "comment": "syl-0CA7-0CCD"
+  },
+  {
+   "input": "ಧಂ",
+   "comment": "syl-0CA7-0C82"
+  },
+  {
+   "input": "ಧಃ",
+   "comment": "syl-0CA7-0C83"
+  },
+  {
+   "input": "ನಾ",
+   "comment": "syl-0CA8-0CBE"
+  },
+  {
+   "input": "ನಿ",
+   "comment": "syl-0CA8-0CBF"
+  },
+  {
+   "input": "ನೀ",
+   "comment": "syl-0CA8-0CC0"
+  },
+  {
+   "input": "ನು",
+   "comment": "syl-0CA8-0CC1"
+  },
+  {
+   "input": "ನೂ",
+   "comment": "syl-0CA8-0CC2"
+  },
+  {
+   "input": "ನೃ",
+   "comment": "syl-0CA8-0CC3"
+  },
+  {
+   "input": "ನೄ",
+   "comment": "syl-0CA8-0CC4"
+  },
+  {
+   "input": "ನೆ",
+   "comment": "syl-0CA8-0CC6"
+  },
+  {
+   "input": "ನೇ",
+   "comment": "syl-0CA8-0CC7"
+  },
+  {
+   "input": "ನೈ",
+   "comment": "syl-0CA8-0CC8"
+  },
+  {
+   "input": "ನೊ",
+   "comment": "syl-0CA8-0CCA"
+  },
+  {
+   "input": "ನೋ",
+   "comment": "syl-0CA8-0CCB"
+  },
+  {
+   "input": "ನೌ",
+   "comment": "syl-0CA8-0CCC"
+  },
+  {
+   "input": "ನೢ",
+   "comment": "syl-0CA8-0CE2"
+  },
+  {
+   "input": "ನೣ",
+   "comment": "syl-0CA8-0CE3"
+  },
+  {
+   "input": "ನ್",
+   "comment": "syl-0CA8-0CCD"
+  },
+  {
+   "input": "ನಂ",
+   "comment": "syl-0CA8-0C82"
+  },
+  {
+   "input": "ನಃ",
+   "comment": "syl-0CA8-0C83"
+  },
+  {
+   "input": "ಪಾ",
+   "comment": "syl-0CAA-0CBE"
+  },
+  {
+   "input": "ಪಿ",
+   "comment": "syl-0CAA-0CBF"
+  },
+  {
+   "input": "ಪೀ",
+   "comment": "syl-0CAA-0CC0"
+  },
+  {
+   "input": "ಪು",
+   "comment": "syl-0CAA-0CC1"
+  },
+  {
+   "input": "ಪೂ",
+   "comment": "syl-0CAA-0CC2"
+  },
+  {
+   "input": "ಪೃ",
+   "comment": "syl-0CAA-0CC3"
+  },
+  {
+   "input": "ಪೄ",
+   "comment": "syl-0CAA-0CC4"
+  },
+  {
+   "input": "ಪೆ",
+   "comment": "syl-0CAA-0CC6"
+  },
+  {
+   "input": "ಪೇ",
+   "comment": "syl-0CAA-0CC7"
+  },
+  {
+   "input": "ಪೈ",
+   "comment": "syl-0CAA-0CC8"
+  },
+  {
+   "input": "ಪೊ",
+   "comment": "syl-0CAA-0CCA"
+  },
+  {
+   "input": "ಪೋ",
+   "comment": "syl-0CAA-0CCB"
+  },
+  {
+   "input": "ಪೌ",
+   "comment": "syl-0CAA-0CCC"
+  },
+  {
+   "input": "ಪೢ",
+   "comment": "syl-0CAA-0CE2"
+  },
+  {
+   "input": "ಪೣ",
+   "comment": "syl-0CAA-0CE3"
+  },
+  {
+   "input": "ಪ್",
+   "comment": "syl-0CAA-0CCD"
+  },
+  {
+   "input": "ಪಂ",
+   "comment": "syl-0CAA-0C82"
+  },
+  {
+   "input": "ಪಃ",
+   "comment": "syl-0CAA-0C83"
+  },
+  {
+   "input": "ಫಾ",
+   "comment": "syl-0CAB-0CBE"
+  },
+  {
+   "input": "ಫಿ",
+   "comment": "syl-0CAB-0CBF"
+  },
+  {
+   "input": "ಫೀ",
+   "comment": "syl-0CAB-0CC0"
+  },
+  {
+   "input": "ಫು",
+   "comment": "syl-0CAB-0CC1"
+  },
+  {
+   "input": "ಫೂ",
+   "comment": "syl-0CAB-0CC2"
+  },
+  {
+   "input": "ಫೃ",
+   "comment": "syl-0CAB-0CC3"
+  },
+  {
+   "input": "ಫೄ",
+   "comment": "syl-0CAB-0CC4"
+  },
+  {
+   "input": "ಫೆ",
+   "comment": "syl-0CAB-0CC6"
+  },
+  {
+   "input": "ಫೇ",
+   "comment": "syl-0CAB-0CC7"
+  },
+  {
+   "input": "ಫೈ",
+   "comment": "syl-0CAB-0CC8"
+  },
+  {
+   "input": "ಫೊ",
+   "comment": "syl-0CAB-0CCA"
+  },
+  {
+   "input": "ಫೋ",
+   "comment": "syl-0CAB-0CCB"
+  },
+  {
+   "input": "ಫೌ",
+   "comment": "syl-0CAB-0CCC"
+  },
+  {
+   "input": "ಫೢ",
+   "comment": "syl-0CAB-0CE2"
+  },
+  {
+   "input": "ಫೣ",
+   "comment": "syl-0CAB-0CE3"
+  },
+  {
+   "input": "ಫ್",
+   "comment": "syl-0CAB-0CCD"
+  },
+  {
+   "input": "ಫಂ",
+   "comment": "syl-0CAB-0C82"
+  },
+  {
+   "input": "ಫಃ",
+   "comment": "syl-0CAB-0C83"
+  },
+  {
+   "input": "ಬಾ",
+   "comment": "syl-0CAC-0CBE"
+  },
+  {
+   "input": "ಬಿ",
+   "comment": "syl-0CAC-0CBF"
+  },
+  {
+   "input": "ಬೀ",
+   "comment": "syl-0CAC-0CC0"
+  },
+  {
+   "input": "ಬು",
+   "comment": "syl-0CAC-0CC1"
+  },
+  {
+   "input": "ಬೂ",
+   "comment": "syl-0CAC-0CC2"
+  },
+  {
+   "input": "ಬೃ",
+   "comment": "syl-0CAC-0CC3"
+  },
+  {
+   "input": "ಬೄ",
+   "comment": "syl-0CAC-0CC4"
+  },
+  {
+   "input": "ಬೆ",
+   "comment": "syl-0CAC-0CC6"
+  },
+  {
+   "input": "ಬೇ",
+   "comment": "syl-0CAC-0CC7"
+  },
+  {
+   "input": "ಬೈ",
+   "comment": "syl-0CAC-0CC8"
+  },
+  {
+   "input": "ಬೊ",
+   "comment": "syl-0CAC-0CCA"
+  },
+  {
+   "input": "ಬೋ",
+   "comment": "syl-0CAC-0CCB"
+  },
+  {
+   "input": "ಬೌ",
+   "comment": "syl-0CAC-0CCC"
+  },
+  {
+   "input": "ಬೢ",
+   "comment": "syl-0CAC-0CE2"
+  },
+  {
+   "input": "ಬೣ",
+   "comment": "syl-0CAC-0CE3"
+  },
+  {
+   "input": "ಬ್",
+   "comment": "syl-0CAC-0CCD"
+  },
+  {
+   "input": "ಬಂ",
+   "comment": "syl-0CAC-0C82"
+  },
+  {
+   "input": "ಬಃ",
+   "comment": "syl-0CAC-0C83"
+  },
+  {
+   "input": "ಭಾ",
+   "comment": "syl-0CAD-0CBE"
+  },
+  {
+   "input": "ಭಿ",
+   "comment": "syl-0CAD-0CBF"
+  },
+  {
+   "input": "ಭೀ",
+   "comment": "syl-0CAD-0CC0"
+  },
+  {
+   "input": "ಭು",
+   "comment": "syl-0CAD-0CC1"
+  },
+  {
+   "input": "ಭೂ",
+   "comment": "syl-0CAD-0CC2"
+  },
+  {
+   "input": "ಭೃ",
+   "comment": "syl-0CAD-0CC3"
+  },
+  {
+   "input": "ಭೄ",
+   "comment": "syl-0CAD-0CC4"
+  },
+  {
+   "input": "ಭೆ",
+   "comment": "syl-0CAD-0CC6"
+  },
+  {
+   "input": "ಭೇ",
+   "comment": "syl-0CAD-0CC7"
+  },
+  {
+   "input": "ಭೈ",
+   "comment": "syl-0CAD-0CC8"
+  },
+  {
+   "input": "ಭೊ",
+   "comment": "syl-0CAD-0CCA"
+  },
+  {
+   "input": "ಭೋ",
+   "comment": "syl-0CAD-0CCB"
+  },
+  {
+   "input": "ಭೌ",
+   "comment": "syl-0CAD-0CCC"
+  },
+  {
+   "input": "ಭೢ",
+   "comment": "syl-0CAD-0CE2"
+  },
+  {
+   "input": "ಭೣ",
+   "comment": "syl-0CAD-0CE3"
+  },
+  {
+   "input": "ಭ್",
+   "comment": "syl-0CAD-0CCD"
+  },
+  {
+   "input": "ಭಂ",
+   "comment": "syl-0CAD-0C82"
+  },
+  {
+   "input": "ಭಃ",
+   "comment": "syl-0CAD-0C83"
+  },
+  {
+   "input": "ಮಾ",
+   "comment": "syl-0CAE-0CBE"
+  },
+  {
+   "input": "ಮಿ",
+   "comment": "syl-0CAE-0CBF"
+  },
+  {
+   "input": "ಮೀ",
+   "comment": "syl-0CAE-0CC0"
+  },
+  {
+   "input": "ಮು",
+   "comment": "syl-0CAE-0CC1"
+  },
+  {
+   "input": "ಮೂ",
+   "comment": "syl-0CAE-0CC2"
+  },
+  {
+   "input": "ಮೃ",
+   "comment": "syl-0CAE-0CC3"
+  },
+  {
+   "input": "ಮೄ",
+   "comment": "syl-0CAE-0CC4"
+  },
+  {
+   "input": "ಮೆ",
+   "comment": "syl-0CAE-0CC6"
+  },
+  {
+   "input": "ಮೇ",
+   "comment": "syl-0CAE-0CC7"
+  },
+  {
+   "input": "ಮೈ",
+   "comment": "syl-0CAE-0CC8"
+  },
+  {
+   "input": "ಮೊ",
+   "comment": "syl-0CAE-0CCA"
+  },
+  {
+   "input": "ಮೋ",
+   "comment": "syl-0CAE-0CCB"
+  },
+  {
+   "input": "ಮೌ",
+   "comment": "syl-0CAE-0CCC"
+  },
+  {
+   "input": "ಮೢ",
+   "comment": "syl-0CAE-0CE2"
+  },
+  {
+   "input": "ಮೣ",
+   "comment": "syl-0CAE-0CE3"
+  },
+  {
+   "input": "ಮ್",
+   "comment": "syl-0CAE-0CCD"
+  },
+  {
+   "input": "ಮಂ",
+   "comment": "syl-0CAE-0C82"
+  },
+  {
+   "input": "ಮಃ",
+   "comment": "syl-0CAE-0C83"
+  },
+  {
+   "input": "ಯಾ",
+   "comment": "syl-0CAF-0CBE"
+  },
+  {
+   "input": "ಯಿ",
+   "comment": "syl-0CAF-0CBF"
+  },
+  {
+   "input": "ಯೀ",
+   "comment": "syl-0CAF-0CC0"
+  },
+  {
+   "input": "ಯು",
+   "comment": "syl-0CAF-0CC1"
+  },
+  {
+   "input": "ಯೂ",
+   "comment": "syl-0CAF-0CC2"
+  },
+  {
+   "input": "ಯೃ",
+   "comment": "syl-0CAF-0CC3"
+  },
+  {
+   "input": "ಯೄ",
+   "comment": "syl-0CAF-0CC4"
+  },
+  {
+   "input": "ಯೆ",
+   "comment": "syl-0CAF-0CC6"
+  },
+  {
+   "input": "ಯೇ",
+   "comment": "syl-0CAF-0CC7"
+  },
+  {
+   "input": "ಯೈ",
+   "comment": "syl-0CAF-0CC8"
+  },
+  {
+   "input": "ಯೊ",
+   "comment": "syl-0CAF-0CCA"
+  },
+  {
+   "input": "ಯೋ",
+   "comment": "syl-0CAF-0CCB"
+  },
+  {
+   "input": "ಯೌ",
+   "comment": "syl-0CAF-0CCC"
+  },
+  {
+   "input": "ಯೢ",
+   "comment": "syl-0CAF-0CE2"
+  },
+  {
+   "input": "ಯೣ",
+   "comment": "syl-0CAF-0CE3"
+  },
+  {
+   "input": "ಯ್",
+   "comment": "syl-0CAF-0CCD"
+  },
+  {
+   "input": "ಯಂ",
+   "comment": "syl-0CAF-0C82"
+  },
+  {
+   "input": "ಯಃ",
+   "comment": "syl-0CAF-0C83"
+  },
+  {
+   "input": "ರಾ",
+   "comment": "syl-0CB0-0CBE"
+  },
+  {
+   "input": "ರಿ",
+   "comment": "syl-0CB0-0CBF"
+  },
+  {
+   "input": "ರೀ",
+   "comment": "syl-0CB0-0CC0"
+  },
+  {
+   "input": "ರು",
+   "comment": "syl-0CB0-0CC1"
+  },
+  {
+   "input": "ರೂ",
+   "comment": "syl-0CB0-0CC2"
+  },
+  {
+   "input": "ರೃ",
+   "comment": "syl-0CB0-0CC3"
+  },
+  {
+   "input": "ರೄ",
+   "comment": "syl-0CB0-0CC4"
+  },
+  {
+   "input": "ರೆ",
+   "comment": "syl-0CB0-0CC6"
+  },
+  {
+   "input": "ರೇ",
+   "comment": "syl-0CB0-0CC7"
+  },
+  {
+   "input": "ರೈ",
+   "comment": "syl-0CB0-0CC8"
+  },
+  {
+   "input": "ರೊ",
+   "comment": "syl-0CB0-0CCA"
+  },
+  {
+   "input": "ರೋ",
+   "comment": "syl-0CB0-0CCB"
+  },
+  {
+   "input": "ರೌ",
+   "comment": "syl-0CB0-0CCC"
+  },
+  {
+   "input": "ರೢ",
+   "comment": "syl-0CB0-0CE2"
+  },
+  {
+   "input": "ರೣ",
+   "comment": "syl-0CB0-0CE3"
+  },
+  {
+   "input": "ರ್",
+   "comment": "syl-0CB0-0CCD"
+  },
+  {
+   "input": "ರಂ",
+   "comment": "syl-0CB0-0C82"
+  },
+  {
+   "input": "ರಃ",
+   "comment": "syl-0CB0-0C83"
+  },
+  {
+   "input": "ಱಾ",
+   "comment": "syl-0CB1-0CBE"
+  },
+  {
+   "input": "ಱಿ",
+   "comment": "syl-0CB1-0CBF"
+  },
+  {
+   "input": "ಱೀ",
+   "comment": "syl-0CB1-0CC0"
+  },
+  {
+   "input": "ಱು",
+   "comment": "syl-0CB1-0CC1"
+  },
+  {
+   "input": "ಱೂ",
+   "comment": "syl-0CB1-0CC2"
+  },
+  {
+   "input": "ಱೃ",
+   "comment": "syl-0CB1-0CC3"
+  },
+  {
+   "input": "ಱೄ",
+   "comment": "syl-0CB1-0CC4"
+  },
+  {
+   "input": "ಱೆ",
+   "comment": "syl-0CB1-0CC6"
+  },
+  {
+   "input": "ಱೇ",
+   "comment": "syl-0CB1-0CC7"
+  },
+  {
+   "input": "ಱೈ",
+   "comment": "syl-0CB1-0CC8"
+  },
+  {
+   "input": "ಱೊ",
+   "comment": "syl-0CB1-0CCA"
+  },
+  {
+   "input": "ಱೋ",
+   "comment": "syl-0CB1-0CCB"
+  },
+  {
+   "input": "ಱೌ",
+   "comment": "syl-0CB1-0CCC"
+  },
+  {
+   "input": "ಱೢ",
+   "comment": "syl-0CB1-0CE2"
+  },
+  {
+   "input": "ಱೣ",
+   "comment": "syl-0CB1-0CE3"
+  },
+  {
+   "input": "ಱ್",
+   "comment": "syl-0CB1-0CCD"
+  },
+  {
+   "input": "ಱಂ",
+   "comment": "syl-0CB1-0C82"
+  },
+  {
+   "input": "ಱಃ",
+   "comment": "syl-0CB1-0C83"
+  },
+  {
+   "input": "ಲಾ",
+   "comment": "syl-0CB2-0CBE"
+  },
+  {
+   "input": "ಲಿ",
+   "comment": "syl-0CB2-0CBF"
+  },
+  {
+   "input": "ಲೀ",
+   "comment": "syl-0CB2-0CC0"
+  },
+  {
+   "input": "ಲು",
+   "comment": "syl-0CB2-0CC1"
+  },
+  {
+   "input": "ಲೂ",
+   "comment": "syl-0CB2-0CC2"
+  },
+  {
+   "input": "ಲೃ",
+   "comment": "syl-0CB2-0CC3"
+  },
+  {
+   "input": "ಲೄ",
+   "comment": "syl-0CB2-0CC4"
+  },
+  {
+   "input": "ಲೆ",
+   "comment": "syl-0CB2-0CC6"
+  },
+  {
+   "input": "ಲೇ",
+   "comment": "syl-0CB2-0CC7"
+  },
+  {
+   "input": "ಲೈ",
+   "comment": "syl-0CB2-0CC8"
+  },
+  {
+   "input": "ಲೊ",
+   "comment": "syl-0CB2-0CCA"
+  },
+  {
+   "input": "ಲೋ",
+   "comment": "syl-0CB2-0CCB"
+  },
+  {
+   "input": "ಲೌ",
+   "comment": "syl-0CB2-0CCC"
+  },
+  {
+   "input": "ಲೢ",
+   "comment": "syl-0CB2-0CE2"
+  },
+  {
+   "input": "ಲೣ",
+   "comment": "syl-0CB2-0CE3"
+  },
+  {
+   "input": "ಲ್",
+   "comment": "syl-0CB2-0CCD"
+  },
+  {
+   "input": "ಲಂ",
+   "comment": "syl-0CB2-0C82"
+  },
+  {
+   "input": "ಲಃ",
+   "comment": "syl-0CB2-0C83"
+  },
+  {
+   "input": "ಳಾ",
+   "comment": "syl-0CB3-0CBE"
+  },
+  {
+   "input": "ಳಿ",
+   "comment": "syl-0CB3-0CBF"
+  },
+  {
+   "input": "ಳೀ",
+   "comment": "syl-0CB3-0CC0"
+  },
+  {
+   "input": "ಳು",
+   "comment": "syl-0CB3-0CC1"
+  },
+  {
+   "input": "ಳೂ",
+   "comment": "syl-0CB3-0CC2"
+  },
+  {
+   "input": "ಳೃ",
+   "comment": "syl-0CB3-0CC3"
+  },
+  {
+   "input": "ಳೄ",
+   "comment": "syl-0CB3-0CC4"
+  },
+  {
+   "input": "ಳೆ",
+   "comment": "syl-0CB3-0CC6"
+  },
+  {
+   "input": "ಳೇ",
+   "comment": "syl-0CB3-0CC7"
+  },
+  {
+   "input": "ಳೈ",
+   "comment": "syl-0CB3-0CC8"
+  },
+  {
+   "input": "ಳೊ",
+   "comment": "syl-0CB3-0CCA"
+  },
+  {
+   "input": "ಳೋ",
+   "comment": "syl-0CB3-0CCB"
+  },
+  {
+   "input": "ಳೌ",
+   "comment": "syl-0CB3-0CCC"
+  },
+  {
+   "input": "ಳೢ",
+   "comment": "syl-0CB3-0CE2"
+  },
+  {
+   "input": "ಳೣ",
+   "comment": "syl-0CB3-0CE3"
+  },
+  {
+   "input": "ಳ್",
+   "comment": "syl-0CB3-0CCD"
+  },
+  {
+   "input": "ಳಂ",
+   "comment": "syl-0CB3-0C82"
+  },
+  {
+   "input": "ಳಃ",
+   "comment": "syl-0CB3-0C83"
+  },
+  {
+   "input": "ವಾ",
+   "comment": "syl-0CB5-0CBE"
+  },
+  {
+   "input": "ವಿ",
+   "comment": "syl-0CB5-0CBF"
+  },
+  {
+   "input": "ವೀ",
+   "comment": "syl-0CB5-0CC0"
+  },
+  {
+   "input": "ವು",
+   "comment": "syl-0CB5-0CC1"
+  },
+  {
+   "input": "ವೂ",
+   "comment": "syl-0CB5-0CC2"
+  },
+  {
+   "input": "ವೃ",
+   "comment": "syl-0CB5-0CC3"
+  },
+  {
+   "input": "ವೄ",
+   "comment": "syl-0CB5-0CC4"
+  },
+  {
+   "input": "ವೆ",
+   "comment": "syl-0CB5-0CC6"
+  },
+  {
+   "input": "ವೇ",
+   "comment": "syl-0CB5-0CC7"
+  },
+  {
+   "input": "ವೈ",
+   "comment": "syl-0CB5-0CC8"
+  },
+  {
+   "input": "ವೊ",
+   "comment": "syl-0CB5-0CCA"
+  },
+  {
+   "input": "ವೋ",
+   "comment": "syl-0CB5-0CCB"
+  },
+  {
+   "input": "ವೌ",
+   "comment": "syl-0CB5-0CCC"
+  },
+  {
+   "input": "ವೢ",
+   "comment": "syl-0CB5-0CE2"
+  },
+  {
+   "input": "ವೣ",
+   "comment": "syl-0CB5-0CE3"
+  },
+  {
+   "input": "ವ್",
+   "comment": "syl-0CB5-0CCD"
+  },
+  {
+   "input": "ವಂ",
+   "comment": "syl-0CB5-0C82"
+  },
+  {
+   "input": "ವಃ",
+   "comment": "syl-0CB5-0C83"
+  },
+  {
+   "input": "ಶಾ",
+   "comment": "syl-0CB6-0CBE"
+  },
+  {
+   "input": "ಶಿ",
+   "comment": "syl-0CB6-0CBF"
+  },
+  {
+   "input": "ಶೀ",
+   "comment": "syl-0CB6-0CC0"
+  },
+  {
+   "input": "ಶು",
+   "comment": "syl-0CB6-0CC1"
+  },
+  {
+   "input": "ಶೂ",
+   "comment": "syl-0CB6-0CC2"
+  },
+  {
+   "input": "ಶೃ",
+   "comment": "syl-0CB6-0CC3"
+  },
+  {
+   "input": "ಶೄ",
+   "comment": "syl-0CB6-0CC4"
+  },
+  {
+   "input": "ಶೆ",
+   "comment": "syl-0CB6-0CC6"
+  },
+  {
+   "input": "ಶೇ",
+   "comment": "syl-0CB6-0CC7"
+  },
+  {
+   "input": "ಶೈ",
+   "comment": "syl-0CB6-0CC8"
+  },
+  {
+   "input": "ಶೊ",
+   "comment": "syl-0CB6-0CCA"
+  },
+  {
+   "input": "ಶೋ",
+   "comment": "syl-0CB6-0CCB"
+  },
+  {
+   "input": "ಶೌ",
+   "comment": "syl-0CB6-0CCC"
+  },
+  {
+   "input": "ಶೢ",
+   "comment": "syl-0CB6-0CE2"
+  },
+  {
+   "input": "ಶೣ",
+   "comment": "syl-0CB6-0CE3"
+  },
+  {
+   "input": "ಶ್",
+   "comment": "syl-0CB6-0CCD"
+  },
+  {
+   "input": "ಶಂ",
+   "comment": "syl-0CB6-0C82"
+  },
+  {
+   "input": "ಶಃ",
+   "comment": "syl-0CB6-0C83"
+  },
+  {
+   "input": "ಷಾ",
+   "comment": "syl-0CB7-0CBE"
+  },
+  {
+   "input": "ಷಿ",
+   "comment": "syl-0CB7-0CBF"
+  },
+  {
+   "input": "ಷೀ",
+   "comment": "syl-0CB7-0CC0"
+  },
+  {
+   "input": "ಷು",
+   "comment": "syl-0CB7-0CC1"
+  },
+  {
+   "input": "ಷೂ",
+   "comment": "syl-0CB7-0CC2"
+  },
+  {
+   "input": "ಷೃ",
+   "comment": "syl-0CB7-0CC3"
+  },
+  {
+   "input": "ಷೄ",
+   "comment": "syl-0CB7-0CC4"
+  },
+  {
+   "input": "ಷೆ",
+   "comment": "syl-0CB7-0CC6"
+  },
+  {
+   "input": "ಷೇ",
+   "comment": "syl-0CB7-0CC7"
+  },
+  {
+   "input": "ಷೈ",
+   "comment": "syl-0CB7-0CC8"
+  },
+  {
+   "input": "ಷೊ",
+   "comment": "syl-0CB7-0CCA"
+  },
+  {
+   "input": "ಷೋ",
+   "comment": "syl-0CB7-0CCB"
+  },
+  {
+   "input": "ಷೌ",
+   "comment": "syl-0CB7-0CCC"
+  },
+  {
+   "input": "ಷೢ",
+   "comment": "syl-0CB7-0CE2"
+  },
+  {
+   "input": "ಷೣ",
+   "comment": "syl-0CB7-0CE3"
+  },
+  {
+   "input": "ಷ್",
+   "comment": "syl-0CB7-0CCD"
+  },
+  {
+   "input": "ಷಂ",
+   "comment": "syl-0CB7-0C82"
+  },
+  {
+   "input": "ಷಃ",
+   "comment": "syl-0CB7-0C83"
+  },
+  {
+   "input": "ಸಾ",
+   "comment": "syl-0CB8-0CBE"
+  },
+  {
+   "input": "ಸಿ",
+   "comment": "syl-0CB8-0CBF"
+  },
+  {
+   "input": "ಸೀ",
+   "comment": "syl-0CB8-0CC0"
+  },
+  {
+   "input": "ಸು",
+   "comment": "syl-0CB8-0CC1"
+  },
+  {
+   "input": "ಸೂ",
+   "comment": "syl-0CB8-0CC2"
+  },
+  {
+   "input": "ಸೃ",
+   "comment": "syl-0CB8-0CC3"
+  },
+  {
+   "input": "ಸೄ",
+   "comment": "syl-0CB8-0CC4"
+  },
+  {
+   "input": "ಸೆ",
+   "comment": "syl-0CB8-0CC6"
+  },
+  {
+   "input": "ಸೇ",
+   "comment": "syl-0CB8-0CC7"
+  },
+  {
+   "input": "ಸೈ",
+   "comment": "syl-0CB8-0CC8"
+  },
+  {
+   "input": "ಸೊ",
+   "comment": "syl-0CB8-0CCA"
+  },
+  {
+   "input": "ಸೋ",
+   "comment": "syl-0CB8-0CCB"
+  },
+  {
+   "input": "ಸೌ",
+   "comment": "syl-0CB8-0CCC"
+  },
+  {
+   "input": "ಸೢ",
+   "comment": "syl-0CB8-0CE2"
+  },
+  {
+   "input": "ಸೣ",
+   "comment": "syl-0CB8-0CE3"
+  },
+  {
+   "input": "ಸ್",
+   "comment": "syl-0CB8-0CCD"
+  },
+  {
+   "input": "ಸಂ",
+   "comment": "syl-0CB8-0C82"
+  },
+  {
+   "input": "ಸಃ",
+   "comment": "syl-0CB8-0C83"
+  },
+  {
+   "input": "ಹಾ",
+   "comment": "syl-0CB9-0CBE"
+  },
+  {
+   "input": "ಹಿ",
+   "comment": "syl-0CB9-0CBF"
+  },
+  {
+   "input": "ಹೀ",
+   "comment": "syl-0CB9-0CC0"
+  },
+  {
+   "input": "ಹು",
+   "comment": "syl-0CB9-0CC1"
+  },
+  {
+   "input": "ಹೂ",
+   "comment": "syl-0CB9-0CC2"
+  },
+  {
+   "input": "ಹೃ",
+   "comment": "syl-0CB9-0CC3"
+  },
+  {
+   "input": "ಹೄ",
+   "comment": "syl-0CB9-0CC4"
+  },
+  {
+   "input": "ಹೆ",
+   "comment": "syl-0CB9-0CC6"
+  },
+  {
+   "input": "ಹೇ",
+   "comment": "syl-0CB9-0CC7"
+  },
+  {
+   "input": "ಹೈ",
+   "comment": "syl-0CB9-0CC8"
+  },
+  {
+   "input": "ಹೊ",
+   "comment": "syl-0CB9-0CCA"
+  },
+  {
+   "input": "ಹೋ",
+   "comment": "syl-0CB9-0CCB"
+  },
+  {
+   "input": "ಹೌ",
+   "comment": "syl-0CB9-0CCC"
+  },
+  {
+   "input": "ಹೢ",
+   "comment": "syl-0CB9-0CE2"
+  },
+  {
+   "input": "ಹೣ",
+   "comment": "syl-0CB9-0CE3"
+  },
+  {
+   "input": "ಹ್",
+   "comment": "syl-0CB9-0CCD"
+  },
+  {
+   "input": "ಹಂ",
+   "comment": "syl-0CB9-0C82"
+  },
+  {
+   "input": "ಹಃ",
+   "comment": "syl-0CB9-0C83"
+  },
+  {
+   "input": "ೞಾ",
+   "comment": "syl-0CDE-0CBE"
+  },
+  {
+   "input": "ೞಿ",
+   "comment": "syl-0CDE-0CBF"
+  },
+  {
+   "input": "ೞೀ",
+   "comment": "syl-0CDE-0CC0"
+  },
+  {
+   "input": "ೞು",
+   "comment": "syl-0CDE-0CC1"
+  },
+  {
+   "input": "ೞೂ",
+   "comment": "syl-0CDE-0CC2"
+  },
+  {
+   "input": "ೞೃ",
+   "comment": "syl-0CDE-0CC3"
+  },
+  {
+   "input": "ೞೄ",
+   "comment": "syl-0CDE-0CC4"
+  },
+  {
+   "input": "ೞೆ",
+   "comment": "syl-0CDE-0CC6"
+  },
+  {
+   "input": "ೞೇ",
+   "comment": "syl-0CDE-0CC7"
+  },
+  {
+   "input": "ೞೈ",
+   "comment": "syl-0CDE-0CC8"
+  },
+  {
+   "input": "ೞೊ",
+   "comment": "syl-0CDE-0CCA"
+  },
+  {
+   "input": "ೞೋ",
+   "comment": "syl-0CDE-0CCB"
+  },
+  {
+   "input": "ೞೌ",
+   "comment": "syl-0CDE-0CCC"
+  },
+  {
+   "input": "ೞೢ",
+   "comment": "syl-0CDE-0CE2"
+  },
+  {
+   "input": "ೞೣ",
+   "comment": "syl-0CDE-0CE3"
+  },
+  {
+   "input": "ೞ್",
+   "comment": "syl-0CDE-0CCD"
+  },
+  {
+   "input": "ೞಂ",
+   "comment": "syl-0CDE-0C82"
+  },
+  {
+   "input": "ೞಃ",
+   "comment": "syl-0CDE-0C83"
+  },
+  {
+   "input": "ಕ್ಕ",
+   "comment": "clu-0C95-0CCD-0C95"
+  },
+  {
+   "input": "ಕ್ಖ",
+   "comment": "clu-0C95-0CCD-0C96"
+  },
+  {
+   "input": "ಕ್ಗ",
+   "comment": "clu-0C95-0CCD-0C97"
+  },
+  {
+   "input": "ಕ್ಘ",
+   "comment": "clu-0C95-0CCD-0C98"
+  },
+  {
+   "input": "ಕ್ಙ",
+   "comment": "clu-0C95-0CCD-0C99"
+  },
+  {
+   "input": "ಕ್ಚ",
+   "comment": "clu-0C95-0CCD-0C9A"
+  },
+  {
+   "input": "ಕ್ಛ",
+   "comment": "clu-0C95-0CCD-0C9B"
+  },
+  {
+   "input": "ಕ್ಜ",
+   "comment": "clu-0C95-0CCD-0C9C"
+  },
+  {
+   "input": "ಕ್ಝ",
+   "comment": "clu-0C95-0CCD-0C9D"
+  },
+  {
+   "input": "ಕ್ಞ",
+   "comment": "clu-0C95-0CCD-0C9E"
+  },
+  {
+   "input": "ಕ್ಟ",
+   "comment": "clu-0C95-0CCD-0C9F"
+  },
+  {
+   "input": "ಕ್ಠ",
+   "comment": "clu-0C95-0CCD-0CA0"
+  },
+  {
+   "input": "ಕ್ಡ",
+   "comment": "clu-0C95-0CCD-0CA1"
+  },
+  {
+   "input": "ಕ್ಢ",
+   "comment": "clu-0C95-0CCD-0CA2"
+  },
+  {
+   "input": "ಕ್ಣ",
+   "comment": "clu-0C95-0CCD-0CA3"
+  },
+  {
+   "input": "ಕ್ತ",
+   "comment": "clu-0C95-0CCD-0CA4"
+  },
+  {
+   "input": "ಕ್ಥ",
+   "comment": "clu-0C95-0CCD-0CA5"
+  },
+  {
+   "input": "ಕ್ದ",
+   "comment": "clu-0C95-0CCD-0CA6"
+  },
+  {
+   "input": "ಕ್ಧ",
+   "comment": "clu-0C95-0CCD-0CA7"
+  },
+  {
+   "input": "ಕ್ನ",
+   "comment": "clu-0C95-0CCD-0CA8"
+  },
+  {
+   "input": "ಕ್ಪ",
+   "comment": "clu-0C95-0CCD-0CAA"
+  },
+  {
+   "input": "ಕ್ಫ",
+   "comment": "clu-0C95-0CCD-0CAB"
+  },
+  {
+   "input": "ಕ್ಬ",
+   "comment": "clu-0C95-0CCD-0CAC"
+  },
+  {
+   "input": "ಕ್ಭ",
+   "comment": "clu-0C95-0CCD-0CAD"
+  },
+  {
+   "input": "ಕ್ಮ",
+   "comment": "clu-0C95-0CCD-0CAE"
+  },
+  {
+   "input": "ಕ್ಯ",
+   "comment": "clu-0C95-0CCD-0CAF"
+  },
+  {
+   "input": "ಕ್ರ",
+   "comment": "clu-0C95-0CCD-0CB0"
+  },
+  {
+   "input": "ಕ್ಱ",
+   "comment": "clu-0C95-0CCD-0CB1"
+  },
+  {
+   "input": "ಕ್ಲ",
+   "comment": "clu-0C95-0CCD-0CB2"
+  },
+  {
+   "input": "ಕ್ಳ",
+   "comment": "clu-0C95-0CCD-0CB3"
+  },
+  {
+   "input": "ಕ್ವ",
+   "comment": "clu-0C95-0CCD-0CB5"
+  },
+  {
+   "input": "ಕ್ಶ",
+   "comment": "clu-0C95-0CCD-0CB6"
+  },
+  {
+   "input": "ಕ್ಷ",
+   "comment": "clu-0C95-0CCD-0CB7"
+  },
+  {
+   "input": "ಕ್ಸ",
+   "comment": "clu-0C95-0CCD-0CB8"
+  },
+  {
+   "input": "ಕ್ಹ",
+   "comment": "clu-0C95-0CCD-0CB9"
+  },
+  {
+   "input": "ಕ್ೞ",
+   "comment": "clu-0C95-0CCD-0CDE"
+  },
+  {
+   "input": "ಖ್ಕ",
+   "comment": "clu-0C96-0CCD-0C95"
+  },
+  {
+   "input": "ಖ್ಖ",
+   "comment": "clu-0C96-0CCD-0C96"
+  },
+  {
+   "input": "ಖ್ಗ",
+   "comment": "clu-0C96-0CCD-0C97"
+  },
+  {
+   "input": "ಖ್ಘ",
+   "comment": "clu-0C96-0CCD-0C98"
+  },
+  {
+   "input": "ಖ್ಙ",
+   "comment": "clu-0C96-0CCD-0C99"
+  },
+  {
+   "input": "ಖ್ಚ",
+   "comment": "clu-0C96-0CCD-0C9A"
+  },
+  {
+   "input": "ಖ್ಛ",
+   "comment": "clu-0C96-0CCD-0C9B"
+  },
+  {
+   "input": "ಖ್ಜ",
+   "comment": "clu-0C96-0CCD-0C9C"
+  },
+  {
+   "input": "ಖ್ಝ",
+   "comment": "clu-0C96-0CCD-0C9D"
+  },
+  {
+   "input": "ಖ್ಞ",
+   "comment": "clu-0C96-0CCD-0C9E"
+  },
+  {
+   "input": "ಖ್ಟ",
+   "comment": "clu-0C96-0CCD-0C9F"
+  },
+  {
+   "input": "ಖ್ಠ",
+   "comment": "clu-0C96-0CCD-0CA0"
+  },
+  {
+   "input": "ಖ್ಡ",
+   "comment": "clu-0C96-0CCD-0CA1"
+  },
+  {
+   "input": "ಖ್ಢ",
+   "comment": "clu-0C96-0CCD-0CA2"
+  },
+  {
+   "input": "ಖ್ಣ",
+   "comment": "clu-0C96-0CCD-0CA3"
+  },
+  {
+   "input": "ಖ್ತ",
+   "comment": "clu-0C96-0CCD-0CA4"
+  },
+  {
+   "input": "ಖ್ಥ",
+   "comment": "clu-0C96-0CCD-0CA5"
+  },
+  {
+   "input": "ಖ್ದ",
+   "comment": "clu-0C96-0CCD-0CA6"
+  },
+  {
+   "input": "ಖ್ಧ",
+   "comment": "clu-0C96-0CCD-0CA7"
+  },
+  {
+   "input": "ಖ್ನ",
+   "comment": "clu-0C96-0CCD-0CA8"
+  },
+  {
+   "input": "ಖ್ಪ",
+   "comment": "clu-0C96-0CCD-0CAA"
+  },
+  {
+   "input": "ಖ್ಫ",
+   "comment": "clu-0C96-0CCD-0CAB"
+  },
+  {
+   "input": "ಖ್ಬ",
+   "comment": "clu-0C96-0CCD-0CAC"
+  },
+  {
+   "input": "ಖ್ಭ",
+   "comment": "clu-0C96-0CCD-0CAD"
+  },
+  {
+   "input": "ಖ್ಮ",
+   "comment": "clu-0C96-0CCD-0CAE"
+  },
+  {
+   "input": "ಖ್ಯ",
+   "comment": "clu-0C96-0CCD-0CAF"
+  },
+  {
+   "input": "ಖ್ರ",
+   "comment": "clu-0C96-0CCD-0CB0"
+  },
+  {
+   "input": "ಖ್ಱ",
+   "comment": "clu-0C96-0CCD-0CB1"
+  },
+  {
+   "input": "ಖ್ಲ",
+   "comment": "clu-0C96-0CCD-0CB2"
+  },
+  {
+   "input": "ಖ್ಳ",
+   "comment": "clu-0C96-0CCD-0CB3"
+  },
+  {
+   "input": "ಖ್ವ",
+   "comment": "clu-0C96-0CCD-0CB5"
+  },
+  {
+   "input": "ಖ್ಶ",
+   "comment": "clu-0C96-0CCD-0CB6"
+  },
+  {
+   "input": "ಖ್ಷ",
+   "comment": "clu-0C96-0CCD-0CB7"
+  },
+  {
+   "input": "ಖ್ಸ",
+   "comment": "clu-0C96-0CCD-0CB8"
+  },
+  {
+   "input": "ಖ್ಹ",
+   "comment": "clu-0C96-0CCD-0CB9"
+  },
+  {
+   "input": "ಖ್ೞ",
+   "comment": "clu-0C96-0CCD-0CDE"
+  },
+  {
+   "input": "ಗ್ಕ",
+   "comment": "clu-0C97-0CCD-0C95"
+  },
+  {
+   "input": "ಗ್ಖ",
+   "comment": "clu-0C97-0CCD-0C96"
+  },
+  {
+   "input": "ಗ್ಗ",
+   "comment": "clu-0C97-0CCD-0C97"
+  },
+  {
+   "input": "ಗ್ಘ",
+   "comment": "clu-0C97-0CCD-0C98"
+  },
+  {
+   "input": "ಗ್ಙ",
+   "comment": "clu-0C97-0CCD-0C99"
+  },
+  {
+   "input": "ಗ್ಚ",
+   "comment": "clu-0C97-0CCD-0C9A"
+  },
+  {
+   "input": "ಗ್ಛ",
+   "comment": "clu-0C97-0CCD-0C9B"
+  },
+  {
+   "input": "ಗ್ಜ",
+   "comment": "clu-0C97-0CCD-0C9C"
+  },
+  {
+   "input": "ಗ್ಝ",
+   "comment": "clu-0C97-0CCD-0C9D"
+  },
+  {
+   "input": "ಗ್ಞ",
+   "comment": "clu-0C97-0CCD-0C9E"
+  },
+  {
+   "input": "ಗ್ಟ",
+   "comment": "clu-0C97-0CCD-0C9F"
+  },
+  {
+   "input": "ಗ್ಠ",
+   "comment": "clu-0C97-0CCD-0CA0"
+  },
+  {
+   "input": "ಗ್ಡ",
+   "comment": "clu-0C97-0CCD-0CA1"
+  },
+  {
+   "input": "ಗ್ಢ",
+   "comment": "clu-0C97-0CCD-0CA2"
+  },
+  {
+   "input": "ಗ್ಣ",
+   "comment": "clu-0C97-0CCD-0CA3"
+  },
+  {
+   "input": "ಗ್ತ",
+   "comment": "clu-0C97-0CCD-0CA4"
+  },
+  {
+   "input": "ಗ್ಥ",
+   "comment": "clu-0C97-0CCD-0CA5"
+  },
+  {
+   "input": "ಗ್ದ",
+   "comment": "clu-0C97-0CCD-0CA6"
+  },
+  {
+   "input": "ಗ್ಧ",
+   "comment": "clu-0C97-0CCD-0CA7"
+  },
+  {
+   "input": "ಗ್ನ",
+   "comment": "clu-0C97-0CCD-0CA8"
+  },
+  {
+   "input": "ಗ್ಪ",
+   "comment": "clu-0C97-0CCD-0CAA"
+  },
+  {
+   "input": "ಗ್ಫ",
+   "comment": "clu-0C97-0CCD-0CAB"
+  },
+  {
+   "input": "ಗ್ಬ",
+   "comment": "clu-0C97-0CCD-0CAC"
+  },
+  {
+   "input": "ಗ್ಭ",
+   "comment": "clu-0C97-0CCD-0CAD"
+  },
+  {
+   "input": "ಗ್ಮ",
+   "comment": "clu-0C97-0CCD-0CAE"
+  },
+  {
+   "input": "ಗ್ಯ",
+   "comment": "clu-0C97-0CCD-0CAF"
+  },
+  {
+   "input": "ಗ್ರ",
+   "comment": "clu-0C97-0CCD-0CB0"
+  },
+  {
+   "input": "ಗ್ಱ",
+   "comment": "clu-0C97-0CCD-0CB1"
+  },
+  {
+   "input": "ಗ್ಲ",
+   "comment": "clu-0C97-0CCD-0CB2"
+  },
+  {
+   "input": "ಗ್ಳ",
+   "comment": "clu-0C97-0CCD-0CB3"
+  },
+  {
+   "input": "ಗ್ವ",
+   "comment": "clu-0C97-0CCD-0CB5"
+  },
+  {
+   "input": "ಗ್ಶ",
+   "comment": "clu-0C97-0CCD-0CB6"
+  },
+  {
+   "input": "ಗ್ಷ",
+   "comment": "clu-0C97-0CCD-0CB7"
+  },
+  {
+   "input": "ಗ್ಸ",
+   "comment": "clu-0C97-0CCD-0CB8"
+  },
+  {
+   "input": "ಗ್ಹ",
+   "comment": "clu-0C97-0CCD-0CB9"
+  },
+  {
+   "input": "ಗ್ೞ",
+   "comment": "clu-0C97-0CCD-0CDE"
+  },
+  {
+   "input": "ಘ್ಕ",
+   "comment": "clu-0C98-0CCD-0C95"
+  },
+  {
+   "input": "ಘ್ಖ",
+   "comment": "clu-0C98-0CCD-0C96"
+  },
+  {
+   "input": "ಘ್ಗ",
+   "comment": "clu-0C98-0CCD-0C97"
+  },
+  {
+   "input": "ಘ್ಘ",
+   "comment": "clu-0C98-0CCD-0C98"
+  },
+  {
+   "input": "ಘ್ಙ",
+   "comment": "clu-0C98-0CCD-0C99"
+  },
+  {
+   "input": "ಘ್ಚ",
+   "comment": "clu-0C98-0CCD-0C9A"
+  },
+  {
+   "input": "ಘ್ಛ",
+   "comment": "clu-0C98-0CCD-0C9B"
+  },
+  {
+   "input": "ಘ್ಜ",
+   "comment": "clu-0C98-0CCD-0C9C"
+  },
+  {
+   "input": "ಘ್ಝ",
+   "comment": "clu-0C98-0CCD-0C9D"
+  },
+  {
+   "input": "ಘ್ಞ",
+   "comment": "clu-0C98-0CCD-0C9E"
+  },
+  {
+   "input": "ಘ್ಟ",
+   "comment": "clu-0C98-0CCD-0C9F"
+  },
+  {
+   "input": "ಘ್ಠ",
+   "comment": "clu-0C98-0CCD-0CA0"
+  },
+  {
+   "input": "ಘ್ಡ",
+   "comment": "clu-0C98-0CCD-0CA1"
+  },
+  {
+   "input": "ಘ್ಢ",
+   "comment": "clu-0C98-0CCD-0CA2"
+  },
+  {
+   "input": "ಘ್ಣ",
+   "comment": "clu-0C98-0CCD-0CA3"
+  },
+  {
+   "input": "ಘ್ತ",
+   "comment": "clu-0C98-0CCD-0CA4"
+  },
+  {
+   "input": "ಘ್ಥ",
+   "comment": "clu-0C98-0CCD-0CA5"
+  },
+  {
+   "input": "ಘ್ದ",
+   "comment": "clu-0C98-0CCD-0CA6"
+  },
+  {
+   "input": "ಘ್ಧ",
+   "comment": "clu-0C98-0CCD-0CA7"
+  },
+  {
+   "input": "ಘ್ನ",
+   "comment": "clu-0C98-0CCD-0CA8"
+  },
+  {
+   "input": "ಘ್ಪ",
+   "comment": "clu-0C98-0CCD-0CAA"
+  },
+  {
+   "input": "ಘ್ಫ",
+   "comment": "clu-0C98-0CCD-0CAB"
+  },
+  {
+   "input": "ಘ್ಬ",
+   "comment": "clu-0C98-0CCD-0CAC"
+  },
+  {
+   "input": "ಘ್ಭ",
+   "comment": "clu-0C98-0CCD-0CAD"
+  },
+  {
+   "input": "ಘ್ಮ",
+   "comment": "clu-0C98-0CCD-0CAE"
+  },
+  {
+   "input": "ಘ್ಯ",
+   "comment": "clu-0C98-0CCD-0CAF"
+  },
+  {
+   "input": "ಘ್ರ",
+   "comment": "clu-0C98-0CCD-0CB0"
+  },
+  {
+   "input": "ಘ್ಱ",
+   "comment": "clu-0C98-0CCD-0CB1"
+  },
+  {
+   "input": "ಘ್ಲ",
+   "comment": "clu-0C98-0CCD-0CB2"
+  },
+  {
+   "input": "ಘ್ಳ",
+   "comment": "clu-0C98-0CCD-0CB3"
+  },
+  {
+   "input": "ಘ್ವ",
+   "comment": "clu-0C98-0CCD-0CB5"
+  },
+  {
+   "input": "ಘ್ಶ",
+   "comment": "clu-0C98-0CCD-0CB6"
+  },
+  {
+   "input": "ಘ್ಷ",
+   "comment": "clu-0C98-0CCD-0CB7"
+  },
+  {
+   "input": "ಘ್ಸ",
+   "comment": "clu-0C98-0CCD-0CB8"
+  },
+  {
+   "input": "ಘ್ಹ",
+   "comment": "clu-0C98-0CCD-0CB9"
+  },
+  {
+   "input": "ಘ್ೞ",
+   "comment": "clu-0C98-0CCD-0CDE"
+  },
+  {
+   "input": "ಙ್ಕ",
+   "comment": "clu-0C99-0CCD-0C95"
+  },
+  {
+   "input": "ಙ್ಖ",
+   "comment": "clu-0C99-0CCD-0C96"
+  },
+  {
+   "input": "ಙ್ಗ",
+   "comment": "clu-0C99-0CCD-0C97"
+  },
+  {
+   "input": "ಙ್ಘ",
+   "comment": "clu-0C99-0CCD-0C98"
+  },
+  {
+   "input": "ಙ್ಙ",
+   "comment": "clu-0C99-0CCD-0C99"
+  },
+  {
+   "input": "ಙ್ಚ",
+   "comment": "clu-0C99-0CCD-0C9A"
+  },
+  {
+   "input": "ಙ್ಛ",
+   "comment": "clu-0C99-0CCD-0C9B"
+  },
+  {
+   "input": "ಙ್ಜ",
+   "comment": "clu-0C99-0CCD-0C9C"
+  },
+  {
+   "input": "ಙ್ಝ",
+   "comment": "clu-0C99-0CCD-0C9D"
+  },
+  {
+   "input": "ಙ್ಞ",
+   "comment": "clu-0C99-0CCD-0C9E"
+  },
+  {
+   "input": "ಙ್ಟ",
+   "comment": "clu-0C99-0CCD-0C9F"
+  },
+  {
+   "input": "ಙ್ಠ",
+   "comment": "clu-0C99-0CCD-0CA0"
+  },
+  {
+   "input": "ಙ್ಡ",
+   "comment": "clu-0C99-0CCD-0CA1"
+  },
+  {
+   "input": "ಙ್ಢ",
+   "comment": "clu-0C99-0CCD-0CA2"
+  },
+  {
+   "input": "ಙ್ಣ",
+   "comment": "clu-0C99-0CCD-0CA3"
+  },
+  {
+   "input": "ಙ್ತ",
+   "comment": "clu-0C99-0CCD-0CA4"
+  },
+  {
+   "input": "ಙ್ಥ",
+   "comment": "clu-0C99-0CCD-0CA5"
+  },
+  {
+   "input": "ಙ್ದ",
+   "comment": "clu-0C99-0CCD-0CA6"
+  },
+  {
+   "input": "ಙ್ಧ",
+   "comment": "clu-0C99-0CCD-0CA7"
+  },
+  {
+   "input": "ಙ್ನ",
+   "comment": "clu-0C99-0CCD-0CA8"
+  },
+  {
+   "input": "ಙ್ಪ",
+   "comment": "clu-0C99-0CCD-0CAA"
+  },
+  {
+   "input": "ಙ್ಫ",
+   "comment": "clu-0C99-0CCD-0CAB"
+  },
+  {
+   "input": "ಙ್ಬ",
+   "comment": "clu-0C99-0CCD-0CAC"
+  },
+  {
+   "input": "ಙ್ಭ",
+   "comment": "clu-0C99-0CCD-0CAD"
+  },
+  {
+   "input": "ಙ್ಮ",
+   "comment": "clu-0C99-0CCD-0CAE"
+  },
+  {
+   "input": "ಙ್ಯ",
+   "comment": "clu-0C99-0CCD-0CAF"
+  },
+  {
+   "input": "ಙ್ರ",
+   "comment": "clu-0C99-0CCD-0CB0"
+  },
+  {
+   "input": "ಙ್ಱ",
+   "comment": "clu-0C99-0CCD-0CB1"
+  },
+  {
+   "input": "ಙ್ಲ",
+   "comment": "clu-0C99-0CCD-0CB2"
+  },
+  {
+   "input": "ಙ್ಳ",
+   "comment": "clu-0C99-0CCD-0CB3"
+  },
+  {
+   "input": "ಙ್ವ",
+   "comment": "clu-0C99-0CCD-0CB5"
+  },
+  {
+   "input": "ಙ್ಶ",
+   "comment": "clu-0C99-0CCD-0CB6"
+  },
+  {
+   "input": "ಙ್ಷ",
+   "comment": "clu-0C99-0CCD-0CB7"
+  },
+  {
+   "input": "ಙ್ಸ",
+   "comment": "clu-0C99-0CCD-0CB8"
+  },
+  {
+   "input": "ಙ್ಹ",
+   "comment": "clu-0C99-0CCD-0CB9"
+  },
+  {
+   "input": "ಙ್ೞ",
+   "comment": "clu-0C99-0CCD-0CDE"
+  },
+  {
+   "input": "ಚ್ಕ",
+   "comment": "clu-0C9A-0CCD-0C95"
+  },
+  {
+   "input": "ಚ್ಖ",
+   "comment": "clu-0C9A-0CCD-0C96"
+  },
+  {
+   "input": "ಚ್ಗ",
+   "comment": "clu-0C9A-0CCD-0C97"
+  },
+  {
+   "input": "ಚ್ಘ",
+   "comment": "clu-0C9A-0CCD-0C98"
+  },
+  {
+   "input": "ಚ್ಙ",
+   "comment": "clu-0C9A-0CCD-0C99"
+  },
+  {
+   "input": "ಚ್ಚ",
+   "comment": "clu-0C9A-0CCD-0C9A"
+  },
+  {
+   "input": "ಚ್ಛ",
+   "comment": "clu-0C9A-0CCD-0C9B"
+  },
+  {
+   "input": "ಚ್ಜ",
+   "comment": "clu-0C9A-0CCD-0C9C"
+  },
+  {
+   "input": "ಚ್ಝ",
+   "comment": "clu-0C9A-0CCD-0C9D"
+  },
+  {
+   "input": "ಚ್ಞ",
+   "comment": "clu-0C9A-0CCD-0C9E"
+  },
+  {
+   "input": "ಚ್ಟ",
+   "comment": "clu-0C9A-0CCD-0C9F"
+  },
+  {
+   "input": "ಚ್ಠ",
+   "comment": "clu-0C9A-0CCD-0CA0"
+  },
+  {
+   "input": "ಚ್ಡ",
+   "comment": "clu-0C9A-0CCD-0CA1"
+  },
+  {
+   "input": "ಚ್ಢ",
+   "comment": "clu-0C9A-0CCD-0CA2"
+  },
+  {
+   "input": "ಚ್ಣ",
+   "comment": "clu-0C9A-0CCD-0CA3"
+  },
+  {
+   "input": "ಚ್ತ",
+   "comment": "clu-0C9A-0CCD-0CA4"
+  },
+  {
+   "input": "ಚ್ಥ",
+   "comment": "clu-0C9A-0CCD-0CA5"
+  },
+  {
+   "input": "ಚ್ದ",
+   "comment": "clu-0C9A-0CCD-0CA6"
+  },
+  {
+   "input": "ಚ್ಧ",
+   "comment": "clu-0C9A-0CCD-0CA7"
+  },
+  {
+   "input": "ಚ್ನ",
+   "comment": "clu-0C9A-0CCD-0CA8"
+  },
+  {
+   "input": "ಚ್ಪ",
+   "comment": "clu-0C9A-0CCD-0CAA"
+  },
+  {
+   "input": "ಚ್ಫ",
+   "comment": "clu-0C9A-0CCD-0CAB"
+  },
+  {
+   "input": "ಚ್ಬ",
+   "comment": "clu-0C9A-0CCD-0CAC"
+  },
+  {
+   "input": "ಚ್ಭ",
+   "comment": "clu-0C9A-0CCD-0CAD"
+  },
+  {
+   "input": "ಚ್ಮ",
+   "comment": "clu-0C9A-0CCD-0CAE"
+  },
+  {
+   "input": "ಚ್ಯ",
+   "comment": "clu-0C9A-0CCD-0CAF"
+  },
+  {
+   "input": "ಚ್ರ",
+   "comment": "clu-0C9A-0CCD-0CB0"
+  },
+  {
+   "input": "ಚ್ಱ",
+   "comment": "clu-0C9A-0CCD-0CB1"
+  },
+  {
+   "input": "ಚ್ಲ",
+   "comment": "clu-0C9A-0CCD-0CB2"
+  },
+  {
+   "input": "ಚ್ಳ",
+   "comment": "clu-0C9A-0CCD-0CB3"
+  },
+  {
+   "input": "ಚ್ವ",
+   "comment": "clu-0C9A-0CCD-0CB5"
+  },
+  {
+   "input": "ಚ್ಶ",
+   "comment": "clu-0C9A-0CCD-0CB6"
+  },
+  {
+   "input": "ಚ್ಷ",
+   "comment": "clu-0C9A-0CCD-0CB7"
+  },
+  {
+   "input": "ಚ್ಸ",
+   "comment": "clu-0C9A-0CCD-0CB8"
+  },
+  {
+   "input": "ಚ್ಹ",
+   "comment": "clu-0C9A-0CCD-0CB9"
+  },
+  {
+   "input": "ಚ್ೞ",
+   "comment": "clu-0C9A-0CCD-0CDE"
+  },
+  {
+   "input": "ಛ್ಕ",
+   "comment": "clu-0C9B-0CCD-0C95"
+  },
+  {
+   "input": "ಛ್ಖ",
+   "comment": "clu-0C9B-0CCD-0C96"
+  },
+  {
+   "input": "ಛ್ಗ",
+   "comment": "clu-0C9B-0CCD-0C97"
+  },
+  {
+   "input": "ಛ್ಘ",
+   "comment": "clu-0C9B-0CCD-0C98"
+  },
+  {
+   "input": "ಛ್ಙ",
+   "comment": "clu-0C9B-0CCD-0C99"
+  },
+  {
+   "input": "ಛ್ಚ",
+   "comment": "clu-0C9B-0CCD-0C9A"
+  },
+  {
+   "input": "ಛ್ಛ",
+   "comment": "clu-0C9B-0CCD-0C9B"
+  },
+  {
+   "input": "ಛ್ಜ",
+   "comment": "clu-0C9B-0CCD-0C9C"
+  },
+  {
+   "input": "ಛ್ಝ",
+   "comment": "clu-0C9B-0CCD-0C9D"
+  },
+  {
+   "input": "ಛ್ಞ",
+   "comment": "clu-0C9B-0CCD-0C9E"
+  },
+  {
+   "input": "ಛ್ಟ",
+   "comment": "clu-0C9B-0CCD-0C9F"
+  },
+  {
+   "input": "ಛ್ಠ",
+   "comment": "clu-0C9B-0CCD-0CA0"
+  },
+  {
+   "input": "ಛ್ಡ",
+   "comment": "clu-0C9B-0CCD-0CA1"
+  },
+  {
+   "input": "ಛ್ಢ",
+   "comment": "clu-0C9B-0CCD-0CA2"
+  },
+  {
+   "input": "ಛ್ಣ",
+   "comment": "clu-0C9B-0CCD-0CA3"
+  },
+  {
+   "input": "ಛ್ತ",
+   "comment": "clu-0C9B-0CCD-0CA4"
+  },
+  {
+   "input": "ಛ್ಥ",
+   "comment": "clu-0C9B-0CCD-0CA5"
+  },
+  {
+   "input": "ಛ್ದ",
+   "comment": "clu-0C9B-0CCD-0CA6"
+  },
+  {
+   "input": "ಛ್ಧ",
+   "comment": "clu-0C9B-0CCD-0CA7"
+  },
+  {
+   "input": "ಛ್ನ",
+   "comment": "clu-0C9B-0CCD-0CA8"
+  },
+  {
+   "input": "ಛ್ಪ",
+   "comment": "clu-0C9B-0CCD-0CAA"
+  },
+  {
+   "input": "ಛ್ಫ",
+   "comment": "clu-0C9B-0CCD-0CAB"
+  },
+  {
+   "input": "ಛ್ಬ",
+   "comment": "clu-0C9B-0CCD-0CAC"
+  },
+  {
+   "input": "ಛ್ಭ",
+   "comment": "clu-0C9B-0CCD-0CAD"
+  },
+  {
+   "input": "ಛ್ಮ",
+   "comment": "clu-0C9B-0CCD-0CAE"
+  },
+  {
+   "input": "ಛ್ಯ",
+   "comment": "clu-0C9B-0CCD-0CAF"
+  },
+  {
+   "input": "ಛ್ರ",
+   "comment": "clu-0C9B-0CCD-0CB0"
+  },
+  {
+   "input": "ಛ್ಱ",
+   "comment": "clu-0C9B-0CCD-0CB1"
+  },
+  {
+   "input": "ಛ್ಲ",
+   "comment": "clu-0C9B-0CCD-0CB2"
+  },
+  {
+   "input": "ಛ್ಳ",
+   "comment": "clu-0C9B-0CCD-0CB3"
+  },
+  {
+   "input": "ಛ್ವ",
+   "comment": "clu-0C9B-0CCD-0CB5"
+  },
+  {
+   "input": "ಛ್ಶ",
+   "comment": "clu-0C9B-0CCD-0CB6"
+  },
+  {
+   "input": "ಛ್ಷ",
+   "comment": "clu-0C9B-0CCD-0CB7"
+  },
+  {
+   "input": "ಛ್ಸ",
+   "comment": "clu-0C9B-0CCD-0CB8"
+  },
+  {
+   "input": "ಛ್ಹ",
+   "comment": "clu-0C9B-0CCD-0CB9"
+  },
+  {
+   "input": "ಛ್ೞ",
+   "comment": "clu-0C9B-0CCD-0CDE"
+  },
+  {
+   "input": "ಜ್ಕ",
+   "comment": "clu-0C9C-0CCD-0C95"
+  },
+  {
+   "input": "ಜ್ಖ",
+   "comment": "clu-0C9C-0CCD-0C96"
+  },
+  {
+   "input": "ಜ್ಗ",
+   "comment": "clu-0C9C-0CCD-0C97"
+  },
+  {
+   "input": "ಜ್ಘ",
+   "comment": "clu-0C9C-0CCD-0C98"
+  },
+  {
+   "input": "ಜ್ಙ",
+   "comment": "clu-0C9C-0CCD-0C99"
+  },
+  {
+   "input": "ಜ್ಚ",
+   "comment": "clu-0C9C-0CCD-0C9A"
+  },
+  {
+   "input": "ಜ್ಛ",
+   "comment": "clu-0C9C-0CCD-0C9B"
+  },
+  {
+   "input": "ಜ್ಜ",
+   "comment": "clu-0C9C-0CCD-0C9C"
+  },
+  {
+   "input": "ಜ್ಝ",
+   "comment": "clu-0C9C-0CCD-0C9D"
+  },
+  {
+   "input": "ಜ್ಞ",
+   "comment": "clu-0C9C-0CCD-0C9E"
+  },
+  {
+   "input": "ಜ್ಟ",
+   "comment": "clu-0C9C-0CCD-0C9F"
+  },
+  {
+   "input": "ಜ್ಠ",
+   "comment": "clu-0C9C-0CCD-0CA0"
+  },
+  {
+   "input": "ಜ್ಡ",
+   "comment": "clu-0C9C-0CCD-0CA1"
+  },
+  {
+   "input": "ಜ್ಢ",
+   "comment": "clu-0C9C-0CCD-0CA2"
+  },
+  {
+   "input": "ಜ್ಣ",
+   "comment": "clu-0C9C-0CCD-0CA3"
+  },
+  {
+   "input": "ಜ್ತ",
+   "comment": "clu-0C9C-0CCD-0CA4"
+  },
+  {
+   "input": "ಜ್ಥ",
+   "comment": "clu-0C9C-0CCD-0CA5"
+  },
+  {
+   "input": "ಜ್ದ",
+   "comment": "clu-0C9C-0CCD-0CA6"
+  },
+  {
+   "input": "ಜ್ಧ",
+   "comment": "clu-0C9C-0CCD-0CA7"
+  },
+  {
+   "input": "ಜ್ನ",
+   "comment": "clu-0C9C-0CCD-0CA8"
+  },
+  {
+   "input": "ಜ್ಪ",
+   "comment": "clu-0C9C-0CCD-0CAA"
+  },
+  {
+   "input": "ಜ್ಫ",
+   "comment": "clu-0C9C-0CCD-0CAB"
+  },
+  {
+   "input": "ಜ್ಬ",
+   "comment": "clu-0C9C-0CCD-0CAC"
+  },
+  {
+   "input": "ಜ್ಭ",
+   "comment": "clu-0C9C-0CCD-0CAD"
+  },
+  {
+   "input": "ಜ್ಮ",
+   "comment": "clu-0C9C-0CCD-0CAE"
+  },
+  {
+   "input": "ಜ್ಯ",
+   "comment": "clu-0C9C-0CCD-0CAF"
+  },
+  {
+   "input": "ಜ್ರ",
+   "comment": "clu-0C9C-0CCD-0CB0"
+  },
+  {
+   "input": "ಜ್ಱ",
+   "comment": "clu-0C9C-0CCD-0CB1"
+  },
+  {
+   "input": "ಜ್ಲ",
+   "comment": "clu-0C9C-0CCD-0CB2"
+  },
+  {
+   "input": "ಜ್ಳ",
+   "comment": "clu-0C9C-0CCD-0CB3"
+  },
+  {
+   "input": "ಜ್ವ",
+   "comment": "clu-0C9C-0CCD-0CB5"
+  },
+  {
+   "input": "ಜ್ಶ",
+   "comment": "clu-0C9C-0CCD-0CB6"
+  },
+  {
+   "input": "ಜ್ಷ",
+   "comment": "clu-0C9C-0CCD-0CB7"
+  },
+  {
+   "input": "ಜ್ಸ",
+   "comment": "clu-0C9C-0CCD-0CB8"
+  },
+  {
+   "input": "ಜ್ಹ",
+   "comment": "clu-0C9C-0CCD-0CB9"
+  },
+  {
+   "input": "ಜ್ೞ",
+   "comment": "clu-0C9C-0CCD-0CDE"
+  },
+  {
+   "input": "ಝ್ಕ",
+   "comment": "clu-0C9D-0CCD-0C95"
+  },
+  {
+   "input": "ಝ್ಖ",
+   "comment": "clu-0C9D-0CCD-0C96"
+  },
+  {
+   "input": "ಝ್ಗ",
+   "comment": "clu-0C9D-0CCD-0C97"
+  },
+  {
+   "input": "ಝ್ಘ",
+   "comment": "clu-0C9D-0CCD-0C98"
+  },
+  {
+   "input": "ಝ್ಙ",
+   "comment": "clu-0C9D-0CCD-0C99"
+  },
+  {
+   "input": "ಝ್ಚ",
+   "comment": "clu-0C9D-0CCD-0C9A"
+  },
+  {
+   "input": "ಝ್ಛ",
+   "comment": "clu-0C9D-0CCD-0C9B"
+  },
+  {
+   "input": "ಝ್ಜ",
+   "comment": "clu-0C9D-0CCD-0C9C"
+  },
+  {
+   "input": "ಝ್ಝ",
+   "comment": "clu-0C9D-0CCD-0C9D"
+  },
+  {
+   "input": "ಝ್ಞ",
+   "comment": "clu-0C9D-0CCD-0C9E"
+  },
+  {
+   "input": "ಝ್ಟ",
+   "comment": "clu-0C9D-0CCD-0C9F"
+  },
+  {
+   "input": "ಝ್ಠ",
+   "comment": "clu-0C9D-0CCD-0CA0"
+  },
+  {
+   "input": "ಝ್ಡ",
+   "comment": "clu-0C9D-0CCD-0CA1"
+  },
+  {
+   "input": "ಝ್ಢ",
+   "comment": "clu-0C9D-0CCD-0CA2"
+  },
+  {
+   "input": "ಝ್ಣ",
+   "comment": "clu-0C9D-0CCD-0CA3"
+  },
+  {
+   "input": "ಝ್ತ",
+   "comment": "clu-0C9D-0CCD-0CA4"
+  },
+  {
+   "input": "ಝ್ಥ",
+   "comment": "clu-0C9D-0CCD-0CA5"
+  },
+  {
+   "input": "ಝ್ದ",
+   "comment": "clu-0C9D-0CCD-0CA6"
+  },
+  {
+   "input": "ಝ್ಧ",
+   "comment": "clu-0C9D-0CCD-0CA7"
+  },
+  {
+   "input": "ಝ್ನ",
+   "comment": "clu-0C9D-0CCD-0CA8"
+  },
+  {
+   "input": "ಝ್ಪ",
+   "comment": "clu-0C9D-0CCD-0CAA"
+  },
+  {
+   "input": "ಝ್ಫ",
+   "comment": "clu-0C9D-0CCD-0CAB"
+  },
+  {
+   "input": "ಝ್ಬ",
+   "comment": "clu-0C9D-0CCD-0CAC"
+  },
+  {
+   "input": "ಝ್ಭ",
+   "comment": "clu-0C9D-0CCD-0CAD"
+  },
+  {
+   "input": "ಝ್ಮ",
+   "comment": "clu-0C9D-0CCD-0CAE"
+  },
+  {
+   "input": "ಝ್ಯ",
+   "comment": "clu-0C9D-0CCD-0CAF"
+  },
+  {
+   "input": "ಝ್ರ",
+   "comment": "clu-0C9D-0CCD-0CB0"
+  },
+  {
+   "input": "ಝ್ಱ",
+   "comment": "clu-0C9D-0CCD-0CB1"
+  },
+  {
+   "input": "ಝ್ಲ",
+   "comment": "clu-0C9D-0CCD-0CB2"
+  },
+  {
+   "input": "ಝ್ಳ",
+   "comment": "clu-0C9D-0CCD-0CB3"
+  },
+  {
+   "input": "ಝ್ವ",
+   "comment": "clu-0C9D-0CCD-0CB5"
+  },
+  {
+   "input": "ಝ್ಶ",
+   "comment": "clu-0C9D-0CCD-0CB6"
+  },
+  {
+   "input": "ಝ್ಷ",
+   "comment": "clu-0C9D-0CCD-0CB7"
+  },
+  {
+   "input": "ಝ್ಸ",
+   "comment": "clu-0C9D-0CCD-0CB8"
+  },
+  {
+   "input": "ಝ್ಹ",
+   "comment": "clu-0C9D-0CCD-0CB9"
+  },
+  {
+   "input": "ಝ್ೞ",
+   "comment": "clu-0C9D-0CCD-0CDE"
+  },
+  {
+   "input": "ಞ್ಕ",
+   "comment": "clu-0C9E-0CCD-0C95"
+  },
+  {
+   "input": "ಞ್ಖ",
+   "comment": "clu-0C9E-0CCD-0C96"
+  },
+  {
+   "input": "ಞ್ಗ",
+   "comment": "clu-0C9E-0CCD-0C97"
+  },
+  {
+   "input": "ಞ್ಘ",
+   "comment": "clu-0C9E-0CCD-0C98"
+  },
+  {
+   "input": "ಞ್ಙ",
+   "comment": "clu-0C9E-0CCD-0C99"
+  },
+  {
+   "input": "ಞ್ಚ",
+   "comment": "clu-0C9E-0CCD-0C9A"
+  },
+  {
+   "input": "ಞ್ಛ",
+   "comment": "clu-0C9E-0CCD-0C9B"
+  },
+  {
+   "input": "ಞ್ಜ",
+   "comment": "clu-0C9E-0CCD-0C9C"
+  },
+  {
+   "input": "ಞ್ಝ",
+   "comment": "clu-0C9E-0CCD-0C9D"
+  },
+  {
+   "input": "ಞ್ಞ",
+   "comment": "clu-0C9E-0CCD-0C9E"
+  },
+  {
+   "input": "ಞ್ಟ",
+   "comment": "clu-0C9E-0CCD-0C9F"
+  },
+  {
+   "input": "ಞ್ಠ",
+   "comment": "clu-0C9E-0CCD-0CA0"
+  },
+  {
+   "input": "ಞ್ಡ",
+   "comment": "clu-0C9E-0CCD-0CA1"
+  },
+  {
+   "input": "ಞ್ಢ",
+   "comment": "clu-0C9E-0CCD-0CA2"
+  },
+  {
+   "input": "ಞ್ಣ",
+   "comment": "clu-0C9E-0CCD-0CA3"
+  },
+  {
+   "input": "ಞ್ತ",
+   "comment": "clu-0C9E-0CCD-0CA4"
+  },
+  {
+   "input": "ಞ್ಥ",
+   "comment": "clu-0C9E-0CCD-0CA5"
+  },
+  {
+   "input": "ಞ್ದ",
+   "comment": "clu-0C9E-0CCD-0CA6"
+  },
+  {
+   "input": "ಞ್ಧ",
+   "comment": "clu-0C9E-0CCD-0CA7"
+  },
+  {
+   "input": "ಞ್ನ",
+   "comment": "clu-0C9E-0CCD-0CA8"
+  },
+  {
+   "input": "ಞ್ಪ",
+   "comment": "clu-0C9E-0CCD-0CAA"
+  },
+  {
+   "input": "ಞ್ಫ",
+   "comment": "clu-0C9E-0CCD-0CAB"
+  },
+  {
+   "input": "ಞ್ಬ",
+   "comment": "clu-0C9E-0CCD-0CAC"
+  },
+  {
+   "input": "ಞ್ಭ",
+   "comment": "clu-0C9E-0CCD-0CAD"
+  },
+  {
+   "input": "ಞ್ಮ",
+   "comment": "clu-0C9E-0CCD-0CAE"
+  },
+  {
+   "input": "ಞ್ಯ",
+   "comment": "clu-0C9E-0CCD-0CAF"
+  },
+  {
+   "input": "ಞ್ರ",
+   "comment": "clu-0C9E-0CCD-0CB0"
+  },
+  {
+   "input": "ಞ್ಱ",
+   "comment": "clu-0C9E-0CCD-0CB1"
+  },
+  {
+   "input": "ಞ್ಲ",
+   "comment": "clu-0C9E-0CCD-0CB2"
+  },
+  {
+   "input": "ಞ್ಳ",
+   "comment": "clu-0C9E-0CCD-0CB3"
+  },
+  {
+   "input": "ಞ್ವ",
+   "comment": "clu-0C9E-0CCD-0CB5"
+  },
+  {
+   "input": "ಞ್ಶ",
+   "comment": "clu-0C9E-0CCD-0CB6"
+  },
+  {
+   "input": "ಞ್ಷ",
+   "comment": "clu-0C9E-0CCD-0CB7"
+  },
+  {
+   "input": "ಞ್ಸ",
+   "comment": "clu-0C9E-0CCD-0CB8"
+  },
+  {
+   "input": "ಞ್ಹ",
+   "comment": "clu-0C9E-0CCD-0CB9"
+  },
+  {
+   "input": "ಞ್ೞ",
+   "comment": "clu-0C9E-0CCD-0CDE"
+  },
+  {
+   "input": "ಟ್ಕ",
+   "comment": "clu-0C9F-0CCD-0C95"
+  },
+  {
+   "input": "ಟ್ಖ",
+   "comment": "clu-0C9F-0CCD-0C96"
+  },
+  {
+   "input": "ಟ್ಗ",
+   "comment": "clu-0C9F-0CCD-0C97"
+  },
+  {
+   "input": "ಟ್ಘ",
+   "comment": "clu-0C9F-0CCD-0C98"
+  },
+  {
+   "input": "ಟ್ಙ",
+   "comment": "clu-0C9F-0CCD-0C99"
+  },
+  {
+   "input": "ಟ್ಚ",
+   "comment": "clu-0C9F-0CCD-0C9A"
+  },
+  {
+   "input": "ಟ್ಛ",
+   "comment": "clu-0C9F-0CCD-0C9B"
+  },
+  {
+   "input": "ಟ್ಜ",
+   "comment": "clu-0C9F-0CCD-0C9C"
+  },
+  {
+   "input": "ಟ್ಝ",
+   "comment": "clu-0C9F-0CCD-0C9D"
+  },
+  {
+   "input": "ಟ್ಞ",
+   "comment": "clu-0C9F-0CCD-0C9E"
+  },
+  {
+   "input": "ಟ್ಟ",
+   "comment": "clu-0C9F-0CCD-0C9F"
+  },
+  {
+   "input": "ಟ್ಠ",
+   "comment": "clu-0C9F-0CCD-0CA0"
+  },
+  {
+   "input": "ಟ್ಡ",
+   "comment": "clu-0C9F-0CCD-0CA1"
+  },
+  {
+   "input": "ಟ್ಢ",
+   "comment": "clu-0C9F-0CCD-0CA2"
+  },
+  {
+   "input": "ಟ್ಣ",
+   "comment": "clu-0C9F-0CCD-0CA3"
+  },
+  {
+   "input": "ಟ್ತ",
+   "comment": "clu-0C9F-0CCD-0CA4"
+  },
+  {
+   "input": "ಟ್ಥ",
+   "comment": "clu-0C9F-0CCD-0CA5"
+  },
+  {
+   "input": "ಟ್ದ",
+   "comment": "clu-0C9F-0CCD-0CA6"
+  },
+  {
+   "input": "ಟ್ಧ",
+   "comment": "clu-0C9F-0CCD-0CA7"
+  },
+  {
+   "input": "ಟ್ನ",
+   "comment": "clu-0C9F-0CCD-0CA8"
+  },
+  {
+   "input": "ಟ್ಪ",
+   "comment": "clu-0C9F-0CCD-0CAA"
+  },
+  {
+   "input": "ಟ್ಫ",
+   "comment": "clu-0C9F-0CCD-0CAB"
+  },
+  {
+   "input": "ಟ್ಬ",
+   "comment": "clu-0C9F-0CCD-0CAC"
+  },
+  {
+   "input": "ಟ್ಭ",
+   "comment": "clu-0C9F-0CCD-0CAD"
+  },
+  {
+   "input": "ಟ್ಮ",
+   "comment": "clu-0C9F-0CCD-0CAE"
+  },
+  {
+   "input": "ಟ್ಯ",
+   "comment": "clu-0C9F-0CCD-0CAF"
+  },
+  {
+   "input": "ಟ್ರ",
+   "comment": "clu-0C9F-0CCD-0CB0"
+  },
+  {
+   "input": "ಟ್ಱ",
+   "comment": "clu-0C9F-0CCD-0CB1"
+  },
+  {
+   "input": "ಟ್ಲ",
+   "comment": "clu-0C9F-0CCD-0CB2"
+  },
+  {
+   "input": "ಟ್ಳ",
+   "comment": "clu-0C9F-0CCD-0CB3"
+  },
+  {
+   "input": "ಟ್ವ",
+   "comment": "clu-0C9F-0CCD-0CB5"
+  },
+  {
+   "input": "ಟ್ಶ",
+   "comment": "clu-0C9F-0CCD-0CB6"
+  },
+  {
+   "input": "ಟ್ಷ",
+   "comment": "clu-0C9F-0CCD-0CB7"
+  },
+  {
+   "input": "ಟ್ಸ",
+   "comment": "clu-0C9F-0CCD-0CB8"
+  },
+  {
+   "input": "ಟ್ಹ",
+   "comment": "clu-0C9F-0CCD-0CB9"
+  },
+  {
+   "input": "ಟ್ೞ",
+   "comment": "clu-0C9F-0CCD-0CDE"
+  },
+  {
+   "input": "ಠ್ಕ",
+   "comment": "clu-0CA0-0CCD-0C95"
+  },
+  {
+   "input": "ಠ್ಖ",
+   "comment": "clu-0CA0-0CCD-0C96"
+  },
+  {
+   "input": "ಠ್ಗ",
+   "comment": "clu-0CA0-0CCD-0C97"
+  },
+  {
+   "input": "ಠ್ಘ",
+   "comment": "clu-0CA0-0CCD-0C98"
+  },
+  {
+   "input": "ಠ್ಙ",
+   "comment": "clu-0CA0-0CCD-0C99"
+  },
+  {
+   "input": "ಠ್ಚ",
+   "comment": "clu-0CA0-0CCD-0C9A"
+  },
+  {
+   "input": "ಠ್ಛ",
+   "comment": "clu-0CA0-0CCD-0C9B"
+  },
+  {
+   "input": "ಠ್ಜ",
+   "comment": "clu-0CA0-0CCD-0C9C"
+  },
+  {
+   "input": "ಠ್ಝ",
+   "comment": "clu-0CA0-0CCD-0C9D"
+  },
+  {
+   "input": "ಠ್ಞ",
+   "comment": "clu-0CA0-0CCD-0C9E"
+  },
+  {
+   "input": "ಠ್ಟ",
+   "comment": "clu-0CA0-0CCD-0C9F"
+  },
+  {
+   "input": "ಠ್ಠ",
+   "comment": "clu-0CA0-0CCD-0CA0"
+  },
+  {
+   "input": "ಠ್ಡ",
+   "comment": "clu-0CA0-0CCD-0CA1"
+  },
+  {
+   "input": "ಠ್ಢ",
+   "comment": "clu-0CA0-0CCD-0CA2"
+  },
+  {
+   "input": "ಠ್ಣ",
+   "comment": "clu-0CA0-0CCD-0CA3"
+  },
+  {
+   "input": "ಠ್ತ",
+   "comment": "clu-0CA0-0CCD-0CA4"
+  },
+  {
+   "input": "ಠ್ಥ",
+   "comment": "clu-0CA0-0CCD-0CA5"
+  },
+  {
+   "input": "ಠ್ದ",
+   "comment": "clu-0CA0-0CCD-0CA6"
+  },
+  {
+   "input": "ಠ್ಧ",
+   "comment": "clu-0CA0-0CCD-0CA7"
+  },
+  {
+   "input": "ಠ್ನ",
+   "comment": "clu-0CA0-0CCD-0CA8"
+  },
+  {
+   "input": "ಠ್ಪ",
+   "comment": "clu-0CA0-0CCD-0CAA"
+  },
+  {
+   "input": "ಠ್ಫ",
+   "comment": "clu-0CA0-0CCD-0CAB"
+  },
+  {
+   "input": "ಠ್ಬ",
+   "comment": "clu-0CA0-0CCD-0CAC"
+  },
+  {
+   "input": "ಠ್ಭ",
+   "comment": "clu-0CA0-0CCD-0CAD"
+  },
+  {
+   "input": "ಠ್ಮ",
+   "comment": "clu-0CA0-0CCD-0CAE"
+  },
+  {
+   "input": "ಠ್ಯ",
+   "comment": "clu-0CA0-0CCD-0CAF"
+  },
+  {
+   "input": "ಠ್ರ",
+   "comment": "clu-0CA0-0CCD-0CB0"
+  },
+  {
+   "input": "ಠ್ಱ",
+   "comment": "clu-0CA0-0CCD-0CB1"
+  },
+  {
+   "input": "ಠ್ಲ",
+   "comment": "clu-0CA0-0CCD-0CB2"
+  },
+  {
+   "input": "ಠ್ಳ",
+   "comment": "clu-0CA0-0CCD-0CB3"
+  },
+  {
+   "input": "ಠ್ವ",
+   "comment": "clu-0CA0-0CCD-0CB5"
+  },
+  {
+   "input": "ಠ್ಶ",
+   "comment": "clu-0CA0-0CCD-0CB6"
+  },
+  {
+   "input": "ಠ್ಷ",
+   "comment": "clu-0CA0-0CCD-0CB7"
+  },
+  {
+   "input": "ಠ್ಸ",
+   "comment": "clu-0CA0-0CCD-0CB8"
+  },
+  {
+   "input": "ಠ್ಹ",
+   "comment": "clu-0CA0-0CCD-0CB9"
+  },
+  {
+   "input": "ಠ್ೞ",
+   "comment": "clu-0CA0-0CCD-0CDE"
+  },
+  {
+   "input": "ಡ್ಕ",
+   "comment": "clu-0CA1-0CCD-0C95"
+  },
+  {
+   "input": "ಡ್ಖ",
+   "comment": "clu-0CA1-0CCD-0C96"
+  },
+  {
+   "input": "ಡ್ಗ",
+   "comment": "clu-0CA1-0CCD-0C97"
+  },
+  {
+   "input": "ಡ್ಘ",
+   "comment": "clu-0CA1-0CCD-0C98"
+  },
+  {
+   "input": "ಡ್ಙ",
+   "comment": "clu-0CA1-0CCD-0C99"
+  },
+  {
+   "input": "ಡ್ಚ",
+   "comment": "clu-0CA1-0CCD-0C9A"
+  },
+  {
+   "input": "ಡ್ಛ",
+   "comment": "clu-0CA1-0CCD-0C9B"
+  },
+  {
+   "input": "ಡ್ಜ",
+   "comment": "clu-0CA1-0CCD-0C9C"
+  },
+  {
+   "input": "ಡ್ಝ",
+   "comment": "clu-0CA1-0CCD-0C9D"
+  },
+  {
+   "input": "ಡ್ಞ",
+   "comment": "clu-0CA1-0CCD-0C9E"
+  },
+  {
+   "input": "ಡ್ಟ",
+   "comment": "clu-0CA1-0CCD-0C9F"
+  },
+  {
+   "input": "ಡ್ಠ",
+   "comment": "clu-0CA1-0CCD-0CA0"
+  },
+  {
+   "input": "ಡ್ಡ",
+   "comment": "clu-0CA1-0CCD-0CA1"
+  },
+  {
+   "input": "ಡ್ಢ",
+   "comment": "clu-0CA1-0CCD-0CA2"
+  },
+  {
+   "input": "ಡ್ಣ",
+   "comment": "clu-0CA1-0CCD-0CA3"
+  },
+  {
+   "input": "ಡ್ತ",
+   "comment": "clu-0CA1-0CCD-0CA4"
+  },
+  {
+   "input": "ಡ್ಥ",
+   "comment": "clu-0CA1-0CCD-0CA5"
+  },
+  {
+   "input": "ಡ್ದ",
+   "comment": "clu-0CA1-0CCD-0CA6"
+  },
+  {
+   "input": "ಡ್ಧ",
+   "comment": "clu-0CA1-0CCD-0CA7"
+  },
+  {
+   "input": "ಡ್ನ",
+   "comment": "clu-0CA1-0CCD-0CA8"
+  },
+  {
+   "input": "ಡ್ಪ",
+   "comment": "clu-0CA1-0CCD-0CAA"
+  },
+  {
+   "input": "ಡ್ಫ",
+   "comment": "clu-0CA1-0CCD-0CAB"
+  },
+  {
+   "input": "ಡ್ಬ",
+   "comment": "clu-0CA1-0CCD-0CAC"
+  },
+  {
+   "input": "ಡ್ಭ",
+   "comment": "clu-0CA1-0CCD-0CAD"
+  },
+  {
+   "input": "ಡ್ಮ",
+   "comment": "clu-0CA1-0CCD-0CAE"
+  },
+  {
+   "input": "ಡ್ಯ",
+   "comment": "clu-0CA1-0CCD-0CAF"
+  },
+  {
+   "input": "ಡ್ರ",
+   "comment": "clu-0CA1-0CCD-0CB0"
+  },
+  {
+   "input": "ಡ್ಱ",
+   "comment": "clu-0CA1-0CCD-0CB1"
+  },
+  {
+   "input": "ಡ್ಲ",
+   "comment": "clu-0CA1-0CCD-0CB2"
+  },
+  {
+   "input": "ಡ್ಳ",
+   "comment": "clu-0CA1-0CCD-0CB3"
+  },
+  {
+   "input": "ಡ್ವ",
+   "comment": "clu-0CA1-0CCD-0CB5"
+  },
+  {
+   "input": "ಡ್ಶ",
+   "comment": "clu-0CA1-0CCD-0CB6"
+  },
+  {
+   "input": "ಡ್ಷ",
+   "comment": "clu-0CA1-0CCD-0CB7"
+  },
+  {
+   "input": "ಡ್ಸ",
+   "comment": "clu-0CA1-0CCD-0CB8"
+  },
+  {
+   "input": "ಡ್ಹ",
+   "comment": "clu-0CA1-0CCD-0CB9"
+  },
+  {
+   "input": "ಡ್ೞ",
+   "comment": "clu-0CA1-0CCD-0CDE"
+  },
+  {
+   "input": "ಢ್ಕ",
+   "comment": "clu-0CA2-0CCD-0C95"
+  },
+  {
+   "input": "ಢ್ಖ",
+   "comment": "clu-0CA2-0CCD-0C96"
+  },
+  {
+   "input": "ಢ್ಗ",
+   "comment": "clu-0CA2-0CCD-0C97"
+  },
+  {
+   "input": "ಢ್ಘ",
+   "comment": "clu-0CA2-0CCD-0C98"
+  },
+  {
+   "input": "ಢ್ಙ",
+   "comment": "clu-0CA2-0CCD-0C99"
+  },
+  {
+   "input": "ಢ್ಚ",
+   "comment": "clu-0CA2-0CCD-0C9A"
+  },
+  {
+   "input": "ಢ್ಛ",
+   "comment": "clu-0CA2-0CCD-0C9B"
+  },
+  {
+   "input": "ಢ್ಜ",
+   "comment": "clu-0CA2-0CCD-0C9C"
+  },
+  {
+   "input": "ಢ್ಝ",
+   "comment": "clu-0CA2-0CCD-0C9D"
+  },
+  {
+   "input": "ಢ್ಞ",
+   "comment": "clu-0CA2-0CCD-0C9E"
+  },
+  {
+   "input": "ಢ್ಟ",
+   "comment": "clu-0CA2-0CCD-0C9F"
+  },
+  {
+   "input": "ಢ್ಠ",
+   "comment": "clu-0CA2-0CCD-0CA0"
+  },
+  {
+   "input": "ಢ್ಡ",
+   "comment": "clu-0CA2-0CCD-0CA1"
+  },
+  {
+   "input": "ಢ್ಢ",
+   "comment": "clu-0CA2-0CCD-0CA2"
+  },
+  {
+   "input": "ಢ್ಣ",
+   "comment": "clu-0CA2-0CCD-0CA3"
+  },
+  {
+   "input": "ಢ್ತ",
+   "comment": "clu-0CA2-0CCD-0CA4"
+  },
+  {
+   "input": "ಢ್ಥ",
+   "comment": "clu-0CA2-0CCD-0CA5"
+  },
+  {
+   "input": "ಢ್ದ",
+   "comment": "clu-0CA2-0CCD-0CA6"
+  },
+  {
+   "input": "ಢ್ಧ",
+   "comment": "clu-0CA2-0CCD-0CA7"
+  },
+  {
+   "input": "ಢ್ನ",
+   "comment": "clu-0CA2-0CCD-0CA8"
+  },
+  {
+   "input": "ಢ್ಪ",
+   "comment": "clu-0CA2-0CCD-0CAA"
+  },
+  {
+   "input": "ಢ್ಫ",
+   "comment": "clu-0CA2-0CCD-0CAB"
+  },
+  {
+   "input": "ಢ್ಬ",
+   "comment": "clu-0CA2-0CCD-0CAC"
+  },
+  {
+   "input": "ಢ್ಭ",
+   "comment": "clu-0CA2-0CCD-0CAD"
+  },
+  {
+   "input": "ಢ್ಮ",
+   "comment": "clu-0CA2-0CCD-0CAE"
+  },
+  {
+   "input": "ಢ್ಯ",
+   "comment": "clu-0CA2-0CCD-0CAF"
+  },
+  {
+   "input": "ಢ್ರ",
+   "comment": "clu-0CA2-0CCD-0CB0"
+  },
+  {
+   "input": "ಢ್ಱ",
+   "comment": "clu-0CA2-0CCD-0CB1"
+  },
+  {
+   "input": "ಢ್ಲ",
+   "comment": "clu-0CA2-0CCD-0CB2"
+  },
+  {
+   "input": "ಢ್ಳ",
+   "comment": "clu-0CA2-0CCD-0CB3"
+  },
+  {
+   "input": "ಢ್ವ",
+   "comment": "clu-0CA2-0CCD-0CB5"
+  },
+  {
+   "input": "ಢ್ಶ",
+   "comment": "clu-0CA2-0CCD-0CB6"
+  },
+  {
+   "input": "ಢ್ಷ",
+   "comment": "clu-0CA2-0CCD-0CB7"
+  },
+  {
+   "input": "ಢ್ಸ",
+   "comment": "clu-0CA2-0CCD-0CB8"
+  },
+  {
+   "input": "ಢ್ಹ",
+   "comment": "clu-0CA2-0CCD-0CB9"
+  },
+  {
+   "input": "ಢ್ೞ",
+   "comment": "clu-0CA2-0CCD-0CDE"
+  },
+  {
+   "input": "ಣ್ಕ",
+   "comment": "clu-0CA3-0CCD-0C95"
+  },
+  {
+   "input": "ಣ್ಖ",
+   "comment": "clu-0CA3-0CCD-0C96"
+  },
+  {
+   "input": "ಣ್ಗ",
+   "comment": "clu-0CA3-0CCD-0C97"
+  },
+  {
+   "input": "ಣ್ಘ",
+   "comment": "clu-0CA3-0CCD-0C98"
+  },
+  {
+   "input": "ಣ್ಙ",
+   "comment": "clu-0CA3-0CCD-0C99"
+  },
+  {
+   "input": "ಣ್ಚ",
+   "comment": "clu-0CA3-0CCD-0C9A"
+  },
+  {
+   "input": "ಣ್ಛ",
+   "comment": "clu-0CA3-0CCD-0C9B"
+  },
+  {
+   "input": "ಣ್ಜ",
+   "comment": "clu-0CA3-0CCD-0C9C"
+  },
+  {
+   "input": "ಣ್ಝ",
+   "comment": "clu-0CA3-0CCD-0C9D"
+  },
+  {
+   "input": "ಣ್ಞ",
+   "comment": "clu-0CA3-0CCD-0C9E"
+  },
+  {
+   "input": "ಣ್ಟ",
+   "comment": "clu-0CA3-0CCD-0C9F"
+  },
+  {
+   "input": "ಣ್ಠ",
+   "comment": "clu-0CA3-0CCD-0CA0"
+  },
+  {
+   "input": "ಣ್ಡ",
+   "comment": "clu-0CA3-0CCD-0CA1"
+  },
+  {
+   "input": "ಣ್ಢ",
+   "comment": "clu-0CA3-0CCD-0CA2"
+  },
+  {
+   "input": "ಣ್ಣ",
+   "comment": "clu-0CA3-0CCD-0CA3"
+  },
+  {
+   "input": "ಣ್ತ",
+   "comment": "clu-0CA3-0CCD-0CA4"
+  },
+  {
+   "input": "ಣ್ಥ",
+   "comment": "clu-0CA3-0CCD-0CA5"
+  },
+  {
+   "input": "ಣ್ದ",
+   "comment": "clu-0CA3-0CCD-0CA6"
+  },
+  {
+   "input": "ಣ್ಧ",
+   "comment": "clu-0CA3-0CCD-0CA7"
+  },
+  {
+   "input": "ಣ್ನ",
+   "comment": "clu-0CA3-0CCD-0CA8"
+  },
+  {
+   "input": "ಣ್ಪ",
+   "comment": "clu-0CA3-0CCD-0CAA"
+  },
+  {
+   "input": "ಣ್ಫ",
+   "comment": "clu-0CA3-0CCD-0CAB"
+  },
+  {
+   "input": "ಣ್ಬ",
+   "comment": "clu-0CA3-0CCD-0CAC"
+  },
+  {
+   "input": "ಣ್ಭ",
+   "comment": "clu-0CA3-0CCD-0CAD"
+  },
+  {
+   "input": "ಣ್ಮ",
+   "comment": "clu-0CA3-0CCD-0CAE"
+  },
+  {
+   "input": "ಣ್ಯ",
+   "comment": "clu-0CA3-0CCD-0CAF"
+  },
+  {
+   "input": "ಣ್ರ",
+   "comment": "clu-0CA3-0CCD-0CB0"
+  },
+  {
+   "input": "ಣ್ಱ",
+   "comment": "clu-0CA3-0CCD-0CB1"
+  },
+  {
+   "input": "ಣ್ಲ",
+   "comment": "clu-0CA3-0CCD-0CB2"
+  },
+  {
+   "input": "ಣ್ಳ",
+   "comment": "clu-0CA3-0CCD-0CB3"
+  },
+  {
+   "input": "ಣ್ವ",
+   "comment": "clu-0CA3-0CCD-0CB5"
+  },
+  {
+   "input": "ಣ್ಶ",
+   "comment": "clu-0CA3-0CCD-0CB6"
+  },
+  {
+   "input": "ಣ್ಷ",
+   "comment": "clu-0CA3-0CCD-0CB7"
+  },
+  {
+   "input": "ಣ್ಸ",
+   "comment": "clu-0CA3-0CCD-0CB8"
+  },
+  {
+   "input": "ಣ್ಹ",
+   "comment": "clu-0CA3-0CCD-0CB9"
+  },
+  {
+   "input": "ಣ್ೞ",
+   "comment": "clu-0CA3-0CCD-0CDE"
+  },
+  {
+   "input": "ತ್ಕ",
+   "comment": "clu-0CA4-0CCD-0C95"
+  },
+  {
+   "input": "ತ್ಖ",
+   "comment": "clu-0CA4-0CCD-0C96"
+  },
+  {
+   "input": "ತ್ಗ",
+   "comment": "clu-0CA4-0CCD-0C97"
+  },
+  {
+   "input": "ತ್ಘ",
+   "comment": "clu-0CA4-0CCD-0C98"
+  },
+  {
+   "input": "ತ್ಙ",
+   "comment": "clu-0CA4-0CCD-0C99"
+  },
+  {
+   "input": "ತ್ಚ",
+   "comment": "clu-0CA4-0CCD-0C9A"
+  },
+  {
+   "input": "ತ್ಛ",
+   "comment": "clu-0CA4-0CCD-0C9B"
+  },
+  {
+   "input": "ತ್ಜ",
+   "comment": "clu-0CA4-0CCD-0C9C"
+  },
+  {
+   "input": "ತ್ಝ",
+   "comment": "clu-0CA4-0CCD-0C9D"
+  },
+  {
+   "input": "ತ್ಞ",
+   "comment": "clu-0CA4-0CCD-0C9E"
+  },
+  {
+   "input": "ತ್ಟ",
+   "comment": "clu-0CA4-0CCD-0C9F"
+  },
+  {
+   "input": "ತ್ಠ",
+   "comment": "clu-0CA4-0CCD-0CA0"
+  },
+  {
+   "input": "ತ್ಡ",
+   "comment": "clu-0CA4-0CCD-0CA1"
+  },
+  {
+   "input": "ತ್ಢ",
+   "comment": "clu-0CA4-0CCD-0CA2"
+  },
+  {
+   "input": "ತ್ಣ",
+   "comment": "clu-0CA4-0CCD-0CA3"
+  },
+  {
+   "input": "ತ್ತ",
+   "comment": "clu-0CA4-0CCD-0CA4"
+  },
+  {
+   "input": "ತ್ಥ",
+   "comment": "clu-0CA4-0CCD-0CA5"
+  },
+  {
+   "input": "ತ್ದ",
+   "comment": "clu-0CA4-0CCD-0CA6"
+  },
+  {
+   "input": "ತ್ಧ",
+   "comment": "clu-0CA4-0CCD-0CA7"
+  },
+  {
+   "input": "ತ್ನ",
+   "comment": "clu-0CA4-0CCD-0CA8"
+  },
+  {
+   "input": "ತ್ಪ",
+   "comment": "clu-0CA4-0CCD-0CAA"
+  },
+  {
+   "input": "ತ್ಫ",
+   "comment": "clu-0CA4-0CCD-0CAB"
+  },
+  {
+   "input": "ತ್ಬ",
+   "comment": "clu-0CA4-0CCD-0CAC"
+  },
+  {
+   "input": "ತ್ಭ",
+   "comment": "clu-0CA4-0CCD-0CAD"
+  },
+  {
+   "input": "ತ್ಮ",
+   "comment": "clu-0CA4-0CCD-0CAE"
+  },
+  {
+   "input": "ತ್ಯ",
+   "comment": "clu-0CA4-0CCD-0CAF"
+  },
+  {
+   "input": "ತ್ರ",
+   "comment": "clu-0CA4-0CCD-0CB0"
+  },
+  {
+   "input": "ತ್ಱ",
+   "comment": "clu-0CA4-0CCD-0CB1"
+  },
+  {
+   "input": "ತ್ಲ",
+   "comment": "clu-0CA4-0CCD-0CB2"
+  },
+  {
+   "input": "ತ್ಳ",
+   "comment": "clu-0CA4-0CCD-0CB3"
+  },
+  {
+   "input": "ತ್ವ",
+   "comment": "clu-0CA4-0CCD-0CB5"
+  },
+  {
+   "input": "ತ್ಶ",
+   "comment": "clu-0CA4-0CCD-0CB6"
+  },
+  {
+   "input": "ತ್ಷ",
+   "comment": "clu-0CA4-0CCD-0CB7"
+  },
+  {
+   "input": "ತ್ಸ",
+   "comment": "clu-0CA4-0CCD-0CB8"
+  },
+  {
+   "input": "ತ್ಹ",
+   "comment": "clu-0CA4-0CCD-0CB9"
+  },
+  {
+   "input": "ತ್ೞ",
+   "comment": "clu-0CA4-0CCD-0CDE"
+  },
+  {
+   "input": "ಥ್ಕ",
+   "comment": "clu-0CA5-0CCD-0C95"
+  },
+  {
+   "input": "ಥ್ಖ",
+   "comment": "clu-0CA5-0CCD-0C96"
+  },
+  {
+   "input": "ಥ್ಗ",
+   "comment": "clu-0CA5-0CCD-0C97"
+  },
+  {
+   "input": "ಥ್ಘ",
+   "comment": "clu-0CA5-0CCD-0C98"
+  },
+  {
+   "input": "ಥ್ಙ",
+   "comment": "clu-0CA5-0CCD-0C99"
+  },
+  {
+   "input": "ಥ್ಚ",
+   "comment": "clu-0CA5-0CCD-0C9A"
+  },
+  {
+   "input": "ಥ್ಛ",
+   "comment": "clu-0CA5-0CCD-0C9B"
+  },
+  {
+   "input": "ಥ್ಜ",
+   "comment": "clu-0CA5-0CCD-0C9C"
+  },
+  {
+   "input": "ಥ್ಝ",
+   "comment": "clu-0CA5-0CCD-0C9D"
+  },
+  {
+   "input": "ಥ್ಞ",
+   "comment": "clu-0CA5-0CCD-0C9E"
+  },
+  {
+   "input": "ಥ್ಟ",
+   "comment": "clu-0CA5-0CCD-0C9F"
+  },
+  {
+   "input": "ಥ್ಠ",
+   "comment": "clu-0CA5-0CCD-0CA0"
+  },
+  {
+   "input": "ಥ್ಡ",
+   "comment": "clu-0CA5-0CCD-0CA1"
+  },
+  {
+   "input": "ಥ್ಢ",
+   "comment": "clu-0CA5-0CCD-0CA2"
+  },
+  {
+   "input": "ಥ್ಣ",
+   "comment": "clu-0CA5-0CCD-0CA3"
+  },
+  {
+   "input": "ಥ್ತ",
+   "comment": "clu-0CA5-0CCD-0CA4"
+  },
+  {
+   "input": "ಥ್ಥ",
+   "comment": "clu-0CA5-0CCD-0CA5"
+  },
+  {
+   "input": "ಥ್ದ",
+   "comment": "clu-0CA5-0CCD-0CA6"
+  },
+  {
+   "input": "ಥ್ಧ",
+   "comment": "clu-0CA5-0CCD-0CA7"
+  },
+  {
+   "input": "ಥ್ನ",
+   "comment": "clu-0CA5-0CCD-0CA8"
+  },
+  {
+   "input": "ಥ್ಪ",
+   "comment": "clu-0CA5-0CCD-0CAA"
+  },
+  {
+   "input": "ಥ್ಫ",
+   "comment": "clu-0CA5-0CCD-0CAB"
+  },
+  {
+   "input": "ಥ್ಬ",
+   "comment": "clu-0CA5-0CCD-0CAC"
+  },
+  {
+   "input": "ಥ್ಭ",
+   "comment": "clu-0CA5-0CCD-0CAD"
+  },
+  {
+   "input": "ಥ್ಮ",
+   "comment": "clu-0CA5-0CCD-0CAE"
+  },
+  {
+   "input": "ಥ್ಯ",
+   "comment": "clu-0CA5-0CCD-0CAF"
+  },
+  {
+   "input": "ಥ್ರ",
+   "comment": "clu-0CA5-0CCD-0CB0"
+  },
+  {
+   "input": "ಥ್ಱ",
+   "comment": "clu-0CA5-0CCD-0CB1"
+  },
+  {
+   "input": "ಥ್ಲ",
+   "comment": "clu-0CA5-0CCD-0CB2"
+  },
+  {
+   "input": "ಥ್ಳ",
+   "comment": "clu-0CA5-0CCD-0CB3"
+  },
+  {
+   "input": "ಥ್ವ",
+   "comment": "clu-0CA5-0CCD-0CB5"
+  },
+  {
+   "input": "ಥ್ಶ",
+   "comment": "clu-0CA5-0CCD-0CB6"
+  },
+  {
+   "input": "ಥ್ಷ",
+   "comment": "clu-0CA5-0CCD-0CB7"
+  },
+  {
+   "input": "ಥ್ಸ",
+   "comment": "clu-0CA5-0CCD-0CB8"
+  },
+  {
+   "input": "ಥ್ಹ",
+   "comment": "clu-0CA5-0CCD-0CB9"
+  },
+  {
+   "input": "ಥ್ೞ",
+   "comment": "clu-0CA5-0CCD-0CDE"
+  },
+  {
+   "input": "ದ್ಕ",
+   "comment": "clu-0CA6-0CCD-0C95"
+  },
+  {
+   "input": "ದ್ಖ",
+   "comment": "clu-0CA6-0CCD-0C96"
+  },
+  {
+   "input": "ದ್ಗ",
+   "comment": "clu-0CA6-0CCD-0C97"
+  },
+  {
+   "input": "ದ್ಘ",
+   "comment": "clu-0CA6-0CCD-0C98"
+  },
+  {
+   "input": "ದ್ಙ",
+   "comment": "clu-0CA6-0CCD-0C99"
+  },
+  {
+   "input": "ದ್ಚ",
+   "comment": "clu-0CA6-0CCD-0C9A"
+  },
+  {
+   "input": "ದ್ಛ",
+   "comment": "clu-0CA6-0CCD-0C9B"
+  },
+  {
+   "input": "ದ್ಜ",
+   "comment": "clu-0CA6-0CCD-0C9C"
+  },
+  {
+   "input": "ದ್ಝ",
+   "comment": "clu-0CA6-0CCD-0C9D"
+  },
+  {
+   "input": "ದ್ಞ",
+   "comment": "clu-0CA6-0CCD-0C9E"
+  },
+  {
+   "input": "ದ್ಟ",
+   "comment": "clu-0CA6-0CCD-0C9F"
+  },
+  {
+   "input": "ದ್ಠ",
+   "comment": "clu-0CA6-0CCD-0CA0"
+  },
+  {
+   "input": "ದ್ಡ",
+   "comment": "clu-0CA6-0CCD-0CA1"
+  },
+  {
+   "input": "ದ್ಢ",
+   "comment": "clu-0CA6-0CCD-0CA2"
+  },
+  {
+   "input": "ದ್ಣ",
+   "comment": "clu-0CA6-0CCD-0CA3"
+  },
+  {
+   "input": "ದ್ತ",
+   "comment": "clu-0CA6-0CCD-0CA4"
+  },
+  {
+   "input": "ದ್ಥ",
+   "comment": "clu-0CA6-0CCD-0CA5"
+  },
+  {
+   "input": "ದ್ದ",
+   "comment": "clu-0CA6-0CCD-0CA6"
+  },
+  {
+   "input": "ದ್ಧ",
+   "comment": "clu-0CA6-0CCD-0CA7"
+  },
+  {
+   "input": "ದ್ನ",
+   "comment": "clu-0CA6-0CCD-0CA8"
+  },
+  {
+   "input": "ದ್ಪ",
+   "comment": "clu-0CA6-0CCD-0CAA"
+  },
+  {
+   "input": "ದ್ಫ",
+   "comment": "clu-0CA6-0CCD-0CAB"
+  },
+  {
+   "input": "ದ್ಬ",
+   "comment": "clu-0CA6-0CCD-0CAC"
+  },
+  {
+   "input": "ದ್ಭ",
+   "comment": "clu-0CA6-0CCD-0CAD"
+  },
+  {
+   "input": "ದ್ಮ",
+   "comment": "clu-0CA6-0CCD-0CAE"
+  },
+  {
+   "input": "ದ್ಯ",
+   "comment": "clu-0CA6-0CCD-0CAF"
+  },
+  {
+   "input": "ದ್ರ",
+   "comment": "clu-0CA6-0CCD-0CB0"
+  },
+  {
+   "input": "ದ್ಱ",
+   "comment": "clu-0CA6-0CCD-0CB1"
+  },
+  {
+   "input": "ದ್ಲ",
+   "comment": "clu-0CA6-0CCD-0CB2"
+  },
+  {
+   "input": "ದ್ಳ",
+   "comment": "clu-0CA6-0CCD-0CB3"
+  },
+  {
+   "input": "ದ್ವ",
+   "comment": "clu-0CA6-0CCD-0CB5"
+  },
+  {
+   "input": "ದ್ಶ",
+   "comment": "clu-0CA6-0CCD-0CB6"
+  },
+  {
+   "input": "ದ್ಷ",
+   "comment": "clu-0CA6-0CCD-0CB7"
+  },
+  {
+   "input": "ದ್ಸ",
+   "comment": "clu-0CA6-0CCD-0CB8"
+  },
+  {
+   "input": "ದ್ಹ",
+   "comment": "clu-0CA6-0CCD-0CB9"
+  },
+  {
+   "input": "ದ್ೞ",
+   "comment": "clu-0CA6-0CCD-0CDE"
+  },
+  {
+   "input": "ಧ್ಕ",
+   "comment": "clu-0CA7-0CCD-0C95"
+  },
+  {
+   "input": "ಧ್ಖ",
+   "comment": "clu-0CA7-0CCD-0C96"
+  },
+  {
+   "input": "ಧ್ಗ",
+   "comment": "clu-0CA7-0CCD-0C97"
+  },
+  {
+   "input": "ಧ್ಘ",
+   "comment": "clu-0CA7-0CCD-0C98"
+  },
+  {
+   "input": "ಧ್ಙ",
+   "comment": "clu-0CA7-0CCD-0C99"
+  },
+  {
+   "input": "ಧ್ಚ",
+   "comment": "clu-0CA7-0CCD-0C9A"
+  },
+  {
+   "input": "ಧ್ಛ",
+   "comment": "clu-0CA7-0CCD-0C9B"
+  },
+  {
+   "input": "ಧ್ಜ",
+   "comment": "clu-0CA7-0CCD-0C9C"
+  },
+  {
+   "input": "ಧ್ಝ",
+   "comment": "clu-0CA7-0CCD-0C9D"
+  },
+  {
+   "input": "ಧ್ಞ",
+   "comment": "clu-0CA7-0CCD-0C9E"
+  },
+  {
+   "input": "ಧ್ಟ",
+   "comment": "clu-0CA7-0CCD-0C9F"
+  },
+  {
+   "input": "ಧ್ಠ",
+   "comment": "clu-0CA7-0CCD-0CA0"
+  },
+  {
+   "input": "ಧ್ಡ",
+   "comment": "clu-0CA7-0CCD-0CA1"
+  },
+  {
+   "input": "ಧ್ಢ",
+   "comment": "clu-0CA7-0CCD-0CA2"
+  },
+  {
+   "input": "ಧ್ಣ",
+   "comment": "clu-0CA7-0CCD-0CA3"
+  },
+  {
+   "input": "ಧ್ತ",
+   "comment": "clu-0CA7-0CCD-0CA4"
+  },
+  {
+   "input": "ಧ್ಥ",
+   "comment": "clu-0CA7-0CCD-0CA5"
+  },
+  {
+   "input": "ಧ್ದ",
+   "comment": "clu-0CA7-0CCD-0CA6"
+  },
+  {
+   "input": "ಧ್ಧ",
+   "comment": "clu-0CA7-0CCD-0CA7"
+  },
+  {
+   "input": "ಧ್ನ",
+   "comment": "clu-0CA7-0CCD-0CA8"
+  },
+  {
+   "input": "ಧ್ಪ",
+   "comment": "clu-0CA7-0CCD-0CAA"
+  },
+  {
+   "input": "ಧ್ಫ",
+   "comment": "clu-0CA7-0CCD-0CAB"
+  },
+  {
+   "input": "ಧ್ಬ",
+   "comment": "clu-0CA7-0CCD-0CAC"
+  },
+  {
+   "input": "ಧ್ಭ",
+   "comment": "clu-0CA7-0CCD-0CAD"
+  },
+  {
+   "input": "ಧ್ಮ",
+   "comment": "clu-0CA7-0CCD-0CAE"
+  },
+  {
+   "input": "ಧ್ಯ",
+   "comment": "clu-0CA7-0CCD-0CAF"
+  },
+  {
+   "input": "ಧ್ರ",
+   "comment": "clu-0CA7-0CCD-0CB0"
+  },
+  {
+   "input": "ಧ್ಱ",
+   "comment": "clu-0CA7-0CCD-0CB1"
+  },
+  {
+   "input": "ಧ್ಲ",
+   "comment": "clu-0CA7-0CCD-0CB2"
+  },
+  {
+   "input": "ಧ್ಳ",
+   "comment": "clu-0CA7-0CCD-0CB3"
+  },
+  {
+   "input": "ಧ್ವ",
+   "comment": "clu-0CA7-0CCD-0CB5"
+  },
+  {
+   "input": "ಧ್ಶ",
+   "comment": "clu-0CA7-0CCD-0CB6"
+  },
+  {
+   "input": "ಧ್ಷ",
+   "comment": "clu-0CA7-0CCD-0CB7"
+  },
+  {
+   "input": "ಧ್ಸ",
+   "comment": "clu-0CA7-0CCD-0CB8"
+  },
+  {
+   "input": "ಧ್ಹ",
+   "comment": "clu-0CA7-0CCD-0CB9"
+  },
+  {
+   "input": "ಧ್ೞ",
+   "comment": "clu-0CA7-0CCD-0CDE"
+  },
+  {
+   "input": "ನ್ಕ",
+   "comment": "clu-0CA8-0CCD-0C95"
+  },
+  {
+   "input": "ನ್ಖ",
+   "comment": "clu-0CA8-0CCD-0C96"
+  },
+  {
+   "input": "ನ್ಗ",
+   "comment": "clu-0CA8-0CCD-0C97"
+  },
+  {
+   "input": "ನ್ಘ",
+   "comment": "clu-0CA8-0CCD-0C98"
+  },
+  {
+   "input": "ನ್ಙ",
+   "comment": "clu-0CA8-0CCD-0C99"
+  },
+  {
+   "input": "ನ್ಚ",
+   "comment": "clu-0CA8-0CCD-0C9A"
+  },
+  {
+   "input": "ನ್ಛ",
+   "comment": "clu-0CA8-0CCD-0C9B"
+  },
+  {
+   "input": "ನ್ಜ",
+   "comment": "clu-0CA8-0CCD-0C9C"
+  },
+  {
+   "input": "ನ್ಝ",
+   "comment": "clu-0CA8-0CCD-0C9D"
+  },
+  {
+   "input": "ನ್ಞ",
+   "comment": "clu-0CA8-0CCD-0C9E"
+  },
+  {
+   "input": "ನ್ಟ",
+   "comment": "clu-0CA8-0CCD-0C9F"
+  },
+  {
+   "input": "ನ್ಠ",
+   "comment": "clu-0CA8-0CCD-0CA0"
+  },
+  {
+   "input": "ನ್ಡ",
+   "comment": "clu-0CA8-0CCD-0CA1"
+  },
+  {
+   "input": "ನ್ಢ",
+   "comment": "clu-0CA8-0CCD-0CA2"
+  },
+  {
+   "input": "ನ್ಣ",
+   "comment": "clu-0CA8-0CCD-0CA3"
+  },
+  {
+   "input": "ನ್ತ",
+   "comment": "clu-0CA8-0CCD-0CA4"
+  },
+  {
+   "input": "ನ್ಥ",
+   "comment": "clu-0CA8-0CCD-0CA5"
+  },
+  {
+   "input": "ನ್ದ",
+   "comment": "clu-0CA8-0CCD-0CA6"
+  },
+  {
+   "input": "ನ್ಧ",
+   "comment": "clu-0CA8-0CCD-0CA7"
+  },
+  {
+   "input": "ನ್ನ",
+   "comment": "clu-0CA8-0CCD-0CA8"
+  },
+  {
+   "input": "ನ್ಪ",
+   "comment": "clu-0CA8-0CCD-0CAA"
+  },
+  {
+   "input": "ನ್ಫ",
+   "comment": "clu-0CA8-0CCD-0CAB"
+  },
+  {
+   "input": "ನ್ಬ",
+   "comment": "clu-0CA8-0CCD-0CAC"
+  },
+  {
+   "input": "ನ್ಭ",
+   "comment": "clu-0CA8-0CCD-0CAD"
+  },
+  {
+   "input": "ನ್ಮ",
+   "comment": "clu-0CA8-0CCD-0CAE"
+  },
+  {
+   "input": "ನ್ಯ",
+   "comment": "clu-0CA8-0CCD-0CAF"
+  },
+  {
+   "input": "ನ್ರ",
+   "comment": "clu-0CA8-0CCD-0CB0"
+  },
+  {
+   "input": "ನ್ಱ",
+   "comment": "clu-0CA8-0CCD-0CB1"
+  },
+  {
+   "input": "ನ್ಲ",
+   "comment": "clu-0CA8-0CCD-0CB2"
+  },
+  {
+   "input": "ನ್ಳ",
+   "comment": "clu-0CA8-0CCD-0CB3"
+  },
+  {
+   "input": "ನ್ವ",
+   "comment": "clu-0CA8-0CCD-0CB5"
+  },
+  {
+   "input": "ನ್ಶ",
+   "comment": "clu-0CA8-0CCD-0CB6"
+  },
+  {
+   "input": "ನ್ಷ",
+   "comment": "clu-0CA8-0CCD-0CB7"
+  },
+  {
+   "input": "ನ್ಸ",
+   "comment": "clu-0CA8-0CCD-0CB8"
+  },
+  {
+   "input": "ನ್ಹ",
+   "comment": "clu-0CA8-0CCD-0CB9"
+  },
+  {
+   "input": "ನ್ೞ",
+   "comment": "clu-0CA8-0CCD-0CDE"
+  },
+  {
+   "input": "ಪ್ಕ",
+   "comment": "clu-0CAA-0CCD-0C95"
+  },
+  {
+   "input": "ಪ್ಖ",
+   "comment": "clu-0CAA-0CCD-0C96"
+  },
+  {
+   "input": "ಪ್ಗ",
+   "comment": "clu-0CAA-0CCD-0C97"
+  },
+  {
+   "input": "ಪ್ಘ",
+   "comment": "clu-0CAA-0CCD-0C98"
+  },
+  {
+   "input": "ಪ್ಙ",
+   "comment": "clu-0CAA-0CCD-0C99"
+  },
+  {
+   "input": "ಪ್ಚ",
+   "comment": "clu-0CAA-0CCD-0C9A"
+  },
+  {
+   "input": "ಪ್ಛ",
+   "comment": "clu-0CAA-0CCD-0C9B"
+  },
+  {
+   "input": "ಪ್ಜ",
+   "comment": "clu-0CAA-0CCD-0C9C"
+  },
+  {
+   "input": "ಪ್ಝ",
+   "comment": "clu-0CAA-0CCD-0C9D"
+  },
+  {
+   "input": "ಪ್ಞ",
+   "comment": "clu-0CAA-0CCD-0C9E"
+  },
+  {
+   "input": "ಪ್ಟ",
+   "comment": "clu-0CAA-0CCD-0C9F"
+  },
+  {
+   "input": "ಪ್ಠ",
+   "comment": "clu-0CAA-0CCD-0CA0"
+  },
+  {
+   "input": "ಪ್ಡ",
+   "comment": "clu-0CAA-0CCD-0CA1"
+  },
+  {
+   "input": "ಪ್ಢ",
+   "comment": "clu-0CAA-0CCD-0CA2"
+  },
+  {
+   "input": "ಪ್ಣ",
+   "comment": "clu-0CAA-0CCD-0CA3"
+  },
+  {
+   "input": "ಪ್ತ",
+   "comment": "clu-0CAA-0CCD-0CA4"
+  },
+  {
+   "input": "ಪ್ಥ",
+   "comment": "clu-0CAA-0CCD-0CA5"
+  },
+  {
+   "input": "ಪ್ದ",
+   "comment": "clu-0CAA-0CCD-0CA6"
+  },
+  {
+   "input": "ಪ್ಧ",
+   "comment": "clu-0CAA-0CCD-0CA7"
+  },
+  {
+   "input": "ಪ್ನ",
+   "comment": "clu-0CAA-0CCD-0CA8"
+  },
+  {
+   "input": "ಪ್ಪ",
+   "comment": "clu-0CAA-0CCD-0CAA"
+  },
+  {
+   "input": "ಪ್ಫ",
+   "comment": "clu-0CAA-0CCD-0CAB"
+  },
+  {
+   "input": "ಪ್ಬ",
+   "comment": "clu-0CAA-0CCD-0CAC"
+  },
+  {
+   "input": "ಪ್ಭ",
+   "comment": "clu-0CAA-0CCD-0CAD"
+  },
+  {
+   "input": "ಪ್ಮ",
+   "comment": "clu-0CAA-0CCD-0CAE"
+  },
+  {
+   "input": "ಪ್ಯ",
+   "comment": "clu-0CAA-0CCD-0CAF"
+  },
+  {
+   "input": "ಪ್ರ",
+   "comment": "clu-0CAA-0CCD-0CB0"
+  },
+  {
+   "input": "ಪ್ಱ",
+   "comment": "clu-0CAA-0CCD-0CB1"
+  },
+  {
+   "input": "ಪ್ಲ",
+   "comment": "clu-0CAA-0CCD-0CB2"
+  },
+  {
+   "input": "ಪ್ಳ",
+   "comment": "clu-0CAA-0CCD-0CB3"
+  },
+  {
+   "input": "ಪ್ವ",
+   "comment": "clu-0CAA-0CCD-0CB5"
+  },
+  {
+   "input": "ಪ್ಶ",
+   "comment": "clu-0CAA-0CCD-0CB6"
+  },
+  {
+   "input": "ಪ್ಷ",
+   "comment": "clu-0CAA-0CCD-0CB7"
+  },
+  {
+   "input": "ಪ್ಸ",
+   "comment": "clu-0CAA-0CCD-0CB8"
+  },
+  {
+   "input": "ಪ್ಹ",
+   "comment": "clu-0CAA-0CCD-0CB9"
+  },
+  {
+   "input": "ಪ್ೞ",
+   "comment": "clu-0CAA-0CCD-0CDE"
+  },
+  {
+   "input": "ಫ್ಕ",
+   "comment": "clu-0CAB-0CCD-0C95"
+  },
+  {
+   "input": "ಫ್ಖ",
+   "comment": "clu-0CAB-0CCD-0C96"
+  },
+  {
+   "input": "ಫ್ಗ",
+   "comment": "clu-0CAB-0CCD-0C97"
+  },
+  {
+   "input": "ಫ್ಘ",
+   "comment": "clu-0CAB-0CCD-0C98"
+  },
+  {
+   "input": "ಫ್ಙ",
+   "comment": "clu-0CAB-0CCD-0C99"
+  },
+  {
+   "input": "ಫ್ಚ",
+   "comment": "clu-0CAB-0CCD-0C9A"
+  },
+  {
+   "input": "ಫ್ಛ",
+   "comment": "clu-0CAB-0CCD-0C9B"
+  },
+  {
+   "input": "ಫ್ಜ",
+   "comment": "clu-0CAB-0CCD-0C9C"
+  },
+  {
+   "input": "ಫ್ಝ",
+   "comment": "clu-0CAB-0CCD-0C9D"
+  },
+  {
+   "input": "ಫ್ಞ",
+   "comment": "clu-0CAB-0CCD-0C9E"
+  },
+  {
+   "input": "ಫ್ಟ",
+   "comment": "clu-0CAB-0CCD-0C9F"
+  },
+  {
+   "input": "ಫ್ಠ",
+   "comment": "clu-0CAB-0CCD-0CA0"
+  },
+  {
+   "input": "ಫ್ಡ",
+   "comment": "clu-0CAB-0CCD-0CA1"
+  },
+  {
+   "input": "ಫ್ಢ",
+   "comment": "clu-0CAB-0CCD-0CA2"
+  },
+  {
+   "input": "ಫ್ಣ",
+   "comment": "clu-0CAB-0CCD-0CA3"
+  },
+  {
+   "input": "ಫ್ತ",
+   "comment": "clu-0CAB-0CCD-0CA4"
+  },
+  {
+   "input": "ಫ್ಥ",
+   "comment": "clu-0CAB-0CCD-0CA5"
+  },
+  {
+   "input": "ಫ್ದ",
+   "comment": "clu-0CAB-0CCD-0CA6"
+  },
+  {
+   "input": "ಫ್ಧ",
+   "comment": "clu-0CAB-0CCD-0CA7"
+  },
+  {
+   "input": "ಫ್ನ",
+   "comment": "clu-0CAB-0CCD-0CA8"
+  },
+  {
+   "input": "ಫ್ಪ",
+   "comment": "clu-0CAB-0CCD-0CAA"
+  },
+  {
+   "input": "ಫ್ಫ",
+   "comment": "clu-0CAB-0CCD-0CAB"
+  },
+  {
+   "input": "ಫ್ಬ",
+   "comment": "clu-0CAB-0CCD-0CAC"
+  },
+  {
+   "input": "ಫ್ಭ",
+   "comment": "clu-0CAB-0CCD-0CAD"
+  },
+  {
+   "input": "ಫ್ಮ",
+   "comment": "clu-0CAB-0CCD-0CAE"
+  },
+  {
+   "input": "ಫ್ಯ",
+   "comment": "clu-0CAB-0CCD-0CAF"
+  },
+  {
+   "input": "ಫ್ರ",
+   "comment": "clu-0CAB-0CCD-0CB0"
+  },
+  {
+   "input": "ಫ್ಱ",
+   "comment": "clu-0CAB-0CCD-0CB1"
+  },
+  {
+   "input": "ಫ್ಲ",
+   "comment": "clu-0CAB-0CCD-0CB2"
+  },
+  {
+   "input": "ಫ್ಳ",
+   "comment": "clu-0CAB-0CCD-0CB3"
+  },
+  {
+   "input": "ಫ್ವ",
+   "comment": "clu-0CAB-0CCD-0CB5"
+  },
+  {
+   "input": "ಫ್ಶ",
+   "comment": "clu-0CAB-0CCD-0CB6"
+  },
+  {
+   "input": "ಫ್ಷ",
+   "comment": "clu-0CAB-0CCD-0CB7"
+  },
+  {
+   "input": "ಫ್ಸ",
+   "comment": "clu-0CAB-0CCD-0CB8"
+  },
+  {
+   "input": "ಫ್ಹ",
+   "comment": "clu-0CAB-0CCD-0CB9"
+  },
+  {
+   "input": "ಫ್ೞ",
+   "comment": "clu-0CAB-0CCD-0CDE"
+  },
+  {
+   "input": "ಬ್ಕ",
+   "comment": "clu-0CAC-0CCD-0C95"
+  },
+  {
+   "input": "ಬ್ಖ",
+   "comment": "clu-0CAC-0CCD-0C96"
+  },
+  {
+   "input": "ಬ್ಗ",
+   "comment": "clu-0CAC-0CCD-0C97"
+  },
+  {
+   "input": "ಬ್ಘ",
+   "comment": "clu-0CAC-0CCD-0C98"
+  },
+  {
+   "input": "ಬ್ಙ",
+   "comment": "clu-0CAC-0CCD-0C99"
+  },
+  {
+   "input": "ಬ್ಚ",
+   "comment": "clu-0CAC-0CCD-0C9A"
+  },
+  {
+   "input": "ಬ್ಛ",
+   "comment": "clu-0CAC-0CCD-0C9B"
+  },
+  {
+   "input": "ಬ್ಜ",
+   "comment": "clu-0CAC-0CCD-0C9C"
+  },
+  {
+   "input": "ಬ್ಝ",
+   "comment": "clu-0CAC-0CCD-0C9D"
+  },
+  {
+   "input": "ಬ್ಞ",
+   "comment": "clu-0CAC-0CCD-0C9E"
+  },
+  {
+   "input": "ಬ್ಟ",
+   "comment": "clu-0CAC-0CCD-0C9F"
+  },
+  {
+   "input": "ಬ್ಠ",
+   "comment": "clu-0CAC-0CCD-0CA0"
+  },
+  {
+   "input": "ಬ್ಡ",
+   "comment": "clu-0CAC-0CCD-0CA1"
+  },
+  {
+   "input": "ಬ್ಢ",
+   "comment": "clu-0CAC-0CCD-0CA2"
+  },
+  {
+   "input": "ಬ್ಣ",
+   "comment": "clu-0CAC-0CCD-0CA3"
+  },
+  {
+   "input": "ಬ್ತ",
+   "comment": "clu-0CAC-0CCD-0CA4"
+  },
+  {
+   "input": "ಬ್ಥ",
+   "comment": "clu-0CAC-0CCD-0CA5"
+  },
+  {
+   "input": "ಬ್ದ",
+   "comment": "clu-0CAC-0CCD-0CA6"
+  },
+  {
+   "input": "ಬ್ಧ",
+   "comment": "clu-0CAC-0CCD-0CA7"
+  },
+  {
+   "input": "ಬ್ನ",
+   "comment": "clu-0CAC-0CCD-0CA8"
+  },
+  {
+   "input": "ಬ್ಪ",
+   "comment": "clu-0CAC-0CCD-0CAA"
+  },
+  {
+   "input": "ಬ್ಫ",
+   "comment": "clu-0CAC-0CCD-0CAB"
+  },
+  {
+   "input": "ಬ್ಬ",
+   "comment": "clu-0CAC-0CCD-0CAC"
+  },
+  {
+   "input": "ಬ್ಭ",
+   "comment": "clu-0CAC-0CCD-0CAD"
+  },
+  {
+   "input": "ಬ್ಮ",
+   "comment": "clu-0CAC-0CCD-0CAE"
+  },
+  {
+   "input": "ಬ್ಯ",
+   "comment": "clu-0CAC-0CCD-0CAF"
+  },
+  {
+   "input": "ಬ್ರ",
+   "comment": "clu-0CAC-0CCD-0CB0"
+  },
+  {
+   "input": "ಬ್ಱ",
+   "comment": "clu-0CAC-0CCD-0CB1"
+  },
+  {
+   "input": "ಬ್ಲ",
+   "comment": "clu-0CAC-0CCD-0CB2"
+  },
+  {
+   "input": "ಬ್ಳ",
+   "comment": "clu-0CAC-0CCD-0CB3"
+  },
+  {
+   "input": "ಬ್ವ",
+   "comment": "clu-0CAC-0CCD-0CB5"
+  },
+  {
+   "input": "ಬ್ಶ",
+   "comment": "clu-0CAC-0CCD-0CB6"
+  },
+  {
+   "input": "ಬ್ಷ",
+   "comment": "clu-0CAC-0CCD-0CB7"
+  },
+  {
+   "input": "ಬ್ಸ",
+   "comment": "clu-0CAC-0CCD-0CB8"
+  },
+  {
+   "input": "ಬ್ಹ",
+   "comment": "clu-0CAC-0CCD-0CB9"
+  },
+  {
+   "input": "ಬ್ೞ",
+   "comment": "clu-0CAC-0CCD-0CDE"
+  },
+  {
+   "input": "ಭ್ಕ",
+   "comment": "clu-0CAD-0CCD-0C95"
+  },
+  {
+   "input": "ಭ್ಖ",
+   "comment": "clu-0CAD-0CCD-0C96"
+  },
+  {
+   "input": "ಭ್ಗ",
+   "comment": "clu-0CAD-0CCD-0C97"
+  },
+  {
+   "input": "ಭ್ಘ",
+   "comment": "clu-0CAD-0CCD-0C98"
+  },
+  {
+   "input": "ಭ್ಙ",
+   "comment": "clu-0CAD-0CCD-0C99"
+  },
+  {
+   "input": "ಭ್ಚ",
+   "comment": "clu-0CAD-0CCD-0C9A"
+  },
+  {
+   "input": "ಭ್ಛ",
+   "comment": "clu-0CAD-0CCD-0C9B"
+  },
+  {
+   "input": "ಭ್ಜ",
+   "comment": "clu-0CAD-0CCD-0C9C"
+  },
+  {
+   "input": "ಭ್ಝ",
+   "comment": "clu-0CAD-0CCD-0C9D"
+  },
+  {
+   "input": "ಭ್ಞ",
+   "comment": "clu-0CAD-0CCD-0C9E"
+  },
+  {
+   "input": "ಭ್ಟ",
+   "comment": "clu-0CAD-0CCD-0C9F"
+  },
+  {
+   "input": "ಭ್ಠ",
+   "comment": "clu-0CAD-0CCD-0CA0"
+  },
+  {
+   "input": "ಭ್ಡ",
+   "comment": "clu-0CAD-0CCD-0CA1"
+  },
+  {
+   "input": "ಭ್ಢ",
+   "comment": "clu-0CAD-0CCD-0CA2"
+  },
+  {
+   "input": "ಭ್ಣ",
+   "comment": "clu-0CAD-0CCD-0CA3"
+  },
+  {
+   "input": "ಭ್ತ",
+   "comment": "clu-0CAD-0CCD-0CA4"
+  },
+  {
+   "input": "ಭ್ಥ",
+   "comment": "clu-0CAD-0CCD-0CA5"
+  },
+  {
+   "input": "ಭ್ದ",
+   "comment": "clu-0CAD-0CCD-0CA6"
+  },
+  {
+   "input": "ಭ್ಧ",
+   "comment": "clu-0CAD-0CCD-0CA7"
+  },
+  {
+   "input": "ಭ್ನ",
+   "comment": "clu-0CAD-0CCD-0CA8"
+  },
+  {
+   "input": "ಭ್ಪ",
+   "comment": "clu-0CAD-0CCD-0CAA"
+  },
+  {
+   "input": "ಭ್ಫ",
+   "comment": "clu-0CAD-0CCD-0CAB"
+  },
+  {
+   "input": "ಭ್ಬ",
+   "comment": "clu-0CAD-0CCD-0CAC"
+  },
+  {
+   "input": "ಭ್ಭ",
+   "comment": "clu-0CAD-0CCD-0CAD"
+  },
+  {
+   "input": "ಭ್ಮ",
+   "comment": "clu-0CAD-0CCD-0CAE"
+  },
+  {
+   "input": "ಭ್ಯ",
+   "comment": "clu-0CAD-0CCD-0CAF"
+  },
+  {
+   "input": "ಭ್ರ",
+   "comment": "clu-0CAD-0CCD-0CB0"
+  },
+  {
+   "input": "ಭ್ಱ",
+   "comment": "clu-0CAD-0CCD-0CB1"
+  },
+  {
+   "input": "ಭ್ಲ",
+   "comment": "clu-0CAD-0CCD-0CB2"
+  },
+  {
+   "input": "ಭ್ಳ",
+   "comment": "clu-0CAD-0CCD-0CB3"
+  },
+  {
+   "input": "ಭ್ವ",
+   "comment": "clu-0CAD-0CCD-0CB5"
+  },
+  {
+   "input": "ಭ್ಶ",
+   "comment": "clu-0CAD-0CCD-0CB6"
+  },
+  {
+   "input": "ಭ್ಷ",
+   "comment": "clu-0CAD-0CCD-0CB7"
+  },
+  {
+   "input": "ಭ್ಸ",
+   "comment": "clu-0CAD-0CCD-0CB8"
+  },
+  {
+   "input": "ಭ್ಹ",
+   "comment": "clu-0CAD-0CCD-0CB9"
+  },
+  {
+   "input": "ಭ್ೞ",
+   "comment": "clu-0CAD-0CCD-0CDE"
+  },
+  {
+   "input": "ಮ್ಕ",
+   "comment": "clu-0CAE-0CCD-0C95"
+  },
+  {
+   "input": "ಮ್ಖ",
+   "comment": "clu-0CAE-0CCD-0C96"
+  },
+  {
+   "input": "ಮ್ಗ",
+   "comment": "clu-0CAE-0CCD-0C97"
+  },
+  {
+   "input": "ಮ್ಘ",
+   "comment": "clu-0CAE-0CCD-0C98"
+  },
+  {
+   "input": "ಮ್ಙ",
+   "comment": "clu-0CAE-0CCD-0C99"
+  },
+  {
+   "input": "ಮ್ಚ",
+   "comment": "clu-0CAE-0CCD-0C9A"
+  },
+  {
+   "input": "ಮ್ಛ",
+   "comment": "clu-0CAE-0CCD-0C9B"
+  },
+  {
+   "input": "ಮ್ಜ",
+   "comment": "clu-0CAE-0CCD-0C9C"
+  },
+  {
+   "input": "ಮ್ಝ",
+   "comment": "clu-0CAE-0CCD-0C9D"
+  },
+  {
+   "input": "ಮ್ಞ",
+   "comment": "clu-0CAE-0CCD-0C9E"
+  },
+  {
+   "input": "ಮ್ಟ",
+   "comment": "clu-0CAE-0CCD-0C9F"
+  },
+  {
+   "input": "ಮ್ಠ",
+   "comment": "clu-0CAE-0CCD-0CA0"
+  },
+  {
+   "input": "ಮ್ಡ",
+   "comment": "clu-0CAE-0CCD-0CA1"
+  },
+  {
+   "input": "ಮ್ಢ",
+   "comment": "clu-0CAE-0CCD-0CA2"
+  },
+  {
+   "input": "ಮ್ಣ",
+   "comment": "clu-0CAE-0CCD-0CA3"
+  },
+  {
+   "input": "ಮ್ತ",
+   "comment": "clu-0CAE-0CCD-0CA4"
+  },
+  {
+   "input": "ಮ್ಥ",
+   "comment": "clu-0CAE-0CCD-0CA5"
+  },
+  {
+   "input": "ಮ್ದ",
+   "comment": "clu-0CAE-0CCD-0CA6"
+  },
+  {
+   "input": "ಮ್ಧ",
+   "comment": "clu-0CAE-0CCD-0CA7"
+  },
+  {
+   "input": "ಮ್ನ",
+   "comment": "clu-0CAE-0CCD-0CA8"
+  },
+  {
+   "input": "ಮ್ಪ",
+   "comment": "clu-0CAE-0CCD-0CAA"
+  },
+  {
+   "input": "ಮ್ಫ",
+   "comment": "clu-0CAE-0CCD-0CAB"
+  },
+  {
+   "input": "ಮ್ಬ",
+   "comment": "clu-0CAE-0CCD-0CAC"
+  },
+  {
+   "input": "ಮ್ಭ",
+   "comment": "clu-0CAE-0CCD-0CAD"
+  },
+  {
+   "input": "ಮ್ಮ",
+   "comment": "clu-0CAE-0CCD-0CAE"
+  },
+  {
+   "input": "ಮ್ಯ",
+   "comment": "clu-0CAE-0CCD-0CAF"
+  },
+  {
+   "input": "ಮ್ರ",
+   "comment": "clu-0CAE-0CCD-0CB0"
+  },
+  {
+   "input": "ಮ್ಱ",
+   "comment": "clu-0CAE-0CCD-0CB1"
+  },
+  {
+   "input": "ಮ್ಲ",
+   "comment": "clu-0CAE-0CCD-0CB2"
+  },
+  {
+   "input": "ಮ್ಳ",
+   "comment": "clu-0CAE-0CCD-0CB3"
+  },
+  {
+   "input": "ಮ್ವ",
+   "comment": "clu-0CAE-0CCD-0CB5"
+  },
+  {
+   "input": "ಮ್ಶ",
+   "comment": "clu-0CAE-0CCD-0CB6"
+  },
+  {
+   "input": "ಮ್ಷ",
+   "comment": "clu-0CAE-0CCD-0CB7"
+  },
+  {
+   "input": "ಮ್ಸ",
+   "comment": "clu-0CAE-0CCD-0CB8"
+  },
+  {
+   "input": "ಮ್ಹ",
+   "comment": "clu-0CAE-0CCD-0CB9"
+  },
+  {
+   "input": "ಮ್ೞ",
+   "comment": "clu-0CAE-0CCD-0CDE"
+  },
+  {
+   "input": "ಯ್ಕ",
+   "comment": "clu-0CAF-0CCD-0C95"
+  },
+  {
+   "input": "ಯ್ಖ",
+   "comment": "clu-0CAF-0CCD-0C96"
+  },
+  {
+   "input": "ಯ್ಗ",
+   "comment": "clu-0CAF-0CCD-0C97"
+  },
+  {
+   "input": "ಯ್ಘ",
+   "comment": "clu-0CAF-0CCD-0C98"
+  },
+  {
+   "input": "ಯ್ಙ",
+   "comment": "clu-0CAF-0CCD-0C99"
+  },
+  {
+   "input": "ಯ್ಚ",
+   "comment": "clu-0CAF-0CCD-0C9A"
+  },
+  {
+   "input": "ಯ್ಛ",
+   "comment": "clu-0CAF-0CCD-0C9B"
+  },
+  {
+   "input": "ಯ್ಜ",
+   "comment": "clu-0CAF-0CCD-0C9C"
+  },
+  {
+   "input": "ಯ್ಝ",
+   "comment": "clu-0CAF-0CCD-0C9D"
+  },
+  {
+   "input": "ಯ್ಞ",
+   "comment": "clu-0CAF-0CCD-0C9E"
+  },
+  {
+   "input": "ಯ್ಟ",
+   "comment": "clu-0CAF-0CCD-0C9F"
+  },
+  {
+   "input": "ಯ್ಠ",
+   "comment": "clu-0CAF-0CCD-0CA0"
+  },
+  {
+   "input": "ಯ್ಡ",
+   "comment": "clu-0CAF-0CCD-0CA1"
+  },
+  {
+   "input": "ಯ್ಢ",
+   "comment": "clu-0CAF-0CCD-0CA2"
+  },
+  {
+   "input": "ಯ್ಣ",
+   "comment": "clu-0CAF-0CCD-0CA3"
+  },
+  {
+   "input": "ಯ್ತ",
+   "comment": "clu-0CAF-0CCD-0CA4"
+  },
+  {
+   "input": "ಯ್ಥ",
+   "comment": "clu-0CAF-0CCD-0CA5"
+  },
+  {
+   "input": "ಯ್ದ",
+   "comment": "clu-0CAF-0CCD-0CA6"
+  },
+  {
+   "input": "ಯ್ಧ",
+   "comment": "clu-0CAF-0CCD-0CA7"
+  },
+  {
+   "input": "ಯ್ನ",
+   "comment": "clu-0CAF-0CCD-0CA8"
+  },
+  {
+   "input": "ಯ್ಪ",
+   "comment": "clu-0CAF-0CCD-0CAA"
+  },
+  {
+   "input": "ಯ್ಫ",
+   "comment": "clu-0CAF-0CCD-0CAB"
+  },
+  {
+   "input": "ಯ್ಬ",
+   "comment": "clu-0CAF-0CCD-0CAC"
+  },
+  {
+   "input": "ಯ್ಭ",
+   "comment": "clu-0CAF-0CCD-0CAD"
+  },
+  {
+   "input": "ಯ್ಮ",
+   "comment": "clu-0CAF-0CCD-0CAE"
+  },
+  {
+   "input": "ಯ್ಯ",
+   "comment": "clu-0CAF-0CCD-0CAF"
+  },
+  {
+   "input": "ಯ್ರ",
+   "comment": "clu-0CAF-0CCD-0CB0"
+  },
+  {
+   "input": "ಯ್ಱ",
+   "comment": "clu-0CAF-0CCD-0CB1"
+  },
+  {
+   "input": "ಯ್ಲ",
+   "comment": "clu-0CAF-0CCD-0CB2"
+  },
+  {
+   "input": "ಯ್ಳ",
+   "comment": "clu-0CAF-0CCD-0CB3"
+  },
+  {
+   "input": "ಯ್ವ",
+   "comment": "clu-0CAF-0CCD-0CB5"
+  },
+  {
+   "input": "ಯ್ಶ",
+   "comment": "clu-0CAF-0CCD-0CB6"
+  },
+  {
+   "input": "ಯ್ಷ",
+   "comment": "clu-0CAF-0CCD-0CB7"
+  },
+  {
+   "input": "ಯ್ಸ",
+   "comment": "clu-0CAF-0CCD-0CB8"
+  },
+  {
+   "input": "ಯ್ಹ",
+   "comment": "clu-0CAF-0CCD-0CB9"
+  },
+  {
+   "input": "ಯ್ೞ",
+   "comment": "clu-0CAF-0CCD-0CDE"
+  },
+  {
+   "input": "ರ್ಕ",
+   "comment": "clu-0CB0-0CCD-0C95"
+  },
+  {
+   "input": "ರ್ಖ",
+   "comment": "clu-0CB0-0CCD-0C96"
+  },
+  {
+   "input": "ರ್ಗ",
+   "comment": "clu-0CB0-0CCD-0C97"
+  },
+  {
+   "input": "ರ್ಘ",
+   "comment": "clu-0CB0-0CCD-0C98"
+  },
+  {
+   "input": "ರ್ಙ",
+   "comment": "clu-0CB0-0CCD-0C99"
+  },
+  {
+   "input": "ರ್ಚ",
+   "comment": "clu-0CB0-0CCD-0C9A"
+  },
+  {
+   "input": "ರ್ಛ",
+   "comment": "clu-0CB0-0CCD-0C9B"
+  },
+  {
+   "input": "ರ್ಜ",
+   "comment": "clu-0CB0-0CCD-0C9C"
+  },
+  {
+   "input": "ರ್ಝ",
+   "comment": "clu-0CB0-0CCD-0C9D"
+  },
+  {
+   "input": "ರ್ಞ",
+   "comment": "clu-0CB0-0CCD-0C9E"
+  },
+  {
+   "input": "ರ್ಟ",
+   "comment": "clu-0CB0-0CCD-0C9F"
+  },
+  {
+   "input": "ರ್ಠ",
+   "comment": "clu-0CB0-0CCD-0CA0"
+  },
+  {
+   "input": "ರ್ಡ",
+   "comment": "clu-0CB0-0CCD-0CA1"
+  },
+  {
+   "input": "ರ್ಢ",
+   "comment": "clu-0CB0-0CCD-0CA2"
+  },
+  {
+   "input": "ರ್ಣ",
+   "comment": "clu-0CB0-0CCD-0CA3"
+  },
+  {
+   "input": "ರ್ತ",
+   "comment": "clu-0CB0-0CCD-0CA4"
+  },
+  {
+   "input": "ರ್ಥ",
+   "comment": "clu-0CB0-0CCD-0CA5"
+  },
+  {
+   "input": "ರ್ದ",
+   "comment": "clu-0CB0-0CCD-0CA6"
+  },
+  {
+   "input": "ರ್ಧ",
+   "comment": "clu-0CB0-0CCD-0CA7"
+  },
+  {
+   "input": "ರ್ನ",
+   "comment": "clu-0CB0-0CCD-0CA8"
+  },
+  {
+   "input": "ರ್ಪ",
+   "comment": "clu-0CB0-0CCD-0CAA"
+  },
+  {
+   "input": "ರ್ಫ",
+   "comment": "clu-0CB0-0CCD-0CAB"
+  },
+  {
+   "input": "ರ್ಬ",
+   "comment": "clu-0CB0-0CCD-0CAC"
+  },
+  {
+   "input": "ರ್ಭ",
+   "comment": "clu-0CB0-0CCD-0CAD"
+  },
+  {
+   "input": "ರ್ಮ",
+   "comment": "clu-0CB0-0CCD-0CAE"
+  },
+  {
+   "input": "ರ್ಯ",
+   "comment": "clu-0CB0-0CCD-0CAF"
+  },
+  {
+   "input": "ರ್ರ",
+   "comment": "clu-0CB0-0CCD-0CB0"
+  },
+  {
+   "input": "ರ್ಱ",
+   "comment": "clu-0CB0-0CCD-0CB1"
+  },
+  {
+   "input": "ರ್ಲ",
+   "comment": "clu-0CB0-0CCD-0CB2"
+  },
+  {
+   "input": "ರ್ಳ",
+   "comment": "clu-0CB0-0CCD-0CB3"
+  },
+  {
+   "input": "ರ್ವ",
+   "comment": "clu-0CB0-0CCD-0CB5"
+  },
+  {
+   "input": "ರ್ಶ",
+   "comment": "clu-0CB0-0CCD-0CB6"
+  },
+  {
+   "input": "ರ್ಷ",
+   "comment": "clu-0CB0-0CCD-0CB7"
+  },
+  {
+   "input": "ರ್ಸ",
+   "comment": "clu-0CB0-0CCD-0CB8"
+  },
+  {
+   "input": "ರ್ಹ",
+   "comment": "clu-0CB0-0CCD-0CB9"
+  },
+  {
+   "input": "ರ್ೞ",
+   "comment": "clu-0CB0-0CCD-0CDE"
+  },
+  {
+   "input": "ಱ್ಕ",
+   "comment": "clu-0CB1-0CCD-0C95"
+  },
+  {
+   "input": "ಱ್ಖ",
+   "comment": "clu-0CB1-0CCD-0C96"
+  },
+  {
+   "input": "ಱ್ಗ",
+   "comment": "clu-0CB1-0CCD-0C97"
+  },
+  {
+   "input": "ಱ್ಘ",
+   "comment": "clu-0CB1-0CCD-0C98"
+  },
+  {
+   "input": "ಱ್ಙ",
+   "comment": "clu-0CB1-0CCD-0C99"
+  },
+  {
+   "input": "ಱ್ಚ",
+   "comment": "clu-0CB1-0CCD-0C9A"
+  },
+  {
+   "input": "ಱ್ಛ",
+   "comment": "clu-0CB1-0CCD-0C9B"
+  },
+  {
+   "input": "ಱ್ಜ",
+   "comment": "clu-0CB1-0CCD-0C9C"
+  },
+  {
+   "input": "ಱ್ಝ",
+   "comment": "clu-0CB1-0CCD-0C9D"
+  },
+  {
+   "input": "ಱ್ಞ",
+   "comment": "clu-0CB1-0CCD-0C9E"
+  },
+  {
+   "input": "ಱ್ಟ",
+   "comment": "clu-0CB1-0CCD-0C9F"
+  },
+  {
+   "input": "ಱ್ಠ",
+   "comment": "clu-0CB1-0CCD-0CA0"
+  },
+  {
+   "input": "ಱ್ಡ",
+   "comment": "clu-0CB1-0CCD-0CA1"
+  },
+  {
+   "input": "ಱ್ಢ",
+   "comment": "clu-0CB1-0CCD-0CA2"
+  },
+  {
+   "input": "ಱ್ಣ",
+   "comment": "clu-0CB1-0CCD-0CA3"
+  },
+  {
+   "input": "ಱ್ತ",
+   "comment": "clu-0CB1-0CCD-0CA4"
+  },
+  {
+   "input": "ಱ್ಥ",
+   "comment": "clu-0CB1-0CCD-0CA5"
+  },
+  {
+   "input": "ಱ್ದ",
+   "comment": "clu-0CB1-0CCD-0CA6"
+  },
+  {
+   "input": "ಱ್ಧ",
+   "comment": "clu-0CB1-0CCD-0CA7"
+  },
+  {
+   "input": "ಱ್ನ",
+   "comment": "clu-0CB1-0CCD-0CA8"
+  },
+  {
+   "input": "ಱ್ಪ",
+   "comment": "clu-0CB1-0CCD-0CAA"
+  },
+  {
+   "input": "ಱ್ಫ",
+   "comment": "clu-0CB1-0CCD-0CAB"
+  },
+  {
+   "input": "ಱ್ಬ",
+   "comment": "clu-0CB1-0CCD-0CAC"
+  },
+  {
+   "input": "ಱ್ಭ",
+   "comment": "clu-0CB1-0CCD-0CAD"
+  },
+  {
+   "input": "ಱ್ಮ",
+   "comment": "clu-0CB1-0CCD-0CAE"
+  },
+  {
+   "input": "ಱ್ಯ",
+   "comment": "clu-0CB1-0CCD-0CAF"
+  },
+  {
+   "input": "ಱ್ರ",
+   "comment": "clu-0CB1-0CCD-0CB0"
+  },
+  {
+   "input": "ಱ್ಱ",
+   "comment": "clu-0CB1-0CCD-0CB1"
+  },
+  {
+   "input": "ಱ್ಲ",
+   "comment": "clu-0CB1-0CCD-0CB2"
+  },
+  {
+   "input": "ಱ್ಳ",
+   "comment": "clu-0CB1-0CCD-0CB3"
+  },
+  {
+   "input": "ಱ್ವ",
+   "comment": "clu-0CB1-0CCD-0CB5"
+  },
+  {
+   "input": "ಱ್ಶ",
+   "comment": "clu-0CB1-0CCD-0CB6"
+  },
+  {
+   "input": "ಱ್ಷ",
+   "comment": "clu-0CB1-0CCD-0CB7"
+  },
+  {
+   "input": "ಱ್ಸ",
+   "comment": "clu-0CB1-0CCD-0CB8"
+  },
+  {
+   "input": "ಱ್ಹ",
+   "comment": "clu-0CB1-0CCD-0CB9"
+  },
+  {
+   "input": "ಱ್ೞ",
+   "comment": "clu-0CB1-0CCD-0CDE"
+  },
+  {
+   "input": "ಲ್ಕ",
+   "comment": "clu-0CB2-0CCD-0C95"
+  },
+  {
+   "input": "ಲ್ಖ",
+   "comment": "clu-0CB2-0CCD-0C96"
+  },
+  {
+   "input": "ಲ್ಗ",
+   "comment": "clu-0CB2-0CCD-0C97"
+  },
+  {
+   "input": "ಲ್ಘ",
+   "comment": "clu-0CB2-0CCD-0C98"
+  },
+  {
+   "input": "ಲ್ಙ",
+   "comment": "clu-0CB2-0CCD-0C99"
+  },
+  {
+   "input": "ಲ್ಚ",
+   "comment": "clu-0CB2-0CCD-0C9A"
+  },
+  {
+   "input": "ಲ್ಛ",
+   "comment": "clu-0CB2-0CCD-0C9B"
+  },
+  {
+   "input": "ಲ್ಜ",
+   "comment": "clu-0CB2-0CCD-0C9C"
+  },
+  {
+   "input": "ಲ್ಝ",
+   "comment": "clu-0CB2-0CCD-0C9D"
+  },
+  {
+   "input": "ಲ್ಞ",
+   "comment": "clu-0CB2-0CCD-0C9E"
+  },
+  {
+   "input": "ಲ್ಟ",
+   "comment": "clu-0CB2-0CCD-0C9F"
+  },
+  {
+   "input": "ಲ್ಠ",
+   "comment": "clu-0CB2-0CCD-0CA0"
+  },
+  {
+   "input": "ಲ್ಡ",
+   "comment": "clu-0CB2-0CCD-0CA1"
+  },
+  {
+   "input": "ಲ್ಢ",
+   "comment": "clu-0CB2-0CCD-0CA2"
+  },
+  {
+   "input": "ಲ್ಣ",
+   "comment": "clu-0CB2-0CCD-0CA3"
+  },
+  {
+   "input": "ಲ್ತ",
+   "comment": "clu-0CB2-0CCD-0CA4"
+  },
+  {
+   "input": "ಲ್ಥ",
+   "comment": "clu-0CB2-0CCD-0CA5"
+  },
+  {
+   "input": "ಲ್ದ",
+   "comment": "clu-0CB2-0CCD-0CA6"
+  },
+  {
+   "input": "ಲ್ಧ",
+   "comment": "clu-0CB2-0CCD-0CA7"
+  },
+  {
+   "input": "ಲ್ನ",
+   "comment": "clu-0CB2-0CCD-0CA8"
+  },
+  {
+   "input": "ಲ್ಪ",
+   "comment": "clu-0CB2-0CCD-0CAA"
+  },
+  {
+   "input": "ಲ್ಫ",
+   "comment": "clu-0CB2-0CCD-0CAB"
+  },
+  {
+   "input": "ಲ್ಬ",
+   "comment": "clu-0CB2-0CCD-0CAC"
+  },
+  {
+   "input": "ಲ್ಭ",
+   "comment": "clu-0CB2-0CCD-0CAD"
+  },
+  {
+   "input": "ಲ್ಮ",
+   "comment": "clu-0CB2-0CCD-0CAE"
+  },
+  {
+   "input": "ಲ್ಯ",
+   "comment": "clu-0CB2-0CCD-0CAF"
+  },
+  {
+   "input": "ಲ್ರ",
+   "comment": "clu-0CB2-0CCD-0CB0"
+  },
+  {
+   "input": "ಲ್ಱ",
+   "comment": "clu-0CB2-0CCD-0CB1"
+  },
+  {
+   "input": "ಲ್ಲ",
+   "comment": "clu-0CB2-0CCD-0CB2"
+  },
+  {
+   "input": "ಲ್ಳ",
+   "comment": "clu-0CB2-0CCD-0CB3"
+  },
+  {
+   "input": "ಲ್ವ",
+   "comment": "clu-0CB2-0CCD-0CB5"
+  },
+  {
+   "input": "ಲ್ಶ",
+   "comment": "clu-0CB2-0CCD-0CB6"
+  },
+  {
+   "input": "ಲ್ಷ",
+   "comment": "clu-0CB2-0CCD-0CB7"
+  },
+  {
+   "input": "ಲ್ಸ",
+   "comment": "clu-0CB2-0CCD-0CB8"
+  },
+  {
+   "input": "ಲ್ಹ",
+   "comment": "clu-0CB2-0CCD-0CB9"
+  },
+  {
+   "input": "ಲ್ೞ",
+   "comment": "clu-0CB2-0CCD-0CDE"
+  },
+  {
+   "input": "ಳ್ಕ",
+   "comment": "clu-0CB3-0CCD-0C95"
+  },
+  {
+   "input": "ಳ್ಖ",
+   "comment": "clu-0CB3-0CCD-0C96"
+  },
+  {
+   "input": "ಳ್ಗ",
+   "comment": "clu-0CB3-0CCD-0C97"
+  },
+  {
+   "input": "ಳ್ಘ",
+   "comment": "clu-0CB3-0CCD-0C98"
+  },
+  {
+   "input": "ಳ್ಙ",
+   "comment": "clu-0CB3-0CCD-0C99"
+  },
+  {
+   "input": "ಳ್ಚ",
+   "comment": "clu-0CB3-0CCD-0C9A"
+  },
+  {
+   "input": "ಳ್ಛ",
+   "comment": "clu-0CB3-0CCD-0C9B"
+  },
+  {
+   "input": "ಳ್ಜ",
+   "comment": "clu-0CB3-0CCD-0C9C"
+  },
+  {
+   "input": "ಳ್ಝ",
+   "comment": "clu-0CB3-0CCD-0C9D"
+  },
+  {
+   "input": "ಳ್ಞ",
+   "comment": "clu-0CB3-0CCD-0C9E"
+  },
+  {
+   "input": "ಳ್ಟ",
+   "comment": "clu-0CB3-0CCD-0C9F"
+  },
+  {
+   "input": "ಳ್ಠ",
+   "comment": "clu-0CB3-0CCD-0CA0"
+  },
+  {
+   "input": "ಳ್ಡ",
+   "comment": "clu-0CB3-0CCD-0CA1"
+  },
+  {
+   "input": "ಳ್ಢ",
+   "comment": "clu-0CB3-0CCD-0CA2"
+  },
+  {
+   "input": "ಳ್ಣ",
+   "comment": "clu-0CB3-0CCD-0CA3"
+  },
+  {
+   "input": "ಳ್ತ",
+   "comment": "clu-0CB3-0CCD-0CA4"
+  },
+  {
+   "input": "ಳ್ಥ",
+   "comment": "clu-0CB3-0CCD-0CA5"
+  },
+  {
+   "input": "ಳ್ದ",
+   "comment": "clu-0CB3-0CCD-0CA6"
+  },
+  {
+   "input": "ಳ್ಧ",
+   "comment": "clu-0CB3-0CCD-0CA7"
+  },
+  {
+   "input": "ಳ್ನ",
+   "comment": "clu-0CB3-0CCD-0CA8"
+  },
+  {
+   "input": "ಳ್ಪ",
+   "comment": "clu-0CB3-0CCD-0CAA"
+  },
+  {
+   "input": "ಳ್ಫ",
+   "comment": "clu-0CB3-0CCD-0CAB"
+  },
+  {
+   "input": "ಳ್ಬ",
+   "comment": "clu-0CB3-0CCD-0CAC"
+  },
+  {
+   "input": "ಳ್ಭ",
+   "comment": "clu-0CB3-0CCD-0CAD"
+  },
+  {
+   "input": "ಳ್ಮ",
+   "comment": "clu-0CB3-0CCD-0CAE"
+  },
+  {
+   "input": "ಳ್ಯ",
+   "comment": "clu-0CB3-0CCD-0CAF"
+  },
+  {
+   "input": "ಳ್ರ",
+   "comment": "clu-0CB3-0CCD-0CB0"
+  },
+  {
+   "input": "ಳ್ಱ",
+   "comment": "clu-0CB3-0CCD-0CB1"
+  },
+  {
+   "input": "ಳ್ಲ",
+   "comment": "clu-0CB3-0CCD-0CB2"
+  },
+  {
+   "input": "ಳ್ಳ",
+   "comment": "clu-0CB3-0CCD-0CB3"
+  },
+  {
+   "input": "ಳ್ವ",
+   "comment": "clu-0CB3-0CCD-0CB5"
+  },
+  {
+   "input": "ಳ್ಶ",
+   "comment": "clu-0CB3-0CCD-0CB6"
+  },
+  {
+   "input": "ಳ್ಷ",
+   "comment": "clu-0CB3-0CCD-0CB7"
+  },
+  {
+   "input": "ಳ್ಸ",
+   "comment": "clu-0CB3-0CCD-0CB8"
+  },
+  {
+   "input": "ಳ್ಹ",
+   "comment": "clu-0CB3-0CCD-0CB9"
+  },
+  {
+   "input": "ಳ್ೞ",
+   "comment": "clu-0CB3-0CCD-0CDE"
+  },
+  {
+   "input": "ವ್ಕ",
+   "comment": "clu-0CB5-0CCD-0C95"
+  },
+  {
+   "input": "ವ್ಖ",
+   "comment": "clu-0CB5-0CCD-0C96"
+  },
+  {
+   "input": "ವ್ಗ",
+   "comment": "clu-0CB5-0CCD-0C97"
+  },
+  {
+   "input": "ವ್ಘ",
+   "comment": "clu-0CB5-0CCD-0C98"
+  },
+  {
+   "input": "ವ್ಙ",
+   "comment": "clu-0CB5-0CCD-0C99"
+  },
+  {
+   "input": "ವ್ಚ",
+   "comment": "clu-0CB5-0CCD-0C9A"
+  },
+  {
+   "input": "ವ್ಛ",
+   "comment": "clu-0CB5-0CCD-0C9B"
+  },
+  {
+   "input": "ವ್ಜ",
+   "comment": "clu-0CB5-0CCD-0C9C"
+  },
+  {
+   "input": "ವ್ಝ",
+   "comment": "clu-0CB5-0CCD-0C9D"
+  },
+  {
+   "input": "ವ್ಞ",
+   "comment": "clu-0CB5-0CCD-0C9E"
+  },
+  {
+   "input": "ವ್ಟ",
+   "comment": "clu-0CB5-0CCD-0C9F"
+  },
+  {
+   "input": "ವ್ಠ",
+   "comment": "clu-0CB5-0CCD-0CA0"
+  },
+  {
+   "input": "ವ್ಡ",
+   "comment": "clu-0CB5-0CCD-0CA1"
+  },
+  {
+   "input": "ವ್ಢ",
+   "comment": "clu-0CB5-0CCD-0CA2"
+  },
+  {
+   "input": "ವ್ಣ",
+   "comment": "clu-0CB5-0CCD-0CA3"
+  },
+  {
+   "input": "ವ್ತ",
+   "comment": "clu-0CB5-0CCD-0CA4"
+  },
+  {
+   "input": "ವ್ಥ",
+   "comment": "clu-0CB5-0CCD-0CA5"
+  },
+  {
+   "input": "ವ್ದ",
+   "comment": "clu-0CB5-0CCD-0CA6"
+  },
+  {
+   "input": "ವ್ಧ",
+   "comment": "clu-0CB5-0CCD-0CA7"
+  },
+  {
+   "input": "ವ್ನ",
+   "comment": "clu-0CB5-0CCD-0CA8"
+  },
+  {
+   "input": "ವ್ಪ",
+   "comment": "clu-0CB5-0CCD-0CAA"
+  },
+  {
+   "input": "ವ್ಫ",
+   "comment": "clu-0CB5-0CCD-0CAB"
+  },
+  {
+   "input": "ವ್ಬ",
+   "comment": "clu-0CB5-0CCD-0CAC"
+  },
+  {
+   "input": "ವ್ಭ",
+   "comment": "clu-0CB5-0CCD-0CAD"
+  },
+  {
+   "input": "ವ್ಮ",
+   "comment": "clu-0CB5-0CCD-0CAE"
+  },
+  {
+   "input": "ವ್ಯ",
+   "comment": "clu-0CB5-0CCD-0CAF"
+  },
+  {
+   "input": "ವ್ರ",
+   "comment": "clu-0CB5-0CCD-0CB0"
+  },
+  {
+   "input": "ವ್ಱ",
+   "comment": "clu-0CB5-0CCD-0CB1"
+  },
+  {
+   "input": "ವ್ಲ",
+   "comment": "clu-0CB5-0CCD-0CB2"
+  },
+  {
+   "input": "ವ್ಳ",
+   "comment": "clu-0CB5-0CCD-0CB3"
+  },
+  {
+   "input": "ವ್ವ",
+   "comment": "clu-0CB5-0CCD-0CB5"
+  },
+  {
+   "input": "ವ್ಶ",
+   "comment": "clu-0CB5-0CCD-0CB6"
+  },
+  {
+   "input": "ವ್ಷ",
+   "comment": "clu-0CB5-0CCD-0CB7"
+  },
+  {
+   "input": "ವ್ಸ",
+   "comment": "clu-0CB5-0CCD-0CB8"
+  },
+  {
+   "input": "ವ್ಹ",
+   "comment": "clu-0CB5-0CCD-0CB9"
+  },
+  {
+   "input": "ವ್ೞ",
+   "comment": "clu-0CB5-0CCD-0CDE"
+  },
+  {
+   "input": "ಶ್ಕ",
+   "comment": "clu-0CB6-0CCD-0C95"
+  },
+  {
+   "input": "ಶ್ಖ",
+   "comment": "clu-0CB6-0CCD-0C96"
+  },
+  {
+   "input": "ಶ್ಗ",
+   "comment": "clu-0CB6-0CCD-0C97"
+  },
+  {
+   "input": "ಶ್ಘ",
+   "comment": "clu-0CB6-0CCD-0C98"
+  },
+  {
+   "input": "ಶ್ಙ",
+   "comment": "clu-0CB6-0CCD-0C99"
+  },
+  {
+   "input": "ಶ್ಚ",
+   "comment": "clu-0CB6-0CCD-0C9A"
+  },
+  {
+   "input": "ಶ್ಛ",
+   "comment": "clu-0CB6-0CCD-0C9B"
+  },
+  {
+   "input": "ಶ್ಜ",
+   "comment": "clu-0CB6-0CCD-0C9C"
+  },
+  {
+   "input": "ಶ್ಝ",
+   "comment": "clu-0CB6-0CCD-0C9D"
+  },
+  {
+   "input": "ಶ್ಞ",
+   "comment": "clu-0CB6-0CCD-0C9E"
+  },
+  {
+   "input": "ಶ್ಟ",
+   "comment": "clu-0CB6-0CCD-0C9F"
+  },
+  {
+   "input": "ಶ್ಠ",
+   "comment": "clu-0CB6-0CCD-0CA0"
+  },
+  {
+   "input": "ಶ್ಡ",
+   "comment": "clu-0CB6-0CCD-0CA1"
+  },
+  {
+   "input": "ಶ್ಢ",
+   "comment": "clu-0CB6-0CCD-0CA2"
+  },
+  {
+   "input": "ಶ್ಣ",
+   "comment": "clu-0CB6-0CCD-0CA3"
+  },
+  {
+   "input": "ಶ್ತ",
+   "comment": "clu-0CB6-0CCD-0CA4"
+  },
+  {
+   "input": "ಶ್ಥ",
+   "comment": "clu-0CB6-0CCD-0CA5"
+  },
+  {
+   "input": "ಶ್ದ",
+   "comment": "clu-0CB6-0CCD-0CA6"
+  },
+  {
+   "input": "ಶ್ಧ",
+   "comment": "clu-0CB6-0CCD-0CA7"
+  },
+  {
+   "input": "ಶ್ನ",
+   "comment": "clu-0CB6-0CCD-0CA8"
+  },
+  {
+   "input": "ಶ್ಪ",
+   "comment": "clu-0CB6-0CCD-0CAA"
+  },
+  {
+   "input": "ಶ್ಫ",
+   "comment": "clu-0CB6-0CCD-0CAB"
+  },
+  {
+   "input": "ಶ್ಬ",
+   "comment": "clu-0CB6-0CCD-0CAC"
+  },
+  {
+   "input": "ಶ್ಭ",
+   "comment": "clu-0CB6-0CCD-0CAD"
+  },
+  {
+   "input": "ಶ್ಮ",
+   "comment": "clu-0CB6-0CCD-0CAE"
+  },
+  {
+   "input": "ಶ್ಯ",
+   "comment": "clu-0CB6-0CCD-0CAF"
+  },
+  {
+   "input": "ಶ್ರ",
+   "comment": "clu-0CB6-0CCD-0CB0"
+  },
+  {
+   "input": "ಶ್ಱ",
+   "comment": "clu-0CB6-0CCD-0CB1"
+  },
+  {
+   "input": "ಶ್ಲ",
+   "comment": "clu-0CB6-0CCD-0CB2"
+  },
+  {
+   "input": "ಶ್ಳ",
+   "comment": "clu-0CB6-0CCD-0CB3"
+  },
+  {
+   "input": "ಶ್ವ",
+   "comment": "clu-0CB6-0CCD-0CB5"
+  },
+  {
+   "input": "ಶ್ಶ",
+   "comment": "clu-0CB6-0CCD-0CB6"
+  },
+  {
+   "input": "ಶ್ಷ",
+   "comment": "clu-0CB6-0CCD-0CB7"
+  },
+  {
+   "input": "ಶ್ಸ",
+   "comment": "clu-0CB6-0CCD-0CB8"
+  },
+  {
+   "input": "ಶ್ಹ",
+   "comment": "clu-0CB6-0CCD-0CB9"
+  },
+  {
+   "input": "ಶ್ೞ",
+   "comment": "clu-0CB6-0CCD-0CDE"
+  },
+  {
+   "input": "ಷ್ಕ",
+   "comment": "clu-0CB7-0CCD-0C95"
+  },
+  {
+   "input": "ಷ್ಖ",
+   "comment": "clu-0CB7-0CCD-0C96"
+  },
+  {
+   "input": "ಷ್ಗ",
+   "comment": "clu-0CB7-0CCD-0C97"
+  },
+  {
+   "input": "ಷ್ಘ",
+   "comment": "clu-0CB7-0CCD-0C98"
+  },
+  {
+   "input": "ಷ್ಙ",
+   "comment": "clu-0CB7-0CCD-0C99"
+  },
+  {
+   "input": "ಷ್ಚ",
+   "comment": "clu-0CB7-0CCD-0C9A"
+  },
+  {
+   "input": "ಷ್ಛ",
+   "comment": "clu-0CB7-0CCD-0C9B"
+  },
+  {
+   "input": "ಷ್ಜ",
+   "comment": "clu-0CB7-0CCD-0C9C"
+  },
+  {
+   "input": "ಷ್ಝ",
+   "comment": "clu-0CB7-0CCD-0C9D"
+  },
+  {
+   "input": "ಷ್ಞ",
+   "comment": "clu-0CB7-0CCD-0C9E"
+  },
+  {
+   "input": "ಷ್ಟ",
+   "comment": "clu-0CB7-0CCD-0C9F"
+  },
+  {
+   "input": "ಷ್ಠ",
+   "comment": "clu-0CB7-0CCD-0CA0"
+  },
+  {
+   "input": "ಷ್ಡ",
+   "comment": "clu-0CB7-0CCD-0CA1"
+  },
+  {
+   "input": "ಷ್ಢ",
+   "comment": "clu-0CB7-0CCD-0CA2"
+  },
+  {
+   "input": "ಷ್ಣ",
+   "comment": "clu-0CB7-0CCD-0CA3"
+  },
+  {
+   "input": "ಷ್ತ",
+   "comment": "clu-0CB7-0CCD-0CA4"
+  },
+  {
+   "input": "ಷ್ಥ",
+   "comment": "clu-0CB7-0CCD-0CA5"
+  },
+  {
+   "input": "ಷ್ದ",
+   "comment": "clu-0CB7-0CCD-0CA6"
+  },
+  {
+   "input": "ಷ್ಧ",
+   "comment": "clu-0CB7-0CCD-0CA7"
+  },
+  {
+   "input": "ಷ್ನ",
+   "comment": "clu-0CB7-0CCD-0CA8"
+  },
+  {
+   "input": "ಷ್ಪ",
+   "comment": "clu-0CB7-0CCD-0CAA"
+  },
+  {
+   "input": "ಷ್ಫ",
+   "comment": "clu-0CB7-0CCD-0CAB"
+  },
+  {
+   "input": "ಷ್ಬ",
+   "comment": "clu-0CB7-0CCD-0CAC"
+  },
+  {
+   "input": "ಷ್ಭ",
+   "comment": "clu-0CB7-0CCD-0CAD"
+  },
+  {
+   "input": "ಷ್ಮ",
+   "comment": "clu-0CB7-0CCD-0CAE"
+  },
+  {
+   "input": "ಷ್ಯ",
+   "comment": "clu-0CB7-0CCD-0CAF"
+  },
+  {
+   "input": "ಷ್ರ",
+   "comment": "clu-0CB7-0CCD-0CB0"
+  },
+  {
+   "input": "ಷ್ಱ",
+   "comment": "clu-0CB7-0CCD-0CB1"
+  },
+  {
+   "input": "ಷ್ಲ",
+   "comment": "clu-0CB7-0CCD-0CB2"
+  },
+  {
+   "input": "ಷ್ಳ",
+   "comment": "clu-0CB7-0CCD-0CB3"
+  },
+  {
+   "input": "ಷ್ವ",
+   "comment": "clu-0CB7-0CCD-0CB5"
+  },
+  {
+   "input": "ಷ್ಶ",
+   "comment": "clu-0CB7-0CCD-0CB6"
+  },
+  {
+   "input": "ಷ್ಷ",
+   "comment": "clu-0CB7-0CCD-0CB7"
+  },
+  {
+   "input": "ಷ್ಸ",
+   "comment": "clu-0CB7-0CCD-0CB8"
+  },
+  {
+   "input": "ಷ್ಹ",
+   "comment": "clu-0CB7-0CCD-0CB9"
+  },
+  {
+   "input": "ಷ್ೞ",
+   "comment": "clu-0CB7-0CCD-0CDE"
+  },
+  {
+   "input": "ಸ್ಕ",
+   "comment": "clu-0CB8-0CCD-0C95"
+  },
+  {
+   "input": "ಸ್ಖ",
+   "comment": "clu-0CB8-0CCD-0C96"
+  },
+  {
+   "input": "ಸ್ಗ",
+   "comment": "clu-0CB8-0CCD-0C97"
+  },
+  {
+   "input": "ಸ್ಘ",
+   "comment": "clu-0CB8-0CCD-0C98"
+  },
+  {
+   "input": "ಸ್ಙ",
+   "comment": "clu-0CB8-0CCD-0C99"
+  },
+  {
+   "input": "ಸ್ಚ",
+   "comment": "clu-0CB8-0CCD-0C9A"
+  },
+  {
+   "input": "ಸ್ಛ",
+   "comment": "clu-0CB8-0CCD-0C9B"
+  },
+  {
+   "input": "ಸ್ಜ",
+   "comment": "clu-0CB8-0CCD-0C9C"
+  },
+  {
+   "input": "ಸ್ಝ",
+   "comment": "clu-0CB8-0CCD-0C9D"
+  },
+  {
+   "input": "ಸ್ಞ",
+   "comment": "clu-0CB8-0CCD-0C9E"
+  },
+  {
+   "input": "ಸ್ಟ",
+   "comment": "clu-0CB8-0CCD-0C9F"
+  },
+  {
+   "input": "ಸ್ಠ",
+   "comment": "clu-0CB8-0CCD-0CA0"
+  },
+  {
+   "input": "ಸ್ಡ",
+   "comment": "clu-0CB8-0CCD-0CA1"
+  },
+  {
+   "input": "ಸ್ಢ",
+   "comment": "clu-0CB8-0CCD-0CA2"
+  },
+  {
+   "input": "ಸ್ಣ",
+   "comment": "clu-0CB8-0CCD-0CA3"
+  },
+  {
+   "input": "ಸ್ತ",
+   "comment": "clu-0CB8-0CCD-0CA4"
+  },
+  {
+   "input": "ಸ್ಥ",
+   "comment": "clu-0CB8-0CCD-0CA5"
+  },
+  {
+   "input": "ಸ್ದ",
+   "comment": "clu-0CB8-0CCD-0CA6"
+  },
+  {
+   "input": "ಸ್ಧ",
+   "comment": "clu-0CB8-0CCD-0CA7"
+  },
+  {
+   "input": "ಸ್ನ",
+   "comment": "clu-0CB8-0CCD-0CA8"
+  },
+  {
+   "input": "ಸ್ಪ",
+   "comment": "clu-0CB8-0CCD-0CAA"
+  },
+  {
+   "input": "ಸ್ಫ",
+   "comment": "clu-0CB8-0CCD-0CAB"
+  },
+  {
+   "input": "ಸ್ಬ",
+   "comment": "clu-0CB8-0CCD-0CAC"
+  },
+  {
+   "input": "ಸ್ಭ",
+   "comment": "clu-0CB8-0CCD-0CAD"
+  },
+  {
+   "input": "ಸ್ಮ",
+   "comment": "clu-0CB8-0CCD-0CAE"
+  },
+  {
+   "input": "ಸ್ಯ",
+   "comment": "clu-0CB8-0CCD-0CAF"
+  },
+  {
+   "input": "ಸ್ರ",
+   "comment": "clu-0CB8-0CCD-0CB0"
+  },
+  {
+   "input": "ಸ್ಱ",
+   "comment": "clu-0CB8-0CCD-0CB1"
+  },
+  {
+   "input": "ಸ್ಲ",
+   "comment": "clu-0CB8-0CCD-0CB2"
+  },
+  {
+   "input": "ಸ್ಳ",
+   "comment": "clu-0CB8-0CCD-0CB3"
+  },
+  {
+   "input": "ಸ್ವ",
+   "comment": "clu-0CB8-0CCD-0CB5"
+  },
+  {
+   "input": "ಸ್ಶ",
+   "comment": "clu-0CB8-0CCD-0CB6"
+  },
+  {
+   "input": "ಸ್ಷ",
+   "comment": "clu-0CB8-0CCD-0CB7"
+  },
+  {
+   "input": "ಸ್ಸ",
+   "comment": "clu-0CB8-0CCD-0CB8"
+  },
+  {
+   "input": "ಸ್ಹ",
+   "comment": "clu-0CB8-0CCD-0CB9"
+  },
+  {
+   "input": "ಸ್ೞ",
+   "comment": "clu-0CB8-0CCD-0CDE"
+  },
+  {
+   "input": "ಹ್ಕ",
+   "comment": "clu-0CB9-0CCD-0C95"
+  },
+  {
+   "input": "ಹ್ಖ",
+   "comment": "clu-0CB9-0CCD-0C96"
+  },
+  {
+   "input": "ಹ್ಗ",
+   "comment": "clu-0CB9-0CCD-0C97"
+  },
+  {
+   "input": "ಹ್ಘ",
+   "comment": "clu-0CB9-0CCD-0C98"
+  },
+  {
+   "input": "ಹ್ಙ",
+   "comment": "clu-0CB9-0CCD-0C99"
+  },
+  {
+   "input": "ಹ್ಚ",
+   "comment": "clu-0CB9-0CCD-0C9A"
+  },
+  {
+   "input": "ಹ್ಛ",
+   "comment": "clu-0CB9-0CCD-0C9B"
+  },
+  {
+   "input": "ಹ್ಜ",
+   "comment": "clu-0CB9-0CCD-0C9C"
+  },
+  {
+   "input": "ಹ್ಝ",
+   "comment": "clu-0CB9-0CCD-0C9D"
+  },
+  {
+   "input": "ಹ್ಞ",
+   "comment": "clu-0CB9-0CCD-0C9E"
+  },
+  {
+   "input": "ಹ್ಟ",
+   "comment": "clu-0CB9-0CCD-0C9F"
+  },
+  {
+   "input": "ಹ್ಠ",
+   "comment": "clu-0CB9-0CCD-0CA0"
+  },
+  {
+   "input": "ಹ್ಡ",
+   "comment": "clu-0CB9-0CCD-0CA1"
+  },
+  {
+   "input": "ಹ್ಢ",
+   "comment": "clu-0CB9-0CCD-0CA2"
+  },
+  {
+   "input": "ಹ್ಣ",
+   "comment": "clu-0CB9-0CCD-0CA3"
+  },
+  {
+   "input": "ಹ್ತ",
+   "comment": "clu-0CB9-0CCD-0CA4"
+  },
+  {
+   "input": "ಹ್ಥ",
+   "comment": "clu-0CB9-0CCD-0CA5"
+  },
+  {
+   "input": "ಹ್ದ",
+   "comment": "clu-0CB9-0CCD-0CA6"
+  },
+  {
+   "input": "ಹ್ಧ",
+   "comment": "clu-0CB9-0CCD-0CA7"
+  },
+  {
+   "input": "ಹ್ನ",
+   "comment": "clu-0CB9-0CCD-0CA8"
+  },
+  {
+   "input": "ಹ್ಪ",
+   "comment": "clu-0CB9-0CCD-0CAA"
+  },
+  {
+   "input": "ಹ್ಫ",
+   "comment": "clu-0CB9-0CCD-0CAB"
+  },
+  {
+   "input": "ಹ್ಬ",
+   "comment": "clu-0CB9-0CCD-0CAC"
+  },
+  {
+   "input": "ಹ್ಭ",
+   "comment": "clu-0CB9-0CCD-0CAD"
+  },
+  {
+   "input": "ಹ್ಮ",
+   "comment": "clu-0CB9-0CCD-0CAE"
+  },
+  {
+   "input": "ಹ್ಯ",
+   "comment": "clu-0CB9-0CCD-0CAF"
+  },
+  {
+   "input": "ಹ್ರ",
+   "comment": "clu-0CB9-0CCD-0CB0"
+  },
+  {
+   "input": "ಹ್ಱ",
+   "comment": "clu-0CB9-0CCD-0CB1"
+  },
+  {
+   "input": "ಹ್ಲ",
+   "comment": "clu-0CB9-0CCD-0CB2"
+  },
+  {
+   "input": "ಹ್ಳ",
+   "comment": "clu-0CB9-0CCD-0CB3"
+  },
+  {
+   "input": "ಹ್ವ",
+   "comment": "clu-0CB9-0CCD-0CB5"
+  },
+  {
+   "input": "ಹ್ಶ",
+   "comment": "clu-0CB9-0CCD-0CB6"
+  },
+  {
+   "input": "ಹ್ಷ",
+   "comment": "clu-0CB9-0CCD-0CB7"
+  },
+  {
+   "input": "ಹ್ಸ",
+   "comment": "clu-0CB9-0CCD-0CB8"
+  },
+  {
+   "input": "ಹ್ಹ",
+   "comment": "clu-0CB9-0CCD-0CB9"
+  },
+  {
+   "input": "ಹ್ೞ",
+   "comment": "clu-0CB9-0CCD-0CDE"
+  },
+  {
+   "input": "ೞ್ಕ",
+   "comment": "clu-0CDE-0CCD-0C95"
+  },
+  {
+   "input": "ೞ್ಖ",
+   "comment": "clu-0CDE-0CCD-0C96"
+  },
+  {
+   "input": "ೞ್ಗ",
+   "comment": "clu-0CDE-0CCD-0C97"
+  },
+  {
+   "input": "ೞ್ಘ",
+   "comment": "clu-0CDE-0CCD-0C98"
+  },
+  {
+   "input": "ೞ್ಙ",
+   "comment": "clu-0CDE-0CCD-0C99"
+  },
+  {
+   "input": "ೞ್ಚ",
+   "comment": "clu-0CDE-0CCD-0C9A"
+  },
+  {
+   "input": "ೞ್ಛ",
+   "comment": "clu-0CDE-0CCD-0C9B"
+  },
+  {
+   "input": "ೞ್ಜ",
+   "comment": "clu-0CDE-0CCD-0C9C"
+  },
+  {
+   "input": "ೞ್ಝ",
+   "comment": "clu-0CDE-0CCD-0C9D"
+  },
+  {
+   "input": "ೞ್ಞ",
+   "comment": "clu-0CDE-0CCD-0C9E"
+  },
+  {
+   "input": "ೞ್ಟ",
+   "comment": "clu-0CDE-0CCD-0C9F"
+  },
+  {
+   "input": "ೞ್ಠ",
+   "comment": "clu-0CDE-0CCD-0CA0"
+  },
+  {
+   "input": "ೞ್ಡ",
+   "comment": "clu-0CDE-0CCD-0CA1"
+  },
+  {
+   "input": "ೞ್ಢ",
+   "comment": "clu-0CDE-0CCD-0CA2"
+  },
+  {
+   "input": "ೞ್ಣ",
+   "comment": "clu-0CDE-0CCD-0CA3"
+  },
+  {
+   "input": "ೞ್ತ",
+   "comment": "clu-0CDE-0CCD-0CA4"
+  },
+  {
+   "input": "ೞ್ಥ",
+   "comment": "clu-0CDE-0CCD-0CA5"
+  },
+  {
+   "input": "ೞ್ದ",
+   "comment": "clu-0CDE-0CCD-0CA6"
+  },
+  {
+   "input": "ೞ್ಧ",
+   "comment": "clu-0CDE-0CCD-0CA7"
+  },
+  {
+   "input": "ೞ್ನ",
+   "comment": "clu-0CDE-0CCD-0CA8"
+  },
+  {
+   "input": "ೞ್ಪ",
+   "comment": "clu-0CDE-0CCD-0CAA"
+  },
+  {
+   "input": "ೞ್ಫ",
+   "comment": "clu-0CDE-0CCD-0CAB"
+  },
+  {
+   "input": "ೞ್ಬ",
+   "comment": "clu-0CDE-0CCD-0CAC"
+  },
+  {
+   "input": "ೞ್ಭ",
+   "comment": "clu-0CDE-0CCD-0CAD"
+  },
+  {
+   "input": "ೞ್ಮ",
+   "comment": "clu-0CDE-0CCD-0CAE"
+  },
+  {
+   "input": "ೞ್ಯ",
+   "comment": "clu-0CDE-0CCD-0CAF"
+  },
+  {
+   "input": "ೞ್ರ",
+   "comment": "clu-0CDE-0CCD-0CB0"
+  },
+  {
+   "input": "ೞ್ಱ",
+   "comment": "clu-0CDE-0CCD-0CB1"
+  },
+  {
+   "input": "ೞ್ಲ",
+   "comment": "clu-0CDE-0CCD-0CB2"
+  },
+  {
+   "input": "ೞ್ಳ",
+   "comment": "clu-0CDE-0CCD-0CB3"
+  },
+  {
+   "input": "ೞ್ವ",
+   "comment": "clu-0CDE-0CCD-0CB5"
+  },
+  {
+   "input": "ೞ್ಶ",
+   "comment": "clu-0CDE-0CCD-0CB6"
+  },
+  {
+   "input": "ೞ್ಷ",
+   "comment": "clu-0CDE-0CCD-0CB7"
+  },
+  {
+   "input": "ೞ್ಸ",
+   "comment": "clu-0CDE-0CCD-0CB8"
+  },
+  {
+   "input": "ೞ್ಹ",
+   "comment": "clu-0CDE-0CCD-0CB9"
+  },
+  {
+   "input": "ೞ್ೞ",
+   "comment": "clu-0CDE-0CCD-0CDE"
+  },
+  {
+   "input": "ಕ್ಕಾ",
+   "comment": "sig-0C95-0CCD-0C95-0CBE"
+  },
+  {
+   "input": "ಕ್ಕಿ",
+   "comment": "sig-0C95-0CCD-0C95-0CBF"
+  },
+  {
+   "input": "ಕ್ಕೀ",
+   "comment": "sig-0C95-0CCD-0C95-0CC0"
+  },
+  {
+   "input": "ಕ್ಕು",
+   "comment": "sig-0C95-0CCD-0C95-0CC1"
+  },
+  {
+   "input": "ಕ್ಕೂ",
+   "comment": "sig-0C95-0CCD-0C95-0CC2"
+  },
+  {
+   "input": "ಕ್ಕೃ",
+   "comment": "sig-0C95-0CCD-0C95-0CC3"
+  },
+  {
+   "input": "ಕ್ಕೆ",
+   "comment": "sig-0C95-0CCD-0C95-0CC6"
+  },
+  {
+   "input": "ಕ್ಕೇ",
+   "comment": "sig-0C95-0CCD-0C95-0CC7"
+  },
+  {
+   "input": "ಕ್ಕೈ",
+   "comment": "sig-0C95-0CCD-0C95-0CC8"
+  },
+  {
+   "input": "ಕ್ಕೊ",
+   "comment": "sig-0C95-0CCD-0C95-0CCA"
+  },
+  {
+   "input": "ಕ್ಕೋ",
+   "comment": "sig-0C95-0CCD-0C95-0CCB"
+  },
+  {
+   "input": "ಕ್ಕೌ",
+   "comment": "sig-0C95-0CCD-0C95-0CCC"
+  },
+  {
+   "input": "ಕ್ಕ್",
+   "comment": "sig-0C95-0CCD-0C95-0CCD"
+  },
+  {
+   "input": "ಕ್ಕಂ",
+   "comment": "sig-0C95-0CCD-0C95-0C82"
+  },
+  {
+   "input": "ಕ್ಕಃ",
+   "comment": "sig-0C95-0CCD-0C95-0C83"
+  },
+  {
+   "input": "ಸ್ತಾ",
+   "comment": "sig-0CB8-0CCD-0CA4-0CBE"
+  },
+  {
+   "input": "ಸ್ತಿ",
+   "comment": "sig-0CB8-0CCD-0CA4-0CBF"
+  },
+  {
+   "input": "ಸ್ತೀ",
+   "comment": "sig-0CB8-0CCD-0CA4-0CC0"
+  },
+  {
+   "input": "ಸ್ತು",
+   "comment": "sig-0CB8-0CCD-0CA4-0CC1"
+  },
+  {
+   "input": "ಸ್ತೂ",
+   "comment": "sig-0CB8-0CCD-0CA4-0CC2"
+  },
+  {
+   "input": "ಸ್ತೃ",
+   "comment": "sig-0CB8-0CCD-0CA4-0CC3"
+  },
+  {
+   "input": "ಸ್ತೆ",
+   "comment": "sig-0CB8-0CCD-0CA4-0CC6"
+  },
+  {
+   "input": "ಸ್ತೇ",
+   "comment": "sig-0CB8-0CCD-0CA4-0CC7"
+  },
+  {
+   "input": "ಸ್ತೈ",
+   "comment": "sig-0CB8-0CCD-0CA4-0CC8"
+  },
+  {
+   "input": "ಸ್ತೊ",
+   "comment": "sig-0CB8-0CCD-0CA4-0CCA"
+  },
+  {
+   "input": "ಸ್ತೋ",
+   "comment": "sig-0CB8-0CCD-0CA4-0CCB"
+  },
+  {
+   "input": "ಸ್ತೌ",
+   "comment": "sig-0CB8-0CCD-0CA4-0CCC"
+  },
+  {
+   "input": "ಸ್ತ್",
+   "comment": "sig-0CB8-0CCD-0CA4-0CCD"
+  },
+  {
+   "input": "ಸ್ತಂ",
+   "comment": "sig-0CB8-0CCD-0CA4-0C82"
+  },
+  {
+   "input": "ಸ್ತಃ",
+   "comment": "sig-0CB8-0CCD-0CA4-0C83"
+  },
+  {
+   "input": "ಕ್ಷಾ",
+   "comment": "sig-0C95-0CCD-0CB7-0CBE"
+  },
+  {
+   "input": "ಕ್ಷಿ",
+   "comment": "sig-0C95-0CCD-0CB7-0CBF"
+  },
+  {
+   "input": "ಕ್ಷೀ",
+   "comment": "sig-0C95-0CCD-0CB7-0CC0"
+  },
+  {
+   "input": "ಕ್ಷು",
+   "comment": "sig-0C95-0CCD-0CB7-0CC1"
+  },
+  {
+   "input": "ಕ್ಷೂ",
+   "comment": "sig-0C95-0CCD-0CB7-0CC2"
+  },
+  {
+   "input": "ಕ್ಷೃ",
+   "comment": "sig-0C95-0CCD-0CB7-0CC3"
+  },
+  {
+   "input": "ಕ್ಷೆ",
+   "comment": "sig-0C95-0CCD-0CB7-0CC6"
+  },
+  {
+   "input": "ಕ್ಷೇ",
+   "comment": "sig-0C95-0CCD-0CB7-0CC7"
+  },
+  {
+   "input": "ಕ್ಷೈ",
+   "comment": "sig-0C95-0CCD-0CB7-0CC8"
+  },
+  {
+   "input": "ಕ್ಷೊ",
+   "comment": "sig-0C95-0CCD-0CB7-0CCA"
+  },
+  {
+   "input": "ಕ್ಷೋ",
+   "comment": "sig-0C95-0CCD-0CB7-0CCB"
+  },
+  {
+   "input": "ಕ್ಷೌ",
+   "comment": "sig-0C95-0CCD-0CB7-0CCC"
+  },
+  {
+   "input": "ಕ್ಷ್",
+   "comment": "sig-0C95-0CCD-0CB7-0CCD"
+  },
+  {
+   "input": "ಕ್ಷಂ",
+   "comment": "sig-0C95-0CCD-0CB7-0C82"
+  },
+  {
+   "input": "ಕ್ಷಃ",
+   "comment": "sig-0C95-0CCD-0CB7-0C83"
+  },
+  {
+   "input": "ನ್ನಾ",
+   "comment": "sig-0CA8-0CCD-0CA8-0CBE"
+  },
+  {
+   "input": "ನ್ನಿ",
+   "comment": "sig-0CA8-0CCD-0CA8-0CBF"
+  },
+  {
+   "input": "ನ್ನೀ",
+   "comment": "sig-0CA8-0CCD-0CA8-0CC0"
+  },
+  {
+   "input": "ನ್ನು",
+   "comment": "sig-0CA8-0CCD-0CA8-0CC1"
+  },
+  {
+   "input": "ನ್ನೂ",
+   "comment": "sig-0CA8-0CCD-0CA8-0CC2"
+  },
+  {
+   "input": "ನ್ನೃ",
+   "comment": "sig-0CA8-0CCD-0CA8-0CC3"
+  },
+  {
+   "input": "ನ್ನೆ",
+   "comment": "sig-0CA8-0CCD-0CA8-0CC6"
+  },
+  {
+   "input": "ನ್ನೇ",
+   "comment": "sig-0CA8-0CCD-0CA8-0CC7"
+  },
+  {
+   "input": "ನ್ನೈ",
+   "comment": "sig-0CA8-0CCD-0CA8-0CC8"
+  },
+  {
+   "input": "ನ್ನೊ",
+   "comment": "sig-0CA8-0CCD-0CA8-0CCA"
+  },
+  {
+   "input": "ನ್ನೋ",
+   "comment": "sig-0CA8-0CCD-0CA8-0CCB"
+  },
+  {
+   "input": "ನ್ನೌ",
+   "comment": "sig-0CA8-0CCD-0CA8-0CCC"
+  },
+  {
+   "input": "ನ್ನ್",
+   "comment": "sig-0CA8-0CCD-0CA8-0CCD"
+  },
+  {
+   "input": "ನ್ನಂ",
+   "comment": "sig-0CA8-0CCD-0CA8-0C82"
+  },
+  {
+   "input": "ನ್ನಃ",
+   "comment": "sig-0CA8-0CCD-0CA8-0C83"
+  },
+  {
+   "input": "ಲ್ಲಾ",
+   "comment": "sig-0CB2-0CCD-0CB2-0CBE"
+  },
+  {
+   "input": "ಲ್ಲಿ",
+   "comment": "sig-0CB2-0CCD-0CB2-0CBF"
+  },
+  {
+   "input": "ಲ್ಲೀ",
+   "comment": "sig-0CB2-0CCD-0CB2-0CC0"
+  },
+  {
+   "input": "ಲ್ಲು",
+   "comment": "sig-0CB2-0CCD-0CB2-0CC1"
+  },
+  {
+   "input": "ಲ್ಲೂ",
+   "comment": "sig-0CB2-0CCD-0CB2-0CC2"
+  },
+  {
+   "input": "ಲ್ಲೃ",
+   "comment": "sig-0CB2-0CCD-0CB2-0CC3"
+  },
+  {
+   "input": "ಲ್ಲೆ",
+   "comment": "sig-0CB2-0CCD-0CB2-0CC6"
+  },
+  {
+   "input": "ಲ್ಲೇ",
+   "comment": "sig-0CB2-0CCD-0CB2-0CC7"
+  },
+  {
+   "input": "ಲ್ಲೈ",
+   "comment": "sig-0CB2-0CCD-0CB2-0CC8"
+  },
+  {
+   "input": "ಲ್ಲೊ",
+   "comment": "sig-0CB2-0CCD-0CB2-0CCA"
+  },
+  {
+   "input": "ಲ್ಲೋ",
+   "comment": "sig-0CB2-0CCD-0CB2-0CCB"
+  },
+  {
+   "input": "ಲ್ಲೌ",
+   "comment": "sig-0CB2-0CCD-0CB2-0CCC"
+  },
+  {
+   "input": "ಲ್ಲ್",
+   "comment": "sig-0CB2-0CCD-0CB2-0CCD"
+  },
+  {
+   "input": "ಲ್ಲಂ",
+   "comment": "sig-0CB2-0CCD-0CB2-0C82"
+  },
+  {
+   "input": "ಲ್ಲಃ",
+   "comment": "sig-0CB2-0CCD-0CB2-0C83"
+  },
+  {
+   "input": "ತ್ರಾ",
+   "comment": "sig-0CA4-0CCD-0CB0-0CBE"
+  },
+  {
+   "input": "ತ್ರಿ",
+   "comment": "sig-0CA4-0CCD-0CB0-0CBF"
+  },
+  {
+   "input": "ತ್ರೀ",
+   "comment": "sig-0CA4-0CCD-0CB0-0CC0"
+  },
+  {
+   "input": "ತ್ರು",
+   "comment": "sig-0CA4-0CCD-0CB0-0CC1"
+  },
+  {
+   "input": "ತ್ರೂ",
+   "comment": "sig-0CA4-0CCD-0CB0-0CC2"
+  },
+  {
+   "input": "ತ್ರೃ",
+   "comment": "sig-0CA4-0CCD-0CB0-0CC3"
+  },
+  {
+   "input": "ತ್ರೆ",
+   "comment": "sig-0CA4-0CCD-0CB0-0CC6"
+  },
+  {
+   "input": "ತ್ರೇ",
+   "comment": "sig-0CA4-0CCD-0CB0-0CC7"
+  },
+  {
+   "input": "ತ್ರೈ",
+   "comment": "sig-0CA4-0CCD-0CB0-0CC8"
+  },
+  {
+   "input": "ತ್ರೊ",
+   "comment": "sig-0CA4-0CCD-0CB0-0CCA"
+  },
+  {
+   "input": "ತ್ರೋ",
+   "comment": "sig-0CA4-0CCD-0CB0-0CCB"
+  },
+  {
+   "input": "ತ್ರೌ",
+   "comment": "sig-0CA4-0CCD-0CB0-0CCC"
+  },
+  {
+   "input": "ತ್ರ್",
+   "comment": "sig-0CA4-0CCD-0CB0-0CCD"
+  },
+  {
+   "input": "ತ್ರಂ",
+   "comment": "sig-0CA4-0CCD-0CB0-0C82"
+  },
+  {
+   "input": "ತ್ರಃ",
+   "comment": "sig-0CA4-0CCD-0CB0-0C83"
+  },
+  {
+   "input": "ದ್ಯಾ",
+   "comment": "sig-0CA6-0CCD-0CAF-0CBE"
+  },
+  {
+   "input": "ದ್ಯಿ",
+   "comment": "sig-0CA6-0CCD-0CAF-0CBF"
+  },
+  {
+   "input": "ದ್ಯೀ",
+   "comment": "sig-0CA6-0CCD-0CAF-0CC0"
+  },
+  {
+   "input": "ದ್ಯು",
+   "comment": "sig-0CA6-0CCD-0CAF-0CC1"
+  },
+  {
+   "input": "ದ್ಯೂ",
+   "comment": "sig-0CA6-0CCD-0CAF-0CC2"
+  },
+  {
+   "input": "ದ್ಯೃ",
+   "comment": "sig-0CA6-0CCD-0CAF-0CC3"
+  },
+  {
+   "input": "ದ್ಯೆ",
+   "comment": "sig-0CA6-0CCD-0CAF-0CC6"
+  },
+  {
+   "input": "ದ್ಯೇ",
+   "comment": "sig-0CA6-0CCD-0CAF-0CC7"
+  },
+  {
+   "input": "ದ್ಯೈ",
+   "comment": "sig-0CA6-0CCD-0CAF-0CC8"
+  },
+  {
+   "input": "ದ್ಯೊ",
+   "comment": "sig-0CA6-0CCD-0CAF-0CCA"
+  },
+  {
+   "input": "ದ್ಯೋ",
+   "comment": "sig-0CA6-0CCD-0CAF-0CCB"
+  },
+  {
+   "input": "ದ್ಯೌ",
+   "comment": "sig-0CA6-0CCD-0CAF-0CCC"
+  },
+  {
+   "input": "ದ್ಯ್",
+   "comment": "sig-0CA6-0CCD-0CAF-0CCD"
+  },
+  {
+   "input": "ದ್ಯಂ",
+   "comment": "sig-0CA6-0CCD-0CAF-0C82"
+  },
+  {
+   "input": "ದ್ಯಃ",
+   "comment": "sig-0CA6-0CCD-0CAF-0C83"
+  },
+  {
+   "input": "ಸ್ವಾ",
+   "comment": "sig-0CB8-0CCD-0CB5-0CBE"
+  },
+  {
+   "input": "ಸ್ವಿ",
+   "comment": "sig-0CB8-0CCD-0CB5-0CBF"
+  },
+  {
+   "input": "ಸ್ವೀ",
+   "comment": "sig-0CB8-0CCD-0CB5-0CC0"
+  },
+  {
+   "input": "ಸ್ವು",
+   "comment": "sig-0CB8-0CCD-0CB5-0CC1"
+  },
+  {
+   "input": "ಸ್ವೂ",
+   "comment": "sig-0CB8-0CCD-0CB5-0CC2"
+  },
+  {
+   "input": "ಸ್ವೃ",
+   "comment": "sig-0CB8-0CCD-0CB5-0CC3"
+  },
+  {
+   "input": "ಸ್ವೆ",
+   "comment": "sig-0CB8-0CCD-0CB5-0CC6"
+  },
+  {
+   "input": "ಸ್ವೇ",
+   "comment": "sig-0CB8-0CCD-0CB5-0CC7"
+  },
+  {
+   "input": "ಸ್ವೈ",
+   "comment": "sig-0CB8-0CCD-0CB5-0CC8"
+  },
+  {
+   "input": "ಸ್ವೊ",
+   "comment": "sig-0CB8-0CCD-0CB5-0CCA"
+  },
+  {
+   "input": "ಸ್ವೋ",
+   "comment": "sig-0CB8-0CCD-0CB5-0CCB"
+  },
+  {
+   "input": "ಸ್ವೌ",
+   "comment": "sig-0CB8-0CCD-0CB5-0CCC"
+  },
+  {
+   "input": "ಸ್ವ್",
+   "comment": "sig-0CB8-0CCD-0CB5-0CCD"
+  },
+  {
+   "input": "ಸ್ವಂ",
+   "comment": "sig-0CB8-0CCD-0CB5-0C82"
+  },
+  {
+   "input": "ಸ್ವಃ",
+   "comment": "sig-0CB8-0CCD-0CB5-0C83"
+  },
+  {
+   "input": "ಪ್ಪಾ",
+   "comment": "sig-0CAA-0CCD-0CAA-0CBE"
+  },
+  {
+   "input": "ಪ್ಪಿ",
+   "comment": "sig-0CAA-0CCD-0CAA-0CBF"
+  },
+  {
+   "input": "ಪ್ಪೀ",
+   "comment": "sig-0CAA-0CCD-0CAA-0CC0"
+  },
+  {
+   "input": "ಪ್ಪು",
+   "comment": "sig-0CAA-0CCD-0CAA-0CC1"
+  },
+  {
+   "input": "ಪ್ಪೂ",
+   "comment": "sig-0CAA-0CCD-0CAA-0CC2"
+  },
+  {
+   "input": "ಪ್ಪೃ",
+   "comment": "sig-0CAA-0CCD-0CAA-0CC3"
+  },
+  {
+   "input": "ಪ್ಪೆ",
+   "comment": "sig-0CAA-0CCD-0CAA-0CC6"
+  },
+  {
+   "input": "ಪ್ಪೇ",
+   "comment": "sig-0CAA-0CCD-0CAA-0CC7"
+  },
+  {
+   "input": "ಪ್ಪೈ",
+   "comment": "sig-0CAA-0CCD-0CAA-0CC8"
+  },
+  {
+   "input": "ಪ್ಪೊ",
+   "comment": "sig-0CAA-0CCD-0CAA-0CCA"
+  },
+  {
+   "input": "ಪ್ಪೋ",
+   "comment": "sig-0CAA-0CCD-0CAA-0CCB"
+  },
+  {
+   "input": "ಪ್ಪೌ",
+   "comment": "sig-0CAA-0CCD-0CAA-0CCC"
+  },
+  {
+   "input": "ಪ್ಪ್",
+   "comment": "sig-0CAA-0CCD-0CAA-0CCD"
+  },
+  {
+   "input": "ಪ್ಪಂ",
+   "comment": "sig-0CAA-0CCD-0CAA-0C82"
+  },
+  {
+   "input": "ಪ್ಪಃ",
+   "comment": "sig-0CAA-0CCD-0CAA-0C83"
+  },
+  {
+   "input": "ಮ್ಮಾ",
+   "comment": "sig-0CAE-0CCD-0CAE-0CBE"
+  },
+  {
+   "input": "ಮ್ಮಿ",
+   "comment": "sig-0CAE-0CCD-0CAE-0CBF"
+  },
+  {
+   "input": "ಮ್ಮೀ",
+   "comment": "sig-0CAE-0CCD-0CAE-0CC0"
+  },
+  {
+   "input": "ಮ್ಮು",
+   "comment": "sig-0CAE-0CCD-0CAE-0CC1"
+  },
+  {
+   "input": "ಮ್ಮೂ",
+   "comment": "sig-0CAE-0CCD-0CAE-0CC2"
+  },
+  {
+   "input": "ಮ್ಮೃ",
+   "comment": "sig-0CAE-0CCD-0CAE-0CC3"
+  },
+  {
+   "input": "ಮ್ಮೆ",
+   "comment": "sig-0CAE-0CCD-0CAE-0CC6"
+  },
+  {
+   "input": "ಮ್ಮೇ",
+   "comment": "sig-0CAE-0CCD-0CAE-0CC7"
+  },
+  {
+   "input": "ಮ್ಮೈ",
+   "comment": "sig-0CAE-0CCD-0CAE-0CC8"
+  },
+  {
+   "input": "ಮ್ಮೊ",
+   "comment": "sig-0CAE-0CCD-0CAE-0CCA"
+  },
+  {
+   "input": "ಮ್ಮೋ",
+   "comment": "sig-0CAE-0CCD-0CAE-0CCB"
+  },
+  {
+   "input": "ಮ್ಮೌ",
+   "comment": "sig-0CAE-0CCD-0CAE-0CCC"
+  },
+  {
+   "input": "ಮ್ಮ್",
+   "comment": "sig-0CAE-0CCD-0CAE-0CCD"
+  },
+  {
+   "input": "ಮ್ಮಂ",
+   "comment": "sig-0CAE-0CCD-0CAE-0C82"
+  },
+  {
+   "input": "ಮ್ಮಃ",
+   "comment": "sig-0CAE-0CCD-0CAE-0C83"
+  },
+  {
+   "input": "ಸ್ತ್ರ",
+   "comment": "sig-0CB8-0CCD-0CA4-0CCD-0CB0"
+  },
+  {
+   "input": "ಷ್ಟ್ರ",
+   "comment": "sig-0CB7-0CCD-0C9F-0CCD-0CB0"
+  },
+  {
+   "input": "ನ್ತ್ಯ",
+   "comment": "sig-0CA8-0CCD-0CA4-0CCD-0CAF"
+  },
+  {
+   "input": "ಕ್ಷ್ಮ",
+   "comment": "sig-0C95-0CCD-0CB7-0CCD-0CAE"
+  },
+  {
+   "input": "ರ್ಕಾ",
+   "comment": "ark-0CB0-0CCD-0C95-0CBE"
+  },
+  {
+   "input": "ರ್ಕಿ",
+   "comment": "ark-0CB0-0CCD-0C95-0CBF"
+  },
+  {
+   "input": "ರ್ಕೀ",
+   "comment": "ark-0CB0-0CCD-0C95-0CC0"
+  },
+  {
+   "input": "ರ್ಕು",
+   "comment": "ark-0CB0-0CCD-0C95-0CC1"
+  },
+  {
+   "input": "ರ್ಕೂ",
+   "comment": "ark-0CB0-0CCD-0C95-0CC2"
+  },
+  {
+   "input": "ರ್ಕೃ",
+   "comment": "ark-0CB0-0CCD-0C95-0CC3"
+  },
+  {
+   "input": "ರ್ಕೄ",
+   "comment": "ark-0CB0-0CCD-0C95-0CC4"
+  },
+  {
+   "input": "ರ್ಕೆ",
+   "comment": "ark-0CB0-0CCD-0C95-0CC6"
+  },
+  {
+   "input": "ರ್ಕೇ",
+   "comment": "ark-0CB0-0CCD-0C95-0CC7"
+  },
+  {
+   "input": "ರ್ಕೈ",
+   "comment": "ark-0CB0-0CCD-0C95-0CC8"
+  },
+  {
+   "input": "ರ್ಕೊ",
+   "comment": "ark-0CB0-0CCD-0C95-0CCA"
+  },
+  {
+   "input": "ರ್ಕೋ",
+   "comment": "ark-0CB0-0CCD-0C95-0CCB"
+  },
+  {
+   "input": "ರ್ಕೌ",
+   "comment": "ark-0CB0-0CCD-0C95-0CCC"
+  },
+  {
+   "input": "ರ್ಕೢ",
+   "comment": "ark-0CB0-0CCD-0C95-0CE2"
+  },
+  {
+   "input": "ರ್ಕೣ",
+   "comment": "ark-0CB0-0CCD-0C95-0CE3"
+  },
+  {
+   "input": "ರ್ಕ್",
+   "comment": "ark-0CB0-0CCD-0C95-0CCD"
+  },
+  {
+   "input": "ರ್ಕಂ",
+   "comment": "ark-0CB0-0CCD-0C95-0C82"
+  },
+  {
+   "input": "ರ್ಕಃ",
+   "comment": "ark-0CB0-0CCD-0C95-0C83"
+  },
+  {
+   "input": "ರ್ಕ್ಷ",
+   "comment": "ark-0CB0-0CCD-0C95-0CCD-0CB7"
+  },
+  {
+   "input": "ರ್ತ್ಯ",
+   "comment": "ark-0CB0-0CCD-0CA4-0CCD-0CAF"
+  },
+  {
+   "input": "ರ್ಧ್ವ",
+   "comment": "ark-0CB0-0CCD-0CA7-0CCD-0CB5"
+  }
+ ]
+}

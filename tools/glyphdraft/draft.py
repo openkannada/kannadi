@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import json
 import math
+import statistics
 import sys
 from pathlib import Path
 
@@ -21,7 +22,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 import skeletons  # noqa: E402
 
 LETTER_A = 0x0C85
-LETTER_KA = 0x0C95
+CONSONANTS = [cp for cp in range(0x0C95, 0x0CBA) if cp not in (0x0CA9, 0x0CB4)]
 ANUSVARA = 0x0C82
 DEFAULT = (0x0CDC, 0x0CDD, 0x0CF3)
 
@@ -169,9 +170,9 @@ class Drafter:
         self.top = measure["top"]
         a = bounds(glyph_for(font, LETTER_A))
         self.aspect = (a[2] - a[0]) / (a[3] - a[1])
-        ka = glyph_for(font, LETTER_KA)
-        self.lsb = ka.left_side_bearing
-        self.rsb = ka.width - bounds(ka)[2]
+        consonants = [g for g in (glyph_for(font, cp) for cp in CONSONANTS) if has_ink(g)]
+        self.lsb = statistics.median(g.left_side_bearing for g in consonants)
+        self.rsb = statistics.median(g.width - bounds(g)[2] for g in consonants)
         self.weight = measure["weight"]
 
     def stroked(self, glyph, pieces, weights, rounds=4):
