@@ -1,24 +1,94 @@
-//! Nudi and Baraha ANSI text to and from Unicode.
+//! Legacy Kannada font text to and from Unicode.
 //!
 //! Before Unicode, Kannada was typed in fonts that draw Kannada shapes at Latin-1
-//! code points. Nudi (up to version 5) and Baraha's ANSI fonts (BRH Kannada and
-//! others) share 1 glyph layout. Text in those fonts reads as `PÀ£ÀßqÀ` until it
-//! is converted.
+//! code points. Each family of fonts has its own glyph layout, a [`Layout`]. Nudi
+//! (up to version 5) and Baraha's ANSI fonts (BRH Kannada and others) share 1.
+//! Text in those fonts reads as `PÀ£ÀßqÀ` until it is converted.
 //!
 //! Glyphs are stored in drawing order: a subscript consonant comes after its
 //! syllable's vowel sign, the arkavattu after the cluster, and some vowel signs
-//! are split into 2 or 3 glyphs. [`nudi_to_unicode`] rebuilds each syllable in
+//! are split into 2 or 3 glyphs. [`to_unicode`] rebuilds each syllable in
 //! Unicode order. It reports every glyph it cannot place and every syllable that
 //! is not valid; spacing glyphs, which carry no text, are the only glyphs dropped.
-//! [`unicode_to_nudi`] goes the other way, for documents that must still be
-//! printed in a legacy font, and reports every character it cannot encode.
+//! [`from_unicode`] goes the other way, for documents that must still be printed
+//! in a legacy font, and reports every character it cannot encode.
 
 mod decode;
 mod encode;
 mod table;
 
-pub use decode::{nudi_syllable_starts, nudi_to_unicode, Conversion, Options, Unknown};
-pub use encode::{unicode_to_nudi, Encoding, Unencodable};
+pub use decode::{
+    nudi_syllable_starts, nudi_to_unicode, syllable_starts, to_unicode, Conversion, Options,
+    Unknown,
+};
+pub use encode::{from_unicode, unicode_to_nudi, Encoding, Unencodable};
+
+use std::fmt;
+use std::str::FromStr;
+
+/// A legacy font glyph layout: which glyph each code draws.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub enum Layout {
+    /// Nudi 01 e to Nudi 05, Nudi Akshara and Baraha's BRH fonts for Kannada.
+    Nudi,
+    /// Akruti's Kannada fonts, such as AkrutiKndPadma.
+    Akruti,
+}
+
+impl Layout {
+    /// Every layout, in a fixed order.
+    pub const ALL: [Layout; 2] = [Layout::Nudi, Layout::Akruti];
+
+    /// The layout's name in lowercase, as [`FromStr`] reads it.
+    ///
+    /// ```
+    /// use kannadi::legacy::Layout;
+    ///
+    /// assert_eq!(Layout::Akruti.name(), "akruti");
+    /// assert_eq!("Akruti".parse(), Ok(Layout::Akruti));
+    /// ```
+    pub fn name(self) -> &'static str {
+        match self {
+            Layout::Nudi => "nudi",
+            Layout::Akruti => "akruti",
+        }
+    }
+
+    fn index(self) -> usize {
+        self as usize
+    }
+}
+
+impl fmt::Display for Layout {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(self.name())
+    }
+}
+
+/// The error for a layout name [`Layout::from_str`] does not know.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct UnknownLayout(pub String);
+
+impl fmt::Display for UnknownLayout {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "unknown layout {:?}", self.0)
+    }
+}
+
+impl std::error::Error for UnknownLayout {}
+
+impl FromStr for Layout {
+    type Err = UnknownLayout;
+
+    /// Reads a layout name, ignoring case. `baraha` is the Nudi layout.
+    fn from_str(name: &str) -> Result<Self, Self::Err> {
+        match name.to_ascii_lowercase().as_str() {
+            "nudi" | "baraha" => Ok(Layout::Nudi),
+            "akruti" => Ok(Layout::Akruti),
+            _ => Err(UnknownLayout(name.to_string())),
+        }
+    }
+}
 
 /// Decodes Windows-1252 bytes, the encoding legacy Kannada text files use.
 /// The 5 bytes Windows-1252 leaves undefined map to the C1 control characters.
@@ -101,6 +171,16 @@ mod tests {
             assert_eq!(windows_1252_byte(c), Some(b), "{b:02X}");
         }
         assert_eq!(windows_1252_byte('\u{0080}'), None);
+    }
+
+    #[test]
+    fn layout_names_round_trip() {
+        for layout in Layout::ALL {
+            assert_eq!(layout.name().parse(), Ok(layout));
+            assert_eq!(Layout::ALL[layout.index()], layout);
+        }
+        assert_eq!("BARAHA".parse(), Ok(Layout::Nudi));
+        assert!("shree".parse::<Layout>().is_err());
     }
 
     #[test]

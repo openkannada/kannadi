@@ -8,9 +8,9 @@ use crate::lookup::Lookup;
 use crate::numerals::to_kannada_digit;
 
 use super::table::{rows, Entry};
-use super::{aspirated, is_passthrough};
+use super::{aspirated, is_passthrough, Layout};
 
-/// Settings for [`nudi_to_unicode`].
+/// Settings for [`to_unicode`].
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Options {
     /// Write digits as Kannada digits. Use this for text set in the `k` variants of
@@ -61,7 +61,8 @@ impl Conversion {
     }
 }
 
-/// Converts text typed in a Nudi or Baraha ANSI font to Unicode Kannada.
+/// Converts text typed in a legacy font with glyph layout `layout` to Unicode
+/// Kannada.
 ///
 /// The input is the text as stored, read as Windows-1252: Word documents and web
 /// pages give it that way. For raw bytes, use [`decode_windows_1252`](super::decode_windows_1252) first.
@@ -69,14 +70,14 @@ impl Conversion {
 /// would be converted too.
 ///
 /// ```
-/// use kannadi::legacy::{nudi_to_unicode, Options};
+/// use kannadi::legacy::{to_unicode, Layout, Options};
 ///
-/// let converted = nudi_to_unicode("PÀ£ÀßqÀ", &Options::default());
+/// let converted = to_unicode("PÀ£ÀßqÀ", Layout::Nudi, &Options::default());
 /// assert_eq!(converted.text, "ಕನ್ನಡ");
 /// assert!(converted.is_clean());
 /// ```
-pub fn nudi_to_unicode(text: &str, options: &Options) -> Conversion {
-    let table = table();
+pub fn to_unicode(text: &str, layout: Layout, options: &Options) -> Conversion {
+    let table = table(layout);
     let chars: Vec<(usize, char)> = text.char_indices().collect();
     let mut writer = Writer::with_capacity(text.len() * 2);
     let mut i = 0;
@@ -96,6 +97,18 @@ pub fn nudi_to_unicode(text: &str, options: &Options) -> Conversion {
     writer.finish()
 }
 
+/// Converts text typed in a Nudi or Baraha ANSI font to Unicode Kannada: the same
+/// as [`to_unicode`] with [`Layout::Nudi`].
+///
+/// ```
+/// use kannadi::legacy::{nudi_to_unicode, Options};
+///
+/// assert_eq!(nudi_to_unicode("PÀ£ÀßqÀ", &Options::default()).text, "ಕನ್ನಡ");
+/// ```
+pub fn nudi_to_unicode(text: &str, options: &Options) -> Conversion {
+    to_unicode(text, Layout::Nudi, options)
+}
+
 /// Byte offsets in legacy `text` where a syllable or other character starts, in
 /// order, always including 0 for text that is not empty. Text split only at
 /// these offsets converts piece by piece the same way as whole, apart from a zero
@@ -103,12 +116,12 @@ pub fn nudi_to_unicode(text: &str, options: &Options) -> Conversion {
 /// offset 0.
 ///
 /// ```
-/// use kannadi::legacy::nudi_syllable_starts;
+/// use kannadi::legacy::{syllable_starts, Layout};
 ///
-/// assert_eq!(nudi_syllable_starts("PÀ£ÀßqÀ"), [0, 3, 9]);
+/// assert_eq!(syllable_starts("PÀ£ÀßqÀ", Layout::Nudi), [0, 3, 9]);
 /// ```
-pub fn nudi_syllable_starts(text: &str) -> Vec<usize> {
-    let table = table();
+pub fn syllable_starts(text: &str, layout: Layout) -> Vec<usize> {
+    let table = table(layout);
     let chars: Vec<(usize, char)> = text.char_indices().collect();
     let mut starts = Vec::new();
     let mut i = 0;
@@ -128,11 +141,17 @@ pub fn nudi_syllable_starts(text: &str) -> Vec<usize> {
     starts
 }
 
-fn table() -> &'static Lookup<Entry> {
-    static TABLE: OnceLock<Lookup<Entry>> = OnceLock::new();
-    TABLE.get_or_init(|| {
+/// [`syllable_starts`] for [`Layout::Nudi`].
+pub fn nudi_syllable_starts(text: &str) -> Vec<usize> {
+    syllable_starts(text, Layout::Nudi)
+}
+
+fn table(layout: Layout) -> &'static Lookup<Entry> {
+    static TABLES: [OnceLock<Lookup<Entry>>; Layout::ALL.len()] =
+        [OnceLock::new(), OnceLock::new()];
+    TABLES[layout.index()].get_or_init(|| {
         let mut lookup = Lookup::new();
-        for row in rows() {
+        for row in rows(layout) {
             lookup.insert(row.key, row.entry);
         }
         lookup
@@ -193,6 +212,14 @@ impl Writer {
             Entry::Ottu(c) => {
                 self.out.push(VIRAMA);
                 self.out.push(*c);
+            }
+            Entry::Subscripts(cs) => {
+                for c in cs.chars() {
+                    if class(c) == Class::Consonant {
+                        self.out.push(VIRAMA);
+                    }
+                    self.out.push(c);
+                }
             }
             _ => {
                 self.report(glyphs);
@@ -294,6 +321,17 @@ impl Syllable {
             }
             Entry::Ottu(c) => {
                 self.ottus.push(*c);
+                true
+            }
+            Entry::Subscripts(cs) => {
+                for c in cs.chars() {
+                    if class(c) == Class::Consonant {
+                        self.ottus.push(c);
+                    } else {
+                        self.signed = true;
+                        self.signs.push(c);
+                    }
+                }
                 true
             }
             Entry::Arka => !std::mem::replace(&mut self.arka, true),
@@ -527,5 +565,48 @@ mod tests {
     #[test]
     fn zero_after_an_anusvara_stays_a_digit() {
         assert_eq!(report("PÀA0PÀ").text, "ಕಂ0ಕ");
+    }
+
+    fn akruti(legacy: &[u8]) -> Conversion {
+        to_unicode(
+            &decode_windows_1252(legacy),
+            Layout::Akruti,
+            &Options::default(),
+        )
+    }
+
+    #[test]
+    fn each_layout_reads_its_own_table() {
+        let codes = [0x64, 0xE2];
+        assert_eq!(akruti(&codes).text, "ಕ");
+        assert_ne!(conv(&codes).text, "ಕ");
+    }
+
+    #[test]
+    fn a_glyph_can_draw_several_subscripts_and_a_sign() {
+        assert_eq!(akruti(&[0xB8, 0xE5, 0xA9, 0xCC, 0xE2, 0xB0]).text, "ಷ್ಟ್ರೀಯ");
+        assert_eq!(akruti(&[0xC9, 0xE2, 0xAF, 0xBB]).text, "ಸ್ಕೃತಿ");
+        assert_eq!(akruti(&[0x79, 0xEA, 0xE8]).text, "ತ್ತೈ");
+        let stray = akruti(&[0x20, 0xE5]);
+        assert_eq!(stray.text, " ್ಟ್ರ");
+        assert_eq!(stray.malformed.len(), 1);
+    }
+
+    #[test]
+    fn e_with_the_vocalic_r_glyph_reads_as_ai() {
+        assert_eq!(akruti(&[0xC0, 0xEA, 0xBD, 0x70, 0xD2]).text, "ವೈರ್");
+    }
+
+    #[test]
+    fn a_sign_typed_after_a_space_joins_the_syllable_before() {
+        let c = akruti(&[0xC9, 0xE2, 0xAA, 0xC9, 0xE2, 0x22, 0x20, 0xBD, 0xBB]);
+        assert!(c.is_clean(), "{c:?}");
+        assert_eq!(c.text, "ಸಂಸ್ಕೃತಿ");
+        assert_eq!(akruti(&[0x79, 0xEA, 0x20, 0xF4]).text, "ತೈ");
+        assert_eq!(
+            akruti(&[0xC9, 0xD6, 0x64, 0xE2, 0x5F, 0x20, 0x58]).text,
+            "ಸಾಕ್ಷ್ಯ"
+        );
+        assert_eq!(akruti(&[0x79, 0xE2, 0x20, 0x79, 0xE2]).text, "ತ ತ");
     }
 }

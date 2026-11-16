@@ -4,7 +4,7 @@ Instructions for anyone changing this repository, human or AI agent. Read this b
 
 ## What this is
 
-A Rust library for Kannada text: akshara segmentation, normalization, transliteration, numerals, and conversion of legacy Nudi and Baraha font text to Unicode. The main goal is converting legacy documents correctly, with measured accuracy.
+A Rust library for Kannada text: akshara segmentation, normalization, transliteration, numerals, and conversion of legacy Nudi, Baraha and Akruti font text to Unicode. The main goal is converting legacy documents correctly, with measured accuracy.
 
 ## Commands
 
@@ -38,12 +38,13 @@ crates/kannadi/
   src/translit/       Kannada to and from ISO 15919, IAST, Baraha
     schemes.rs        the scheme tables, as data
     mod.rs            1 engine for all schemes: romanize and parse
-  src/legacy/         Nudi and Baraha ANSI to and from Unicode
-    table.rs          parses data/nudi.tsv once for both directions
+  src/legacy/         legacy font text to and from Unicode, 1 table per Layout
+    table.rs          parses each layout's table once for both directions
     decode.rs         to Unicode: a Writer builds the output and the reports;
                       a Syllable decides what it can accept
     encode.rs         from Unicode: each akshara written in storage order
-  data/nudi.tsv       the legacy glyph table, as data
+  data/nudi.tsv       the Nudi and Baraha ANSI glyph table, as data
+  data/akruti.tsv     the Akruti glyph table
   tests/              golden fixtures, property tests, differential test
   examples/           demo, and a command-line converter for legacy files
 crates/kannadi-cli/   the `kannadi` binary: batch conversion of files and folders
@@ -85,7 +86,7 @@ docs/                 design notes, corpus plan, prior art
 
 Principles:
 
-- **Tables are data and engines are generic.** Scheme spellings and glyph layouts live in tables. A new transliteration scheme needs a table and an entry in the `Scheme` enum. A new legacy font layout needs a table; the converter currently loads only `nudi.tsv`. Keep scheme-specific behavior as fields on the table.
+- **Tables are data and engines are generic.** Scheme spellings and glyph layouts live in tables. A new transliteration scheme needs a table and an entry in the `Scheme` enum. A new legacy font layout needs a table and an entry in the `Layout` enum. Keep scheme-specific behavior as fields on the table.
 - **Lossless by default.** Transliteration round-trips Kannada text exactly. When the converter cannot place a glyph, it reports it. Nothing is dropped silently, except spacing glyphs, which carry no text.
 - **Small modules with 1 job each.** Shared behavior goes in 1 place; do not copy code between modules.
 - **No abstraction before it earns its place.** Add a trait when a second implementation exists.

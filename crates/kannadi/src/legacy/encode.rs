@@ -8,10 +8,10 @@ use crate::akshara::{aksharas, Akshara, AksharaKind};
 use crate::chars::{class, Class, VIRAMA};
 use crate::numerals::to_ascii_digit;
 
-use super::table::{rows, Entry, Prefer};
-use super::{is_passthrough, unaspirated, windows_1252_byte};
+use super::table::{rows, source, Entry, Prefer};
+use super::{is_passthrough, unaspirated, windows_1252_byte, Layout};
 
-/// A character [`unicode_to_nudi`] could not encode.
+/// A character [`from_unicode`] could not encode.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Unencodable {
     /// Byte offset of the character in the input.
@@ -20,11 +20,11 @@ pub struct Unencodable {
     pub character: char,
 }
 
-/// The result of [`unicode_to_nudi`].
+/// The result of [`from_unicode`].
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Encoding {
-    /// The glyph codes as Windows-1252 characters, ready to be set in a Nudi or
-    /// Baraha ANSI font. Characters that could not be encoded are kept as they were.
+    /// The glyph codes as Windows-1252 characters, ready to be set in a font with
+    /// the layout. Characters that could not be encoded are kept as they were.
     pub text: String,
     /// Characters with no glyph in the layout, in input order. Joiners and nuktas
     /// are kept at the end of their akshara.
@@ -42,7 +42,7 @@ impl Encoding {
     }
 }
 
-/// Converts Unicode Kannada to the glyph codes of the Nudi and Baraha ANSI fonts.
+/// Converts Unicode Kannada to the glyph codes of the fonts with layout `layout`.
 ///
 /// Each akshara is written in the order typists stored it: the consonant shape,
 /// the vowel sign, the subscript consonants, ೃ and the length marks ೕ ೖ, the
@@ -50,24 +50,26 @@ impl Encoding {
 /// font uses in that position is chosen.
 ///
 /// When the result [`is_clean`](Encoding::is_clean),
-/// [`nudi_to_unicode`](super::nudi_to_unicode) gives back the NFC form of the input.
-/// Kannada digits are written as ASCII digits, which the `k` variants of the fonts
-/// draw as Kannada digits. A digit zero written between 2 letters reads back as ಂ
-/// unless [`Options::zero_as_anusvara`](super::Options::zero_as_anusvara) is off.
+/// [`to_unicode`](super::to_unicode) gives back the NFC form of the input.
+/// Kannada digits are written as ASCII digits, which the `k` variants of the Nudi
+/// fonts draw as Kannada digits. A digit zero written between 2 letters reads back
+/// as ಂ unless [`Options::zero_as_anusvara`](super::Options::zero_as_anusvara) is
+/// off.
 ///
 /// ```
-/// use kannadi::legacy::unicode_to_nudi;
+/// use kannadi::legacy::{from_unicode, Layout};
 ///
-/// let encoded = unicode_to_nudi("ಕನ್ನಡ");
+/// let encoded = from_unicode("ಕನ್ನಡ", Layout::Nudi);
 /// assert_eq!(encoded.text, "PÀ£ÀßqÀ");
 /// assert!(encoded.is_clean());
 ///
-/// let mixed = unicode_to_nudi("ಕ A");
+/// let mixed = from_unicode("ಕ A", Layout::Nudi);
 /// assert_eq!(mixed.unencodable[0].character, 'A');
 /// ```
-pub fn unicode_to_nudi(text: &str) -> Encoding {
+pub fn from_unicode(text: &str, layout: Layout) -> Encoding {
     let mut writer = Writer {
-        glyphs: glyphs(),
+        glyphs: glyphs(layout),
+        text,
         out: String::with_capacity(text.len()),
         unencodable: Vec::new(),
     };
@@ -95,6 +97,18 @@ pub fn unicode_to_nudi(text: &str) -> Encoding {
     }
 }
 
+/// Converts Unicode Kannada to the glyph codes of the Nudi and Baraha ANSI fonts:
+/// the same as [`from_unicode`] with [`Layout::Nudi`].
+///
+/// ```
+/// use kannadi::legacy::unicode_to_nudi;
+///
+/// assert_eq!(unicode_to_nudi("ಕನ್ನಡ").text, "PÀ£ÀßqÀ");
+/// ```
+pub fn unicode_to_nudi(text: &str) -> Encoding {
+    from_unicode(text, Layout::Nudi)
+}
+
 fn is_well_formed(akshara: &Akshara) -> bool {
     let mut classes = akshara.text.chars().map(class);
     match akshara.kind {
@@ -107,8 +121,8 @@ fn is_well_formed(akshara: &Akshara) -> bool {
     }
 }
 
-/// Vowel signs Nudi draws on the letter form of a consonant. The other signs take
-/// the place of the head stroke, so they go on the base form.
+/// Vowel signs the layouts draw on the letter form of a consonant. The other signs
+/// take the place of the head stroke, so they go on the base form.
 const LETTER_SIGNS: [char; 3] = ['ಿ', 'ು', 'ೂ'];
 
 /// Signs typists stored after the subscript consonants: ೃ (U+0CC3) and the length
@@ -140,11 +154,15 @@ struct Glyphs {
     key_starts: HashSet<char>,
 }
 
-fn glyphs() -> &'static Glyphs {
-    static GLYPHS: OnceLock<Glyphs> = OnceLock::new();
-    GLYPHS.get_or_init(|| {
+fn glyphs(layout: Layout) -> &'static Glyphs {
+    static GLYPHS: [OnceLock<Glyphs>; Layout::ALL.len()] = [OnceLock::new(), OnceLock::new()];
+    GLYPHS[layout.index()].get_or_init(|| {
+        let file = source(layout).0;
         let mut g = Glyphs::default();
-        for row in rows() {
+        for row in rows(layout) {
+            if is_read_only(&row.key) {
+                continue;
+            }
             g.key_starts.extend(row.key.chars().next());
             let choice = Choice {
                 key: row.key,
@@ -159,7 +177,7 @@ fn glyphs() -> &'static Glyphs {
             );
             assert!(
                 choosable || choice.prefer == Prefer::Otherwise,
-                "nudi.tsv: a preference on {:?} has no effect",
+                "{file}: a preference on {:?} has no effect",
                 row.entry
             );
             match row.entry {
@@ -167,7 +185,7 @@ fn glyphs() -> &'static Glyphs {
                     g.letters.entry(l.nfd().collect()).or_insert(choice.key);
                 }
                 Entry::Base(b) => {
-                    let c = single(&b);
+                    let c = single(&b, file);
                     g.bases.entry(c).or_insert(choice.key);
                 }
                 Entry::Sign(s) if s.is_empty() => {
@@ -175,7 +193,7 @@ fn glyphs() -> &'static Glyphs {
                         g.head_stroke = choice.key;
                     }
                 }
-                Entry::Sign(s) => g.signs.entry(single(&s)).or_default().push(choice),
+                Entry::Sign(s) => g.signs.entry(single(&s, file)).or_default().push(choice),
                 Entry::Virama => g.signs.entry(VIRAMA).or_default().push(choice),
                 Entry::Ottu(c) => g.ottus.entry(c).or_default().push(choice),
                 Entry::Arka => g.arka.push(choice),
@@ -184,21 +202,31 @@ fn glyphs() -> &'static Glyphs {
                     g.mods.entry(m).or_insert(choice.key);
                 }
                 Entry::Literal(l) => {
-                    g.literals.entry(single(&l)).or_insert(choice.key);
+                    g.literals.entry(single(&l, file)).or_insert(choice.key);
                 }
-                Entry::Ignore => {}
+                Entry::Subscripts(_) | Entry::Ignore => {}
             }
         }
         g
     })
 }
 
-fn single(value: &str) -> char {
+/// A glyph sequence that starts with a space, such as a sign typed after a space,
+/// is a way of typing that is read but never written.
+fn is_read_only(key: &str) -> bool {
+    key.len() > 1 && key.starts_with(' ')
+}
+
+fn single(value: &str, file: &str) -> char {
     let mut chars = value.chars();
     match (chars.next(), chars.next()) {
         (Some(c), None) => c,
-        _ => panic!("expected 1 character, found {value:?} in nudi.tsv"),
+        _ => panic!("{file}: expected 1 character, found {value:?}"),
     }
+}
+
+fn choose_sign<'a>(glyphs: &'a Glyphs, part: char, context: &Context) -> Option<&'a str> {
+    glyphs.signs.get(&part).and_then(|s| choose(s, context))
 }
 
 /// What a glyph's preference is checked against.
@@ -265,13 +293,15 @@ impl Parts {
     }
 }
 
-struct Writer {
+struct Writer<'a> {
     glyphs: &'static Glyphs,
+    /// The input, to report a vowel sign whole when only some of its parts have glyphs.
+    text: &'a str,
     out: String,
     unencodable: Vec<Unencodable>,
 }
 
-impl Writer {
+impl Writer<'_> {
     fn consonant(&mut self, parts: &Parts) {
         let arka = parts.consonants.len() > 1 && parts.consonants[0].1 == RA;
         let cluster = &parts.consonants[usize::from(arka)..];
@@ -298,9 +328,24 @@ impl Writer {
                 0
             }
         };
+        let unwritable: Vec<usize> = before[used..]
+            .iter()
+            .chain(&after)
+            .filter(|&&(_, c)| choose_sign(self.glyphs, c, &context).is_none())
+            .map(|&(i, _)| i)
+            .collect();
+        let mut reported = Vec::new();
+        let mut sign = |w: &mut Self, (i, c): (usize, char), context: &Context| {
+            if !unwritable.contains(&i) {
+                w.write(choose_sign(w.glyphs, c, context), i, c);
+            } else if !reported.contains(&i) {
+                reported.push(i);
+                let whole = w.text[i..].chars().next().unwrap_or(c);
+                w.unencodable(i, whole);
+            }
+        };
         for &(i, c) in &before[used..] {
-            let key = self.glyphs.signs.get(&c).and_then(|s| choose(s, &context));
-            self.write(key, i, c);
+            sign(self, (i, c), &context);
         }
         for &(i, c) in &cluster[1..] {
             let key = self.glyphs.ottus.get(&c).and_then(|o| choose(o, &context));
@@ -308,8 +353,7 @@ impl Writer {
             context.after_ottu = true;
         }
         for &(i, c) in &after {
-            let key = self.glyphs.signs.get(&c).and_then(|s| choose(s, &context));
-            self.write(key, i, c);
+            sign(self, (i, c), &context);
             context.after_ottu = false;
         }
         if arka {
@@ -368,7 +412,11 @@ impl Writer {
     fn single(&mut self, (offset, c): (usize, char)) {
         let g = self.glyphs;
         let plain = c.is_ascii_digit() || is_passthrough(c);
-        if plain && windows_1252_byte(c).is_some() && !g.key_starts.contains(&c) {
+        // Outside ASCII, a layout may draw punctuation at other codes, as Akruti
+        // draws – at F6 and leaves 96 empty.
+        let drawn_as_itself = c.is_ascii() || !g.literals.contains_key(&c);
+        if plain && drawn_as_itself && windows_1252_byte(c).is_some() && !g.key_starts.contains(&c)
+        {
             self.out.push(c);
             return;
         }
@@ -411,7 +459,7 @@ impl Writer {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::legacy::{nudi_to_unicode, Options};
+    use crate::legacy::{nudi_to_unicode, to_unicode, Options};
 
     fn encode(text: &str) -> Vec<u8> {
         let e = unicode_to_nudi(text);
@@ -594,5 +642,59 @@ mod tests {
         ] {
             roundtrip(word);
         }
+    }
+
+    fn akruti(text: &str) -> Vec<u8> {
+        let e = from_unicode(text, Layout::Akruti);
+        assert!(e.is_clean(), "{e:?}");
+        e.text
+            .chars()
+            .map(|c| windows_1252_byte(c).expect("Windows-1252 character"))
+            .collect()
+    }
+
+    #[test]
+    fn each_layout_writes_its_own_glyphs() {
+        assert_eq!(akruti("ಕನ್ನಡ"), [0x64, 0xE2, 0x7D, 0xE2, 0x51, 0x76, 0xE2]);
+        assert_eq!(akruti("ಮುಖ"), [0xC0, 0xE2, 0xB0, 0xB0, 0xD9]);
+    }
+
+    #[test]
+    fn spaces_are_written_as_spaces_where_a_sign_may_follow_one() {
+        assert_eq!(akruti("ಕ ಕ"), [0x64, 0xE2, 0x20, 0x64, 0xE2]);
+    }
+
+    #[test]
+    fn punctuation_outside_ascii_uses_the_layout_glyph() {
+        assert_eq!(akruti("‘ಕ’"), [0x60, 0x64, 0xE2, 0x27]);
+        assert_eq!(akruti("ಕ–ಕ"), [0x64, 0xE2, 0xF6, 0x64, 0xE2]);
+        assert_eq!(encode("ಕ. ಕ।"), [0x50, 0xC0, 0x2E, 0x20, 0x50, 0xC0, 0x86]);
+    }
+
+    #[test]
+    fn akruti_words_roundtrip() {
+        for word in ["ಸರ್ಕಾರ", "ಮೋಟಾರು", "ಯೋಜನೆ", "ಶ್ರೀ", "ಋಣ", "ಸಾಮಾಜಿಕ", "ವಿಶ್ವವಿದ್ಯಾನಿಲಯ"]
+        {
+            let back = to_unicode(
+                &from_unicode(word, Layout::Akruti).text,
+                Layout::Akruti,
+                &Options::default(),
+            );
+            assert!(back.is_clean(), "{back:?}");
+            assert_eq!(back.text, word);
+        }
+    }
+
+    #[test]
+    fn a_sign_with_a_part_the_layout_lacks_is_reported_whole() {
+        let e = from_unicode("ಞೀ", Layout::Akruti);
+        assert_eq!(
+            e.unencodable,
+            [Unencodable {
+                offset: 3,
+                character: 'ೀ'
+            }]
+        );
+        assert_eq!(e.text, "qೀ");
     }
 }
