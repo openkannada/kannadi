@@ -5,7 +5,7 @@ Status: checked on 16 November 2026. Akruti is built: see [akruti.md](akruti.md)
 ## Summary
 
 - Shree-Lipi (Modular Infotech; fonts named `Shree-Kan-0850` and similar) is a widely used Kannada layout besides Nudi and Baraha. No public code page for it was found.
-- A Shree-Lipi table could be derived from public PDFs that use Shree-Lipi fonts, without reading the fonts themselves. No PDF with a real Shree-Lipi font name was found yet among the Karnataka sources checked.
+- No PDF with a real Shree-Lipi font name was found among the Karnataka sources checked, including the 98 archived Kannada Acts on `dpal.kar.nic.in` (Akruti, Nudi and BRH fonts only). The Udayavani newspaper's 2003 web pages set their text in `Shree-Kan-0850` and served the font to readers; they give Shree-Lipi text without glyph images. See [Searching for Shree-Lipi sources](#searching-for-shree-lipi-sources).
 - Akruti (`AkrutiKndPadma`) appears with its real font name in public Karnataka PDFs. It is a separate layout from Nudi and needs its own table. Its sources are confirmed, so it can start before Shree-Lipi.
 - Asking Modular Infotech to publish the Shree-Lipi code page under an open license would avoid derivation. That is a decision for the maintainer.
 
@@ -25,7 +25,7 @@ For background: typeface designs are generally not protected by copyright in the
 - The font name `Shree-Kan-0850` and the file `SHREE850.ttf` are named as a non-Unicode Kannada encoding in a [Mozilla bug report](https://bugzilla.mozilla.org/show_bug.cgi?id=213213).
 - [Baraha's converter](https://baraha.com/help/FontConvert.htm) lists Shree-Kan-0850 among the fonts it converts. It is closed source and states no license for its tables.
 - The [Modular Infotech site](https://www.modular-infotech.com) lists a blog post titled "Convert Shree-Lipi to Unicode Online" and a Downloads page. Their content and the site's terms could not be read. No code page was found there.
-- 2 Karnataka Legislative Assembly member pages, [13mem/50.pdf](http://web.archive.org/web/20150427105120/http://kla.kar.nic.in/13mem/50.pdf) and [13mem/75.pdf](http://web.archive.org/web/20160304030357/http://kla.kar.nic.in/13mem/75.pdf), embed a TrueType subset whose name was replaced with `TTE10AECA0t00` when the PDF was made with PScript5 and Ghostscript 8.15. The extracted text does not decode with the Nudi table: 50.pdf gives 145 unknown glyphs and 267 malformed syllables. The layout is unknown; it could be Shree-Lipi.
+- 2 Karnataka Legislative Assembly member pages, [13mem/50.pdf](http://web.archive.org/web/20150427105120/http://kla.kar.nic.in/13mem/50.pdf) and [13mem/75.pdf](http://web.archive.org/web/20160304030357/http://kla.kar.nic.in/13mem/75.pdf), embed a TrueType subset whose name was replaced with `TTE10AECA0t00` when the PDF was made with PScript5 and Ghostscript 8.15. The extracted text does not decode with the Nudi table: 50.pdf gives 145 unknown glyphs and 267 malformed syllables. Rendering the subset shows a third layout: Latin letters and digits at their ASCII codes, and Kannada glyphs from 0x83 up. Its family name is gone, so whether it is a Shree-Lipi font is not known.
 
 ### Akruti
 
@@ -51,6 +51,17 @@ Akruti text does not decode with the Nudi table. On page 1 of `bh2002k.pdf`, the
 
 These are test inputs for PDF text extraction.
 
+## Searching for Shree-Lipi sources
+
+Checked on 16 November 2026, with the Akruti work.
+
+- **Karnataka Acts.** All 98 archived Kannada Acts and Ordinances on `dpal.kar.nic.in` were downloaded and their fonts listed. Those of 2001 to 2003 use AkrutiKndPadma; later ones use Nudi 01 e, Nudi 03 e, Nudi Akshara, NudiB-Akshar and BRH Kannada. 1 Act of 2003 also uses AkliteKndPadmini, a layout of its own. None uses a Shree-Lipi font.
+- **Udayavani, 2003.** The newspaper's archived home page (`199.74.239.15/udayavani/home.asp`, Internet Archive, April 2003) sets its Kannada in `<font face="Shree-Kan-0850">`, with text such as `ÃÜã±ÜñÝÃÝ`. The site offered the font to readers as `SHREE850.ttf` and as the embedded web font `SHREEKA0.eot`. These pages are Shree-Lipi text with a known font name, so they can check a table. They carry no glyph images, so they cannot build one alone.
+- **Legislative Assembly member pages.** The unnamed font in `13mem/50.pdf` is a third layout, described above. Its subset holds only the 117 glyphs that page uses, too few to test the Udayavani text against, so whether it is Shree-Kan-0850 is not known.
+- **Web search.** Searches for PDFs naming `Shree-Kan` fonts found only font shops and converters.
+
+A Shree-Lipi table can be built the way Akruti was if its glyphs can be seen: from a public PDF that embeds a named Shree-Lipi font, or from the web font Udayavani served with its pages. The Udayavani text then checks the table, as the Acts checked Akruti. Whether to render the font Udayavani served is a decision for the maintainer: it was published for readers of those pages, but it is a font file and not a document.
+
 ## How a table is derived
 
 The Akruti table was built this way, and Shree-Lipi will follow it. [akruti.md](akruti.md) has the details.
@@ -69,4 +80,6 @@ A table is ready when every code seen in the collected documents has a checked e
 
 1. Whether to ask Modular Infotech to publish the Shree-Lipi code page under an open license, such as CC0 for the data. The research found `support@modular-infotech.com` as a contact; it was not contacted. Modular offers its own conversion tool, so it may decline.
 2. A Kannada reader's check of the 125 Akruti fixture lines.
-3. Where to look for Shree-Lipi documents with real font names. Candidates are publishers' and newspapers' PDF archives from before 2010, and university question papers.
+3. Whether to render the Shree-Kan-0850 web font that Udayavani served with its 2003 pages, to build the Shree-Lipi table, with the archived pages to check it.
+4. Whether to build a table for the unnamed layout in the Legislative Assembly member pages of 2013 to 2015.
+5. Where to look for Shree-Lipi documents with real font names. Candidates are publishers' and newspapers' PDF archives from before 2010, and university question papers.
