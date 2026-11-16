@@ -436,7 +436,10 @@ mod tests {
         let word = phonetic_key("ನಮಸ್ಕಾರ", "medium").unwrap();
         assert_eq!(latin_key("namaskara", "medium").unwrap(), word);
         assert_eq!(latin_key("namaskAra", "medium").unwrap(), word);
-        assert_eq!(latin_key("neeru", "medium").unwrap(), phonetic_key("ನೀರು", "medium").unwrap());
+        assert_eq!(
+            latin_key("neeru", "medium").unwrap(),
+            phonetic_key("ನೀರು", "medium").unwrap()
+        );
     }
 
     #[test]

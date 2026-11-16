@@ -25,8 +25,11 @@
 /// How much a key folds. See the module documentation.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum Level {
+    /// Folds aspiration, vowel length, doubled consonants and nasals before stops.
     Narrow,
+    /// Also folds retroflex with dental, ಳ with ಲ, the sibilants, ಜ with ಝ and ಫ with ಪ.
     Medium,
+    /// Keeps only the consonants and a leading vowel.
     Broad,
 }
 
@@ -50,7 +53,11 @@ pub struct UnknownLevel(pub String);
 
 impl std::fmt::Display for UnknownLevel {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "unknown key level {:?}: use narrow, medium or broad", self.0)
+        write!(
+            f,
+            "unknown key level {:?}: use narrow, medium or broad",
+            self.0
+        )
     }
 }
 
@@ -227,7 +234,11 @@ fn following_stop(next: Option<&Sound>) -> Option<Place> {
 }
 
 fn homorganic(stop: Place) -> char {
-    if stop.is_labial() { 'm' } else { 'n' }
+    if stop.is_labial() {
+        'm'
+    } else {
+        'n'
+    }
 }
 
 /// True when `next` is a sibilant or ಹ, before which writers spell a nasal as ಂ, ನ್ or ಮ್
