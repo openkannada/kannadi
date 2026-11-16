@@ -65,8 +65,20 @@ assert.equal(kannadi.decodeWindows1252(kannadi.encodeWindows1252(NUDI)), NUDI);
 const io = {
   convert: (t, layout) => kannadi.convertLegacy(t, { layout }),
   bestLayout: kannadi.bestLayout,
+  fontLayout: kannadi.fontLayout,
   decodeWindows1252: kannadi.decodeWindows1252,
 };
+
+// Font names follow the crate's rules.
+assert.equal(kannadi.fontLayout("BRH Kannada"), "nudi");
+assert.equal(kannadi.fontLayout("AkrutiKndPadma,Bold"), "akruti");
+for (const name of ["Nudi Parijatha", "BRH Devanagari", "BRH Telugu", "Arial"]) {
+  assert.equal(kannadi.fontLayout(name), null, name);
+  assert.ok(!kannadi.isLegacyFont(name), name);
+}
+assert.ok(kannadi.isLegacyFont("Shree-Kan-0850"));
+assert.equal(kannadi.fontLayout("Shree-Kan-0850"), null);
+assert.ok(kannadi.drawsKannadaDigits("Nudi 04 k"));
 const bytes = new Uint8Array([...NUDI].map((c) => c.charCodeAt(0) < 256 ? c.charCodeAt(0) : 0x3f));
 const txt = await openFile(new File([bytes], "page.txt"), io);
 assert.equal(txt.text, UNICODE);

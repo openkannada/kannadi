@@ -118,6 +118,27 @@ pub fn to_unicode(text: &str, layout: &str, options: &NudiOptions) -> Result<Con
     Ok(convert(text, layout.parse()?, options))
 }
 
+/// The name of the layout of the font named `name`, such as `"nudi"` for BRH
+/// Kannada, or `undefined` for a font with no table. See [`legacy::font_layout`].
+#[wasm_bindgen(js_name = fontLayout)]
+pub fn font_layout(name: &str) -> Option<String> {
+    legacy::font_layout(name).map(|l| l.name().to_string())
+}
+
+/// True for a font that stores Kannada as glyph codes, with or without a table.
+/// See [`legacy::is_legacy_font`].
+#[wasm_bindgen(js_name = isLegacyFont)]
+pub fn is_legacy_font(name: &str) -> bool {
+    legacy::is_legacy_font(name)
+}
+
+/// True for a font that draws Kannada digits at the ASCII digit codes. See
+/// [`legacy::draws_kannada_digits`].
+#[wasm_bindgen(js_name = drawsKannadaDigits)]
+pub fn draws_kannada_digits(name: &str) -> bool {
+    legacy::draws_kannada_digits(name)
+}
+
 /// The name of the layout `text` reads best in. See [`legacy::best_layout`].
 #[wasm_bindgen(js_name = bestLayout)]
 pub fn best_layout(text: &str) -> String {
@@ -406,6 +427,18 @@ mod tests {
         let c = nudi_to_unicode("PÀ£ÀßqÀ", &NudiOptions::new());
         assert_eq!(c.text(), "ಕನ್ನಡ");
         assert!(c.is_clean());
+    }
+
+    #[test]
+    fn font_names_give_layouts() {
+        assert_eq!(font_layout("BRH Kannada").as_deref(), Some("nudi"));
+        assert_eq!(font_layout("AkrutiKndPadma").as_deref(), Some("akruti"));
+        for f in ["Nudi Parijatha", "BRH Devanagari", "BRH Telugu"] {
+            assert_eq!(font_layout(f), None, "{f}");
+            assert!(!is_legacy_font(f), "{f}");
+        }
+        assert!(is_legacy_font("Shree-Kan-0850"));
+        assert!(draws_kannada_digits("Nudi 04 k"));
     }
 
     #[test]

@@ -15,6 +15,7 @@
 
 mod decode;
 mod encode;
+mod fonts;
 mod table;
 
 pub use decode::{
@@ -22,6 +23,7 @@ pub use decode::{
     Options, Unknown,
 };
 pub use encode::{from_unicode, unicode_to_nudi, Encoding, Unencodable};
+pub use fonts::{draws_kannada_digits, font_layout, is_legacy_font};
 
 use std::fmt;
 use std::str::FromStr;

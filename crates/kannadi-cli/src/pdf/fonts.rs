@@ -3,11 +3,13 @@
 use std::collections::HashMap;
 use std::rc::Rc;
 
-use kannadi::legacy::{best_layout, to_unicode, windows_1252_byte, Layout, Options};
+use kannadi::legacy::{
+    best_layout, draws_kannada_digits, is_legacy_font, to_unicode, windows_1252_byte, Layout,
+    Options,
+};
 use lopdf::{Dictionary, Document, Object};
 
 use crate::convert::Settings;
-use crate::fonts::has_kannada_digits;
 
 use super::cmap::CMap;
 use super::widths::Widths;
@@ -16,6 +18,8 @@ use super::{resolve, LIMIT};
 pub const RENUMBERED: &str = "named as a legacy font, but its glyph codes do not follow the \
      layout and its character map does not help; the PDF maker may have renumbered them";
 pub const OTHER_LAYOUT: &str = "looks like legacy Kannada in a layout this tool does not know";
+pub const NO_TABLE: &str = "named as a legacy font whose layout this tool has no table for, \
+     such as Shree-Lipi";
 pub const RENUMBERED_SUBSET: &str = "its glyph codes were renumbered and the PDF has no usable \
      character map, so its text cannot be read";
 
@@ -41,6 +45,8 @@ pub struct Font {
     pub name: String,
     /// The layout the font's name gives, if it is a legacy font.
     named: Option<Layout>,
+    /// Named as a legacy font with no table, such as Shree-Kan-0850.
+    no_table: bool,
     /// The layout its text is read in: the named one, or the one its text fits.
     read_as: Layout,
     /// The font maps codes with its own glyph list and no ToUnicode map.
@@ -85,7 +91,8 @@ impl Fonts {
             named,
             read_as: named.unwrap_or(Layout::Nudi),
             custom_codes,
-            kannada_digits: has_kannada_digits(plain),
+            no_table: named.is_none() && is_legacy_font(plain),
+            kannada_digits: draws_kannada_digits(plain),
             name,
             text: String::new(),
             mapped: String::new(),
@@ -137,7 +144,9 @@ impl Fonts {
             let layout = font.layout();
             let raw = Judgment::of(&font.text, layout);
             let renumbered = looks_renumbered(&font.text);
-            font.verdict = if font.named.is_some() {
+            font.verdict = if font.no_table && looks_legacy(&font.text) {
+                Verdict::Unreadable(NO_TABLE)
+            } else if font.named.is_some() {
                 let mapped = Judgment::of(&font.mapped, layout);
                 // Short text: the map wins when only its reading looks like legacy codes.
                 let mapped_usable = mapped.clean()
