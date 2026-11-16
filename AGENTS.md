@@ -70,6 +70,7 @@ web/
   test/units.mjs      tests the page modules in Node, with no WebAssembly
 tools/fontqa/         Python: HarfBuzz shaping tests for Kannada fonts, results,
                       and fixes for font tables; see its README
+corpus/               benchmark lines from real documents, with a data card
 docs/                 design notes, corpus plan, prior art
 ```
 

@@ -20,7 +20,7 @@ Version 0.1, in development.
 | Kannada numerals | Done |
 | Nudi and Baraha to Unicode | Done, waiting on a native reader's check of 100 sample lines |
 | Unicode to Nudi and Baraha | Done |
-| Verified test corpus | Planned: [docs/corpus-plan.md](docs/corpus-plan.md) |
+| Test corpus | 207 lines from 31 government pages of 2002 in [corpus/](corpus/); a Kannada reader's check is pending |
 | Editor page that runs in the browser, with no upload | Built, not deployed: [web/](web/) |
 | Command-line tool for TXT, HTML and DOCX | TXT done; HTML and DOCX next |
 | Shaping tests for Kannada fonts, with results for 41 fonts | Done: [tools/fontqa](tools/fontqa) |
