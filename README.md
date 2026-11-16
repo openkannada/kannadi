@@ -1,10 +1,10 @@
 # kannadi
 
-Convert Kannada documents typed in the legacy Nudi, Baraha and Akruti fonts to Unicode, and back. kannadi is a Rust library, a command-line tool for TXT, HTML, DOCX and PDF files, and an editor page that runs in the browser with no upload.
+Convert Kannada documents typed in the legacy Nudi, Baraha and Akruti fonts to Unicode, and back. kannadi is a Rust library, a command-line tool that converts whole folders of TXT, HTML, DOCX and PDF files, and an editor that runs in the browser.
 
 ಕನ್ನಡಿ (kannaḍi) means mirror.
 
-![The kannadi editor after pasting 4 lines from a 2002 Karnataka government page typed in a Baraha font: the text is converted to Unicode, and 1 unknown glyph is marked for checking](https://raw.githubusercontent.com/prasadus92/kannadi/main/docs/images/editor.png)
+![The kannadi editor after pasting 4 lines from a 2002 Karnataka government page typed in a Baraha font: the text is converted to Unicode, and the 2 places it could not convert cleanly are marked](https://raw.githubusercontent.com/prasadus92/kannadi/main/docs/images/editor.png)
 
 ## Why
 
@@ -13,8 +13,9 @@ For years, Kannada text in Karnataka was typed with Nudi and Baraha fonts that s
 ## Install
 
 ```sh
-# Command-line tool
-cargo install --git https://github.com/prasadus92/kannadi kannadi-cli
+# Command-line tool (Rust 1.89 or later)
+cargo install --locked --git https://github.com/prasadus92/kannadi kannadi-cli
+kannadi to-unicode old-orders/ --out converted/
 
 # Library, in Cargo.toml (not on crates.io yet)
 kannadi = { git = "https://github.com/prasadus92/kannadi" }
@@ -26,9 +27,9 @@ The editor page is not hosted yet. To run it locally, see [Editor page](#editor-
 
 | Check | Result | How it is measured |
 |---|---|---|
-| Nudi and Baraha to Unicode, benchmark corpus | 207 of 207 lines match the expected text; 1 line flagged | `cargo run -p kannadi --example corpus` on [corpus/](https://github.com/prasadus92/kannadi/tree/main/corpus). No line is verified by a Kannada reader yet, so today this compares the converter with its own reviewed output. A 100-line reader check is in progress. |
+| Nudi and Baraha to Unicode, benchmark corpus | 207 of 207 lines match the reviewed output; 1 line flagged | `cargo run -p kannadi --example corpus` on [corpus/](https://github.com/prasadus92/kannadi/tree/main/corpus). No line is verified by a Kannada reader yet, so today this compares the converter with its own reviewed output. A 100-line reader check is in progress. |
 | Unicode to Nudi, as typed | 9,029 of 9,047 words encode to the exact bytes that were typed | Words from Karnataka government pages of 2002. The rest differ in typing habits, such as a zero typed for ಂ. |
-| Akruti to Unicode | 6 unknown glyphs in 908,075, all read against the page as source errors | 16,857 lines from 35 Karnataka Acts. See [docs/akruti.md](https://github.com/prasadus92/kannadi/blob/main/docs/akruti.md). |
+| Akruti to Unicode | 6 unknown glyphs and 22 malformed syllables in 908,075 glyphs, each read against the page: errors in the source, or syllables the PDF split across 2 lines | 16,857 lines from 35 documents: 33 Karnataka Acts and Ordinances and 2 budget papers. See [docs/akruti.md](https://github.com/prasadus92/kannadi/blob/main/docs/akruti.md). |
 | Transliteration round trip | Exact on every generated string | Property tests: 2,000 random strings per run, 50,000 in CI |
 | ISO 15919 against vidyut-lipi | Same output on 5,000 random words per run, apart from 1 documented difference | `tests/differential.rs` |
 
@@ -246,7 +247,7 @@ cargo clippy --all-targets
 web/build.sh && node web/test/smoke.mjs && node --test web/test/units.mjs
 ```
 
-The minimum supported Rust version is 1.75 for the `kannadi` library and 1.88 for the command-line tool.
+The minimum supported Rust version is 1.75 for the `kannadi` library and 1.89 for the command-line tool.
 
 ## License
 

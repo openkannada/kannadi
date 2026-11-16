@@ -82,7 +82,7 @@ The consonant shape is a letter glyph that already carries the sign (ಕಿ, ಮ
 
 | Format | How legacy text is found | Notes |
 |---|---|---|
-| TXT | The whole file is read as legacy text in the layout the command names | Automatic detection is not done. |
+| TXT | The whole file is read as Nudi and Baraha ANSI text | Automatic detection is not done. |
 | HTML | `font-family` in styles, and `<font face>` | The font declaration is changed to a Unicode Kannada font. |
 | DOCX | Run properties `w:rFonts` | Only legacy-font runs change. Styles and layout stay. |
 

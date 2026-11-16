@@ -19,7 +19,7 @@ corpus/<id>/
 |---|---|
 | `source` | URL, or "typed for this corpus" |
 | `retrieved` | 2026-11-20 |
-| `licence_basis` | "Official Gazette, Indian Copyright Act s. 52(1)(q)", "contributed under CC0", "typed for this corpus" |
+| `license_basis` | "Official Gazette, Indian Copyright Act s. 52(1)(q)", "contributed under CC0", "typed for this corpus" |
 | `font` | Font name exactly as it appears in the file |
 | `encoding` | nudi or baraha |
 | `verified_by` | Name of the Kannada reader who checked `expected.txt` |
@@ -69,7 +69,6 @@ Newspaper and publisher archives are the largest real-world use, and many are in
 ## Order of work
 
 This was the plan on 15 November 2026. What was built is in [corpus/](../corpus/README.md): real government pages came first, and the typed script of tier 1 was not made.
-
 
 1. Write the tier 1 Unicode script (this repository, `corpus/script.txt`).
 2. Get it typed in Nudi and Baraha; commit the files with `expected.txt`.

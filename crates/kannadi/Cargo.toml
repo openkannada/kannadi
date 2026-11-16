@@ -9,7 +9,7 @@ repository.workspace = true
 authors.workspace = true
 readme = "../../README.md"
 keywords = ["kannada", "nudi", "unicode", "transliteration", "indic"]
-exclude = ["tests/corpus.rs", "examples/corpus.rs"]
+exclude = ["tests/", "examples/corpus.rs"]
 categories = ["text-processing", "internationalization"]
 
 [dependencies]
