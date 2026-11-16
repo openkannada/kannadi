@@ -87,6 +87,9 @@ enum Verdict {
 struct Font {
     name: String,
     named_legacy: bool,
+    /// The font maps its codes with its own glyph list and no ToUnicode map, so
+    /// its codes may mean anything.
+    custom_codes: bool,
     kannada_digits: bool,
     /// The text shown in this font across the document.
     text: String,
@@ -96,23 +99,34 @@ struct Font {
 #[derive(Debug, Default)]
 struct Fonts {
     fonts: Vec<Font>,
-    by_name: HashMap<String, usize>,
+    /// By [`font_key`]: copies of 1 font on many pages pool their text, and
+    /// different fonts that share a name stay apart.
+    by_key: HashMap<(String, u64), usize>,
 }
 
 impl Fonts {
-    fn index(&mut self, name: &str, settings: &Settings) -> usize {
-        if let Some(&i) = self.by_name.get(name) {
+    fn index(&mut self, doc: &Document, dict: &Dictionary, settings: &Settings) -> usize {
+        let key = font_key(doc, dict);
+        if let Some(&i) = self.by_key.get(&key) {
             return i;
         }
-        let plain = plain_name(name);
+        let name = key.0.clone();
+        let plain = plain_name(&name);
+        let named_legacy = settings.fonts.is_legacy(plain);
+        let kannada_digits = is_kannada_digit_font(plain);
+        let custom_codes = dict.get(b"ToUnicode").is_err()
+            && dict
+                .get(b"Encoding")
+                .is_ok_and(|e| !matches!(e, Object::Name(_)));
         self.fonts.push(Font {
-            name: name.to_string(),
-            named_legacy: settings.fonts.is_legacy(plain),
-            kannada_digits: is_kannada_digit_font(plain),
+            named_legacy,
+            custom_codes,
+            name,
+            kannada_digits,
             text: String::new(),
             verdict: Verdict::Other,
         });
-        self.by_name.insert(name.to_string(), self.fonts.len() - 1);
+        self.by_key.insert(key, self.fonts.len() - 1);
         self.fonts.len() - 1
     }
 
@@ -121,7 +135,9 @@ impl Fonts {
         for font in &mut self.fonts {
             let clean = converts_cleanly(&font.text);
             font.verdict = match (font.named_legacy, clean, looks_legacy(&font.text)) {
-                _ if looks_renumbered(&font.text) => Verdict::Unreadable(RENUMBERED_SUBSET),
+                _ if font.custom_codes && looks_renumbered(&font.text) => {
+                    Verdict::Unreadable(RENUMBERED_SUBSET)
+                }
                 (true, Some(false), _) => Verdict::Unreadable(RENUMBERED),
                 (true, _, _) => Verdict::Legacy,
                 (false, Some(true), true) => Verdict::Legacy,
@@ -137,6 +153,30 @@ impl Fonts {
             _ => None,
         })
     }
+}
+
+/// A font's name and a fingerprint of how it maps codes: its type, its encoding
+/// and its ToUnicode map.
+fn font_key(doc: &Document, dict: &Dictionary) -> (String, u64) {
+    use std::hash::{Hash, Hasher};
+    let name = dict
+        .get(b"BaseFont")
+        .and_then(Object::as_name)
+        .map(|n| String::from_utf8_lossy(n).to_string())
+        .unwrap_or_default();
+    let resolve = |o: &Object| match o {
+        Object::Reference(id) => doc.get_object(*id).ok().cloned(),
+        other => Some(other.clone()),
+    };
+    let mut hasher = std::collections::hash_map::DefaultHasher::new();
+    for entry in [&b"Subtype"[..], b"Encoding"] {
+        format!("{:?}", dict.get(entry).ok().and_then(resolve)).hash(&mut hasher);
+    }
+    let to_unicode = dict.get(b"ToUnicode").ok().and_then(resolve);
+    if let Some(Object::Stream(s)) = to_unicode {
+        s.content.hash(&mut hasher);
+    }
+    (name, hasher.finish())
 }
 
 /// The font name without a subset tag (`ABCDEF+`) or a style suffix (`,Bold`).
@@ -267,7 +307,10 @@ impl Widths {
             match resolve(&list[i + 1]) {
                 Some(Object::Array(run)) => {
                     for (k, w) in run.iter().filter_map(number).enumerate() {
-                        widths.insert(start + k as u32, w);
+                        if let Some(cid) = u32::try_from(k).ok().and_then(|k| start.checked_add(k))
+                        {
+                            widths.insert(cid, w);
+                        }
                     }
                     i += 2;
                 }
@@ -277,7 +320,7 @@ impl Widths {
                     else {
                         break;
                     };
-                    for c in start..=(end as u32).min(start + 65_535) {
+                    for c in start..=(end as u32).min(start.saturating_add(65_535)) {
                         widths.insert(c, w);
                     }
                     i += 3;
@@ -383,6 +426,7 @@ fn read_page(
             ..Pen::default()
         },
         current: None,
+        saved: Vec::new(),
     };
     reader.walk(&content, &resources, 0)?;
     Ok(reader.lines)
@@ -400,6 +444,8 @@ struct PageReader<'d, 'f> {
     lines: Vec<Line>,
     pen: Pen,
     current: Option<&'d Dictionary>,
+    /// Fonts and sizes saved by `q`, restored by `Q`.
+    saved: Vec<(Option<&'d Dictionary>, f32)>,
 }
 
 impl<'d> PageReader<'d, '_> {
@@ -427,7 +473,16 @@ impl<'d> PageReader<'d, '_> {
                         .set(a.unwrap_or(1.0), e.unwrap_or(0.0), f.unwrap_or(0.0));
                 }
                 "T*" | "'" | "\"" => break_line = true,
+                // Gaps are measured within a text object only: glyph widths in
+                // real PDFs are not exact enough to measure across them.
                 "BT" => self.pen.end = None,
+                "q" => self.saved.push((self.current, self.pen.size)),
+                "Q" => {
+                    if let Some((font, size)) = self.saved.pop() {
+                        self.current = font;
+                        self.pen.size = size;
+                    }
+                }
                 "Do" if depth < MAX_FORM_DEPTH => {
                     if let Some(form) = name().and_then(|n| self.form(resources, n)) {
                         let (content, own) = form;
@@ -542,12 +597,7 @@ fn page_font<'d>(
     fonts: &mut Fonts,
     settings: &Settings,
 ) -> PageFont<'d> {
-    let name = dict
-        .get(b"BaseFont")
-        .and_then(Object::as_name)
-        .map(|n| String::from_utf8_lossy(n).to_string())
-        .unwrap_or_default();
-    let index = fonts.index(&name, settings);
+    let index = fonts.index(doc, dict, settings);
     let simple = dict
         .get(b"Subtype")
         .and_then(Object::as_name)
@@ -627,7 +677,11 @@ fn write_line(
             Piece::Space => out.push(' '),
             Piece::Text { font, text } => match fonts.fonts[*font].verdict {
                 Verdict::Legacy => {
-                    digits = fonts.fonts[*font].kannada_digits;
+                    let font_digits = fonts.fonts[*font].kannada_digits;
+                    if font_digits != digits {
+                        flush(&mut legacy, digits, &mut out, report);
+                        digits = font_digits;
+                    }
                     legacy.push_str(text);
                 }
                 Verdict::Unreadable(_) => flush(&mut legacy, digits, &mut out, report),
@@ -871,7 +925,14 @@ endcmap\nCMapName currentdict /CMap defineresource pop\nend\nend\n";
     fn unreadable_fonts_are_reported_and_left_out() {
         let renumbered =
             b"BT /F1 12 Tf 72 700 Td (!\"#$%&'()*+,-./!\"#$%&'()*+,-./ABCDEFGHIJ) Tj ET";
-        let (text, report) = run(&pdf(vec![("F1", simple_font("Nudi01k"))], renumbered));
+        let mut font = simple_font("Nudi01k");
+        let mut differences = vec![Object::Integer(33)];
+        differences.extend((1..=10).map(|i| Object::Name(format!("g{i}").into_bytes())));
+        font.set(
+            "Encoding",
+            dictionary! { "Type" => "Encoding", "Differences" => differences },
+        );
+        let (text, report) = run(&pdf(vec![("F1", font)], renumbered));
         assert_eq!(text, "\n");
         assert_eq!(report.rows[0].kind, Kind::NotConverted);
         assert_eq!(report.rows[0].location, "font Nudi01k");
@@ -894,6 +955,73 @@ endcmap\nCMapName currentdict /CMap defineresource pop\nend\nend\n";
         assert!(!looks_renumbered(
             "Sultan & Another Vs. U.P. Public Service Commission (C) No. 2/2024"
         ));
+    }
+
+    #[test]
+    fn code_in_an_ordinary_font_is_kept() {
+        let content =
+            b"BT /F1 12 Tf 72 700 Td (if \\(alpha == beta && gamma != delta\\) { return true; }) Tj ET";
+        let (text, report) = run(&pdf(vec![("F1", simple_font("Arial"))], content));
+        assert_eq!(
+            text,
+            "if (alpha == beta && gamma != delta) { return true; }\n"
+        );
+        assert!(report.is_empty(), "{:?}", report.rows);
+    }
+
+    #[test]
+    fn a_font_saved_by_q_is_restored_by_q() {
+        let mut content = b"BT /F2 12 Tf ET q BT /F1 12 Tf 1 0 0 1 72 650 Tm (x) Tj ET Q \
+                            BT 1 0 0 1 72 600 Tm ("
+            .to_vec();
+        content.extend_from_slice(KANNADA);
+        content.extend_from_slice(b") Tj ET");
+        let fonts = vec![
+            ("F1", simple_font("Arial")),
+            ("F2", simple_font("BRHKannada")),
+        ];
+        let (text, _) = run(&pdf(fonts, &content));
+        assert_eq!(text, "x\nಕನ್ನಡ\n");
+    }
+
+    #[test]
+    fn digit_conventions_stay_with_their_font() {
+        let content = b"BT /F1 12 Tf 72 700 Td (P\xC0 12) Tj /F2 12 Tf (P\xC0 34) Tj ET";
+        let fonts = vec![
+            ("F1", simple_font("Nudi 04 k")),
+            ("F2", simple_font("Nudi 01 e")),
+        ];
+        let (text, _) = run(&pdf(fonts, content));
+        assert_eq!(text, "ಕ ೧೨ಕ 34\n");
+    }
+
+    #[test]
+    fn fonts_with_one_name_are_judged_apart() {
+        let mut content = b"BT /F1 12 Tf 72 700 Td (".to_vec();
+        content.extend_from_slice(&KANNADA.repeat(4));
+        content.extend_from_slice(b") Tj /F2 12 Tf 0 -20 Td (Plain English words here) Tj ET");
+        let mut other = simple_font("CIDFont+F1");
+        other.set("Encoding", "MacRomanEncoding");
+        let fonts = vec![("F1", simple_font("CIDFont+F1")), ("F2", other)];
+        let (text, _) = run(&pdf(fonts, &content));
+        assert_eq!(
+            text,
+            format!("{}\nPlain English words here\n", "ಕನ್ನಡ".repeat(4))
+        );
+    }
+
+    #[test]
+    fn huge_width_ranges_do_not_panic() {
+        let (doc, font) = cid_font(Some(vec![
+            Object::Integer(4_294_967_295),
+            Object::Integer(4_294_967_295),
+            Object::Integer(500),
+            Object::Integer(4_294_967_295),
+            vec![Object::Integer(250); 3].into(),
+        ]));
+        let bytes = pdf_with_objects(doc, vec![font], b"BT /F1 12 Tf 72 700 Td <0001> Tj ET");
+        let settings = Settings::new(Direction::ToUnicode(Options::default()));
+        assert!(convert_file(&bytes, &settings).is_ok());
     }
 
     #[test]
