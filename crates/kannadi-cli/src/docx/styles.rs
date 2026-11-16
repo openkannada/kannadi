@@ -6,9 +6,16 @@ use anyhow::Result;
 use quick_xml::events::{BytesStart, Event};
 use quick_xml::Reader;
 
+use kannadi::legacy::Layout;
+
 use crate::convert::Fonts;
 
 use super::xml::attr;
+
+/// What a font setting says about text: `Some(Some(layout))` for a legacy font in
+/// that layout, `Some(None)` for a font that is not legacy, and `None` when it
+/// names no Latin font, so the text inherits the setting.
+pub type Setting = Option<Option<Layout>>;
 
 /// Whether a run's text is set in a legacy font, as far as styles say.
 #[derive(Debug, Default)]
@@ -16,14 +23,14 @@ pub struct Styles {
     styles: HashMap<String, Style>,
     default_paragraph: Option<String>,
     /// From `w:docDefaults`.
-    default: Option<bool>,
+    default: Setting,
 }
 
 #[derive(Debug, Default)]
 struct Style {
     based_on: Option<String>,
     /// Set when the style names a font for Latin text.
-    legacy: Option<bool>,
+    legacy: Setting,
 }
 
 impl Styles {
@@ -86,7 +93,7 @@ impl Styles {
     }
 
     /// Whether a style, or a style it is based on, sets a legacy font.
-    pub fn legacy(&self, id: &str) -> Option<bool> {
+    pub fn legacy(&self, id: &str) -> Setting {
         let mut id = id;
         for _ in 0..32 {
             let style = self.styles.get(id)?;
@@ -100,42 +107,41 @@ impl Styles {
 
     /// The legacy setting for a paragraph's style. A paragraph with no style, or
     /// with a style the document does not define, has the default paragraph style.
-    pub fn paragraph(&self, id: Option<&str>) -> Option<bool> {
+    pub fn paragraph(&self, id: Option<&str>) -> Setting {
         match id {
             Some(id) if self.styles.contains_key(id) => self.legacy(id),
             _ => self.default_paragraph(),
         }
     }
 
-    fn default_paragraph(&self) -> Option<bool> {
+    fn default_paragraph(&self) -> Setting {
         self.default_paragraph
             .as_deref()
             .and_then(|id| self.legacy(id))
     }
 
-    pub fn document_default(&self) -> Option<bool> {
+    pub fn document_default(&self) -> Setting {
         self.default
     }
 }
 
-/// Whether a `w:rFonts` element sets a legacy font for Latin text. Word draws
-/// Latin-1 glyph codes with the `w:ascii` and `w:hAnsi` fonts. In each of those
-/// slots a theme font, which is never legacy, wins over a named font.
-pub fn legacy_font(e: &BytesStart, fonts: &Fonts) -> Option<bool> {
+/// Whether a `w:rFonts` element sets a legacy font for Latin text, and in which
+/// layout. Word draws Latin-1 glyph codes with the `w:ascii` and `w:hAnsi` fonts.
+/// In each of those slots a theme font, which is never legacy, wins over a named
+/// font. A legacy font in either slot wins.
+pub fn legacy_font(e: &BytesStart, fonts: &Fonts) -> Setting {
     let slots = [("w:ascii", "w:asciiTheme"), ("w:hAnsi", "w:hAnsiTheme")].map(|(named, theme)| {
         if attr(e, theme).is_some() {
-            Some(false)
+            Some(None)
         } else {
-            attr(e, named).map(|f| fonts.is_legacy(&f))
+            attr(e, named).map(|f| fonts.layout(&f))
         }
     });
-    if slots.contains(&Some(true)) {
-        Some(true)
-    } else if slots.contains(&Some(false)) {
-        Some(false)
-    } else {
-        None
-    }
+    let legacy = slots.iter().find(|s| matches!(s, Some(Some(_))));
+    legacy
+        .or_else(|| slots.iter().find(|s| s.is_some()))
+        .copied()
+        .flatten()
 }
 
 #[cfg(test)]
@@ -162,24 +168,28 @@ mod tests {
                 other => panic!("{other:?}"),
             }
         };
-        assert_eq!(rfonts(r#"w:ascii="Nudi 01 e""#), Some(true));
+        assert_eq!(rfonts(r#"w:ascii="Nudi 01 e""#), Some(Some(Layout::Nudi)));
+        assert_eq!(
+            rfonts(r#"w:ascii="Arial" w:hAnsi="AkrutiKndPadmaDemi""#),
+            Some(Some(Layout::Akruti))
+        );
         let themed = r#"w:ascii="Nudi 01 e" w:hAnsi="Nudi 01 e" w:asciiTheme="minorHAnsi" w:hAnsiTheme="minorHAnsi""#;
-        assert_eq!(rfonts(themed), Some(false));
+        assert_eq!(rfonts(themed), Some(None));
         assert_eq!(rfonts(r#"w:cs="Tunga""#), None);
     }
 
     #[test]
     fn styles_inherit_fonts() {
         let styles = Styles::parse(STYLES, &Fonts::default()).unwrap();
-        assert_eq!(styles.legacy("Normal"), Some(true));
-        assert_eq!(styles.legacy("Heading1"), Some(true));
-        assert_eq!(styles.legacy("English"), Some(false));
+        assert_eq!(styles.legacy("Normal"), Some(Some(Layout::Nudi)));
+        assert_eq!(styles.legacy("Heading1"), Some(Some(Layout::Nudi)));
+        assert_eq!(styles.legacy("English"), Some(None));
         assert_eq!(styles.legacy("Loop"), None);
         assert_eq!(styles.legacy("Missing"), None);
-        assert_eq!(styles.paragraph(None), Some(true));
-        assert_eq!(styles.paragraph(Some("Gone")), Some(true));
-        assert_eq!(styles.paragraph(Some("English")), Some(false));
+        assert_eq!(styles.paragraph(None), Some(Some(Layout::Nudi)));
+        assert_eq!(styles.paragraph(Some("Gone")), Some(Some(Layout::Nudi)));
+        assert_eq!(styles.paragraph(Some("English")), Some(None));
         assert_eq!(styles.paragraph(Some("Plain")), None);
-        assert_eq!(styles.document_default(), Some(false));
+        assert_eq!(styles.document_default(), Some(None));
     }
 }

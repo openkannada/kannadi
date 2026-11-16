@@ -280,6 +280,51 @@ pub fn differences(
     Some(table)
 }
 
+/// Codes by string byte for a font named as legacy whose `Differences` list
+/// renames its glyphs `G<n>`, as Acrobat Distiller does when it converts a
+/// TrueType font: the glyph named `G112` is the font's code 112. Other bytes keep
+/// their own code. `None` if no glyph has such a name.
+pub fn glyph_codes(doc: &Document, font: &Dictionary) -> Option<Vec<char>> {
+    let encoding = resolve(doc, font.get(b"Encoding").ok()?)?.as_dict().ok()?;
+    let list = resolve(doc, encoding.get(b"Differences").ok()?)?;
+    let mut table: Vec<char> = (0..=255u8)
+        .map(|b| {
+            decode_windows_1252(&[b])
+                .chars()
+                .next()
+                .unwrap_or('\u{FFFD}')
+        })
+        .collect();
+    let mut found = false;
+    let mut code = 0usize;
+    for item in list.as_array().ok()? {
+        match item {
+            Object::Integer(n) => code = usize::try_from(*n).unwrap_or(256),
+            Object::Name(name) => {
+                if let (Some(slot), Some(n)) = (table.get_mut(code), code_name(name)) {
+                    *slot = decode_windows_1252(&[n])
+                        .chars()
+                        .next()
+                        .unwrap_or('\u{FFFD}');
+                    found = true;
+                }
+                code += 1;
+            }
+            _ => {}
+        }
+    }
+    found.then_some(table)
+}
+
+/// The code in a glyph name `G<n>`, with n from 0 to 255 written in decimal.
+fn code_name(name: &[u8]) -> Option<u8> {
+    let digits = name.strip_prefix(b"G")?;
+    if digits.is_empty() || digits.len() > 3 || !digits.iter().all(u8::is_ascii_digit) {
+        return None;
+    }
+    std::str::from_utf8(digits).ok()?.parse().ok()
+}
+
 fn glyph(name: &[u8]) -> Option<char> {
     let name = std::str::from_utf8(name).ok().filter(|n| !n.is_empty())?;
     if let Some(i) = WIN_ANSI.iter().position(|&n| n == name) {

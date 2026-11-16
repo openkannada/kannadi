@@ -11,7 +11,7 @@ mod tokens;
 use std::ops::Range;
 
 use anyhow::Result;
-use kannadi::legacy::decode_windows_1252;
+use kannadi::legacy::{decode_windows_1252, Layout};
 
 use crate::convert::{convert, kannada_runs, Direction, Issue, Settings};
 use crate::edits::apply;
@@ -113,7 +113,8 @@ const CLOSES_P: [&str; 25] = [
 
 struct Open {
     name: String,
-    legacy: bool,
+    /// The layout of text in the element, if it is set in a legacy font.
+    layout: Option<Layout>,
 }
 
 struct Walker<'s> {
@@ -184,10 +185,10 @@ impl Walker<'_> {
             .and_then(css::font_family)
             .or_else(|| self.rules.family(&tag.name, &classes).map(str::to_string))
             .or(face.clone());
-        let inherited = self.stack.last().is_some_and(|o| o.legacy);
-        let legacy = match family.as_deref().map(css::Family::of) {
-            Some(css::Family::Named(f)) => self.settings.fonts.is_legacy(first_family(f)),
-            Some(css::Family::Initial) => false,
+        let inherited = self.stack.last().and_then(|o| o.layout);
+        let layout = match family.as_deref().map(css::Family::of) {
+            Some(css::Family::Named(f)) => self.settings.fonts.layout(first_family(f)),
+            Some(css::Family::Initial) => None,
             Some(css::Family::Inherit) | None => inherited,
         };
 
@@ -222,7 +223,7 @@ impl Walker<'_> {
         if !VOID.contains(&tag.name.as_str()) {
             self.stack.push(Open {
                 name: tag.name.clone(),
-                legacy,
+                layout,
             });
         }
     }
@@ -252,15 +253,15 @@ impl Walker<'_> {
     }
 
     fn text(&mut self, source: &str) {
-        let legacy = self.stack.last().is_some_and(|o| o.legacy);
-        match (self.settings.direction, legacy) {
-            (Direction::ToUnicode(_), true) => {
+        let layout = self.stack.last().and_then(|o| o.layout);
+        match (self.settings.direction, layout) {
+            (Direction::ToUnicode(_), Some(layout)) => {
                 let text = entities::decode(source).text;
-                let converted = convert(&text, self.settings);
+                let converted = convert(&text, layout, self.settings);
                 self.rows(self.line, &converted.issues);
                 self.out.push_str(&entities::escape(&converted.text, None));
             }
-            (Direction::ToNudi, false) => self.wrap_kannada(source),
+            (Direction::ToNudi, None) => self.wrap_kannada(source),
             _ => self.out.push_str(source),
         }
     }
@@ -274,7 +275,11 @@ impl Walker<'_> {
         for run in kannada_runs(&decoded.text) {
             let start = decoded.source_offset(run.start);
             self.out.push_str(&source[last..start]);
-            let converted = convert(&decoded.text[run.clone()], self.settings);
+            let converted = convert(
+                &decoded.text[run.clone()],
+                self.settings.layout,
+                self.settings,
+            );
             let line = self.line + source[..start].matches('\n').count();
             self.rows(line, &converted.issues);
             self.out.push_str(&format!(
@@ -353,6 +358,21 @@ mod tests {
 
     fn to_unicode(html: &str) -> String {
         run(html, Direction::ToUnicode(Options::default())).0
+    }
+
+    #[test]
+    fn each_font_is_read_in_its_layout() {
+        let html = "<p><span style=\"font-family:AkrutiKndPadmaDemi\">d&#226;}&#226;</span>\
+                    <font face=\"Nudi 01 e\">PÀ</font></p>";
+        let out = to_unicode(html);
+        assert!(
+            out.contains("<span style=\"font-family:'Noto Sans Kannada'\">ಕನ</span>"),
+            "{out}"
+        );
+        assert!(
+            out.contains("<font face=\"Noto Sans Kannada\">ಕ</font>"),
+            "{out}"
+        );
     }
 
     #[test]

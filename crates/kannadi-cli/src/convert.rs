@@ -1,6 +1,6 @@
 //! Converts 1 piece of text in either direction and lists what went wrong.
 
-use kannadi::legacy::{nudi_to_unicode, unicode_to_nudi, windows_1252_byte, Options};
+use kannadi::legacy::{from_unicode, to_unicode, windows_1252_byte, Layout, Options};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Direction {
@@ -12,6 +12,9 @@ pub enum Direction {
 pub struct Settings {
     pub direction: Direction,
     pub fonts: Fonts,
+    /// The layout of text files read as legacy text, and of all text `to-nudi`
+    /// writes.
+    pub layout: Layout,
 }
 
 impl Settings {
@@ -19,6 +22,7 @@ impl Settings {
         Settings {
             direction,
             fonts: Fonts::default(),
+            layout: Layout::Nudi,
         }
     }
 }
@@ -30,8 +34,8 @@ pub struct Fonts {
     pub unicode: String,
     /// Set on text converted to Nudi.
     pub legacy: String,
-    /// More font names to treat as Nudi and Baraha ANSI fonts.
-    pub extra_legacy: Vec<String>,
+    /// More font names to treat as legacy fonts, each with its layout.
+    pub extra_legacy: Vec<(String, Layout)>,
 }
 
 impl Default for Fonts {
@@ -45,8 +49,9 @@ impl Default for Fonts {
 }
 
 impl Fonts {
-    pub fn is_legacy(&self, font: &str) -> bool {
-        crate::fonts::is_legacy(font, &self.extra_legacy)
+    /// The layout of text set in `font`, if it is a legacy font.
+    pub fn layout(&self, font: &str) -> Option<Layout> {
+        crate::fonts::layout(font, &self.extra_legacy)
     }
 
     /// A `font-family` list with each legacy family replaced by the Unicode font,
@@ -109,14 +114,16 @@ pub struct Converted {
     pub issues: Vec<Issue>,
 }
 
-pub fn convert(text: &str, settings: &Settings) -> Converted {
+/// Converts `text` from `layout` to Unicode, or from Unicode to `layout`, as the
+/// direction says.
+pub fn convert(text: &str, layout: Layout, settings: &Settings) -> Converted {
     let input = Lines::new(text);
     match settings.direction {
         Direction::ToUnicode(options) => {
-            let c = nudi_to_unicode(text, &options);
+            let c = to_unicode(text, layout, &options);
             let output = Lines::new(&c.text);
             let unknown = c.unknown.iter().map(|u| {
-                let around = nudi_to_unicode(window(text, &input, u.offset), &options).text;
+                let around = to_unicode(window(text, &input, u.offset), layout, &options).text;
                 (
                     u.offset,
                     Issue {
@@ -147,7 +154,7 @@ pub fn convert(text: &str, settings: &Settings) -> Converted {
             }
         }
         Direction::ToNudi => {
-            let e = unicode_to_nudi(text);
+            let e = from_unicode(text, layout);
             let issue = |kind, at: usize, detail| {
                 let context = window(text, &input, at).to_string();
                 let line = input.line(at);
@@ -285,13 +292,13 @@ mod tests {
         assert_eq!(runs, ["ಕನ್ನಡ ನಾಡು, 2026।", "ಕ"]);
     }
 
-    fn to_unicode() -> Settings {
+    fn to_unicode_settings() -> Settings {
         settings(Direction::ToUnicode(Options::default()))
     }
 
     #[test]
     fn to_unicode_lists_issues_in_line_order() {
-        let c = convert("PÀ Á\nPÀ\u{F1}\r\nÁ", &to_unicode());
+        let c = convert("PÀ Á\nPÀ\u{F1}\r\nÁ", Layout::Nudi, &to_unicode_settings());
         assert_eq!(c.text, "ಕ ಾ\nಕ\u{F1}\r\nಾ");
         let found: Vec<(usize, Kind)> = c.issues.iter().map(|i| (i.line, i.kind)).collect();
         assert_eq!(
@@ -308,7 +315,7 @@ mod tests {
 
     #[test]
     fn to_nudi_lists_malformed_input() {
-        let c = convert("ಕ ಕೇೂ", &settings(Direction::ToNudi));
+        let c = convert("ಕ ಕೇೂ", Layout::Nudi, &settings(Direction::ToNudi));
         assert_eq!(c.issues[0].kind, Kind::Malformed);
         assert_eq!(c.issues[0].detail, "ಕೇೂ");
         assert_eq!(c.issues[0].context, "ಕ ಕೇೂ");
@@ -316,7 +323,7 @@ mod tests {
 
     #[test]
     fn to_nudi_lists_unencodable() {
-        let c = convert("ಕ ಌ", &settings(Direction::ToNudi));
+        let c = convert("ಕ ಌ", Layout::Nudi, &settings(Direction::ToNudi));
         assert_eq!(c.issues.len(), 1);
         assert_eq!(c.issues[0].detail, "ಌ (U+0C8C)");
     }

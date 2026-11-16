@@ -12,7 +12,7 @@ mod reader;
 mod widths;
 
 use anyhow::{bail, Context, Result};
-use kannadi::legacy::Options;
+use kannadi::legacy::{syllable_starts, Layout, Options};
 use lopdf::{Document, Object};
 
 use crate::convert::{convert, Direction, Issue, Kind, Settings};
@@ -125,8 +125,11 @@ impl<'a> LineWriter<'a> {
     fn write(&self, line: &[Piece], location: &str, report: &mut Report) -> String {
         let mut out = String::new();
         let mut legacy = String::new();
-        let mut digits = false;
-        let flush = |legacy: &mut String, digits: bool, out: &mut String, report: &mut Report| {
+        let mut reading = (Layout::Nudi, false);
+        let flush = |legacy: &mut String,
+                     (layout, digits): (Layout, bool),
+                     out: &mut String,
+                     report: &mut Report| {
             if legacy.is_empty() {
                 return;
             }
@@ -135,42 +138,72 @@ impl<'a> LineWriter<'a> {
             } else {
                 &self.latin_digits
             };
-            let converted = convert(legacy, settings);
+            let converted = convert(legacy, layout, settings);
             add_rows(report, location, &converted.issues);
             out.push_str(&converted.text);
             legacy.clear();
         };
-        for piece in line {
-            let Piece::Text { font, raw, mapped } = piece else {
+        let mut gap = false;
+        let space = |gap: &mut bool, legacy: &mut String, out: &mut String| {
+            if std::mem::take(gap) {
                 if legacy.is_empty() {
                     out.push(' ');
                 } else {
                     legacy.push(' ');
                 }
+            }
+        };
+        for piece in line {
+            let Piece::Text { font, raw, mapped } = piece else {
+                space(&mut gap, &mut legacy, &mut out);
+                gap = true;
                 continue;
             };
             let font = &self.fonts.fonts[*font];
             match font.verdict {
                 Verdict::Legacy(source) => {
-                    if font.kannada_digits != digits {
-                        flush(&mut legacy, digits, &mut out, report);
-                        digits = font.kannada_digits;
+                    let text = match (source, mapped) {
+                        (Source::Mapped, Some(mapped)) => mapped,
+                        _ => raw,
+                    };
+                    let font_reading = (font.layout(), font.kannada_digits);
+                    if font_reading == reading && gap && !starts_syllable(&legacy, text, reading.0)
+                    {
+                        gap = false;
                     }
-                    match (source, mapped) {
-                        (Source::Mapped, Some(mapped)) => legacy.push_str(mapped),
-                        _ => legacy.push_str(raw),
+                    if font_reading != reading {
+                        space(&mut gap, &mut legacy, &mut out);
+                        flush(&mut legacy, reading, &mut out, report);
+                        reading = font_reading;
                     }
+                    space(&mut gap, &mut legacy, &mut out);
+                    legacy.push_str(text);
                 }
-                Verdict::Unreadable(_) => flush(&mut legacy, digits, &mut out, report),
+                Verdict::Unreadable(_) => {
+                    space(&mut gap, &mut legacy, &mut out);
+                    flush(&mut legacy, reading, &mut out, report);
+                }
                 Verdict::Other => {
-                    flush(&mut legacy, digits, &mut out, report);
+                    space(&mut gap, &mut legacy, &mut out);
+                    flush(&mut legacy, reading, &mut out, report);
                     out.push_str(raw);
                 }
             }
         }
-        flush(&mut legacy, digits, &mut out, report);
+        space(&mut gap, &mut legacy, &mut out);
+        flush(&mut legacy, reading, &mut out, report);
         out.trim_end().to_string()
     }
+}
+
+/// Whether `next`, written after `legacy`, starts a syllable. A gap the page
+/// leaves before a sign or subscript is spacing between glyphs, not a word space.
+fn starts_syllable(legacy: &str, next: &str, layout: Layout) -> bool {
+    if legacy.is_empty() || next.is_empty() {
+        return true;
+    }
+    let joined = format!("{legacy}{next}");
+    syllable_starts(&joined, layout).contains(&legacy.len())
 }
 
 fn add_rows(report: &mut Report, location: &str, issues: &[Issue]) {
@@ -183,7 +216,7 @@ fn add_rows(report: &mut Report, location: &str, issues: &[Issue]) {
 mod tests {
     use super::fonts::{OTHER_LAYOUT, RENUMBERED};
     use super::*;
-    use kannadi::legacy::Options;
+    use kannadi::legacy::{syllable_starts, Layout, Options};
     use lopdf::{dictionary, Dictionary, Object, Stream};
 
     /// A 1-page PDF with the given fonts and content stream.
@@ -648,12 +681,79 @@ endcmap\nCMapName currentdict /CMap defineresource pop\nend\nend\n";
         assert_eq!(text, "\n");
         assert_eq!(report.rows[0].kind, Kind::NotConverted);
         assert_eq!(report.rows[0].location, "font Nudi01k");
-        let other_layout = b"BT /F1 12 Tf 72 700 Td (p\xEA\xB3\xA9\xEEd\xD2 \xC0\xE2\xB0y\xE2\xB0K {\xEA\xA9\xC6d\xD6p\xD6\xB9 p\xEA\xB3\xA9\xEEd\xD2) Tj ET";
-        let (_, report) = run(&pdf(
-            vec![("F1", simple_font("AkrutiKndPadma"))],
-            other_layout,
-        ));
+        let (_, report) = run(&pdf(vec![("F1", simple_font("F1"))], AKLITE));
         assert_eq!(report.rows[0].detail, OTHER_LAYOUT);
+    }
+
+    /// AkliteKndPadmini text from the Repealing and Amending Act, 2003, twice,
+    /// which fits no layout this tool knows.
+    const AKLITE: &[u8] = b"BT /F1 12 Tf 72 700 Td (\xB0\xF0\xC2\xF1 \xF0 \x8B\xC7\xF0\xCD\xF0\xC2\xF0 \xB3\xFA\xF7\x92\xCD\xF0\xF4\xC6\xF0 \xC6\xF0\xF4\xC0\xF0\xF4\xDE \x89\xC1\xF0\xF4\xE0\xC3\xF0\x88 \xB0\xF0\xC2\xF1 \xF0 \x8B\xC7\xF0\xCD\xF0\xC2\xF0 \xB3\xFA\xF7\x92\xCD\xF0\xF4\xC6\xF0 \xC6\xF0\xF4\xC0\xF0\xF4\xDE \x89\xC1\xF0\xF4\xE0\xC3\xF0\x88) Tj ET";
+
+    /// ರೋರಿಕ್ ಮತ್ತು ದೇವಿಕಾರಾಣಿ ರೋರಿಕ್, from the title of the Roerich Act, 2001.
+    const AKRUTI: &[u8] = b"p\xEA\xB3\xA9\xEEd\xD2 \xC0\xE2\xB0y\xE2\xB0K {\xEA\xA9\xC6d\xD6p\xD6\xB9 p\xEA\xB3\xA9\xEEd\xD2";
+
+    fn shown(font: &str, bytes: &[u8]) -> Vec<u8> {
+        let mut content = format!("BT /{font} 12 Tf 72 700 Td (").into_bytes();
+        content.extend_from_slice(bytes);
+        content.extend_from_slice(b") Tj ET");
+        content
+    }
+
+    #[test]
+    fn akruti_fonts_are_read_in_their_layout() {
+        let (text, report) = run(&pdf(
+            vec![("F1", simple_font("AkrutiKndPadma"))],
+            &shown("F1", AKRUTI),
+        ));
+        assert_eq!(text, "ರೋರಿಕ್ ಮತ್ತು ದೇವಿಕಾರಾಣಿ ರೋರಿಕ್\n");
+        assert!(report.rows.is_empty(), "{:?}", report.rows);
+    }
+
+    #[test]
+    fn fonts_with_hidden_names_are_read_in_the_layout_their_text_fits() {
+        let (text, _) = run(&pdf(vec![("F1", simple_font("F1"))], &shown("F1", AKRUTI)));
+        assert_eq!(text, "ರೋರಿಕ್ ಮತ್ತು ದೇವಿಕಾರಾಣಿ ರೋರಿಕ್\n");
+    }
+
+    #[test]
+    fn glyphs_named_by_their_code_are_read_as_that_code() {
+        // Distiller renumbers the codes from 1 and names each glyph G<code>.
+        let mut font = simple_font("BEEKHI+AkrutiKndPadmaDemi0108.313");
+        let names = ["G100", "G226", "G125", "G32"];
+        let mut differences = vec![Object::Integer(1)];
+        differences.extend(names.iter().map(|n| Object::Name(n.as_bytes().to_vec())));
+        font.set(
+            "Encoding",
+            dictionary! { "Type" => "Encoding", "Differences" => differences },
+        );
+        let (text, _) = run(&pdf(
+            vec![("F1", font)],
+            &shown("F1", b"\x01\x02\x03\x02\x04\x01\x02"),
+        ));
+        assert_eq!(text, "ಕನ ಕ\n");
+    }
+
+    #[test]
+    fn a_gap_before_a_sign_is_not_a_word_space() {
+        let content = b"BT /F1 12 Tf 72 700 Td (d) Tj 30 0 Td (\xE2}\xE2) Tj 30 0 Td (d\xE2) Tj ET";
+        let (text, report) = run(&pdf(vec![("F1", simple_font("AkrutiKndPadma"))], content));
+        assert_eq!(text, "ಕನ ಕ\n");
+        assert!(report.rows.is_empty(), "{:?}", report.rows);
+    }
+
+    #[test]
+    fn each_layout_in_a_line_is_converted_on_its_own() {
+        let mut content = b"BT /F1 12 Tf 72 700 Td (".to_vec();
+        content.extend_from_slice(KANNADA);
+        content.extend_from_slice(b") Tj /F2 12 Tf (d\xE2}\xE2) Tj ET");
+        let (text, _) = run(&pdf(
+            vec![
+                ("F1", simple_font("Nudi 01 e")),
+                ("F2", simple_font("AkrutiKndPadmaDemi")),
+            ],
+            &content,
+        ));
+        assert_eq!(text, "ಕನ್ನಡಕನ\n");
     }
 
     #[test]

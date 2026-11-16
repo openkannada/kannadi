@@ -121,6 +121,19 @@ mod tests {
     const NUDI: &str = "<w:rFonts w:ascii=\"Nudi 01 e\" w:hAnsi=\"Nudi 01 e\"/>";
 
     #[test]
+    fn runs_are_read_in_their_own_layout() {
+        let akruti = "<w:rFonts w:ascii=\"AkrutiKndPadma\" w:hAnsi=\"AkrutiKndPadma\"/>";
+        let body = format!(
+            "<w:p><w:r><w:rPr>{NUDI}</w:rPr><w:t>PÀ</w:t></w:r>\
+             <w:r><w:rPr>{akruti}</w:rPr><w:t>dâ}}â</w:t></w:r></w:p>"
+        );
+        let (xml, report) = run(&docx(&body, None), to_unicode());
+        assert!(xml.contains(">ಕ</w:t>"), "{xml}");
+        assert!(xml.contains(">ಕನ</w:t>"), "{xml}");
+        assert!(report.rows.is_empty(), "{:?}", report.rows);
+    }
+
+    #[test]
     fn legacy_runs_become_unicode_and_others_stay() {
         let body = format!(
             "<w:p><w:r><w:rPr>{NUDI}<w:sz w:val=\"28\"/></w:rPr><w:t>PÀ£ÀßqÀ</w:t></w:r>\

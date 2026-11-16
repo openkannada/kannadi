@@ -9,7 +9,7 @@ use quick_xml::Reader;
 
 use crate::convert::Fonts;
 
-use super::styles::legacy_font;
+use super::styles::{legacy_font, Setting};
 use super::xml::attr;
 
 #[derive(Debug, Default)]
@@ -57,8 +57,8 @@ pub struct Properties {
     pub style: Option<String>,
     pub style_element: Option<Element>,
     pub fonts: Option<Element>,
-    /// What the run's own `w:rFonts` says, if it names a Latin font.
-    pub legacy: Option<bool>,
+    /// What the run's own `w:rFonts` says.
+    pub legacy: Setting,
     pub bold: Option<Element>,
     pub bold_cs: Option<Element>,
     pub italic: Option<Element>,

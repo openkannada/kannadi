@@ -1,23 +1,37 @@
-//! Font names: which ones use the Nudi and Baraha ANSI layout.
+//! Font names: which ones are legacy fonts, and in which glyph layout.
 
-/// True if text set in `font` uses the Nudi and Baraha ANSI glyph layout: the
-/// ANSI Nudi fonts up to version 5 (Nudi 01 e, Nudi Akshara, Nudi B-Akshara) and
-/// Baraha's BRH fonts for Kannada. The Unicode Nudi fonts (Nudi Parijatha and
-/// others) are not legacy fonts. `extra` adds exact names, ignoring case.
-pub fn is_legacy(font: &str, extra: &[String]) -> bool {
+use kannadi::legacy::Layout;
+
+/// The glyph layout of text set in `font`, or `None` for a font that is not a
+/// legacy font.
+///
+/// - [`Layout::Nudi`]: the ANSI Nudi fonts up to version 5 (Nudi 01 e, Nudi
+///   Akshara, Nudi B-Akshara) and Baraha's BRH fonts for Kannada. The Unicode
+///   Nudi fonts (Nudi Parijatha and others) are not legacy fonts.
+/// - [`Layout::Akruti`]: AkrutiKndPadma and its weights. Other Akruti Kannada
+///   fonts, such as AkrutiKndPadmini, were not checked and are left out.
+///
+/// `extra` adds exact names, ignoring case, each with its layout.
+pub fn layout(font: &str, extra: &[(String, Layout)]) -> Option<Layout> {
     let font = font.trim().trim_matches(|c| c == '"' || c == '\'');
-    if extra.iter().any(|e| e.eq_ignore_ascii_case(font)) {
-        return true;
+    if let Some((_, layout)) = extra.iter().find(|(e, _)| e.eq_ignore_ascii_case(font)) {
+        return Some(*layout);
     }
     let key = key(font);
     if let Some(rest) = key.strip_prefix("brh") {
-        return !BRH_OTHER_SCRIPTS.iter().any(|s| rest.starts_with(s));
+        return (!BRH_OTHER_SCRIPTS.iter().any(|s| rest.starts_with(s))).then_some(Layout::Nudi);
     }
-    let Some(rest) = key.strip_prefix("nudi") else {
-        return false;
-    };
+    if let Some(rest) = key.strip_prefix("akrutikndpadma") {
+        return (!rest.starts_with("ini")).then_some(Layout::Akruti);
+    }
+    let rest = key.strip_prefix("nudi")?;
     let numbered = rest.len() >= 3 && rest[..2].bytes().all(|b| b.is_ascii_digit());
-    numbered || rest.starts_with("akshar") || rest.starts_with("bakshar")
+    (numbered || rest.starts_with("akshar") || rest.starts_with("bakshar")).then_some(Layout::Nudi)
+}
+
+/// True if `font` is a legacy font in any layout.
+pub fn is_legacy(font: &str, extra: &[(String, Layout)]) -> bool {
+    layout(font, extra).is_some()
 }
 
 /// True for the `k` variants of the numbered Nudi fonts, such as Nudi 04 k, which
@@ -62,7 +76,12 @@ pub fn first_family(list: &str) -> &str {
 
 /// A `font-family` list with each legacy family replaced by `font`, in `quote`
 /// marks when given.
-pub fn replace_legacy(list: &str, font: &str, quote: Option<char>, extra: &[String]) -> String {
+pub fn replace_legacy(
+    list: &str,
+    font: &str,
+    quote: Option<char>,
+    extra: &[(String, Layout)],
+) -> String {
     list.split(',')
         .map(|family| {
             if is_legacy(family, extra) {
@@ -94,7 +113,15 @@ mod tests {
             "\"BRH Sirigannada\"",
             "brh kasturi",
         ] {
-            assert!(is_legacy(f, &[]), "{f}");
+            assert_eq!(layout(f, &[]), Some(Layout::Nudi), "{f}");
+        }
+        for f in [
+            "AkrutiKndPadma",
+            "AkrutiKndPadmaDemi",
+            "AkrutiKndPadma,Bold",
+            "Akruti Knd Padma Demib",
+        ] {
+            assert_eq!(layout(f, &[]), Some(Layout::Akruti), "{f}");
         }
         for f in [
             "Nudi Parijatha",
@@ -103,10 +130,13 @@ mod tests {
             "BRH Devanagari",
             "Noto Sans Kannada",
             "Arial",
+            "AkrutiKndPadmini",
+            "AkrutiDevPriya",
         ] {
             assert!(!is_legacy(f, &[]), "{f}");
         }
-        assert!(is_legacy("My Font", &["my font".to_string()]));
+        let extra = [("my font".to_string(), Layout::Akruti)];
+        assert_eq!(layout("My Font", &extra), Some(Layout::Akruti));
     }
 
     #[test]

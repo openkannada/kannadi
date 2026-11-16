@@ -3,7 +3,7 @@
 use std::collections::HashMap;
 use std::rc::Rc;
 
-use kannadi::legacy::{nudi_to_unicode, windows_1252_byte, Options};
+use kannadi::legacy::{to_unicode, windows_1252_byte, Layout, Options};
 use lopdf::{Dictionary, Document, Object};
 
 use crate::convert::Settings;
@@ -13,9 +13,9 @@ use super::cmap::CMap;
 use super::widths::Widths;
 use super::{resolve, LIMIT};
 
-pub const RENUMBERED: &str = "named as a Nudi or Baraha font, but its glyph codes do not follow \
-     the layout and its character map does not help; the PDF maker may have renumbered them";
-pub const OTHER_LAYOUT: &str = "looks like legacy Kannada in a layout other than Nudi and Baraha";
+pub const RENUMBERED: &str = "named as a legacy font, but its glyph codes do not follow the \
+     layout and its character map does not help; the PDF maker may have renumbered them";
+pub const OTHER_LAYOUT: &str = "looks like legacy Kannada in a layout this tool does not know";
 pub const RENUMBERED_SUBSET: &str = "its glyph codes were renumbered and the PDF has no usable \
      character map, so its text cannot be read";
 
@@ -39,7 +39,10 @@ pub enum Verdict {
 #[derive(Debug)]
 pub struct Font {
     pub name: String,
-    named_legacy: bool,
+    /// The layout the font's name gives, if it is a legacy font.
+    named: Option<Layout>,
+    /// The layout its text is read in: the named one, or the one its text fits.
+    read_as: Layout,
     /// The font maps codes with its own glyph list and no ToUnicode map.
     custom_codes: bool,
     pub kannada_digits: bool,
@@ -48,6 +51,12 @@ pub struct Font {
     /// The ToUnicode reading, for a 1-byte font named as legacy that has a map.
     mapped: String,
     pub verdict: Verdict,
+}
+
+impl Font {
+    pub fn layout(&self) -> Layout {
+        self.read_as
+    }
 }
 
 #[derive(Debug, Default)]
@@ -70,10 +79,11 @@ impl Fonts {
         }
         let name = key.0.clone();
         let plain = plain_name(&name);
-        let named_legacy = settings.fonts.is_legacy(plain);
+        let named = settings.fonts.layout(plain);
         let custom_codes = dict.get(b"ToUnicode").is_err() && has_differences(doc, dict);
         self.fonts.push(Font {
-            named_legacy,
+            named,
+            read_as: named.unwrap_or(Layout::Nudi),
             custom_codes,
             kannada_digits: has_kannada_digits(plain),
             name,
@@ -86,7 +96,7 @@ impl Fonts {
     }
 
     pub fn is_named_legacy(&self, index: usize) -> bool {
-        self.fonts[index].named_legacy
+        self.fonts[index].named.is_some()
     }
 
     pub fn widths(&mut self, doc: &Document, dict: &Dictionary) -> Rc<Widths> {
@@ -124,10 +134,11 @@ impl Fonts {
     /// Decides which fonts hold legacy text, once all their text is known.
     pub fn decide(&mut self) {
         for font in &mut self.fonts {
-            let raw = Judgment::of(&font.text);
+            let layout = font.layout();
+            let raw = Judgment::of(&font.text, layout);
             let renumbered = looks_renumbered(&font.text);
-            font.verdict = if font.named_legacy {
-                let mapped = Judgment::of(&font.mapped);
+            font.verdict = if font.named.is_some() {
+                let mapped = Judgment::of(&font.mapped, layout);
                 // Short text: the map wins when only its reading looks like legacy codes.
                 let mapped_usable = mapped.clean()
                     || (mapped.short()
@@ -142,7 +153,12 @@ impl Fonts {
                     Verdict::Unreadable(RENUMBERED)
                 }
             } else if looks_legacy(&font.text) {
-                if raw.clean() || (raw.short() && raw.flawless()) {
+                let readable = |j: &Judgment| j.clean() || (j.short() && j.flawless());
+                let found = Layout::ALL
+                    .into_iter()
+                    .find(|&l| readable(&Judgment::of(&font.text, l)));
+                if let Some(found) = found {
+                    font.read_as = found;
                     Verdict::Legacy(Source::Raw)
                 } else if raw.short() {
                     Verdict::Other
@@ -203,15 +219,15 @@ pub fn plain_name(name: &str) -> &str {
     name.split(',').next().unwrap_or(name)
 }
 
-/// How a font's text converts as Nudi.
+/// How a font's text converts in a layout.
 struct Judgment {
     syllables: usize,
     problems: usize,
 }
 
 impl Judgment {
-    fn of(text: &str) -> Self {
-        let converted = nudi_to_unicode(text, &Options::default());
+    fn of(text: &str, layout: Layout) -> Self {
+        let converted = to_unicode(text, layout, &Options::default());
         Judgment {
             syllables: kannadi::count_aksharas(&converted.text),
             problems: converted.unknown.len() + converted.malformed.len(),

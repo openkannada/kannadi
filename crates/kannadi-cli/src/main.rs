@@ -1,4 +1,4 @@
-//! `kannadi`: converts folders of documents between Nudi or Baraha ANSI and Unicode.
+//! `kannadi`: converts folders of documents between legacy Kannada fonts and Unicode.
 
 mod convert;
 mod docx;
@@ -15,7 +15,7 @@ use std::process::ExitCode;
 
 use anyhow::{Context, Result};
 use clap::{Args, Parser, Subcommand};
-use kannadi::legacy::Options;
+use kannadi::legacy::{Layout, Options};
 
 use convert::{Direction, Settings};
 use files::{Format, Job};
@@ -23,7 +23,8 @@ use report::Report;
 
 #[derive(Parser)]
 #[command(name = "kannadi", version, about)]
-/// Converts Kannada documents typed in Nudi or Baraha ANSI fonts to Unicode, and back.
+/// Converts Kannada documents typed in Nudi, Baraha or Akruti fonts to Unicode,
+/// and Unicode back to Nudi.
 ///
 /// Each converted file gets a report next to it, FILE.report.tsv, when anything
 /// could not be converted cleanly.
@@ -34,10 +35,14 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Command {
-    /// Convert Nudi and Baraha text to Unicode.
+    /// Convert Nudi, Baraha and Akruti text to Unicode.
     ToUnicode {
         #[command(flatten)]
         common: Common,
+        /// The layout of text files, and of fonts added with --legacy-font that
+        /// name none: nudi (Nudi and Baraha) or akruti.
+        #[arg(long, value_name = "LAYOUT", default_value = "nudi", value_parser = parse_layout)]
+        layout: Layout,
         /// Write digits as Kannada digits, for text set in the k variants of the
         /// Nudi fonts.
         #[arg(long)]
@@ -70,16 +75,18 @@ struct Common {
     /// to-unicode, Nudi 01 e for to-nudi.
     #[arg(long, value_name = "NAME")]
     font: Option<String>,
-    /// Also treat this font as a Nudi or Baraha ANSI font. Repeat for more.
-    #[arg(long, value_name = "NAME")]
+    /// Also treat this font as a legacy font, in the layout after `=` if given
+    /// (`"My Font=akruti"`). Repeat for more.
+    #[arg(long, value_name = "NAME[=LAYOUT]")]
     legacy_font: Vec<String>,
 }
 
 fn main() -> ExitCode {
     let cli = Cli::parse();
-    let (common, direction) = match cli.command {
+    let (common, direction, layout) = match cli.command {
         Command::ToUnicode {
             common,
+            layout,
             kannada_digits,
             keep_zeros,
         } => {
@@ -87,18 +94,23 @@ fn main() -> ExitCode {
                 kannada_digits,
                 zero_as_anusvara: !keep_zeros,
             };
-            (common, Direction::ToUnicode(options))
+            (common, Direction::ToUnicode(options), layout)
         }
-        Command::ToNudi { common } => (common, Direction::ToNudi),
+        Command::ToNudi { common } => (common, Direction::ToNudi, Layout::Nudi),
     };
     let mut settings = Settings::new(direction);
+    settings.layout = layout;
     if let Some(font) = &common.font {
         match direction {
             Direction::ToUnicode(_) => settings.fonts.unicode.clone_from(font),
             Direction::ToNudi => settings.fonts.legacy.clone_from(font),
         }
     }
-    settings.fonts.extra_legacy.clone_from(&common.legacy_font);
+    settings.fonts.extra_legacy = common
+        .legacy_font
+        .iter()
+        .map(|f| legacy_font(f, layout))
+        .collect();
     match run(&common, &settings) {
         Ok(Outcome { failed: true, .. }) => ExitCode::from(2),
         Ok(Outcome { issues: true, .. }) if common.strict => ExitCode::from(1),
@@ -107,6 +119,23 @@ fn main() -> ExitCode {
             eprintln!("error: {e:#}");
             ExitCode::from(2)
         }
+    }
+}
+
+fn parse_layout(name: &str) -> Result<Layout, String> {
+    name.parse()
+        .map_err(|e: kannadi::legacy::UnknownLayout| e.to_string())
+}
+
+/// A `--legacy-font` value: the name, and the layout after its last `=` if that
+/// names one, or else `default`.
+fn legacy_font(value: &str, default: Layout) -> (String, Layout) {
+    match value.rsplit_once('=') {
+        Some((name, layout)) => match layout.parse() {
+            Ok(layout) => (name.to_string(), layout),
+            Err(_) => (value.to_string(), default),
+        },
+        None => (value.to_string(), default),
     }
 }
 
@@ -175,4 +204,25 @@ fn convert_job(job: &Job, settings: &Settings) -> Result<Report> {
             .with_context(|| format!("writing {}", report_path.display()))?;
     }
     Ok(report)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn added_fonts_may_name_their_layout() {
+        assert_eq!(
+            legacy_font("My Font=akruti", Layout::Nudi),
+            ("My Font".to_string(), Layout::Akruti)
+        );
+        assert_eq!(
+            legacy_font("My Font", Layout::Akruti),
+            ("My Font".to_string(), Layout::Akruti)
+        );
+        assert_eq!(
+            legacy_font("A=B", Layout::Nudi),
+            ("A=B".to_string(), Layout::Nudi)
+        );
+    }
 }
