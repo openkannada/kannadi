@@ -34,10 +34,19 @@ fn wrong(table: &str, column: usize, layout: Layout) -> (usize, usize) {
 fn single_words_mostly_find_their_layout() {
     let (nudi, nudi_words) = wrong(include_str!("fixtures/nudi.tsv"), 0, Layout::Nudi);
     let (akruti, akruti_words) = wrong(include_str!("fixtures/akruti.tsv"), 0, Layout::Akruti);
+    let (shree, shree_words) = wrong(
+        include_str!("fixtures/shree-lipi.tsv"),
+        0,
+        Layout::ShreeLipi,
+    );
     assert_eq!(nudi, 0, "{nudi} of {nudi_words} Nudi words");
     assert!(
         akruti * 100 <= akruti_words,
         "{akruti} of {akruti_words} Akruti words"
+    );
+    assert!(
+        shree * 50 <= shree_words,
+        "{shree} of {shree_words} Shree-Lipi words"
     );
 }
 

@@ -14,6 +14,7 @@ Library (`kannadi`):
 - Nudi and Baraha ANSI to Unicode (`legacy::nudi_to_unicode`), with a glyph table derived from the font files and reports of unknown glyphs and malformed syllables.
 - Unicode to Nudi and Baraha ANSI (`legacy::unicode_to_nudi`), writing each akshara in the order typists stored it, with reports of unencodable characters.
 - Akruti to Unicode and back (`legacy::to_unicode` and `legacy::from_unicode` with `Layout::Akruti`), with a glyph table derived from the fonts embedded in Karnataka Acts and checked on 908,075 glyphs from 35 documents. `legacy::Layout`, `UnknownLayout` and `syllable_starts`.
+- Shree-Lipi to Unicode and back (`Layout::ShreeLipi`), with a glyph table derived from the Shree-Kan-0850 font the Udayavani newspaper served with its web pages, checked on 233,346 glyphs from 173 pages. `legacy::font_layout` gives Shree-Kan-0850 this layout; other Shree-Kan fonts stay legacy fonts with no table.
 - `chars::Class::is_mark`.
 - Sound-alike keys (`phonetic::key`, `keys`, `latin_key`) at 3 levels, for fuzzy search and for suggesting Kannada words from loosely typed Latin letters: "namaskara" and ನಮಸ್ಕಾರ share a medium key. `kannadi-wasm` exports `phoneticKey` and `latinKey`, so the editor page can use them.
 

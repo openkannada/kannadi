@@ -700,6 +700,9 @@ endcmap\nCMapName currentdict /CMap defineresource pop\nend\nend\n";
     /// which fits no layout this tool knows.
     const AKLITE: &[u8] = b"BT /F1 12 Tf 72 700 Td (\xB0\xF0\xC2\xF1 \xF0 \x8B\xC7\xF0\xCD\xF0\xC2\xF0 \xB3\xFA\xF7\x92\xCD\xF0\xF4\xC6\xF0 \xC6\xF0\xF4\xC0\xF0\xF4\xDE \x89\xC1\xF0\xF4\xE0\xC3\xF0\x88 \xB0\xF0\xC2\xF1 \xF0 \x8B\xC7\xF0\xCD\xF0\xC2\xF0 \xB3\xFA\xF7\x92\xCD\xF0\xF4\xC6\xF0 \xC6\xF0\xF4\xC0\xF0\xF4\xDE \x89\xC1\xF0\xF4\xE0\xC3\xF0\x88) Tj ET";
 
+    /// ರೂಪತಾರಾ in Shree-Lipi, from Udayavani's web pages of 2003.
+    const ROOPATARA: &[u8] = b"\xC3\xDC\xE3\xB1\xDC\xF1\xDD\xC3\xDD";
+
     /// ರೋರಿಕ್ ಮತ್ತು ದೇವಿಕಾರಾಣಿ ರೋರಿಕ್, from the title of the Roerich Act, 2001.
     const AKRUTI: &[u8] = b"p\xEA\xB3\xA9\xEEd\xD2 \xC0\xE2\xB0y\xE2\xB0K {\xEA\xA9\xC6d\xD6p\xD6\xB9 p\xEA\xB3\xA9\xEEd\xD2";
 
@@ -713,17 +716,27 @@ endcmap\nCMapName currentdict /CMap defineresource pop\nend\nend\n";
     #[test]
     fn a_legacy_font_with_no_table_is_reported_and_left_out() {
         let (text, report) = run(&pdf(
-            vec![("F1", simple_font("ABCDEF+Shree-Kan-0850"))],
-            &shown("F1", b"\xC3\xDC\xE3\xB1\xDC\xF1\xDD\xC3\xDD"),
+            vec![("F1", simple_font("ABCDEF+Shree-Kan-0851"))],
+            &shown("F1", ROOPATARA),
         ));
         assert_eq!(text, "\n");
         assert_eq!(report.rows[0].detail, NO_TABLE);
     }
 
     #[test]
+    fn shree_lipi_fonts_are_read_in_their_layout() {
+        let (text, report) = run(&pdf(
+            vec![("F1", simple_font("ABCDEF+Shree-Kan-0850"))],
+            &shown("F1", ROOPATARA),
+        ));
+        assert_eq!(text, "ರೂಪತಾರಾ\n");
+        assert!(report.rows.is_empty(), "{:?}", report.rows);
+    }
+
+    #[test]
     fn digits_in_a_legacy_font_with_no_table_stay() {
         let (text, report) = run(&pdf(
-            vec![("F1", simple_font("Shree-Kan-0850"))],
+            vec![("F1", simple_font("Shree-Kan-0851"))],
             &shown("F1", b"2002-03"),
         ));
         assert_eq!(text, "2002-03\n");
@@ -733,9 +746,9 @@ endcmap\nCMapName currentdict /CMap defineresource pop\nend\nend\n";
     #[test]
     fn an_added_name_gives_a_no_table_font_its_layout() {
         let mut settings = Settings::new(Direction::ToUnicode(Options::default()));
-        settings.fonts.extra_legacy = vec![("Shree-Kan-0850".to_string(), Layout::Nudi)];
+        settings.fonts.extra_legacy = vec![("Shree-Kan-0851".to_string(), Layout::Nudi)];
         let bytes = pdf(
-            vec![("F1", simple_font("Shree-Kan-0850"))],
+            vec![("F1", simple_font("Shree-Kan-0851"))],
             &shown("F1", KANNADA),
         );
         let (out, report) = convert_file(&bytes, &settings).unwrap();

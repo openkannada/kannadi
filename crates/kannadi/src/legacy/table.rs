@@ -76,6 +76,7 @@ pub(super) fn file_name(layout: Layout) -> &'static str {
     match layout {
         Layout::Nudi => "nudi.tsv",
         Layout::Akruti => "akruti.tsv",
+        Layout::ShreeLipi => "shree-lipi.tsv",
     }
 }
 
@@ -83,6 +84,7 @@ fn contents(layout: Layout) -> &'static str {
     match layout {
         Layout::Nudi => include_str!("../../data/nudi.tsv"),
         Layout::Akruti => include_str!("../../data/akruti.tsv"),
+        Layout::ShreeLipi => include_str!("../../data/shree-lipi.tsv"),
     }
 }
 

@@ -12,12 +12,16 @@ use super::Layout;
 ///   Baraha's BRH fonts for other scripts are not legacy Kannada fonts.
 /// - [`Layout::Akruti`]: AkrutiKndPadma and its weights. Other Akruti Kannada
 ///   fonts, such as AkrutiKndPadmini, were not checked and are left out.
+/// - [`Layout::ShreeLipi`]: Shree-Kan-0850, also with a style word such as Bold
+///   after it. Other Shree-Kan numbers were not checked; [`is_legacy_font`] still
+///   knows them.
 ///
 /// ```
 /// use kannadi::legacy::{font_layout, Layout};
 ///
 /// assert_eq!(font_layout("BRH Kannada"), Some(Layout::Nudi));
 /// assert_eq!(font_layout("AkrutiKndPadmaDemi"), Some(Layout::Akruti));
+/// assert_eq!(font_layout("Shree-Kan-0850"), Some(Layout::ShreeLipi));
 /// assert_eq!(font_layout("Nudi Parijatha"), None);
 /// ```
 pub fn font_layout(name: &str) -> Option<Layout> {
@@ -31,21 +35,27 @@ pub fn font_layout(name: &str) -> Option<Layout> {
     if key.starts_with("akrutikndpadma") {
         return Some(Layout::Akruti);
     }
+    if key
+        .strip_prefix("shreekan0850")
+        .is_some_and(|rest| !rest.starts_with(|c: char| c.is_ascii_digit()))
+    {
+        return Some(Layout::ShreeLipi);
+    }
     let rest = key.strip_prefix("nudi")?;
     let numbered = rest.len() >= 3 && rest[..2].bytes().all(|b| b.is_ascii_digit());
     (numbered || rest.starts_with("akshar") || rest.starts_with("bakshar")).then_some(Layout::Nudi)
 }
 
 /// True for a font that stores Kannada as glyph codes in place of letters: the
-/// fonts [`font_layout`] knows, and Shree-Lipi's Shree-Kan fonts, such as
-/// Shree-Kan-0850, which have no table yet, so [`font_layout`] gives `None` for
+/// fonts [`font_layout`] knows, and the other Shree-Lipi Shree-Kan fonts, such as
+/// Shree-Kan-0851, which have no table yet, so [`font_layout`] gives `None` for
 /// them.
 ///
 /// ```
 /// use kannadi::legacy::{font_layout, is_legacy_font};
 ///
-/// assert!(is_legacy_font("Shree-Kan-0850"));
-/// assert_eq!(font_layout("Shree-Kan-0850"), None);
+/// assert!(is_legacy_font("Shree-Kan-0851"));
+/// assert_eq!(font_layout("Shree-Kan-0851"), None);
 /// assert!(!is_legacy_font("Arial"));
 /// ```
 pub fn is_legacy_font(name: &str) -> bool {
@@ -155,8 +165,15 @@ mod tests {
     }
 
     #[test]
-    fn shree_lipi_fonts_are_legacy_with_no_table() {
-        for f in ["Shree-Kan-0850", "SHREE-KAN-0851", "Shree Kan 0853 Bold"] {
+    fn shree_kan_0850_fonts() {
+        for f in ["Shree-Kan-0850", "SHREE-KAN-0850", "Shree Kan 0850 Bold"] {
+            assert_eq!(font_layout(f), Some(Layout::ShreeLipi), "{f}");
+        }
+    }
+
+    #[test]
+    fn other_shree_lipi_fonts_are_legacy_with_no_table() {
+        for f in ["SHREE-KAN-0851", "Shree Kan 0853 Bold", "Shree-Kan-08500"] {
             assert!(is_legacy_font(f), "{f}");
             assert_eq!(font_layout(f), None, "{f}");
         }

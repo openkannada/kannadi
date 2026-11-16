@@ -89,7 +89,7 @@ const io = {
   decodeWindows1252: kannadi.decodeWindows1252,
 };
 
-/** "Nudi or Baraha", "Akruti", or both, for the layouts a result was read in. */
+/** "Nudi or Baraha", "Akruti", "Shree-Lipi", or several, for the layouts a result was read in. */
 function layoutNames(layouts = []) {
   const names = layouts.map((l) => LAYOUT_NAMES[l] ?? l);
   return names.length ? names.join(", and from ") : "a legacy font";
@@ -449,7 +449,7 @@ function restore() {
     fileName = saved.fileName ?? "kannada";
     say(
       looksLegacy(saved.text)
-        ? "Restored your last document. Some of it still looks like Nudi, Baraha or Akruti: select it and choose Convert."
+        ? "Restored your last document. Some of it still looks like Nudi, Baraha, Akruti or Shree-Lipi: select it and choose Convert."
         : "Restored your last document from this browser.",
     );
   } else {

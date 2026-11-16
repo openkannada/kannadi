@@ -19,7 +19,7 @@ pub const RENUMBERED: &str = "named as a legacy font, but its glyph codes do not
      layout and its character map does not help; the PDF maker may have renumbered them";
 pub const OTHER_LAYOUT: &str = "looks like legacy Kannada in a layout this tool does not know";
 pub const NO_TABLE: &str = "named as a legacy font whose layout this tool has no table for, \
-     such as Shree-Lipi";
+     such as Shree-Kan-0851";
 pub const RENUMBERED_SUBSET: &str = "its glyph codes were renumbered and the PDF has no usable \
      character map, so its text cannot be read";
 

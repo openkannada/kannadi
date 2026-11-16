@@ -23,7 +23,7 @@ const WHO = {
   a: 'It is built on <a href="https://github.com/prasadus92/kannadi">kannadi</a>, an open-source Rust library for Kannada text by Prasad Subrahmanya, released under the MIT license. The fonts are Noto Sans Kannada and Noto Serif Kannada, under the SIL Open Font License.',
 };
 const CONVERT_STEPS = [
-  "Open your file with <b>Open</b>, or copy the text from Word and paste it into the sheet. Word files keep their fonts, so only the text set in Nudi, Baraha or Akruti fonts is converted.",
+  "Open your file with <b>Open</b>, or copy the text from Word and paste it into the sheet. Word files keep their fonts, so only the text set in Nudi, Baraha, Akruti or Shree-Lipi fonts is converted.",
   "Check the marks. Red is a glyph with no Kannada letter. Amber is a sign that cannot form a syllable. Select a mark, or press <kbd>F8</kbd>, and pick a fix.",
   "Choose <b>Save</b> and pick Word, plain text or web page.",
 ];
@@ -110,7 +110,7 @@ export const PAGES = [
     faq: [
       {
         q: "How do I convert a Nudi file to Unicode?",
-        a: "Choose <b>Open</b> and pick the Word, text or web page file. The editor reads the fonts in the file and converts the text set in Nudi, Baraha or Akruti fonts. Check the marked problems, then choose <b>Save</b>.",
+        a: "Choose <b>Open</b> and pick the Word, text or web page file. The editor reads the fonts in the file and converts the text set in Nudi, Baraha, Akruti or Shree-Lipi fonts. Check the marked problems, then choose <b>Save</b>.",
       },
       {
         q: "How can I tell if my text is Nudi or Unicode?",

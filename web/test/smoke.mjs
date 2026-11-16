@@ -76,8 +76,10 @@ for (const name of ["Nudi Parijatha", "BRH Devanagari", "BRH Telugu", "Arial"]) 
   assert.equal(kannadi.fontLayout(name), null, name);
   assert.ok(!kannadi.isLegacyFont(name), name);
 }
-assert.ok(kannadi.isLegacyFont("Shree-Kan-0850"));
-assert.equal(kannadi.fontLayout("Shree-Kan-0850"), null);
+assert.equal(kannadi.fontLayout("Shree-Kan-0850"), "shree-lipi");
+assert.ok(kannadi.isLegacyFont("Shree-Kan-0851"));
+assert.equal(kannadi.fontLayout("Shree-Kan-0851"), null);
+assert.equal(kannadi.convertLegacy("PÜ®Ü°vÜ", { layout: "shree-lipi" }).text, "ಕನ್ನಡ");
 assert.ok(kannadi.drawsKannadaDigits("Nudi 04 k"));
 const bytes = new Uint8Array([...NUDI].map((c) => c.charCodeAt(0) < 256 ? c.charCodeAt(0) : 0x3f));
 const txt = await openFile(new File([bytes], "page.txt"), io);

@@ -382,19 +382,20 @@ impl Syllable {
 
     /// Writes the syllable in Unicode order; false if it is not a valid syllable.
     fn write(&self, out: &mut String) -> bool {
-        let mut letter = self.letter.chars();
-        let head = letter.next();
+        let letter: Vec<char> = self.letter.chars().collect();
+        let head = letter.first().copied();
         let mut s = String::new();
         if self.arka {
             s.push('ರ');
             s.push(VIRAMA);
         }
-        s.extend(head);
+        let cluster = cluster_len(&letter);
+        s.extend(&letter[..cluster]);
         for &o in &self.ottus {
             s.push(VIRAMA);
             s.push(o);
         }
-        s.extend(letter);
+        s.extend(&letter[cluster..]);
         s.push_str(&self.signs);
         if self.virama {
             s.push(VIRAMA);
@@ -413,6 +414,23 @@ impl Syllable {
         out.push_str(&self.rejected);
         valid
     }
+}
+
+/// Where subscripts typed after a letter join it: after its consonant cluster, such
+/// as ಕ್ಷ in ಕ್ಷಿ, but before a final ್ರ, which Unicode keeps last (ಶ್ರೀ with ಕ is
+/// ಶ್ಕ್ರೀ). A vowel letter counts as 1.
+fn cluster_len(letter: &[char]) -> usize {
+    let mut end = usize::from(!letter.is_empty());
+    while end + 1 < letter.len()
+        && letter[end] == VIRAMA
+        && class(letter[end + 1]) == Class::Consonant
+    {
+        end += 2;
+    }
+    if end >= 3 && letter[end - 2] == VIRAMA && letter[end - 1] == 'ರ' {
+        end -= 2;
+    }
+    end
 }
 
 fn is_letter(c: char) -> bool {
@@ -620,6 +638,11 @@ mod tests {
     }
 
     #[test]
+    fn a_subscript_after_a_letter_with_ra_goes_before_the_ra() {
+        assert_eq!(akruti(&[0xDE, 0x22]).text, "ಶ್ಕ್ರೀ");
+    }
+
+    #[test]
     fn e_with_the_vocalic_r_glyph_reads_as_ai() {
         assert_eq!(akruti(&[0xC0, 0xEA, 0xBD, 0x70, 0xD2]).text, "ವೈರ್");
     }
@@ -649,6 +672,48 @@ mod tests {
     fn the_no_break_space_is_a_space() {
         assert_eq!(akruti(&[0x64, 0xE2, 0xA0, 0x64, 0xE2]).text, "ಕ\u{A0}ಕ");
         assert_eq!(akruti(&[0x64, 0xE2, 0x5F, 0xA0, 0x58]).text, "ಕ್ಷ್ಯ");
+    }
+
+    fn shree(legacy: &[u8]) -> Conversion {
+        to_unicode(
+            &decode_windows_1252(legacy),
+            Layout::ShreeLipi,
+            &Options::default(),
+        )
+    }
+
+    #[test]
+    fn shree_lipi_builds_ma_ya_and_jha_from_parts() {
+        for (codes, text) in [
+            (&[0xCA, 0xDC, 0xE1, 0xE1][..], "ಮು"),
+            (&[0xCA, 0xDC, 0xDE], "ಮಾ"),
+            (&[0xCA, 0xDC, 0xE5, 0x85], "ಮ್"),
+            (&[0xBF, 0xE1], "ಯ"),
+            (&[0xC1, 0xE5, 0x85], "ಯ್"),
+            (&[0xC3, 0xDC, 0x6B, 0xDE], "ಝಾ"),
+            (&[0xC4, 0x6B, 0xE1, 0xE0], "ಝೀ"),
+            (&[0x4D, 0xE1], "ಋ"),
+            (&[0xC3, 0xE6, 0x6B, 0xE1], "ಝೆ"),
+            (&[0xC3, 0xDC, 0x6B, 0xE5, 0x85], "ಝ್"),
+        ] {
+            let c = shree(codes);
+            assert!(c.is_clean(), "{c:?}");
+            assert_eq!(c.text, text);
+        }
+    }
+
+    #[test]
+    fn shree_lipi_reads_cluster_glyphs_and_typing_habits() {
+        assert_eq!(shree(&[0xFB, 0xDC]).text, "ಕ್ಷ");
+        assert_eq!(shree(&[0xC6, 0xFC, 0xBE]).text, "ಲಕ್ಷ್ಮಿ");
+        assert_eq!(shree(&[0xC6, 0xFB, 0xDC, 0xC2]).text, "ಲಕ್ಷ್ಯ");
+        assert_eq!(shree(&[0x76, 0xE6, 0xF9]).text, "ಡೈ");
+        assert_eq!(shree(&[0x50, 0xDC, 0x24, 0x20, 0xAE, 0xDC]).text, "ಕ ನ");
+        assert_eq!(shree(&[0xFE, 0xDD]).text, "ಜ್ಞಾ");
+        assert_eq!(shree(&[0xAE, 0xDC, 0x24, 0xC2]).text, "ನ್ಯ");
+        assert_eq!(shree(&[0xD3, 0xDD, 0xE7]).text, "ಸೈ");
+        assert_eq!(shree(&[0x50, 0xDC, 0x2D]).text, "ಕ");
+        assert_eq!(shree(&[0x50, 0xDC, 0x26, 0x3E]).text, "ಕ-।");
     }
 
     /// Every row of every table reads without an unknown glyph: letters and

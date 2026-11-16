@@ -36,11 +36,13 @@ pub enum Layout {
     Nudi,
     /// Akruti's Kannada fonts, such as AkrutiKndPadma.
     Akruti,
+    /// Shree-Lipi's Kannada fonts, such as Shree-Kan-0850.
+    ShreeLipi,
 }
 
 impl Layout {
     /// Every layout, in a fixed order.
-    pub const ALL: [Layout; 2] = [Layout::Nudi, Layout::Akruti];
+    pub const ALL: [Layout; 3] = [Layout::Nudi, Layout::Akruti, Layout::ShreeLipi];
 
     /// The layout's name in lowercase, as [`FromStr`] reads it.
     ///
@@ -54,6 +56,7 @@ impl Layout {
         match self {
             Layout::Nudi => "nudi",
             Layout::Akruti => "akruti",
+            Layout::ShreeLipi => "shree-lipi",
         }
     }
 

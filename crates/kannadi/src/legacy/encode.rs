@@ -709,6 +709,28 @@ mod tests {
         assert_eq!(e.text, "qೀ");
     }
 
+    fn shree(text: &str) -> Vec<u8> {
+        let e = from_unicode(text, Layout::ShreeLipi);
+        assert!(e.is_clean(), "{e:?}");
+        e.text
+            .chars()
+            .map(|c| windows_1252_byte(c).expect("Windows-1252 character"))
+            .collect()
+    }
+
+    #[test]
+    fn shree_lipi_writes_as_typists_did() {
+        assert_eq!(shree("ಕನ್ನಡ"), [0x50, 0xDC, 0xAE, 0xDC, 0xB0, 0x76, 0xDC]);
+        assert_eq!(shree("ಮಾಮು"), [0xCA, 0xDC, 0xDE, 0xCA, 0xDC, 0xE1, 0xE1]);
+        assert_eq!(shree("ಲಕ್ಷ"), [0xC6, 0x50, 0xDC, 0xD2]);
+        assert_eq!(shree("ಕ-ಕ"), [0x50, 0xDC, 0x26, 0x50, 0xDC]);
+        assert_eq!(shree("ಪುವೂ"), [0xB1, 0xDC, 0xE2, 0xCA, 0xDC, 0xE4]);
+        assert_eq!(shree("ತ್ರ್ಯ"), [0xF1, 0xDC, 0xC5, 0xE9]);
+        assert_eq!(shree("ಝೆ"), [0xC3, 0xE6, 0x6B, 0xE1]);
+        let dollar = from_unicode("$", Layout::ShreeLipi);
+        assert_eq!(dollar.unencodable.len(), 1);
+    }
+
     #[test]
     fn kannada_digits_use_the_layout_glyphs() {
         assert_eq!(akruti("೧೨೯"), [0x81, 0x82, 0x89]);

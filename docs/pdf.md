@@ -1,6 +1,6 @@
 # Text from PDFs typeset in legacy fonts
 
-Status: `kannadi to-unicode` reads PDF files and writes their text as `NAME.pdf.txt`, with text in Nudi, Baraha ANSI and Akruti fonts converted to Unicode. This note says how it works, what was measured, and what does not work.
+Status: `kannadi to-unicode` reads PDF files and writes their text as `NAME.pdf.txt`, with text in Nudi, Baraha ANSI, Akruti and Shree-Lipi fonts converted to Unicode. This note says how it works, what was measured, and what does not work.
 
 ## How legacy text sits in a PDF
 
@@ -27,7 +27,7 @@ A PDF shows text with operators such as `Tj` and `TJ`, which give a string of co
 These fonts are reported as `not converted`, with their text left out:
 
 - a font named as legacy whose text does not convert, which happens when codes were renumbered;
-- a font that looks like legacy Kannada but converts in no known layout, such as Shree-Lipi or AkliteKndPadmini;
+- a font that looks like legacy Kannada but converts in no known layout, such as AkliteKndPadmini or the unnamed font of the Legislative Assembly member pages;
 - a font whose text is mostly rare symbols such as `! # $ % & *`, which means renumbered codes with no usable map.
 
 ## Measured on public PDFs
@@ -45,13 +45,15 @@ Run on public PDFs from Karnataka government sources, kept outside the repositor
 | Unicode L2/03-068 from Karnataka DIT, [PDF](https://www.unicode.org/L2/L2003/03068-kannada.pdf), 16 pages | 5 Nudi01k subsets, renumbered by pdfFactory | 47 Kannada lines read through the ToUnicode map of 1 subset, 1 malformed syllable; the other 4 subsets are charts of single glyphs, which read as malformed syllables, and are reported as renumbered |
 | Legislative Assembly member page, [13mem/50.pdf](http://web.archive.org/web/20150427105120/http://kla.kar.nic.in/13mem/50.pdf), 2 pages | Renamed TrueType subset with a `Differences` list, made by Ghostscript | Reported as another layout; not converted |
 
+With the Shree-Lipi table added on 17 November 2026, the Legislative Assembly pages (all 5 archived ones), the Repealing and Amending Act of 2003 with its AkliteKndPadmini lines, and 6 budget and school-board PDFs in Kan-Eng and KN-Nandi fonts give the same output as before: their fonts are still reported as other layouts.
+
 The Gazette notification also has a heading in a Unicode font whose ToUnicode map is broken; it comes out garbled, as it does in other extractors. That is not a legacy font.
 
 ## What does not work
 
 - **Renumbered subsets with no usable map.** Reading the font embedded in the file being converted is allowed (the maintainer's decision, 16 November 2026), and it would recover these. Match each glyph's outline against the same glyph in another subset of the document whose codes are known, or against outlines taken once from the Nudi font files. Subsetting copies outlines unchanged, so the match is exact. It is not built, because none of the public PDFs checked needs it.
 - **Why the checked PDFs do not need it.** In the Unicode L2/03-068 PDF, the 4 subsets reported as renumbered have ToUnicode maps that give legacy codes. Those maps agree on 104 of the 105 glyph outlines the subsets share. Their text is a chart of single glyphs, which reads as malformed syllables, so the tool reports it. The Gazette's fonts with stripped names are read through their maps. The Legislative Assembly page is another layout.
-- **Other layouts.** Shree-Lipi and AkliteKndPadmini have no table yet; see [shree-lipi.md](shree-lipi.md). Akruti is described in [akruti.md](akruti.md).
+- **Other layouts.** Shree-Kan fonts other than 0850 and AkliteKndPadmini have no table yet; see [shree-lipi.md](shree-lipi.md). Akruti is described in [akruti.md](akruti.md).
 - **Reading order.** Lines follow the order the PDF draws them. Multi-column pages and tables come out in drawing order, which is usually right for government documents and sometimes not.
 - **Scanned pages.** Pages that are images have no text. They need OCR, which this crate does not do.
 - **Short legacy text in a mostly Latin font.** A font is judged by all its text. The Gazette's page header ¨sÁUÀ (ಭಾಗ) is drawn in a font that mostly shows Latin text, so it stays as it is.

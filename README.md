@@ -1,6 +1,6 @@
 # kannadi
 
-Convert Kannada documents typed in the legacy Nudi, Baraha and Akruti fonts to Unicode, and back. kannadi is a Rust library, a command-line tool that converts whole folders of TXT, HTML, DOCX and PDF files, and an editor that runs in the browser.
+Convert Kannada documents typed in the legacy Nudi, Baraha, Akruti and Shree-Lipi fonts to Unicode, and back. kannadi is a Rust library, a command-line tool that converts whole folders of TXT, HTML, DOCX and PDF files, and an editor that runs in the browser.
 
 ಕನ್ನಡಿ (kannaḍi) means mirror.
 
@@ -30,6 +30,7 @@ The editor page is not hosted yet. To run it locally, see [Editor page](#editor-
 | Nudi and Baraha to Unicode, benchmark corpus | 207 of 207 lines match the reviewed output; 1 line flagged | `cargo run -p kannadi --example corpus` on [corpus/](https://github.com/prasadus92/kannadi/tree/main/corpus). No line is verified by a Kannada reader yet, so today this compares the converter with its own reviewed output. A 100-line reader check is in progress. |
 | Unicode to Nudi, as typed | 9,029 of 9,047 words encode to the exact bytes that were typed | Words from Karnataka government pages of 2002. The rest differ in typing habits, such as a zero typed for ಂ. |
 | Akruti to Unicode | 6 unknown glyphs and 22 malformed syllables in 908,075 glyphs, each read against the page: errors in the source, or syllables the PDF split across 2 lines | 16,857 lines from 35 documents: 33 Karnataka Acts and Ordinances and 2 budget papers. See [docs/akruti.md](https://github.com/prasadus92/kannadi/blob/main/docs/akruti.md). |
+| Shree-Lipi to Unicode | 0 unknown glyphs and 20 malformed syllables in 233,346 glyphs, each read against the text rendered in the font: ಆ್ಯ for the English vowel, and errors in the source | 1,660 lines from 173 Udayavani newspaper pages of 2003 and 2004. See [docs/shree-lipi.md](https://github.com/prasadus92/kannadi/blob/main/docs/shree-lipi.md#the-shree-lipi-table). |
 | Transliteration round trip | Exact on every generated string | Property tests: 2,000 random strings per run, 50,000 in CI |
 | ISO 15919 against vidyut-lipi | Same output on 5,000 random words per run, apart from 1 documented difference | `tests/differential.rs` |
 
@@ -48,7 +49,8 @@ Version 0.1, in development.
 | Sound-alike keys for fuzzy search and loose Latin typing | Done |
 | Nudi and Baraha to Unicode | Done, waiting on a native reader's check of 100 sample lines |
 | Unicode to Nudi and Baraha | Done |
-| Akruti to Unicode and back | Done in the library, the command-line tool and the editor page, checked on 908,075 glyphs from 35 documents; a Kannada reader's check of 125 lines is pending |
+| Akruti to Unicode and back | To Unicode in the library, the command-line tool and the editor page; back to Akruti in the library. Checked on 908,075 glyphs from 35 documents; a Kannada reader's check of 125 lines is pending |
+| Shree-Lipi (Shree-Kan-0850) to Unicode and back | To Unicode in the library, the command-line tool and the editor page; back to Shree-Lipi in the library. Checked on 233,346 glyphs from 173 newspaper pages; a Kannada reader's check of 130 lines is pending |
 | Test corpus | 207 lines from 31 government pages of 2002 in [corpus/](https://github.com/prasadus92/kannadi/tree/main/corpus); a Kannada reader's check is pending |
 | Editor page that runs in the browser, with no upload | Built, not hosted yet: [web/](https://github.com/prasadus92/kannadi/tree/main/web) |
 | Command-line tool for TXT, HTML, DOCX and PDF | Done; PDF to Unicode only |
@@ -104,7 +106,7 @@ assert!(converted.unknown.is_empty());
 
 Run `cargo run --example nudi -- file.txt` to convert a Windows-1252 text file.
 
-Other layouts go through `legacy::to_unicode` and `legacy::from_unicode` with a `Layout`. `Layout::Akruti` covers AkrutiKndPadma and its weights, used in Karnataka Acts of 2001 to 2003:
+Other layouts go through `legacy::to_unicode` and `legacy::from_unicode` with a `Layout`. `Layout::Akruti` covers AkrutiKndPadma and its weights, used in Karnataka Acts of 2001 to 2003, and `Layout::ShreeLipi` covers Shree-Kan-0850, used by the Udayavani newspaper's web pages:
 
 ```rust
 use kannadi::legacy::{to_unicode, Layout, Options};
@@ -113,7 +115,7 @@ let converted = to_unicode("dâ}â", Layout::Akruti, &Options::default());
 assert_eq!(converted.text, "ಕನ");
 ```
 
-The Akruti table was derived from the fonts embedded in public PDFs and checked against the pages; [docs/akruti.md](https://github.com/prasadus92/kannadi/blob/main/docs/akruti.md) has the method and results. The command-line tool reads Akruti too. So does the editor page: by font name in DOCX and HTML files, and otherwise (pasted text, text files, HTML with no font, the Convert button) in the layout that converts best, chosen by `legacy::best_layout` once for all such text in a paste, a file or a selection.
+The Akruti table was derived from the fonts embedded in public PDFs and checked against the pages; [docs/akruti.md](https://github.com/prasadus92/kannadi/blob/main/docs/akruti.md) has the method and results. The Shree-Lipi table was derived from the font Udayavani served with its pages and checked against them; [docs/shree-lipi.md](https://github.com/prasadus92/kannadi/blob/main/docs/shree-lipi.md#the-shree-lipi-table) has the method and results. The command-line tool reads both layouts too. So does the editor page: by font name in DOCX and HTML files, and otherwise (pasted text, text files, HTML with no font, the Convert button) in the layout that converts best, chosen by `legacy::best_layout` once for all such text in a paste, a file or a selection.
 
 `legacy::unicode_to_nudi` goes the other way, for documents that must still be printed in a legacy font:
 
@@ -133,7 +135,7 @@ assert!(encoded.is_clean());
 
 [web/](https://github.com/prasadus92/kannadi/tree/main/web) is a static Kannada editor that runs in the browser. The crate runs as WebAssembly through the bindings in [crates/kannadi-wasm](https://github.com/prasadus92/kannadi/tree/main/crates/kannadi-wasm), so text never leaves the device.
 
-- Paste text, or open a TXT, DOCX or HTML file. Nudi, Baraha and Akruti text is converted to Unicode. In DOCX files, only text set in one of their fonts is converted; in HTML files, also text with no font that looks like legacy codes.
+- Paste text, or open a TXT, DOCX or HTML file. Nudi, Baraha, Akruti and Shree-Lipi text is converted to Unicode. In DOCX files, only text set in one of their fonts is converted; in HTML files, also text with no font that looks like legacy codes.
 - Unknown glyphs and malformed syllables are marked in the text and listed beside it. Selecting one offers checked fixes, or a replacement typed in Baraha letters.
 - Type Kannada with Baraha or ISO 15919 letters.
 - Normalize, modernize Old Kannada letters, and count aksharas and words.
@@ -169,8 +171,8 @@ kannadi to-nudi letter.txt --out for-printing/ --strict
 - `to-unicode` takes `--kannada-digits` and `--keep-zeros`, the same settings as `legacy::Options`.
 - **HTML.** Only text set in a legacy font is converted to Unicode, in that font's layout. The font of each piece of text comes from its `style` attribute, then `<style>` rules for tags and classes such as `td.xl24` or `.font12` (the most specific, then the last), then `<font face>`, inherited from enclosing elements. End tags HTML lets authors leave out, such as `</td>` and `</p>`, are closed where a browser would close them. Legacy font names are replaced with `--font` (Noto Sans Kannada by default). `to-nudi` converts Kannada text outside legacy fonts and wraps it in a span set in `--font` (Nudi 01 e by default); the rest of the text is copied as it was. A page that declares a Windows-1252 or ISO-8859-1 charset is read that way. Output is UTF-8, and the charset declaration says so. Text in `<title>`, `<textarea>` and attribute values is not converted, and a syllable split across tags is converted piece by piece, so it shows as malformed in the report. More complex selectors and the `font` shorthand are not read.
 - **DOCX.** A run's font comes from its own `w:rFonts`, its character style, its paragraph style (or the default paragraph style), or the document defaults, following `basedOn`. Only runs whose Latin font is a legacy font are converted to Unicode, in that font's layout. Their fonts are set to `--font`. Word often splits a word across runs; text is moved between neighboring runs so no syllable is split. `to-nudi` moves each Kannada run of text into a new run set in `--font`, with the rest of the run's formatting. The body, headers, footers, footnotes, endnotes and comments are converted; every other part of the package is copied unchanged. Report rows name the part and paragraph; the fallback copy of a text box is converted but not reported twice. Where a run sets `w:b`, `w:i` or `w:sz` but not their complex-script copies, these are added, since Word formats Kannada with `w:bCs`, `w:iCs` and `w:szCs`; `to-nudi` copies them the other way. Tracked deletions are converted too. Not done: bold, italic and sizes that come from styles, symbols inserted with `w:sym`, fonts of paragraph marks and styles, and parts written with a namespace prefix other than `w:`.
-- **PDF.** `to-unicode` reads PDF files and writes their text to `NAME.pdf.txt`, with text in legacy fonts converted, Akruti included. Legacy fonts are found by name, or by their text when the PDF hides the name. A font whose codes were renumbered is read through its ToUnicode map when the map gives the codes back. Other renumbered fonts, and legacy fonts in layouts without a table, such as Shree-Lipi, are reported and left out. [docs/pdf.md](https://github.com/prasadus92/kannadi/blob/main/docs/pdf.md) has the method and results on public PDFs.
-- **Legacy font names.** The tool knows the ANSI Nudi fonts (Nudi 01 e to Nudi 05 k, Nudi Akshara, Nudi B-Akshara) and Baraha's BRH fonts for Kannada, in the Nudi layout, and AkrutiKndPadma and its weights, in the Akruti layout. `--legacy-font "NAME=akruti"` adds another in the layout named after `=`; with no `=`, it is in the `--layout` layout. `to-unicode --layout akruti` reads text files as Akruti; the default is Nudi. `to-nudi` writes Nudi only.
+- **PDF.** `to-unicode` reads PDF files and writes their text to `NAME.pdf.txt`, with text in legacy fonts converted, Akruti and Shree-Lipi included. Legacy fonts are found by name, or by their text when the PDF hides the name. A font whose codes were renumbered is read through its ToUnicode map when the map gives the codes back. Other renumbered fonts, and legacy fonts in layouts without a table, such as Shree-Kan-0851, are reported and left out. [docs/pdf.md](https://github.com/prasadus92/kannadi/blob/main/docs/pdf.md) has the method and results on public PDFs.
+- **Legacy font names.** The tool knows the ANSI Nudi fonts (Nudi 01 e to Nudi 05 k, Nudi Akshara, Nudi B-Akshara) and Baraha's BRH fonts for Kannada, in the Nudi layout, AkrutiKndPadma and its weights, in the Akruti layout, and Shree-Kan-0850, in the Shree-Lipi layout. Other Shree-Kan fonts are known as legacy fonts with no table. `--legacy-font "NAME=akruti"` adds another in the layout named after `=`; with no `=`, it is in the `--layout` layout. `to-unicode --layout akruti` or `--layout shree-lipi` reads text files in that layout; the default is Nudi. `to-nudi` writes Nudi only.
 
 ## Segmentation
 
