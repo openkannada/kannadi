@@ -97,15 +97,10 @@ pub enum Family<'a> {
 impl<'a> Family<'a> {
     pub fn of(value: &'a str) -> Self {
         let bare = value.trim().trim_end_matches("!important").trim();
-        if ["inherit", "unset"]
-            .iter()
-            .any(|k| bare.eq_ignore_ascii_case(k))
-        {
+        let is = |words: &[&str]| words.iter().any(|k| bare.eq_ignore_ascii_case(k));
+        if is(&["inherit", "unset", "revert"]) {
             Family::Inherit
-        } else if ["initial", "revert"]
-            .iter()
-            .any(|k| bare.eq_ignore_ascii_case(k))
-        {
+        } else if is(&["initial"]) {
             Family::Initial
         } else {
             Family::Named(value)
@@ -161,7 +156,7 @@ pub fn rewrite_font_families(
                 .eq_ignore_ascii_case("font-family")
             {
                 let value = body.start + value.start..body.start + value.end;
-                edits.push((value.clone(), replace(&css[value])));
+                edits.push((value.clone(), replace(&without_comments(&css[value]))));
             }
         }
     }
@@ -261,6 +256,9 @@ mod tests {
         assert_eq!(Family::of("inherit"), Family::Inherit);
         assert_eq!(Family::of(" Initial "), Family::Initial);
         assert_eq!(Family::of("Arial"), Family::Named("Arial"));
+        assert_eq!(Family::of("revert"), Family::Inherit);
+        let commented = rewrite_font_families("font-family:/* n */ X", false, |v| format!("[{v}]"));
+        assert_eq!(commented, "font-family:[ X]");
         let css = "p{font-family:\"A;B\";mso-font-family:x} q{font-family: C}";
         let out = rewrite_font_families(css, true, |v| format!("[{v}]"));
         assert_eq!(

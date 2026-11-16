@@ -64,7 +64,7 @@ fn declared_charset(bytes: &[u8]) -> Option<Charset> {
             let content = tag.attr("content")?.value.to_ascii_lowercase();
             let at = content.find("charset=")? + "charset=".len();
             let name = content[at..].split([';', ' ']).next().unwrap_or_default();
-            Some(name.trim().to_string())
+            Some(name.trim().trim_matches(['"', '\'']).to_string())
         }
         _ => None,
     })?;
@@ -468,6 +468,12 @@ mod tests {
         assert!(to_unicode(html).contains(">ಕ ಕ</p>"));
         let bom = "\u{FEFF}<meta charset=windows-1252><p style=\"font-family:BRH Kannada\">PÀ</p>";
         assert!(to_unicode(bom).contains(">ಕ</p>"));
+        let quoted =
+            b"<meta http-equiv=\"Content-Type\" content=\"text/html; charset='windows-1252'\">\
+                       <p style=\"font-family:BRH Kannada\">Q\xC3\xA4</p>";
+        let settings = Settings::new(Direction::ToUnicode(Options::default()));
+        let out = String::from_utf8(convert_file(quoted, &settings).unwrap().0).unwrap();
+        assert!(out.contains(">ಕೀನಿ</p>"), "{out}");
     }
 
     #[test]
