@@ -87,7 +87,7 @@ const io = { convert, bestLayout: kannadi.bestLayout, decodeWindows1252: kannadi
 /** "Nudi or Baraha", "Akruti", or both, for the layouts a result was read in. */
 function layoutNames(layouts = []) {
   const names = layouts.map((l) => LAYOUT_NAMES[l] ?? l);
-  return names.length ? names.join(" and ") : "a legacy font";
+  return names.length ? names.join(", and from ") : "a legacy font";
 }
 
 function report(result, what) {

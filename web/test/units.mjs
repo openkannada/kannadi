@@ -5,7 +5,7 @@ import { test } from "node:test";
 import { Composer } from "../src/js/compose.js";
 import { readDocx, writeDocx } from "../src/js/docx.js";
 import { DocEditor } from "../src/js/editor.js";
-import { pasted } from "../src/js/files.js";
+import { htmlSegments, pasted } from "../src/js/files.js";
 import {
   codePoints,
   countWords,
@@ -155,6 +155,29 @@ test("auto segments get 1 layout, chosen over all their text", () => {
   );
   assert.deepEqual(seen, ["ab\ncd"]);
   assert.equal(resolveAuto([{ text: "x", legacy: false }], () => assert.fail("no auto text")).length, 1);
+});
+
+// Just enough DOM for htmlSegments: elements with attributes, classes and children.
+globalThis.Node ??= { TEXT_NODE: 3, ELEMENT_NODE: 1 };
+const el = (tag, attrs = {}, ...kids) => ({
+  nodeType: 1,
+  tagName: tag.toUpperCase(),
+  childNodes: kids.map((k) => (typeof k === "string" ? { nodeType: 3, data: k } : k)),
+  getAttribute: (n) => attrs[n] ?? null,
+  hasAttribute: (n) => n in attrs,
+  classList: (attrs.class ?? "").split(" ").filter(Boolean),
+});
+const page = (css, body) => ({ body, querySelectorAll: () => [{ textContent: css }] });
+const fontOf = (css, body) => htmlSegments(page(css, el("body", {}, body))).find((s) => s.text.trim()).legacy;
+
+test("html text takes the font of the last class rule, and a page-wide plain font leaves it to its looks", () => {
+  const text = "PÀ£ÀßqÀ £ÁqÀÄ";
+  assert.equal(fontOf(".a{font-family:'Nudi 01 e'} .b{font-family:Arial}", el("span", { class: "a b" }, text)), false);
+  assert.equal(fontOf(".b{font-family:Arial} .a{font-family:'Nudi 01 e'}", el("span", { class: "b a" }, text)), "nudi");
+  assert.equal(fontOf(".a{font-family:AkrutiKndPadma}", el("p", { class: "a" }, text)), "akruti");
+  assert.equal(fontOf("p{font-family:'Nudi 01 e'} .x{font-family:Arial}", el("p", { class: "x" }, text)), false);
+  assert.equal(fontOf("body{font-family:Arial} #kan{font-family:'BRH Kannada'}", el("div", { id: "kan" }, text)), "auto");
+  assert.equal(fontOf("body{font-family:Arial}", el("p", {}, text)), "auto");
 });
 
 test("word count and code points", () => {

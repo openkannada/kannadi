@@ -85,7 +85,7 @@ let converted = to_unicode("dâ}â", Layout::Akruti, &Options::default());
 assert_eq!(converted.text, "ಕನ");
 ```
 
-The Akruti table was derived from the fonts embedded in public PDFs and checked against the pages; [docs/akruti.md](docs/akruti.md) has the method and results. The editor page reads Akruti too: by font name in DOCX and HTML files, and otherwise (pasted text, text files, HTML with no font, the Convert button) in the layout that converts best, chosen once for all such text in a paste or file by `legacy::best_layout`. The command-line tool reads Nudi and Baraha only until its Akruti change lands.
+The Akruti table was derived from the fonts embedded in public PDFs and checked against the pages; [docs/akruti.md](docs/akruti.md) has the method and results. The editor page reads Akruti too: by font name in DOCX and HTML files, and otherwise (pasted text, text files, HTML with no font, the Convert button) in the layout that converts best, chosen by `legacy::best_layout` once for all such text in a paste, a file or a selection. The command-line tool reads Nudi and Baraha only.
 
 `legacy::unicode_to_nudi` goes the other way, for documents that must still be printed in a legacy font:
 

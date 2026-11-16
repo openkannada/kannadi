@@ -26,7 +26,9 @@ function parseHtml(html) {
 /**
  * The font that style rules in the page give class names and tag names: the
  * layout of a legacy font or false, and the rule's place in the page, since a
- * later rule wins.
+ * later rule wins. Tag rules count only for legacy fonts, so a page-wide rule
+ * such as body{font-family:Arial} leaves text with no other font to be judged
+ * by how it looks.
  */
 function legacySelectors(doc) {
   const classes = new Map();
@@ -41,7 +43,7 @@ function legacySelectors(doc) {
       for (const selector of selectors.split(",")) {
         const [, tag, cls] = selector.trim().match(/^([a-z0-9]*)(?:\.([\w-]+))?$/i) ?? [];
         if (cls) classes.set(cls, font);
-        else if (tag) tags.set(tag.toUpperCase(), font);
+        else if (tag && font.layout) tags.set(tag.toUpperCase(), font);
       }
     }
   }

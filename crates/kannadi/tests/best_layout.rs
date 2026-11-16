@@ -47,6 +47,5 @@ fn corpus_words_find_their_layout() {
     let path = concat!(env!("CARGO_MANIFEST_DIR"), "/../../corpus/nudi-2002.tsv");
     let corpus = std::fs::read_to_string(path).expect(path);
     let (nudi, words) = wrong(&corpus, 3, Layout::Nudi);
-    eprintln!("corpus {nudi} of {words}");
     assert!(nudi * 200 <= words, "{nudi} of {words} corpus words");
 }
