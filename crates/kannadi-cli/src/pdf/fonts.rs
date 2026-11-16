@@ -144,7 +144,7 @@ impl Fonts {
             let layout = font.layout();
             let raw = Judgment::of(&font.text, layout);
             let renumbered = looks_renumbered(&font.text);
-            font.verdict = if font.no_table {
+            font.verdict = if font.no_table && looks_legacy(&font.text) {
                 Verdict::Unreadable(NO_TABLE)
             } else if font.named.is_some() {
                 let mapped = Judgment::of(&font.mapped, layout);

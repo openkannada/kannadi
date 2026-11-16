@@ -721,6 +721,29 @@ endcmap\nCMapName currentdict /CMap defineresource pop\nend\nend\n";
     }
 
     #[test]
+    fn digits_in_a_legacy_font_with_no_table_stay() {
+        let (text, report) = run(&pdf(
+            vec![("F1", simple_font("Shree-Kan-0850"))],
+            &shown("F1", b"2002-03"),
+        ));
+        assert_eq!(text, "2002-03\n");
+        assert!(report.rows.is_empty(), "{:?}", report.rows);
+    }
+
+    #[test]
+    fn an_added_name_gives_a_no_table_font_its_layout() {
+        let mut settings = Settings::new(Direction::ToUnicode(Options::default()));
+        settings.fonts.extra_legacy = vec![("Shree-Kan-0850".to_string(), Layout::Nudi)];
+        let bytes = pdf(
+            vec![("F1", simple_font("Shree-Kan-0850"))],
+            &shown("F1", KANNADA),
+        );
+        let (out, report) = convert_file(&bytes, &settings).unwrap();
+        assert_eq!(String::from_utf8(out).unwrap(), "ಕನ್ನಡ\n");
+        assert!(report.rows.is_empty(), "{:?}", report.rows);
+    }
+
+    #[test]
     fn akruti_fonts_are_read_in_their_layout() {
         let (text, report) = run(&pdf(
             vec![("F1", simple_font("AkrutiKndPadma"))],

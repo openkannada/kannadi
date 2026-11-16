@@ -8,8 +8,8 @@ use super::Layout;
 ///
 /// - [`Layout::Nudi`]: the ANSI Nudi fonts up to version 5 (Nudi 01 e, Nudi
 ///   Akshara, Nudi B-Akshara) and Baraha's BRH fonts for Kannada. The Unicode
-///   Nudi fonts, such as Nudi Parijatha, and Baraha's BRH fonts for other scripts
-///   are not legacy Kannada fonts.
+///   Nudi fonts, such as Nudi Parijatha, names that say Uni or Unicode, and
+///   Baraha's BRH fonts for other scripts are not legacy Kannada fonts.
 /// - [`Layout::Akruti`]: AkrutiKndPadma and its weights. Other Akruti Kannada
 ///   fonts, such as AkrutiKndPadmini, were not checked and are left out.
 ///
@@ -22,6 +22,9 @@ use super::Layout;
 /// ```
 pub fn font_layout(name: &str) -> Option<Layout> {
     let key = key(name);
+    if key.contains("uni") {
+        return None;
+    }
     if let Some(rest) = key.strip_prefix("brh") {
         return (!BRH_OTHER_SCRIPTS.iter().any(|s| rest.starts_with(s))).then_some(Layout::Nudi);
     }
@@ -35,8 +38,8 @@ pub fn font_layout(name: &str) -> Option<Layout> {
 
 /// True for a font that stores Kannada as glyph codes in place of letters: the
 /// fonts [`font_layout`] knows, and Shree-Lipi's Shree-Kan fonts, such as
-/// Shree-Kan-0850, which have no table yet. Text in a legacy font with no table
-/// cannot be converted, and should not be taken for Latin text either.
+/// Shree-Kan-0850, which have no table yet, so [`font_layout`] gives `None` for
+/// them.
 ///
 /// ```
 /// use kannadi::legacy::{font_layout, is_legacy_font};
@@ -67,8 +70,10 @@ pub fn draws_kannada_digits(name: &str) -> bool {
 
 /// Shree-Kan followed by its number, as in Shree-Kan-0850 and SHREE-KAN-0851.
 fn is_shree_lipi(key: &str) -> bool {
-    key.strip_prefix("shreekan")
-        .is_some_and(|rest| rest.bytes().next().is_some_and(|b| b.is_ascii_digit()))
+    !key.contains("uni")
+        && key
+            .strip_prefix("shreekan")
+            .is_some_and(|rest| rest.bytes().next().is_some_and(|b| b.is_ascii_digit()))
 }
 
 /// A font name in lowercase letters and digits only.
@@ -140,6 +145,9 @@ mod tests {
             "AkrutiKndPadmini",
             "AkrutiDevPriya",
             "Shree Kannada",
+            "Nudi 01 e Uni",
+            "BRH Kannada Unicode",
+            "Shree-Kan-0850 Unicode",
         ] {
             assert_eq!(font_layout(f), None, "{f}");
             assert!(!is_legacy_font(f), "{f}");
