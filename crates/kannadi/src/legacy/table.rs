@@ -123,6 +123,11 @@ fn parse(source: &str, file: &str) -> Vec<Row> {
             "literal" => Entry::Literal(value.to_string()),
             other => panic!("{file}: unknown kind {other:?}"),
         };
+        let after_space = key.chars().count() > 1 && key.starts_with(char::is_whitespace);
+        assert!(
+            !after_space || prefer == Prefer::Read,
+            "{file}: {codes} starts with a space, so it must be marked read"
+        );
         rows.push(Row { key, entry, prefer });
     }
     rows
@@ -168,6 +173,12 @@ mod tests {
         assert_eq!(parse_prefer("on ಪ ಫ ವ", "t"), Prefer::On("ಪಫವ".into()));
         assert_eq!(parse_prefer("with ಿ", "t"), Prefer::With("ಿ".into()));
         assert_eq!(parse_prefer("read", "t"), Prefer::Read);
+    }
+
+    #[test]
+    fn rows_typed_after_a_space_must_be_read_only() {
+        assert_eq!(parse("20 BD\tsign\tೃ\tread", "t").len(), 1);
+        assert!(std::panic::catch_unwind(|| parse("20 BD\tsign\tೃ", "t")).is_err());
     }
 
     #[test]

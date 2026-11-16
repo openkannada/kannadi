@@ -85,7 +85,7 @@ pub fn to_unicode(text: &str, layout: Layout, options: &Options) -> Conversion {
         // A sequence that starts with a space joins the syllable before it, if any.
         let matched = table
             .longest_match(chars[i..].iter().map(|&(_, c)| c))
-            .filter(|&(_, len)| len == 1 || !chars[i].1.is_whitespace() || writer.in_syllable());
+            .filter(|_| !chars[i].1.is_whitespace() || writer.in_syllable());
         let Some((entry, len)) = matched else {
             let starts_syllable = matches!(
                 table.longest_match(chars[i + 1..].iter().map(|&(_, c)| c)),
@@ -608,6 +608,7 @@ mod tests {
             akruti(&[0xC9, 0xD6, 0x64, 0xE2, 0x5F, 0x20, 0x58]).text,
             "ಸಾಕ್ಷ್ಯ"
         );
+        assert_eq!(akruti(&[0x64, 0xE2, 0x5F, 0x20, 0x57]).text, "ಕ್ಷ್ಮ");
         assert_eq!(akruti(&[0x79, 0xE2, 0x20, 0x79, 0xE2]).text, "ತ ತ");
     }
 

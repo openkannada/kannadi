@@ -13,7 +13,7 @@ Typists often put a space, or the no-break space A0, before ೃ, ೖ and the sub
 No code page is published for Akruti. The table was derived from public documents, all fetched from the Internet Archive:
 
 - Karnataka Acts and Ordinances in Kannada from `dpal.kar.nic.in`, 2001 to 2003, made with PageMaker 6.52 and Acrobat Distiller 5.0. Some embed the whole AkrutiKndPadmaDemi and AkrutiKndPadmaBold font programs. Their text uses codes 1 to N with a Differences list whose glyph names `G<n>` give each glyph's code n.
-- The 2002 budget highlights, [bh2002k.pdf](http://web.archive.org/web/20040822015443/http://www.kar.nic.in:80/finance/bud2002-kan/bh2002k.pdf), which embeds TrueType subsets of AkrutiKndPadma Bold and Demi whose codes are the bytes the page shows.
+- The 2002 budget highlights, [bh2002k.pdf](http://web.archive.org/web/20040822015443/http://www.kar.nic.in:80/finance/bud2002-kan/bh2002k.pdf), which embeds TrueType subsets of AkrutiKndPadma Bold and Demi whose codes are the bytes the page shows, and the 2002 budget speech, [bs2002-k.pdf](http://web.archive.org/web/20060517033426/http://kar.nic.in:80/finance/bud2002-kan/bs2002-k.pdf), 75 pages.
 
 ## Method
 
@@ -29,26 +29,26 @@ Glyphs the fonts have but no document used are left out of the table. They are l
 
 | Measure | Result |
 |---|---|
-| Documents with Akruti text | 34: 33 Acts and Ordinances of 2001 to 2003, and the 2002 budget highlights |
-| Text lines and glyphs | 14,999 lines, 807,491 glyphs |
-| Unknown glyphs | 5 |
-| Malformed syllables | 19 |
+| Documents with Akruti text | 35: 33 Acts and Ordinances of 2001 to 2003, and the 2002 budget highlights and speech |
+| Text lines and glyphs | 16,857 lines, 908,075 glyphs |
+| Unknown glyphs | 6 |
+| Malformed syllables | 22 |
 | Fixture lines read against the page image | 125 lines from 5 documents, all equal |
-| Words that encode back to the bytes typed | 82,910 of 83,813 (98.9%) |
+| Words that encode back to the bytes typed | 93,422 of 94,576 (98.8%) |
 
 By font, over the same text:
 
 | Font | Documents | Glyphs | Unknown | Malformed |
 |---|---|---|---|---|
-| AkrutiKndPadmaDemi | 34 | 766,835 | 5 | 20 |
-| AkrutiKndPadmaBold | 31 | 23,849 | 0 | 0 |
+| AkrutiKndPadmaDemi | 35 | 866,448 | 6 | 23 |
+| AkrutiKndPadmaBold | 32 | 24,821 | 0 | 0 |
 | AkrutiKndPadmaDemib | 11 | 12,546 | 0 | 0 |
 | AkrutiKndPadmaDemii | 23 | 4,176 | 0 | 0 |
 | AkrutiKndPadmaBoldi | 6 | 84 | 0 | 0 |
 
-Unknown and malformed counts are per line of text as the PDF draws it. By font, each font's text is converted on its own, so a syllable split between 2 weights counts in neither. A space the page leaves by moving the text, with no space character, is counted as a space.
+Unknown and malformed counts are per line of text as the PDF draws it. By font, each font's text is converted on its own, so a syllable split between 2 weights counts as malformed in each of them; that is why the Demi count is higher than the total. A space the page leaves by moving the text, with no space character, is counted as a space.
 
-The remaining unknown glyphs and malformed syllables were read against the page. They are the source's own errors, such as a stray subscript, a doubled ಮ tail, a mahaprana mark on ಾ, ೃ typed for ೖ, ು typed before ೂ, and ೃ carried to the next line, or a syllable split by the PDF across 2 lines.
+The remaining unknown glyphs and malformed syllables were read against the page. They are the source's own errors, such as a stray subscript, a doubled ಮ tail, a mahaprana mark on ಾ, ೃ typed for ೖ, ು typed before ೂ, and ೃ carried to the next line, or a syllable split by the PDF across 2 lines. 1 is ಯ drawn with the tail meant for ಾ and no ಾ after it; the table reads that tail as a base needing a sign, as typists used it everywhere else.
 
 The Repealing and Amending Act of 2003 also uses AkliteKndPadmini, which is a different layout. Its 19 lines are not converted. The Acts on the same site from 2004 on use Nudi.
 

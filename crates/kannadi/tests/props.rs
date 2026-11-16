@@ -222,8 +222,11 @@ proptest! {
     }
 
     #[test]
-    fn akruti_roundtrip_words(words in prop::collection::vec(akruti_word(), 1..4)) {
-        let text = words.join(" ");
+    fn akruti_roundtrip_words(
+        words in prop::collection::vec(akruti_word(), 1..4),
+        number in "[೧-೯]{0,3}",
+    ) {
+        let text = format!("{} {number}", words.join(" "));
         let encoded = from_unicode(&text, Layout::Akruti);
         prop_assert!(encoded.is_clean(), "{:?}", encoded);
         let back = to_unicode(&encoded.text, Layout::Akruti, &Options::default());

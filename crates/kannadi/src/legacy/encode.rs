@@ -51,8 +51,9 @@ impl Encoding {
 ///
 /// When the result [`is_clean`](Encoding::is_clean),
 /// [`to_unicode`](super::to_unicode) gives back the NFC form of the input.
-/// Kannada digits are written with the layout's glyphs for them. A layout with
-/// none, such as Nudi, gets ASCII digits, which the `k` variants of the Nudi fonts
+/// Kannada digits are written with the layout's glyphs for them, and a digit the
+/// layout has no glyph for, such as ೦ in Akruti, is reported. A layout with no
+/// Kannada digit glyphs, such as Nudi, gets ASCII digits, which the `k` variants of the Nudi fonts
 /// draw as Kannada digits. A digit zero written between 2 letters reads back as ಂ
 /// unless [`Options::zero_as_anusvara`](super::Options::zero_as_anusvara) is off.
 ///
