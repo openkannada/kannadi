@@ -8,12 +8,14 @@
 # 199.74.239.15/udayavani/fonts/SHREE850.ttf, fetched from the Internet Archive
 # (capture of 10 April 2003). Each glyph was identified by eye and matched against
 # glyphs shaped with HarfBuzz from Noto Sans Kannada, then checked in context: the
-# Kannada text of Udayavani's archived story pages of 2002 to 2006, which set it in
-# Shree-Kan-0850 through their style sheet, was converted, and every unknown glyph
-# and malformed syllable was read against the same text rendered in the font.
+# Kannada text of 173 Udayavani story pages archived in 2003 and 2004, which name
+# Shree-Kan-0850 in their font tags, was converted, and every unknown glyph and
+# malformed syllable was read against the same text rendered in the font.
 # docs/shree-lipi.md has the method and results.
 #
-# Codes the font has but no page used are left out, and are reported as unknown.
+# Codes the font has but no page used are left out, and are reported as unknown,
+# except those at ASCII punctuation codes, which pass through as punctuation: 23 (ಓಂ),
+# 5D, 5F, 60 and 7D draw Kannada glyphs no page used.
 # Vowels
 41	letter	ಅ
 42	letter	ಆ
@@ -118,6 +120,8 @@ C1 E5	base	ಯ
 C3 DC 6B E1	letter	ಝ
 C3 DC 6B DE	letter	ಝಾ
 C3 E6 6B E3	letter	ಝೊ
+C3 E6 6B E1	letter	ಝೆ
+C3 DC 6B E5	base	ಝ
 C4 6B E1	letter	ಝಿ
 # Vowel signs. DC is the head stroke for the inherent a.
 DC	sign
@@ -190,7 +194,9 @@ F5	ottu	ತೃ
 # Arkavattu
 EC	arka
 # Spacing glyphs with no text value. 2D draws nothing; typists used 26 for the hyphen.
+# 24 draws a wide blank, typed only to move the next glyph.
 2D	ignore
+24	ignore
 99	ignore
 # Punctuation drawn at codes ASCII uses for others. 3E draws a short bar, typed after
 # abbreviations and numbers, as in ಸಂ।ರದ.

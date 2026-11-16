@@ -12,8 +12,9 @@ use super::Layout;
 ///   Baraha's BRH fonts for other scripts are not legacy Kannada fonts.
 /// - [`Layout::Akruti`]: AkrutiKndPadma and its weights. Other Akruti Kannada
 ///   fonts, such as AkrutiKndPadmini, were not checked and are left out.
-/// - [`Layout::ShreeLipi`]: Shree-Kan-0850 and its weights. Other Shree-Kan
-///   numbers were not checked; [`is_legacy_font`] still knows them.
+/// - [`Layout::ShreeLipi`]: Shree-Kan-0850, also with a style word such as Bold
+///   after it. Other Shree-Kan numbers were not checked; [`is_legacy_font`] still
+///   knows them.
 ///
 /// ```
 /// use kannadi::legacy::{font_layout, Layout};

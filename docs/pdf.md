@@ -27,7 +27,7 @@ A PDF shows text with operators such as `Tj` and `TJ`, which give a string of co
 These fonts are reported as `not converted`, with their text left out:
 
 - a font named as legacy whose text does not convert, which happens when codes were renumbered;
-- a font that looks like legacy Kannada but converts in no known layout, such as Shree-Lipi or AkliteKndPadmini;
+- a font that looks like legacy Kannada but converts in no known layout, such as AkliteKndPadmini or the unnamed font of the Legislative Assembly member pages;
 - a font whose text is mostly rare symbols such as `! # $ % & *`, which means renumbered codes with no usable map.
 
 ## Measured on public PDFs

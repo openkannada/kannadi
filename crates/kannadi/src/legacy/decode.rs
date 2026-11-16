@@ -382,19 +382,20 @@ impl Syllable {
 
     /// Writes the syllable in Unicode order; false if it is not a valid syllable.
     fn write(&self, out: &mut String) -> bool {
-        let mut letter = self.letter.chars();
-        let head = letter.next();
+        let letter: Vec<char> = self.letter.chars().collect();
+        let head = letter.first().copied();
         let mut s = String::new();
         if self.arka {
             s.push('ರ');
             s.push(VIRAMA);
         }
-        s.extend(head);
+        let cluster = cluster_len(&letter);
+        s.extend(&letter[..cluster]);
         for &o in &self.ottus {
             s.push(VIRAMA);
             s.push(o);
         }
-        s.extend(letter);
+        s.extend(&letter[cluster..]);
         s.push_str(&self.signs);
         if self.virama {
             s.push(VIRAMA);
@@ -413,6 +414,20 @@ impl Syllable {
         out.push_str(&self.rejected);
         valid
     }
+}
+
+/// The length of the consonant cluster a letter starts with, such as ಕ್ಷ in ಕ್ಷಿ;
+/// subscripts typed after the letter join the cluster there. A vowel letter counts
+/// as 1.
+fn cluster_len(letter: &[char]) -> usize {
+    let mut end = usize::from(!letter.is_empty());
+    while end + 1 < letter.len()
+        && letter[end] == VIRAMA
+        && class(letter[end + 1]) == Class::Consonant
+    {
+        end += 2;
+    }
+    end
 }
 
 fn is_letter(c: char) -> bool {
@@ -670,6 +685,8 @@ mod tests {
             (&[0xC3, 0xDC, 0x6B, 0xDE], "ಝಾ"),
             (&[0xC4, 0x6B, 0xE1, 0xE0], "ಝೀ"),
             (&[0x4D, 0xE1], "ಋ"),
+            (&[0xC3, 0xE6, 0x6B, 0xE1], "ಝೆ"),
+            (&[0xC3, 0xDC, 0x6B, 0xE5, 0x85], "ಝ್"),
         ] {
             let c = shree(codes);
             assert!(c.is_clean(), "{c:?}");
@@ -680,6 +697,10 @@ mod tests {
     #[test]
     fn shree_lipi_reads_cluster_glyphs_and_typing_habits() {
         assert_eq!(shree(&[0xFB, 0xDC]).text, "ಕ್ಷ");
+        assert_eq!(shree(&[0xC6, 0xFC, 0xBE]).text, "ಲಕ್ಷ್ಮಿ");
+        assert_eq!(shree(&[0xC6, 0xFB, 0xDC, 0xC2]).text, "ಲಕ್ಷ್ಯ");
+        assert_eq!(shree(&[0x76, 0xE6, 0xF9]).text, "ಡೈ");
+        assert_eq!(shree(&[0x50, 0xDC, 0x24, 0x20, 0xAE, 0xDC]).text, "ಕ ನ");
         assert_eq!(shree(&[0xFE, 0xDD]).text, "ಜ್ಞಾ");
         assert_eq!(shree(&[0xAE, 0xDC, 0x24, 0xC2]).text, "ನ್ಯ");
         assert_eq!(shree(&[0xD3, 0xDD, 0xE7]).text, "ಸೈ");

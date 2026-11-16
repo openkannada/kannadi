@@ -79,7 +79,7 @@ fn most_akruti_words_encode_as_typed() {
 }
 
 /// Shree-Lipi typists also stored some clusters in more than 1 way, such as ್ಟ್ರ as
-/// 1 glyph or 2, so most fixture words, not all, encode as typed.
+/// 1 glyph or 2, so at least 95% of fixture words encode as typed.
 #[test]
 fn most_shree_lipi_words_encode_as_typed() {
     let (same, total) = typed_back(Layout::ShreeLipi);

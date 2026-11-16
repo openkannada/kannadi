@@ -68,15 +68,15 @@ The maintainer decided on 17 November 2026 that the font Udayavani served with i
 
 ## The Shree-Lipi table
 
-`Layout::ShreeLipi` converts text in Shree-Kan-0850 in both directions. The table is [shree-lipi.tsv](../crates/kannadi/data/shree-lipi.tsv). Font names follow `legacy::font_layout`: Shree-Kan-0850 and its weights get this layout, and other Shree-Kan numbers are still known as legacy fonts with no table, because their layouts were not checked.
+`Layout::ShreeLipi` converts text in Shree-Kan-0850 in both directions in the library; the command-line tool and the editor page convert it to Unicode. The table is [shree-lipi.tsv](../crates/kannadi/data/shree-lipi.tsv). Font names follow `legacy::font_layout`: Shree-Kan-0850, also with a style word such as Bold after it, gets this layout, though no bold font was checked. Other Shree-Kan numbers are known as legacy fonts with no table, because their layouts were not checked.
 
 ### The layout
 
 Shree-Lipi stores Kannada the way Nudi and Akruti do, at its own codes: a consonant shape, then the head stroke (DC) or a vowel sign, then subscripts, then the arkavattu (EC). ಾ is DD, ು is E1, ೂ is E3, ೆ is E6, the length mark ೕ is E0, ೖ is E7, ೃ is EA, ಂ is ED and the virama is 85. ಪ, ಫ and ವ take their own ು (E2) and ೂ (E4). Letters with ಿ have glyphs of their own, such as ಕಿ at 51.
 
-ಮ is ವ with the head stroke and a tail (CA DC E1); ಮಾ uses the tail with ಾ (DE), and ಮ್ the tail before the virama (E5). ಯ is a base of its own with the same tails (BF E1). ಝ is ರ with a hook (6B) and a tail. ಋ is 4D followed by the ು tail. Some glyphs draw 2 subscripts, such as ್ಟ್ರ (F3) and ್ತ್ರ (F7), or a subscript with its sign, such as ್ಕೃ (A2) and ್ತೈ (F4). Latin digits stay at the ASCII codes. The font draws ‘ at 22, the hyphen at 26 and a short bar at 3E, used after abbreviations and numbers (ಸಂ।ರದ); the table reads 3E as ।. It draws nothing at 2D.
+ಮ is ವ with the head stroke and a tail (CA DC E1); ಮಾ uses the tail with ಾ (DE), and ಮ್ the tail before the virama (E5). ಯ is a base of its own with the same tails (BF E1). ಝ is ರ with a hook (6B) and a tail. ಋ is 4D followed by the ು tail. Some glyphs draw 2 subscripts, such as ್ಟ್ರ (F3) and ್ತ್ರ (F7), or a subscript with a sign, such as ್ಕೃ (A2) and ್ತ with ೖ (F4), which follows ೆ to make ್ತೈ. Latin digits stay at the ASCII codes. The font draws ‘ at 22, the hyphen at 26 and a short bar at 3E, used after abbreviations and numbers (ಸಂ।ರದ); the table reads 3E as ।. It draws nothing at 2D.
 
-Typing habits the table reads: the wide blank 24 typed before a subscript or ೖ to move it right; ಾ with ೖ for ೈ in loanwords such as ಶಾಂಘೈ and ಸೊಸೈಟಿ; and ಕ್ಷ and ಜ್ಞ as glyphs of their own (FB, FE), which the encoder writes as ಕ and ಜ with a subscript, the way most of the text has them.
+Typing habits the table reads: the wide blank 24 typed before a subscript or ೖ to move it right, which is dropped elsewhere; ಾ with ೖ for ೈ in loanwords such as ಶಾಂಘೈ and ಸೊಸೈಟಿ; and ಕ್ಷ and ಜ್ಞ as glyphs of their own (FB, FE), which the encoder writes as ಕ and ಜ with a subscript, the way most of the text has them.
 
 ### Source and method
 
@@ -87,7 +87,7 @@ The font is Shree-Kan-0850 version 1.0 of 18 March 2000, as the Udayavani newspa
 3. List the words each code appears in, and settle each code from the words: ಘೋಷಿತ shows that 4E is ಘ with ೆ, ಹರಿಣಾಕ್ಷಿ that FC is ಕ್ಷಿ.
 4. Convert all the text, and read every unknown glyph and malformed syllable against the same codes rendered in the font.
 
-Codes the font has but no page used are left out, and are reported as unknown if they appear.
+Codes the font has but no page used are left out, and are reported as unknown if they appear. The exceptions are codes ASCII uses for punctuation, which pass through: 23 (ಓಂ), 5D, 5F, 60 and 7D draw Kannada glyphs no page used.
 
 ### Results
 
@@ -96,17 +96,19 @@ Codes the font has but no page used are left out, and are reported as unknown if
 | Pages | 173 Udayavani story pages, captured in 2003 and 2004 |
 | Text | 1,660 distinct lines, 233,346 glyphs |
 | Unknown glyphs | 0 |
-| Malformed syllables | 23 |
+| Malformed syllables | 20 |
 | Fixture lines read against the rendered font | 130 lines from 36 pages, all equal |
-| Words that encode back to the bytes typed | 28,015 of 28,783 (97.3%); in the fixture, 765 of 787 |
+| Words that encode back to the bytes typed | 28,015 of 28,786 (97.3%); in the fixture, 765 of 787 |
 | Fixture words read alone that `best_layout` gives another layout | 11 of 787 |
 
-Of the 23 malformed syllables, 12 are ಆ್ಯ, the way these pages write the vowel of English "and" (ಆ್ಯಂಡ್, ಆ್ಯಂಟನಿ); the converter keeps it and reports it, as Unicode has no valid syllable for it. The rest are the pages' own typing errors: ೖ on ಮೊ and ನೊ for ಮೊಯ್ಲಿ and ನೊಯ್ಡಾ, a subscript typed twice, a stray ಾ, ರು with ೖ, and a consonant with no head stroke.
+Of the 20 malformed syllables, 12 are ಆ್ಯ, the way these pages write the vowel of English "and" (ಆ್ಯಂಡ್, ಆ್ಯಂಟನಿ); the converter keeps it and reports it, as Unicode has no valid syllable for it. The other 8 are the pages' own typing errors: ೖ on ಮೊ and ನೊ for ಮೊಯ್ಲಿ and ನೊಯ್ಡಾ, ರು with ೖ, a stray ಾ, and a consonant with no head stroke. 3 words have the subscript ನ typed twice with 24 between; they read as 2 subscripts, as they would draw.
 
 The fixture is [shree-lipi.tsv](../crates/kannadi/tests/fixtures/shree-lipi.tsv), with the source URL of each line. The pages have no page images, so each line was checked against its codes rendered in Shree-Kan-0850.
 
 ### Limits
 
+- No public PDF with a named Shree-Lipi font was found, so PDF reading rests on a test PDF made for it.
+- Signs no page used on ಮ, ಯ and ಝ, such as ೌ, are written from the table's parts; no typist's form was seen for them.
 - Only Shree-Kan-0850 was checked. Other Shree-Kan fonts may share the layout, but they are left out until a document confirms it.
 - Udayavani's story pages name Shree-Kan-0850 only in some `<font face>` tags. The story text takes its font from an external style sheet, which the `kannadi` tool does not fetch, so that text is left as it is. Save it as a text file and use `--layout shree-lipi`.
 - Typists stored some clusters in more than 1 way, such as ್ಟ್ರ as 1 glyph or 2, and ನ್ನ as a half form or a subscript. Both read the same; the encoder writes 1 of them.
