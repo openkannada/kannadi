@@ -9,11 +9,7 @@ pub fn is_legacy(font: &str, extra: &[String]) -> bool {
     if extra.iter().any(|e| e.eq_ignore_ascii_case(font)) {
         return true;
     }
-    let key: String = font
-        .chars()
-        .filter(|c| c.is_ascii_alphanumeric())
-        .collect::<String>()
-        .to_ascii_lowercase();
+    let key = key(font);
     if let Some(rest) = key.strip_prefix("brh") {
         return !BRH_OTHER_SCRIPTS.iter().any(|s| rest.starts_with(s));
     }
@@ -21,7 +17,24 @@ pub fn is_legacy(font: &str, extra: &[String]) -> bool {
         return false;
     };
     let numbered = rest.len() >= 3 && rest[..2].bytes().all(|b| b.is_ascii_digit());
-    numbered || rest.starts_with("akshara") || rest.starts_with("bakshara")
+    numbered || rest.starts_with("akshar") || rest.starts_with("bakshar")
+}
+
+/// True for the `k` variants of the numbered Nudi fonts, such as Nudi 04 k, which
+/// draw Kannada digits at the ASCII digit codes.
+pub fn has_kannada_digits(font: &str) -> bool {
+    key(font).strip_prefix("nudi").is_some_and(|rest| {
+        let b = rest.as_bytes();
+        b.len() >= 3 && b[0].is_ascii_digit() && b[1].is_ascii_digit() && b[2] == b'k'
+    })
+}
+
+/// A font name in lowercase letters and digits only.
+fn key(font: &str) -> String {
+    font.chars()
+        .filter(char::is_ascii_alphanumeric)
+        .collect::<String>()
+        .to_ascii_lowercase()
 }
 
 /// Baraha also made BRH fonts for these scripts, in other layouts.
@@ -74,6 +87,7 @@ mod tests {
             "Nudi 01 e",
             "Nudi 05 k",
             "NudiAkshara",
+            "Nudi Akshar-14",
             "Nudi B-Akshara",
             "BRH Kannada",
             "BRHKannada-Bold",
@@ -93,6 +107,16 @@ mod tests {
             assert!(!is_legacy(f, &[]), "{f}");
         }
         assert!(is_legacy("My Font", &["my font".to_string()]));
+    }
+
+    #[test]
+    fn kannada_digit_fonts() {
+        for f in ["Nudi 04 k", "Nudi01k", "Nudi01k-Bold", "Nudi 05 k Bold"] {
+            assert!(has_kannada_digits(f), "{f}");
+        }
+        for f in ["Nudi 01 e", "NudiAkshara", "BRH Kannada"] {
+            assert!(!has_kannada_digits(f), "{f}");
+        }
     }
 
     #[test]

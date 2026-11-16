@@ -79,7 +79,7 @@ impl Kind {
             Kind::UnknownGlyph => "unknown glyph",
             Kind::Malformed => "malformed syllable",
             Kind::Unencodable => "unencodable",
-            Kind::NotConverted => "not converted",
+            Kind::NotConverted => "part not converted",
         }
     }
 
