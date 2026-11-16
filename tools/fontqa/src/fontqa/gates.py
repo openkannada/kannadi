@@ -12,8 +12,8 @@ from fontTools.pens.recordingPen import RecordingPen, replayRecording
 from fontTools.ttLib import TTFont
 
 from .checks import mark_indistinct, run_case
-from .kannada import Case
-from .outline import polygons, split_contours, to_path
+from .kannada import CONSONANTS, Case
+from .outline import mean_stroke_width, polygons, split_contours, to_path
 from .shaping import Face
 
 # Curves are cut into this many straight pieces for scanline measurement.
@@ -29,10 +29,12 @@ class GateResult:
 
 @dataclass(frozen=True)
 class Strokes:
-    """Median ink run widths: vertical stems across rows, horizontal strokes down columns."""
+    """Median ink run widths (vertical stems across rows, horizontal strokes down columns), the
+    mean stroke width, and the most common bottom and top ink edges."""
 
     vstem: float
     hstem: float
+    weight: float
     bottom: float
     top: float
 
@@ -79,6 +81,7 @@ def strokes(path: pathops.Path, lines: int = 21) -> Strokes:
     return Strokes(
         vstem=statistics.median(v) if v else 0.0,
         hstem=statistics.median(h) if h else 0.0,
+        weight=mean_stroke_width(path),
         bottom=_common_edge(bottoms),
         top=_common_edge(tops),
     )
@@ -98,9 +101,106 @@ def reference(paths: list[pathops.Path]) -> Strokes:
     return Strokes(
         vstem=statistics.median(x.vstem for x in s),
         hstem=statistics.median(x.hstem for x in s),
+        weight=statistics.median(x.weight for x in s),
         bottom=statistics.median(x.bottom for x in s),
         top=statistics.median(x.top for x in s),
     )
+
+
+def measure(face: Face) -> Strokes:
+    """The font's typical strokes and edges, measured on the consonants it has."""
+    order = face.tt.getGlyphOrder()
+    gids = [order.index(face.cmap[ord(c)]) for c in CONSONANTS if ord(c) in face.cmap]
+    if not gids:
+        raise ValueError(f"{face.path.name} has no Kannada consonants")
+    return reference([face.outline(g) for g in gids])
+
+
+@dataclass(frozen=True)
+class Target:
+    """What a drafted glyph must look like.
+
+    holes: counters after overlap removal. on_baseline: the body spans baseline to x-height.
+    scanline: stems and strokes are measured along rows and columns; off for shapes whose rows
+    cut curves at a slant. aspect_to_a: ink width over height, relative to the font's ಅ.
+    ring: a raised ring sized from the font's ಂ.
+    """
+
+    holes: int
+    on_baseline: bool
+    scanline: bool
+    aspect_to_a: float | None = None
+    ring: bool = False
+
+
+# Proportions are Noto Sans Kannada Regular's.
+DRAFT_TARGETS = {
+    0x0CDC: Target(holes=1, on_baseline=True, scanline=True, aspect_to_a=0.90),
+    0x0CDD: Target(holes=0, on_baseline=True, scanline=False, aspect_to_a=0.71),
+    0x0CF3: Target(holes=1, on_baseline=False, scanline=False, ring=True),
+}
+RING_HEIGHT, RING_BOTTOM = 0.49, 0.83
+LETTER_A, ANUSVARA = 0x0C85, 0x0C82
+
+
+def gate_glyph(face: Face, codepoint: int, ref: Strokes) -> list[GateResult]:
+    """The outline gates that suit 1 drafted glyph in a built font."""
+    name = face.cmap.get(codepoint)
+    if name is None:
+        return [GateResult("present", False, "no glyph in the cmap")]
+    target = DRAFT_TARGETS[codepoint]
+    needed = [LETTER_A] * (target.aspect_to_a is not None) + [ANUSVARA] * target.ring
+    missing = [f"U+{cp:04X}" for cp in needed if cp not in face.cmap]
+    if missing:
+        return [GateResult("present", False, f"the font has no {' '.join(missing)} to compare")]
+    path = _outline(face, codepoint)
+    pen = RecordingPen()
+    face.tt.getGlyphSet()[name].draw(pen)
+    results = [gate_weight(path, ref)]
+    if target.scanline:
+        results.append(gate_strokes(path, ref))
+    if target.on_baseline:
+        results.append(gate_vertical(path, ref))
+    if target.aspect_to_a is not None:
+        results.append(gate_aspect(path, _outline(face, LETTER_A), target.aspect_to_a))
+    if target.ring:
+        results.append(gate_ring(path, _outline(face, ANUSVARA), ref))
+    results.append(
+        gate_contours(pen.value, outer_sign=outer_sign(face.tt), expected_holes=target.holes)
+    )
+    return results
+
+
+def _outline(face: Face, codepoint: int) -> pathops.Path:
+    return face.outline(face.tt.getGlyphOrder().index(face.cmap[codepoint]))
+
+
+def _aspect(path: pathops.Path) -> float:
+    x0, y0, x1, y1 = path.bounds
+    return (x1 - x0) / (y1 - y0) if y1 > y0 else 0.0
+
+
+def gate_aspect(
+    draft: pathops.Path, letter_a: pathops.Path, expected: float, tolerance: float = 0.2
+) -> GateResult:
+    """Width over height, relative to ಅ's, within a share of the expected ratio."""
+    ratio = _aspect(draft) / _aspect(letter_a)
+    ok = _rel(ratio, expected) <= tolerance
+    return GateResult("aspect", ok, f"width to ಅ {ratio:.2f} vs {expected:.2f}")
+
+
+def gate_ring(
+    draft: pathops.Path, anusvara: pathops.Path, ref: Strokes, tolerance: float = 0.15
+) -> GateResult:
+    """A ring RING_HEIGHT of ಂ's height, with its bottom at RING_BOTTOM of the x-height."""
+    _, y0, _, y1 = draft.bounds
+    _, a0, _, a1 = anusvara.bounds
+    height = (y1 - y0) / (a1 - a0)
+    x_height = ref.top - ref.bottom
+    bottom = (y0 - ref.bottom) / x_height
+    ok = _rel(height, RING_HEIGHT) <= tolerance and abs(bottom - RING_BOTTOM) <= 0.05
+    detail = f"height to ಂ {height:.2f} vs {RING_HEIGHT}, bottom {bottom:.2f} vs {RING_BOTTOM}"
+    return GateResult("ring", ok, detail)
 
 
 def gate_strokes(draft: pathops.Path, ref: Strokes, tolerance: float = 0.15) -> GateResult:
@@ -119,11 +219,23 @@ def gate_strokes(draft: pathops.Path, ref: Strokes, tolerance: float = 0.15) -> 
     return GateResult("strokes", not bad, detail)
 
 
+def gate_weight(draft: pathops.Path, ref: Strokes, tolerance: float = 0.15) -> GateResult:
+    """Mean stroke width within a share of the reference."""
+    weight = mean_stroke_width(draft)
+    ok = _rel(weight, ref.weight) <= tolerance
+    return GateResult("weight", ok, f"mean stroke {weight:.0f} vs {ref.weight:.0f}")
+
+
 def gate_vertical(draft: pathops.Path, ref: Strokes, tolerance: float = 20) -> GateResult:
-    """The glyph body sits on the baseline and reaches the x-height, as the reference glyphs do."""
+    """The glyph body sits on the baseline and reaches the x-height, as the reference glyphs do.
+
+    The bottom is the lowest ink, since a long top bar can outnumber the bottom stroke in the
+    common-edge count; the top is the common edge, so a flick above the x-height is allowed.
+    """
     d = strokes(draft)
-    ok = abs(d.bottom - ref.bottom) <= tolerance and abs(d.top - ref.top) <= tolerance
-    detail = f"bottom {d.bottom:.0f} vs {ref.bottom:.0f}, top {d.top:.0f} vs {ref.top:.0f}"
+    bottom = draft.bounds[1]
+    ok = abs(bottom - ref.bottom) <= tolerance and abs(d.top - ref.top) <= tolerance
+    detail = f"bottom {bottom:.0f} vs {ref.bottom:.0f}, top {d.top:.0f} vs {ref.top:.0f}"
     return GateResult("vertical", ok, detail)
 
 

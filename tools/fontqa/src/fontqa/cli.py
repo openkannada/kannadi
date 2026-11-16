@@ -1,8 +1,9 @@
-"""Command line: fetch the fonts, run the tests, check 1 font file."""
+"""Command line: fetch the fonts, run the tests, check font files, gate drafted glyphs."""
 
 from __future__ import annotations
 
 import argparse
+import json
 import sys
 from collections import Counter
 from pathlib import Path
@@ -12,6 +13,7 @@ from fontTools.ttLib import TTFont
 from . import compose, fixes
 from . import fetch as fetching
 from .checks import FAILURES, mark_indistinct, run_case
+from .gates import DRAFT_TARGETS, gate_glyph, measure
 from .kannada import all_cases
 from .proof import sheet
 from .report import (
@@ -64,6 +66,18 @@ def main(argv: list[str] | None = None) -> int:
     x.add_argument("--compose-rr", action="store_true", help="add U+0CC4 from U+0CC3 and U+0CC2")
     x.add_argument("--compose-l", action="store_true", help="add U+0CE2 and U+0CE3 as subscripts")
 
+    m = sub.add_parser("measure", help="print a font's stems and edges as JSON")
+    m.add_argument("font", type=Path)
+
+    g = sub.add_parser("gate", help="run the outline gates on drafted glyphs")
+    g.add_argument("font", type=Path)
+    g.add_argument(
+        "--chars",
+        nargs="+",
+        default=[f"{cp:04X}" for cp in DRAFT_TARGETS],
+        help="hex codepoints, from: " + " ".join(f"{cp:04X}" for cp in DRAFT_TARGETS),
+    )
+
     sub.add_parser("cases", help="print the test strings as CSV").add_argument(
         "--out", type=Path, default=Path("/dev/stdout")
     )
@@ -74,6 +88,8 @@ def main(argv: list[str] | None = None) -> int:
         "run": cmd_run,
         "check": cmd_check,
         "fix": cmd_fix,
+        "measure": cmd_measure,
+        "gate": cmd_gate,
         "cases": cmd_cases,
     }[args.cmd](args)
 
@@ -179,6 +195,28 @@ def cmd_fix(args) -> int:
         print(f"added: {' '.join(compose.compose_l_signs(font))}")
     font.save(str(args.out))
     return 0
+
+
+def cmd_measure(args) -> int:
+    ref = measure(Face(args.font))
+    print(json.dumps({k: round(v, 1) for k, v in vars(ref).items()}))
+    return 0
+
+
+def cmd_gate(args) -> int:
+    face = Face(args.font)
+    ref = measure(face)
+    failed = 0
+    for code in args.chars:
+        cp = int(code, 16)
+        if cp not in DRAFT_TARGETS:
+            print(f"U+{cp:04X}: no gate target", file=sys.stderr)
+            return 2
+        for result in gate_glyph(face, cp, ref):
+            failed += not result.passed
+            verdict = "pass" if result.passed else "FAIL"
+            print(f"U+{cp:04X} {result.name}: {verdict}: {result.detail}")
+    return 1 if failed else 0
 
 
 def cmd_cases(args) -> int:

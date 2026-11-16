@@ -16,7 +16,7 @@ from fontTools.pens.recordingPen import DecomposingRecordingPen
 from fontTools.pens.ttGlyphPen import TTGlyphPen
 from fontTools.ttLib import TTFont
 
-from .outline import polygons
+from .outline import mean_stroke_width
 
 U_SIGN, UU_SIGN, R_SIGN, RR_SIGN = 0x0CC1, 0x0CC2, 0x0CC3, 0x0CC4
 L_SIGN, LL_SIGN = 0x0CE2, 0x0CE3
@@ -71,7 +71,7 @@ def tail(font: TTFont, short: str, long: str) -> pathops.Path:
     whole = to_path(contours(font, long))
     whole.simplify(fix_winding=True)
     x0, y0, x1, y1 = whole.bounds
-    cut = font["hmtx"][short][0] - stem(base)
+    cut = font["hmtx"][short][0] - mean_stroke_width(base)
     if cut >= x1:
         raise ComposeError(f"{long} has nothing right of {short}")
     box = pathops.Path()
@@ -130,19 +130,6 @@ def compose_l_signs(font: TTFont) -> list[str]:
     return added
 
 
-def stem(path: pathops.Path) -> float:
-    """Mean stroke width of an outline: 2 x area / perimeter, close for long thin strokes."""
-    flat = pathops.Path(path)
-    flat.convertConicsToQuads()
-    perimeter = 0.0
-    for contour in polygons(flat, steps=8):
-        perimeter += sum(
-            ((x1 - x0) ** 2 + (y1 - y0) ** 2) ** 0.5
-            for (x0, y0), (x1, y1) in zip(contour, contour[1:] + contour[:1], strict=True)
-        )
-    return 2 * abs(flat.area) / perimeter if perimeter else 0.0
-
-
 def _require(cmap, *cps):
     missing = [f"U+{cp:04X}" for cp in cps if cp not in cmap]
     if missing:
@@ -177,11 +164,11 @@ def _add_subscript(font, name, cp, letter: pathops.Path, model: str) -> str:
     """Fit letter into the model subscript's box, thicken it to the model's stem, add it."""
     target = to_path(contours(font, model))
     target.simplify(fix_winding=True)
-    want = stem(target)
+    want = mean_stroke_width(target)
     gap = 0.0
     for _ in range(3):
         path = _fit(letter, target.bounds, inset=gap / 2)
-        gap = max(0.0, want - stem(path))
+        gap = max(0.0, want - mean_stroke_width(path))
     if gap > 1:
         stroke = pathops.Path()
         stroke.addPath(path)

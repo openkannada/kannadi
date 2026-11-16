@@ -1,18 +1,26 @@
+from fontTools.fontBuilder import FontBuilder
+from fontTools.pens.recordingPen import replayRecording
+from fontTools.pens.ttGlyphPen import TTGlyphPen
 from fontTools.ttLib import TTFont
 
+from fontqa.cli import main
 from fontqa.gates import (
     gate_compatible,
     gate_contours,
+    gate_glyph,
     gate_shaping,
     gate_strokes,
     gate_vertical,
+    gate_weight,
     ink_runs,
+    measure,
     outer_sign,
     reference,
     strokes,
     to_path,
 )
 from fontqa.kannada import ZWNJ, Case
+from fontqa.outline import mean_stroke_width, polygons, split_contours
 from fontqa.shaping import Face
 
 from .synth import ANUSVARA, E_SIGN, KA, KHA, OLD_ORDER_FEA, VIRAMA, build
@@ -153,3 +161,125 @@ def test_shaping_gate_catches_a_sign_drawn_like_another(tmp_path):
 def test_vertical_gate_measures_edges_before_rounding():
     ref = reference([to_path(ring())])
     assert not gate_vertical(to_path(ring(y=25)), ref).passed
+
+
+def test_off_curve_only_contour_is_flattened_as_a_closed_curve():
+    # 4 off-curve points, no on-curve point: TrueType's implied-point circle of radius 100.
+    circle = [("qCurveTo", ((100, 0), (0, 100), (-100, 0), (0, -100), None)), ("closePath", ())]
+    (poly,) = polygons(to_path(circle), steps=16)
+    radii = [(x * x + y * y) ** 0.5 for x, y in poly]
+    assert min(radii) > 49 and max(radii) < 101
+
+
+def test_quadratic_with_implied_points_is_split_into_quadratics():
+    # 2 off-curve points imply an on-curve point at their midpoint (100, 100).
+    rec = [
+        ("moveTo", ((0, 0),)),
+        ("qCurveTo", ((0, 100), (200, 100), (200, 0))),
+        ("closePath", ()),
+    ]
+    (poly,) = polygons(to_path(rec), steps=4)
+    assert (100, 100) in [(round(x), round(y)) for x, y in poly]
+
+
+def test_weight_gate_compares_mean_stroke_width():
+    ref = reference([to_path(ring())])
+    assert gate_weight(to_path(ring(w=300)), ref).passed
+    assert not gate_weight(to_path(ring(stem=90, stroke=80)), ref).passed
+    assert mean_stroke_width(to_path(ring())) > 0
+
+
+def _rec_glyph(rec):
+    pen = TTGlyphPen(None)
+    replayRecording(rec, pen)
+    return pen.glyph()
+
+
+def drafted_font(path, cf3=None, cdd=None):
+    """Ring consonants, ಅ and ಂ, a raised ring U+0CF3 and a C-shaped U+0CDD, unless replaced."""
+    c_shape = box(0, 0, 400, 50) + box(0, 450, 400, 500) + box(0, 0, 60, 500)
+    glyphs = {
+        ".notdef": box(0, 0, 400, 500),
+        **{name: ring() for name in ("ka", "kha", "ga")},
+        "a": ring(w=600),
+        "anusvara": ring(),
+        "uni0CF3": cf3 if cf3 is not None else ring(y=415, w=200, h=245),
+        "uni0CDD": cdd if cdd is not None else c_shape,
+    }
+    cmap = {0x0C95: "ka", 0x0C96: "kha", 0x0C97: "ga", 0x0C85: "a", 0x0C82: "anusvara"}
+    cmap |= {0x0CF3: "uni0CF3", 0x0CDD: "uni0CDD"}
+    fb = FontBuilder(1000, isTTF=True)
+    fb.setupGlyphOrder(list(glyphs))
+    fb.setupCharacterMap(cmap)
+    fb.setupGlyf({n: _rec_glyph(_cw(r)) for n, r in glyphs.items()})
+    fb.setupHorizontalMetrics({n: (700, 0) for n in glyphs})
+    fb.setupHorizontalHeader(ascent=800, descent=-200)
+    fb.setupNameTable({"familyName": "Drafts", "styleName": "Regular"})
+    fb.setupOS2()
+    fb.setupPost()
+    fb.save(str(path))
+    return path
+
+
+def _cw(rec):
+    """TrueType outer contours run clockwise: reverse every contour of a counter-clockwise box."""
+    out = []
+    for contour in split_contours(rec):
+        pts = [args[0] for op, args in contour if args]
+        out += [("moveTo", (pts[0],))] + [("lineTo", (p,)) for p in reversed(pts[1:])]
+        out.append(("closePath", ()))
+    return out
+
+
+def test_measure_reads_the_consonants(tmp_path):
+    ref = measure(Face(drafted_font(tmp_path / "d.ttf")))
+    assert (round(ref.vstem), round(ref.hstem), ref.bottom, ref.top) == (60, 50, 0, 500)
+
+
+def test_gate_glyph_passes_matching_drafts(tmp_path):
+    face = Face(drafted_font(tmp_path / "d.ttf"))
+    ref = measure(face)
+    for cp in (0x0CF3, 0x0CDD):
+        results = gate_glyph(face, cp, ref)
+        assert all(r.passed for r in results), [r.detail for r in results]
+
+
+def test_gate_glyph_catches_a_full_size_ring_on_the_baseline(tmp_path):
+    face = Face(drafted_font(tmp_path / "d.ttf", cf3=ring()))
+    failed = {r.name for r in gate_glyph(face, 0x0CF3, measure(face)) if not r.passed}
+    assert "ring" in failed
+
+
+def test_gate_glyph_catches_a_draft_3_times_too_wide(tmp_path):
+    wide = box(0, 0, 1200, 50) + box(0, 450, 1200, 500) + box(0, 0, 60, 500)
+    face = Face(drafted_font(tmp_path / "d.ttf", cdd=wide))
+    failed = {r.name for r in gate_glyph(face, 0x0CDD, measure(face)) if not r.passed}
+    assert "aspect" in failed
+
+
+def test_gate_glyph_catches_a_filled_ring_and_a_missing_glyph(tmp_path):
+    face = Face(drafted_font(tmp_path / "d.ttf", cf3=box(0, 415, 200, 660)))
+    ref = measure(face)
+    failed = {r.name for r in gate_glyph(face, 0x0CF3, ref) if not r.passed}
+    assert {"weight", "contours"} <= failed
+    assert [r.name for r in gate_glyph(face, 0x0CDC, ref)] == ["present"]
+
+
+def test_gate_glyph_reports_a_missing_reference_letter(tmp_path):
+    font = TTFont(str(drafted_font(tmp_path / "d.ttf")))
+    for table in font["cmap"].tables:
+        table.cmap.pop(0x0C82, None)
+    font.save(str(tmp_path / "no-anusvara.ttf"))
+    face = Face(tmp_path / "no-anusvara.ttf")
+    (result,) = gate_glyph(face, 0x0CF3, measure(face))
+    assert not result.passed and "U+0C82" in result.detail
+
+
+def test_gate_command_exit_codes(tmp_path, capsys):
+    good = drafted_font(tmp_path / "good.ttf")
+    assert main(["gate", str(good), "--chars", "0CF3", "0CDD"]) == 0
+    bad = drafted_font(tmp_path / "bad.ttf", cdd=box(0, 0, 400, 500))
+    assert main(["gate", str(bad), "--chars", "0CDD"]) == 1
+    assert main(["gate", str(good), "--chars", "0C95"]) == 2
+    assert main(["measure", str(good)]) == 0
+    assert '"vstem": 60.0' in capsys.readouterr().out

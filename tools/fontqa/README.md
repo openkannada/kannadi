@@ -65,10 +65,40 @@ The composed signs are drafts. A Kannada reader checks the proof sheet before th
 
 `fontqa.gates` checks a drafted glyph against the font it goes into:
 
+- `gate_weight`: mean stroke width (2 x area / perimeter) within 15% of the font's consonants;
 - `gate_strokes`: vertical stem, horizontal stroke and their ratio within 15% of the font's own glyphs, measured on scanlines;
 - `gate_vertical`: the bottom and top ink edges within 20 units of theirs;
 - `gate_contours`: closed contours with no tiny contours or short segments, the font's contour direction (`outer_sign` gives it: clockwise for TrueType, counter-clockwise for CFF), and the expected number of counters with no slivers after overlap removal;
 - `gate_compatible`: the same contours, points and contour directions in every master of a variable font;
 - `gate_shaping`: no test string fails that passed before, `indistinct` included.
 
+`gate_glyph` runs the outline gates that suit 1 drafted character (`DRAFT_TARGETS`): U+0CDC, U+0CDD and U+0CF3.
+
+- Scanline stems do not suit U+0CDD and U+0CF3, whose rows cut curves at a slant, so those get the weight gate instead.
+- `gate_aspect` holds U+0CDC and U+0CDD to Noto Sans Kannada Regular's width relative to ಅ, within 20%.
+- `gate_ring` holds U+0CF3 to 0.49 of ಂ's height, within 15%, with its bottom at 0.83 of the x-height.
+
+Noto Sans Kannada's own U+0CDD and U+0CF3 pass.
+
+From the command line:
+
+    uv run fontqa measure FONT.ttf            # stems, mean stroke width and edges as JSON
+    uv run fontqa gate FONT.ttf --chars 0CDD  # exit 1 if a gate fails
+
 Passing the gates means a draft is well formed and in proportion. It does not mean the shape is right; a reader decides that.
+
+## Drafting glyphs
+
+`tools/glyphdraft` drafts U+0CDC, U+0CDD and U+0CF3 into a FontForge source, matched to that font:
+
+    uv run fontqa measure Font.ttf > measure.json
+    fontforge -lang=py -script ../glyphdraft/draft.py Font.sfd measure.json
+    # build the font, then
+    uv run fontqa gate Font.ttf
+
+- U+0CDC and U+0CDD are skeletons (`skeletons.py`) stroked with an elliptical nib in the proportion of the font's stems. The nib is rescaled over 4 rounds until the mean stroke width matches the consonants' weight from `fontqa measure`. Height follows the consonants' edges and width follows the font's ಅ.
+- U+0CF3 is the font's own ಂ, scaled to 0.49, emboldened back to 0.9 of the ಂ's stroke width, with its bottom at 0.83 of the x-height.
+- A glyph that already has ink or references is left alone.
+- FontForge can print `Internal Error (overlap)` while removing overlaps in a real font; the gates decide whether the result is usable. The CI run on the synthetic font fails on such errors.
+
+The drafts are a starting point for a reader to judge, not finished design.
