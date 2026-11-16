@@ -149,6 +149,10 @@ def gate_glyph(face: Face, codepoint: int, ref: Strokes) -> list[GateResult]:
     if name is None:
         return [GateResult("present", False, "no glyph in the cmap")]
     target = DRAFT_TARGETS[codepoint]
+    needed = [LETTER_A] * (target.aspect_to_a is not None) + [ANUSVARA] * target.ring
+    missing = [f"U+{cp:04X}" for cp in needed if cp not in face.cmap]
+    if missing:
+        return [GateResult("present", False, f"the font has no {' '.join(missing)} to compare")]
     path = _outline(face, codepoint)
     pen = RecordingPen()
     face.tt.getGlyphSet()[name].draw(pen)

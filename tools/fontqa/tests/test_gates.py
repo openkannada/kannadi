@@ -265,6 +265,16 @@ def test_gate_glyph_catches_a_filled_ring_and_a_missing_glyph(tmp_path):
     assert [r.name for r in gate_glyph(face, 0x0CDC, ref)] == ["present"]
 
 
+def test_gate_glyph_reports_a_missing_reference_letter(tmp_path):
+    font = TTFont(str(drafted_font(tmp_path / "d.ttf")))
+    for table in font["cmap"].tables:
+        table.cmap.pop(0x0C82, None)
+    font.save(str(tmp_path / "no-anusvara.ttf"))
+    face = Face(tmp_path / "no-anusvara.ttf")
+    (result,) = gate_glyph(face, 0x0CF3, measure(face))
+    assert not result.passed and "U+0C82" in result.detail
+
+
 def test_gate_command_exit_codes(tmp_path, capsys):
     good = drafted_font(tmp_path / "good.ttf")
     assert main(["gate", str(good), "--chars", "0CF3", "0CDD"]) == 0

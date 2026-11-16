@@ -202,20 +202,23 @@ class Drafter:
         glyph.foreground = ink
         self.clean(glyph)
 
-    def ring(self, glyph, rounds=4):
-        """The font's anusvara, scaled down and raised, emboldened over a few rounds until its
-        mean stroke width is RING_WEIGHT of the anusvara's."""
+    def ring(self, glyph, rounds=5):
+        """The font's anusvara, scaled and emboldened over a few rounds until its height is
+        RING_SCALE of the anusvara's and its mean stroke width RING_WEIGHT of the anusvara's."""
         source = glyph_for(self.font, ANUSVARA)
-        target = mean_stroke_width(source.foreground) * skeletons.RING_WEIGHT
-        s = skeletons.RING_SCALE
-        added = 0.0
-        for _ in range(rounds + 1):
+        target_weight = mean_stroke_width(source.foreground) * skeletons.RING_WEIGHT
+        _, a0, _, a1 = bounds(source)
+        target_height = (a1 - a0) * skeletons.RING_SCALE
+        scale, added = skeletons.RING_SCALE, 0.0
+        for _ in range(rounds):
             glyph.foreground = source.foreground.dup()
-            glyph.transform((s, 0, 0, s, 0, 0))
+            glyph.transform((scale, 0, 0, scale, 0, 0))
             if added > 0:
                 glyph.changeWeight(added, "auto", 0, 0, "squish")
             self.clean(glyph)
-            added += target - mean_stroke_width(glyph.foreground)
+            _, y0, _, y1 = bounds(glyph)
+            added += target_weight - mean_stroke_width(glyph.foreground)
+            scale *= target_height / (y1 - y0)
         _, ymin, _, _ = bounds(glyph)
         bottom = self.bottom + skeletons.RING_BOTTOM * (self.top - self.bottom)
         glyph.transform((1, 0, 0, 1, 0, round(bottom - ymin)))
