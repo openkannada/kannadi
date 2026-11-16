@@ -4,6 +4,7 @@
 
 ### Added
 
+- `tools/glyphdraft`: drafts U+0CDC, U+0CDD and U+0CF3 into a FontForge source, matched to the font's stems, weight, heights and spacing. fontqa `measure` and `gate` commands, and a mean stroke width gate.
 - Akshara segmentation (`aksharas`, `split`, `count_aksharas`), including conjuncts, nukta, ZWJ and ZWNJ after a virama, and Old Kannada letters.
 - Normalization (`normalize`): NFC, look-alike vowel letters, repeated marks. `fix_zero_as_anusvara` for converted and scanned text.
 - Modernization (`modernize`): ೞ to ಳ, ಱ to ರ, ೝ to ನ್.
@@ -22,3 +23,8 @@
 - `kannadi-wasm`: `malformed`, `fixes`, `countAksharas`, `modernize`, and unknown glyph offsets in the converted text.
 - Nudi and Baraha ANSI to Unicode (`legacy::nudi_to_unicode`), with a glyph table derived from the font files, reports of unknown glyphs and malformed syllables, and fixtures from Karnataka government pages.
 - `tools/fontqa`: HarfBuzz shaping tests for Kannada fonts, results for 41 fonts (146 faces) with a data card, proof sheets, and fixes for broken `knd2` tables, broken `morx` tables and missing ೄ, ೢ and ೣ.
+
+### Fixed
+
+- fontqa outline flattening: a TrueType quadratic with several off-curve points is split at its implied on-curve points, and a closed contour with no on-curve point is read. Stroke measurements on TrueType fonts were slightly off before.
+- fontqa manifest: Navilu is OFL-1.1 with Reserved Font Name Navilu, not GPL.

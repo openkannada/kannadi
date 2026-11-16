@@ -7,6 +7,7 @@ from fontTools.ttLib.tables.DefaultTable import DefaultTable
 
 from fontqa import compose, fixes
 from fontqa.checks import run_case
+from fontqa.outline import mean_stroke_width
 from fontqa.shaping import Face, area
 
 from .synth import KA, KHA, OLD_ORDER_FEA, VIRAMA, build
@@ -137,7 +138,7 @@ def test_l_sign_takes_the_subscript_box_and_mark_class(tmp_path):
     face = Face(tmp_path / "out.ttf")
     new = face.outline(face.font.get_nominal_glyph(0x0CE2))
     model = face.outline(face.font.get_glyph_from_name("la.blwf"))
-    assert compose.stem(new) == pytest.approx(compose.stem(model), rel=0.2)
+    assert mean_stroke_width(new) == pytest.approx(mean_stroke_width(model), rel=0.2)
 
 
 def test_compose_refuses_a_font_without_the_parts(tmp_path):
@@ -152,7 +153,7 @@ def test_stem_of_a_bar_is_its_width():
     bar = compose.to_path([(("moveTo", ((0, 0),)), ("lineTo", ((0, 1000),)),
                             ("lineTo", ((80, 1000),)), ("lineTo", ((80, 0),)),
                             ("closePath", ()))])  # fmt: skip
-    assert compose.stem(bar) == pytest.approx(80, rel=0.1)
+    assert mean_stroke_width(bar) == pytest.approx(80, rel=0.1)
 
 
 MIXED_FEA = """
