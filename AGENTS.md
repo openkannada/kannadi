@@ -51,8 +51,10 @@ crates/kannadi-cli/   the `kannadi` binary: batch conversion of files and folder
   src/convert.rs      1 piece of text in either direction, with its issues
   src/report.rs       the per-file report
   src/fonts.rs        which font names are Nudi and Baraha ANSI fonts
+  src/edits.rs        rewriting a document by byte ranges
   src/txt.rs          plain text files
   src/html/           HTML: a small tokenizer, CSS font rules, character references
+  src/docx/           DOCX: styles, and paragraphs, runs and text found by position
 crates/kannadi-wasm/  wasm-bindgen bindings for the page; offsets in UTF-16 code units
 web/
   src/                the static editor page: HTML, CSS, fonts (OFL), JavaScript

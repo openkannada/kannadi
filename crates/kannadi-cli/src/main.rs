@@ -1,6 +1,7 @@
 //! `kannadi`: converts folders of documents between Nudi or Baraha ANSI and Unicode.
 
 mod convert;
+mod docx;
 mod edits;
 mod files;
 mod fonts;
@@ -53,8 +54,8 @@ enum Command {
 
 #[derive(Args)]
 struct Common {
-    /// Files and folders to convert. Folders are searched for .txt, .htm and
-    /// .html files.
+    /// Files and folders to convert. Folders are searched for .txt, .htm, .html
+    /// and .docx files.
     #[arg(required = true)]
     inputs: Vec<PathBuf>,
     /// Folder to write the converted files to.
@@ -64,7 +65,7 @@ struct Common {
     /// unencodable characters.
     #[arg(long)]
     strict: bool,
-    /// Font for converted text in HTML: Noto Sans Kannada by default for
+    /// Font for converted text in HTML and DOCX: Noto Sans Kannada by default for
     /// to-unicode, Nudi 01 e for to-nudi.
     #[arg(long, value_name = "NAME")]
     font: Option<String>,
@@ -152,6 +153,7 @@ fn convert_job(job: &Job, settings: &Settings) -> Result<Report> {
     let (out, report) = match job.format {
         Format::Txt => txt::convert_file(&bytes, settings)?,
         Format::Html => html::convert_file(&bytes, settings)?,
+        Format::Docx => docx::convert_file(&bytes, settings)?,
     };
     if let Some(dir) = job.output.parent() {
         std::fs::create_dir_all(dir).with_context(|| format!("creating {}", dir.display()))?;

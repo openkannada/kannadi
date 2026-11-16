@@ -1,5 +1,5 @@
 use kannadi::chars::{class, Class};
-use kannadi::legacy::{nudi_to_unicode, unicode_to_nudi, Options};
+use kannadi::legacy::{nudi_syllable_starts, nudi_to_unicode, unicode_to_nudi, Options};
 use kannadi::{aksharas, from_latin, modernize, normalize, numerals, split, to_latin, Scheme};
 use proptest::prelude::*;
 use unicode_normalization::UnicodeNormalization;
@@ -186,6 +186,25 @@ proptest! {
             let expected: String = numerals::to_ascii_digits(&s).nfc().collect();
             prop_assert_eq!(back.text, expected);
         }
+    }
+
+    #[test]
+    fn nudi_converts_the_same_split_at_syllable_starts(
+        words in prop::collection::vec(nudi_word(), 1..4),
+        cuts in prop::collection::vec(any::<prop::sample::Index>(), 0..6),
+    ) {
+        let legacy = unicode_to_nudi(&words.join(" ")).text;
+        let starts = nudi_syllable_starts(&legacy);
+        let mut at: Vec<usize> = cuts.iter().map(|c| starts[c.index(starts.len())]).collect();
+        at.extend([0, legacy.len()]);
+        at.sort_unstable();
+        at.dedup();
+        let options = Options { zero_as_anusvara: false, ..Options::default() };
+        let pieces: String = at
+            .windows(2)
+            .map(|w| nudi_to_unicode(&legacy[w[0]..w[1]], &options).text)
+            .collect();
+        prop_assert_eq!(pieces, nudi_to_unicode(&legacy, &options).text);
     }
 
     #[test]

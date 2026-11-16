@@ -96,6 +96,37 @@ pub fn nudi_to_unicode(text: &str, options: &Options) -> Conversion {
     writer.finish()
 }
 
+/// Byte offsets in legacy `text` where a syllable or other character starts, in
+/// order. Text split only at these offsets converts piece by piece the same way
+/// as whole, apart from a zero typed for ಂ at a split. Signs, subscripts and other
+/// marks never start a piece.
+///
+/// ```
+/// use kannadi::legacy::nudi_syllable_starts;
+///
+/// assert_eq!(nudi_syllable_starts("PÀ£ÀßqÀ"), [0, 3, 9]);
+/// ```
+pub fn nudi_syllable_starts(text: &str) -> Vec<usize> {
+    let table = table();
+    let chars: Vec<(usize, char)> = text.char_indices().collect();
+    let mut starts = Vec::new();
+    let mut i = 0;
+    while i < chars.len() {
+        let (starts_here, len) = match table.longest_match(chars[i..].iter().map(|&(_, c)| c)) {
+            Some((entry, len)) => (
+                matches!(entry, Entry::Letter(_) | Entry::Base(_) | Entry::Literal(_)),
+                len,
+            ),
+            None => (true, 1),
+        };
+        if starts_here || i == 0 {
+            starts.push(chars[i].0);
+        }
+        i += len;
+    }
+    starts
+}
+
 fn table() -> &'static Lookup<Entry> {
     static TABLE: OnceLock<Lookup<Entry>> = OnceLock::new();
     TABLE.get_or_init(|| {
@@ -482,6 +513,14 @@ mod tests {
             assert!(!report(input).malformed.is_empty(), "{input:?}");
         }
         assert!(report("PÉÆÃ").is_clean());
+    }
+
+    #[test]
+    fn syllable_starts_skip_marks() {
+        assert_eq!(nudi_syllable_starts(""), Vec::<usize>::new());
+        assert_eq!(nudi_syllable_starts("ÀP"), [0, 2]);
+        let ksha = decode_windows_1252(&[0x50, 0xC0, 0xEB, 0x20, 0x41, 0x69, 0xC0, 0xC4]);
+        assert_eq!(nudi_syllable_starts(&ksha), [0, 5, 6]);
     }
 
     #[test]

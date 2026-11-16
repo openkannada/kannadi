@@ -9,6 +9,7 @@ use anyhow::{bail, Context, Result};
 pub enum Format {
     Txt,
     Html,
+    Docx,
 }
 
 impl Format {
@@ -17,6 +18,7 @@ impl Format {
         match ext.as_str() {
             "txt" => Some(Format::Txt),
             "htm" | "html" => Some(Format::Html),
+            "docx" => Some(Format::Docx),
             _ => None,
         }
     }
