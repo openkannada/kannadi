@@ -158,9 +158,6 @@ impl<'a> LineWriter<'a> {
                 gap = true;
                 continue;
             };
-            if raw.is_empty() && mapped.as_deref().is_none_or(str::is_empty) {
-                continue;
-            }
             let font = &self.fonts.fonts[*font];
             match font.verdict {
                 Verdict::Legacy(source) => {
@@ -168,6 +165,9 @@ impl<'a> LineWriter<'a> {
                         (Source::Mapped, Some(mapped)) => mapped,
                         _ => raw,
                     };
+                    if text.is_empty() {
+                        continue;
+                    }
                     let font_reading = (font.layout(), font.kannada_digits);
                     if font_reading == reading && gap && inside_syllable(&legacy, text, reading.0) {
                         gap = false;
@@ -184,6 +184,7 @@ impl<'a> LineWriter<'a> {
                     space(&mut gap, &mut legacy, &mut out);
                     flush(&mut legacy, reading, &mut out, report);
                 }
+                Verdict::Other if raw.is_empty() => {}
                 Verdict::Other => {
                     space(&mut gap, &mut legacy, &mut out);
                     flush(&mut legacy, reading, &mut out, report);
@@ -199,12 +200,16 @@ impl<'a> LineWriter<'a> {
 
 /// Whether a gap the page leaves between `legacy` and `next` falls inside a
 /// syllable: a space there would leave more problems than none, as before a sign
-/// or subscript. Only the last syllable of `legacy` is converted again.
+/// or subscript. Only the last 2 syllables of `legacy` are converted again, since
+/// a letter drawn with several glyphs, such as Nudi's ಯ, may read as 2 when cut.
 fn inside_syllable(legacy: &str, next: &str, layout: Layout) -> bool {
-    let Some(&last) = syllable_starts(legacy, layout).last() else {
+    let window = legacy.char_indices().rev().nth(31).map_or(0, |(i, _)| i);
+    let recent = &legacy[window..];
+    let starts = syllable_starts(recent, layout);
+    let Some(&from) = starts.iter().rev().nth(1).or(starts.first()) else {
         return false;
     };
-    let tail = &legacy[last..];
+    let tail = &recent[from..];
     let problems = |text: &str| {
         let c = to_unicode(text, layout, &Options::default());
         c.unknown.len() + c.malformed.len()
@@ -744,6 +749,15 @@ endcmap\nCMapName currentdict /CMap defineresource pop\nend\nend\n";
         let content = b"BT /F1 12 Tf 72 700 Td (d) Tj 30 0 Td (\xE2}\xE2) Tj 30 0 Td (d\xE2) Tj ET";
         let (text, report) = run(&pdf(vec![("F1", simple_font("AkrutiKndPadma"))], content));
         assert_eq!(text, "ಕನ ಕ\n");
+        assert!(report.rows.is_empty(), "{:?}", report.rows);
+    }
+
+    #[test]
+    fn a_gap_inside_a_letter_drawn_with_several_glyphs_is_not_a_word_space() {
+        // ಗೆಯು, with a gap inside the 4 glyphs of ಯ.
+        let content = b"BT /F1 12 Tf 72 700 Td (U\xC9Ai) Tj 30 0 Td (\xC0\xC4\xC4) Tj ET";
+        let (text, report) = run(&pdf(vec![("F1", simple_font("BRH Kannada"))], content));
+        assert_eq!(text, "ಗೆಯು\n");
         assert!(report.rows.is_empty(), "{:?}", report.rows);
     }
 
