@@ -721,6 +721,16 @@ endcmap\nCMapName currentdict /CMap defineresource pop\nend\nend\n";
     }
 
     #[test]
+    fn short_text_in_a_font_with_a_hidden_name_is_read_in_its_best_layout() {
+        // ಇತರ ಕ್ರಮ reads with no problems as Nudi too, as clusters.
+        let (text, _) = run(&pdf(
+            vec![("F1", simple_font("F1"))],
+            &shown("F1", b"Ey\xE2p\xE2 d\xE2Z\xC0\xE2\xB0"),
+        ));
+        assert_eq!(text, "ಇತರ ಕ್ರಮ\n");
+    }
+
+    #[test]
     fn fonts_with_hidden_names_are_read_in_the_layout_their_text_fits() {
         let (text, _) = run(&pdf(vec![("F1", simple_font("F1"))], &shown("F1", AKRUTI)));
         assert_eq!(text, "ರೋರಿಕ್ ಮತ್ತು ದೇವಿಕಾರಾಣಿ ರೋರಿಕ್\n");
