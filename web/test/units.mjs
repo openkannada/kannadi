@@ -14,6 +14,7 @@ import {
   isLegacyFont,
   joinSegments,
   looksLegacy,
+  nudiNotes,
   shiftAnchors,
   shiftRanges,
 } from "../src/js/text.js";
@@ -67,6 +68,15 @@ test("plain text that needs no conversion is kept exactly", () => {
   for (const text of ["    indented code\n\n\n\nend ", "ಕನ್ನಡ  ನಾಡು\r\n\t", " "]) {
     assert.deepEqual(pasted("", text, convert), { text, unknown: [], converted: 0 });
   }
+});
+
+test("Nudi notes say what happened to each character", () => {
+  assert.equal(nudiNotes(0, 0), "");
+  assert.equal(nudiNotes(1, 0), "1 character has no Nudi glyph and stayed as typed.");
+  assert.equal(
+    nudiNotes(3, 1, 2),
+    "1 character has no Nudi glyph and stayed as typed. 2 characters have no byte in a Nudi text file and became ?. 1 syllable is malformed and may not read back the same.",
+  );
 });
 
 test("markup escaping", () => {

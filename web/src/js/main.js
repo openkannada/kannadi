@@ -3,7 +3,7 @@ import { Composer } from "./compose.js";
 import { DocEditor } from "./editor.js";
 import { exportBlob, openFile, pasted } from "./files.js";
 import { Issues } from "./issues.js";
-import { countWords, looksLegacy } from "./text.js";
+import { countWords, looksLegacy, nudiNotes } from "./text.js";
 
 // From a Karnataka RDPR scheme page, Dec 2002, set in BRH Kannada:
 // https://web.archive.org/web/20021227171554/http://www.kar.nic.in:80/rdpr/kan-www/Schemes/Chapter-1/Matter/1_2(M).htm
@@ -162,16 +162,9 @@ async function open(file) {
   }
 }
 
-/** The document in Nudi glyph codes, and a sentence on what could not be written. */
+/** The document in Nudi glyph codes. */
 function nudi() {
-  const encoded = kannadi.toNudi(editor.text);
-  const lost = encoded.unencodable.length;
-  const broken = encoded.malformed.length / 2;
-  const notes = [
-    lost ? `${plural(lost, "character has", "characters have")} no Nudi glyph and stayed as typed.` : "",
-    broken ? `${plural(broken, "syllable is", "syllables are")} malformed and may not read back the same.` : "",
-  ].join(" ").trim();
-  return { text: encoded.text, notes };
+  return kannadi.toNudi(editor.text);
 }
 
 async function exportAs(format) {
@@ -181,9 +174,12 @@ async function exportAs(format) {
   let notes = "";
   if (format === "nudi") {
     const encoded = nudi();
-    blob = new Blob([kannadi.encodeWindows1252(encoded.text)], { type: "text/plain;charset=windows-1252" });
+    const bytes = kannadi.encodeWindows1252(encoded.text);
+    const chars = Array.from(encoded.text);
+    const questionMarks = chars.filter((c, i) => bytes[i] === 0x3f && c !== "?").length;
+    blob = new Blob([bytes], { type: "text/plain;charset=windows-1252" });
     name = `${fileName}-nudi.txt`;
-    notes = ` Set it in a Nudi or BRH font to read it. ${encoded.notes}`;
+    notes = ` Set it in a Nudi or BRH font to read it. ${nudiNotes(encoded.unencodable.length, encoded.malformed.length / 2, questionMarks)}`;
   } else {
     blob = await exportBlob(editor.text, format, fileName);
   }
@@ -192,7 +188,7 @@ async function exportAs(format) {
   link.download = name;
   link.click();
   setTimeout(() => URL.revokeObjectURL(link.href), 1000);
-  settings.lastFormat = format;
+  if (format !== "nudi") settings.lastFormat = format;
   saveSettings();
   say(`Saved ${link.download} to your downloads.${notes}`.trim());
   $("export-menu").open = false;
@@ -225,11 +221,12 @@ function convertSelection() {
   report({ ...result, converted: end - start }, whole ? "Converted the document" : "Converted the selection");
 }
 
-function setMode(mode) {
-  settings.mode = mode;
+function setMode(mode, remember = true) {
   composer.setMode(mode);
   for (const input of document.querySelectorAll('input[name="mode"]')) input.checked = input.value === mode;
   document.documentElement.dataset.mode = mode;
+  if (!remember) return;
+  settings.mode = mode;
   saveSettings();
 }
 
@@ -359,7 +356,8 @@ function wire() {
     const encoded = nudi();
     try {
       await navigator.clipboard.writeText(encoded.text);
-      say(`Copied as Nudi. Paste it into Word and set a Nudi or BRH font. ${encoded.notes}`.trim());
+      const notes = nudiNotes(encoded.unencodable.length, encoded.malformed.length / 2);
+      say(`Copied as Nudi. Paste it into Word and set a Nudi or BRH font. ${notes}`.trim());
     } catch {
       say("Could not copy. Save as Nudi text instead.");
     }
@@ -425,7 +423,8 @@ function restore() {
   ui.zero.checked = settings.zero;
   ui.digits.checked = settings.digits;
   // Typing pages open ready to type in English letters.
-  setMode(document.documentElement.dataset.defaultMode ?? settings.mode);
+  const pageMode = document.documentElement.dataset.defaultMode;
+  setMode(pageMode ?? settings.mode, !pageMode);
   setFont(settings.font);
   setTheme(settings.theme);
   if (saved?.text) {

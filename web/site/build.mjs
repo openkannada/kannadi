@@ -9,9 +9,18 @@ import { pathToFileURL } from "node:url";
 import { CHART, EXAMPLE_WORDS, PAGES } from "./pages.mjs";
 
 const dist = resolve(process.argv[2] ?? "web/dist");
-const site = (process.argv[3] ?? process.env.KANNADI_SITE_URL ?? "").replace(/\/*$/, "/");
-const hasSite = site !== "/";
-if (hasSite && !/^https:\/\/[^/]+\/(.+\/)?$/.test(site)) throw new Error(`site URL must be https: ${site}`);
+const site = siteUrl(process.argv[3] || process.env.KANNADI_SITE_URL || "");
+const hasSite = site !== "";
+
+/** The site URL with a trailing slash, or "" when none is given. */
+function siteUrl(value) {
+  if (!value) return "";
+  const url = new URL(value.endsWith("/") ? value : `${value}/`);
+  if (url.protocol !== "https:" || url.search || url.hash || url.username || url.password) {
+    throw new Error(`The site URL must be a plain https address: ${value}`);
+  }
+  return url.href;
+}
 
 const wasm = await import(pathToFileURL(join(dist, "pkg", "kannadi_wasm.js")).href);
 wasm.initSync({ module: readFileSync(join(dist, "pkg", "kannadi_wasm_bg.wasm")) });
@@ -41,14 +50,15 @@ function fill(html, name, content) {
 /** Makes the template's relative asset links work from a page `depth` folders down. */
 function rebase(html, root) {
   if (!root) return html;
-  return html.replace(/\b(href|src)="(?![a-z]+:|#|\/)([^"]*)"/g, (_, attr, url) =>
+  return html.replace(/(?<![\w-])(href|src)="(?![a-z]+:|#|\/)([^"]*)"/g, (_, attr, url) =>
     `${attr}="${url === "./" || url === "" ? root : root + url}"`,
   );
 }
 
-function head(page, root) {
+function head(page) {
   const url = hasSite ? site + page.path : null;
-  const image = `${hasSite ? site : root}og/${page.path ? page.path.slice(0, -1) : "home"}.png`;
+  // Social sites ignore relative image URLs, so the card needs the site URL.
+  const image = hasSite ? `${site}og/${page.path ? page.path.slice(0, -1) : "home"}.png` : null;
   const app = {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
@@ -65,7 +75,7 @@ function head(page, root) {
   const faq = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
-    mainEntity: page.faq.map(({ q, a }) => ({
+    mainEntity: page.faq.filter((f) => !f.shared || page.path === "").map(({ q, a }) => ({
       "@type": "Question",
       name: q,
       acceptedAnswer: { "@type": "Answer", text: plain(a) },
@@ -75,15 +85,15 @@ function head(page, root) {
   return [
     `<title>${escape(page.title)}</title>`,
     `<meta name="description" content="${escape(page.description)}">`,
-    url ? `<link rel="canonical" href="${url}">` : "",
+    url ? `<link rel="canonical" href="${escape(url)}">` : "",
     `<meta property="og:type" content="website">`,
     `<meta property="og:title" content="${escape(page.title)}">`,
     `<meta property="og:description" content="${escape(page.description)}">`,
-    url ? `<meta property="og:url" content="${url}">` : "",
-    `<meta property="og:image" content="${image}">`,
-    `<meta property="og:image:width" content="1200">`,
-    `<meta property="og:image:height" content="630">`,
-    `<meta name="twitter:card" content="summary_large_image">`,
+    url ? `<meta property="og:url" content="${escape(url)}">` : "",
+    image ? `<meta property="og:image" content="${escape(image)}">` : "",
+    image ? `<meta property="og:image:width" content="1200">` : "",
+    image ? `<meta property="og:image:height" content="630">` : "",
+    `<meta name="twitter:card" content="${image ? "summary_large_image" : "summary"}">`,
     `<script type="application/ld+json">\n${json(app)}\n</script>`,
     `<script type="application/ld+json">\n${json(faq)}\n</script>`,
   ]
@@ -91,7 +101,7 @@ function head(page, root) {
     .join("\n");
 }
 
-function chart() {
+function chart(kind) {
   const spell = (k) => [wasm.transliterate(k, "kannada", "baraha"), wasm.transliterate(k, "kannada", "iso15919")];
   const groups = Object.entries(CHART)
     .map(([name, letters]) => {
@@ -108,12 +118,17 @@ function chart() {
     const [b, i] = spell(k);
     return `<tr><td lang="kn">${k}</td><td><kbd>${escape(b)}</kbd></td><td>${escape(i)}</td></tr>`;
   }).join("");
+  if (kind === "words") {
+    return `<section aria-labelledby="chart-heading">
+<h2 id="chart-heading">Common Kannada words in English letters</h2>
+<p>Type the spelling in the middle column to get the word. Capitals matter: <kbd>D</kbd> is <span lang="kn">ಡ</span> and <kbd>d</kbd> is <span lang="kn">ದ</span>.</p>
+<table class="words"><thead><tr><th scope="col">Kannada</th><th scope="col">Type in Baraha</th><th scope="col">ISO 15919</th></tr></thead><tbody>${rows}</tbody></table>
+</section>`;
+  }
   return `<section aria-labelledby="chart-heading">
 <h2 id="chart-heading">Kannada letters in English letters</h2>
 <p>Each letter with its Baraha spelling, which this page uses, and its ISO 15919 spelling.</p>
 ${groups}
-<h3>Common words</h3>
-<table class="words"><thead><tr><th scope="col">Kannada</th><th scope="col">Type in Baraha</th><th scope="col">ISO 15919</th></tr></thead><tbody>${rows}</tbody></table>
 </section>`;
 }
 
@@ -131,7 +146,7 @@ function prose(page, root) {
 ${steps}
 </ol>
 </section>
-${page.chart ? chart() : ""}
+${page.chart ? chart(page.chart) : ""}
 <section aria-labelledby="faq-heading">
 <h2 id="faq-heading">Questions</h2>
 ${faq}
@@ -147,7 +162,7 @@ ${links}
 for (const page of PAGES) {
   const root = page.path ? "../".repeat(page.path.split("/").length - 1) : "";
   let html = rebase(template, root);
-  html = fill(html, "head", head(page, root));
+  html = fill(html, "head", head(page));
   html = fill(html, "intro", `<h1>${escape(page.h1)}</h1>\n<p>${page.intro}</p>`);
   html = fill(html, "lead", `<p class="empty-lead">${page.lead ?? DEFAULT_LEAD}</p>`);
   html = fill(html, "prose", prose(page, root));
@@ -158,7 +173,7 @@ for (const page of PAGES) {
 
 const robots = ["User-agent: *", "Allow: /"];
 if (hasSite) {
-  const urls = PAGES.map((p) => `  <url><loc>${site}${p.path}</loc></url>`).join("\n");
+  const urls = PAGES.map((p) => `  <url><loc>${escape(site + p.path)}</loc></url>`).join("\n");
   writeFileSync(
     join(dist, "sitemap.xml"),
     `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`,
@@ -170,11 +185,10 @@ writeFileSync(join(dist, "robots.txt"), robots.join("\n") + "\n");
 const llms = [
   "# kannadi Kannada editor",
   "",
-  "> A free Kannada editor that runs in the browser. It converts Kannada text typed in the old Nudi and Baraha ANSI fonts to Unicode, marks every glyph it could not convert with fixes, types Kannada from English letters (Baraha or ISO 15919), and saves as DOCX, TXT or HTML. Nothing is uploaded.",
+  "> A free Kannada editor that runs in the browser. It converts Kannada text typed in the old Nudi and Baraha ANSI fonts to Unicode, marks every glyph it could not convert with fixes, converts Unicode back to Nudi glyph codes, types Kannada from English letters (Baraha or ISO 15919), and saves as DOCX, TXT, HTML or Nudi text. Nothing is uploaded.",
   "",
-  ...PAGES.map((p) => `- [${p.h1}](${hasSite ? site : ""}${p.path}): ${plain(p.description)}`),
+  ...PAGES.map((p) => `- [${p.h1}](${hasSite ? site + p.path : p.path || "./"}): ${plain(p.description)}`),
   "",
-  "Unicode to Nudi conversion is not available yet.",
   "Source: https://github.com/prasadus92/kannadi (MIT).",
 ];
 writeFileSync(join(dist, "llms.txt"), llms.join("\n") + "\n");

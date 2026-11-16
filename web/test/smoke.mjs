@@ -90,7 +90,11 @@ for (const page of PAGES) {
   assert.ok(html.includes(`<h1>${page.h1}</h1>`), page.path);
   const blocks = [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)].map((m) => JSON.parse(m[1]));
   const faq = blocks.find((b) => b["@type"] === "FAQPage");
-  assert.equal(faq.mainEntity.length, page.faq.length, page.path);
+  const marked = page.faq.filter((f) => !f.shared || page.path === "");
+  assert.deepEqual(faq.mainEntity.map((e) => e.name), marked.map((f) => f.q), "shared answers are marked up on the home page only");
+  for (const e of faq.mainEntity) assert.ok(!/[<>]/.test(e.acceptedAnswer.text), `${page.path}: ${e.acceptedAnswer.text}`);
+  assert.ok(page.description.length <= 160, `${page.path} description is ${page.description.length} characters`);
+  assert.ok(!html.includes('property="og:image"'), "no relative og:image without a site URL");
   const visible = html.slice(html.indexOf('id="faq-heading"')).match(/<h3>/g).length;
   assert.equal(visible, page.faq.length, page.path);
   assert.ok(blocks.some((b) => b["@type"] === "SoftwareApplication"), page.path);
@@ -98,8 +102,12 @@ for (const page of PAGES) {
   assert.ok(!html.includes('rel="canonical"'), "no canonical link without a site URL");
   assert.ok(existsSync(join(dist, "og", `${page.path ? page.path.slice(0, -1) : "home"}.png`)), page.path);
 }
-assert.match(pageHtml("kannada-typing/"), /<kbd>kannaDa<\/kbd>/, "the typing chart is computed by the transliterator");
-assert.ok(readFileSync(join(dist, "llms.txt"), "utf8").includes("Unicode to Nudi converter"));
+assert.match(pageHtml("kannada-typing/"), /<li><span class="chart-kn" lang="kn">ಟ<\/span><kbd>Ta<\/kbd>/, "the letter chart is computed by the transliterator");
+assert.match(pageHtml("english-to-kannada-typing/"), /<td lang="kn">ನಮಸ್ಕಾರ<\/td><td><kbd>namaskAra<\/kbd>/);
+assert.ok(!pageHtml("english-to-kannada-typing/").includes('class="chart"'), "each typing page has its own table");
+const llms = readFileSync(join(dist, "llms.txt"), "utf8");
+assert.ok(llms.includes("[Unicode to Nudi converter](unicode-to-nudi/)") && llms.includes("Nudi text"));
+assert.ok(!/not available/i.test(llms) && !llms.includes("]()"));
 assert.ok(!existsSync(join(dist, "sitemap.xml")));
 
 // With a site URL, pages get canonical links and the site gets a sitemap.
@@ -107,6 +115,12 @@ const copy = mkdtempSync(join(tmpdir(), "kannadi-site-"));
 try {
   cpSync(dist, copy, { recursive: true });
   const site = fileURLToPath(new URL("../site/build.mjs", import.meta.url));
+  // Rebuilding over built pages gives the same bytes.
+  execFileSync(process.execPath, [site, copy], { stdio: "ignore" });
+  for (const page of PAGES) assert.equal(readFileSync(join(copy, page.path, "index.html"), "utf8"), pageHtml(page.path), page.path);
+  for (const bad of ["http://kannadi.example/", "https://kannadi.example/?x=1", "https://user@kannadi.example/"]) {
+    assert.throws(() => execFileSync(process.execPath, [site, copy, bad], { stdio: "ignore" }), bad);
+  }
   execFileSync(process.execPath, [site, copy, "https://kannadi.example/tools/"], { stdio: "ignore" });
   const sitemap = readFileSync(join(copy, "sitemap.xml"), "utf8");
   for (const page of PAGES) assert.ok(sitemap.includes(`<loc>https://kannadi.example/tools/${page.path}</loc>`), page.path);
