@@ -8,6 +8,8 @@ from .kannada import RA, VIRAMA, Case
 
 # Glyph names fonts give U+25CC; HarfBuzz inserts it before a broken cluster.
 DOTTED_CIRCLE_NAMES = ("uni25CC", "dottedcircle", "dottedCircle")
+# Features that form conjuncts; Shaperglot turns them off with a minus sign.
+CONJUNCT_FEATURES = ("-akhn", "-rphf", "-blwf", "-half", "-pstf", "-cjct")
 
 
 def fontbakery_forbidden(cases: list[Case]) -> dict:
@@ -55,9 +57,6 @@ def shaperglot_checks(cases: list[Case], language: str = "kn_Knda") -> str:
         ),
     ]
     return "\n".join(_shaperglot_check(language, *check) for check in checks)
-
-
-CONJUNCT_FEATURES = ("-akhn", "-rphf", "-blwf", "-half", "-pstf", "-cjct")
 
 
 def _shaperglot_check(language, name, description, texts, features_off) -> str:
