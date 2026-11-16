@@ -22,6 +22,18 @@ export function convertLegacy(text, { kannadaDigits = false, zeroAsAnusvara = tr
   return out;
 }
 
+/**
+ * Converts Unicode Kannada to Nudi and Baraha glyph codes. Report offsets are
+ * UTF-16 code units in the input.
+ * @returns {{text: string, unencodable: number[], malformed: number[]}}
+ */
+export function toNudi(text) {
+  const result = wasm.unicodeToNudi(text);
+  const out = { text: result.text, unencodable: Array.from(result.unencodable), malformed: Array.from(result.malformed) };
+  result.free();
+  return out;
+}
+
 /** Flat [start, end, ...] ranges of aksharas that are not well formed. */
 export function malformed(text) {
   return wasm.malformed(text);
@@ -41,3 +53,4 @@ export const normalize = wasm.normalize;
 export const modernize = wasm.modernize;
 export const countAksharas = wasm.countAksharas;
 export const decodeWindows1252 = wasm.decodeWindows1252;
+export const encodeWindows1252 = wasm.encodeWindows1252;

@@ -66,7 +66,10 @@ web/
     js/docx.js        DOCX text and run fonts; zip.js reads and writes ZIP
     js/text.js        pure helpers: legacy detection, diffs, anchors
     js/kannadi.js     wrapper over the WebAssembly bindings
-  build.sh            builds the WebAssembly package and the page into web/dist
+  site/pages.mjs      the content of each page: title, definition, how-to, FAQ
+  site/build.mjs      writes the pages, JSON-LD, robots.txt, llms.txt and the sitemap
+  site/og.mjs         renders the Open Graph cards in src/og with Chrome
+  build.sh            builds the WebAssembly package and the pages into web/dist
   wasm-bindgen-version.sh  the wasm-bindgen version in Cargo.lock, for build.sh and CI
   serve.py            local server for web/dist
   DESIGN.md           why the page looks as it does: world, tokens, contrast rules
@@ -101,7 +104,8 @@ Principles:
 - Keep `web/src/js/text.js`, `docx.js`, `zip.js` and `compose.js` free of DOM access, so `units.mjs` can test them in Node.
 - No tracking, no cookies and no network requests beyond the page's own files. The Content-Security-Policy in `index.html` enforces this.
 - Build DOM nodes with `textContent`, never `innerHTML`, since the report shows user text.
-- Page copy follows the writing rules below. Do not claim a feature, such as Unicode to Nudi, before it ships.
+- Page copy follows the writing rules below. Do not claim a feature before it ships.
+- Page content lives in `web/site/pages.mjs`. The visible FAQ and the FAQPage JSON-LD come from the same entries, so they cannot drift. Rerun `node web/site/og.mjs` after changing a page title.
 
 ## Tests
 

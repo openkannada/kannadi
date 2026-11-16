@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Open Graph card</title>
+<style>
+@font-face { font-family: "Noto Sans Kannada"; font-weight: 100 900; src: url(../src/fonts/noto-sans-kannada-kannada-wght-normal.woff2) format("woff2"); unicode-range: U+0C80-0CFF, U+200C-200D, U+25CC; }
+@font-face { font-family: "Noto Sans Kannada"; font-weight: 100 900; src: url(../src/fonts/noto-sans-kannada-latin-wght-normal.woff2) format("woff2"); unicode-range: U+0000-00FF, U+2000-206F; }
+* { box-sizing: border-box; }
+html, body { margin: 0; width: 1200px; height: 630px; overflow: hidden; }
+body { display: grid; grid-template-rows: auto 1fr auto; padding: 64px 72px 56px; background: #0c4a36; color: #fff; font-family: "Noto Sans Kannada", sans-serif; }
+.brand { display: flex; align-items: center; gap: 20px; }
+.disc { display: grid; place-items: center; width: 84px; height: 84px; border-radius: 50%; background: #ffcc00; color: #0c2a1f; font-size: 48px; font-weight: 700; }
+.brand-kn { font-size: 46px; font-weight: 700; line-height: 1.1; }
+.brand-en { font-size: 24px; color: #c3e2d4; }
+h1 { align-self: end; margin: 0 0 28px; font-size: 76px; line-height: 1.08; font-weight: 750; letter-spacing: -0.01em; max-width: 1000px; }
+.route { display: flex; align-items: center; gap: 28px; padding: 22px 30px; background: #08321f; border-radius: 14px; font-size: 40px; }
+.from { color: #c3e2d4; }
+.line { flex: 1; height: 6px; border-radius: 3px; background: #ffcc00; position: relative; }
+.line::before, .line::after { content: ""; position: absolute; top: -9px; width: 24px; height: 24px; border-radius: 50%; background: #ffcc00; }
+.line::before { left: -4px; }
+.line::after { right: -4px; }
+.to { font-weight: 700; }
+</style>
+</head>
+<body>
+<div class="brand"><span class="disc">ಕ</span><span><span class="brand-kn">ಕನ್ನಡಿ</span><br><span class="brand-en">Free in your browser. Nothing is uploaded.</span></span></div>
+<h1 id="title"></h1>
+<div class="route"><span class="from" id="from"></span><span class="line"></span><span class="to" id="to" lang="kn"></span></div>
+<script>
+const q = new URLSearchParams(location.search);
+document.getElementById("title").textContent = q.get("title");
+document.getElementById("from").textContent = q.get("from");
+document.getElementById("to").textContent = q.get("to");
+</script>
+</body>
+</html>
