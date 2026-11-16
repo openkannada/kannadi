@@ -363,8 +363,13 @@ mod tests {
     #[test]
     fn each_font_is_read_in_its_layout() {
         let html = "<p><span style=\"font-family:AkrutiKndPadmaDemi\">d&#226;}&#226;</span>\
-                    <font face=\"Nudi 01 e\">PÀ</font></p>";
+                    <font face=\"Nudi 01 e\">PÀ</font>\
+                    <font face=\"Shree-Kan-0850\">PÜ®Ü°vÜ</font></p>";
         let out = to_unicode(html);
+        assert!(
+            out.contains("<font face=\"Noto Sans Kannada\">ಕನ್ನಡ</font>"),
+            "{out}"
+        );
         assert!(
             out.contains("<span style=\"font-family:'Noto Sans Kannada'\">ಕನ</span>"),
             "{out}"

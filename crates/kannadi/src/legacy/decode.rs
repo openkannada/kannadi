@@ -651,6 +651,42 @@ mod tests {
         assert_eq!(akruti(&[0x64, 0xE2, 0x5F, 0xA0, 0x58]).text, "ಕ್ಷ್ಯ");
     }
 
+    fn shree(legacy: &[u8]) -> Conversion {
+        to_unicode(
+            &decode_windows_1252(legacy),
+            Layout::ShreeLipi,
+            &Options::default(),
+        )
+    }
+
+    #[test]
+    fn shree_lipi_builds_ma_ya_and_jha_from_parts() {
+        for (codes, text) in [
+            (&[0xCA, 0xDC, 0xE1, 0xE1][..], "ಮು"),
+            (&[0xCA, 0xDC, 0xDE], "ಮಾ"),
+            (&[0xCA, 0xDC, 0xE5, 0x85], "ಮ್"),
+            (&[0xBF, 0xE1], "ಯ"),
+            (&[0xC1, 0xE5, 0x85], "ಯ್"),
+            (&[0xC3, 0xDC, 0x6B, 0xDE], "ಝಾ"),
+            (&[0xC4, 0x6B, 0xE1, 0xE0], "ಝೀ"),
+            (&[0x4D, 0xE1], "ಋ"),
+        ] {
+            let c = shree(codes);
+            assert!(c.is_clean(), "{c:?}");
+            assert_eq!(c.text, text);
+        }
+    }
+
+    #[test]
+    fn shree_lipi_reads_cluster_glyphs_and_typing_habits() {
+        assert_eq!(shree(&[0xFB, 0xDC]).text, "ಕ್ಷ");
+        assert_eq!(shree(&[0xFE, 0xDD]).text, "ಜ್ಞಾ");
+        assert_eq!(shree(&[0xAE, 0xDC, 0x24, 0xC2]).text, "ನ್ಯ");
+        assert_eq!(shree(&[0xD3, 0xDD, 0xE7]).text, "ಸೈ");
+        assert_eq!(shree(&[0x50, 0xDC, 0x2D]).text, "ಕ");
+        assert_eq!(shree(&[0x50, 0xDC, 0x26, 0x3E]).text, "ಕ-।");
+    }
+
     /// Every row of every table reads without an unknown glyph: letters and
     /// literals alone, the rest after a consonant.
     #[test]

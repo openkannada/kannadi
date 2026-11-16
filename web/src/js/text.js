@@ -50,7 +50,7 @@ export function decodeBytes(bytes, decodeWindows1252) {
 }
 
 /** What the page calls each layout. */
-export const LAYOUT_NAMES = { nudi: "Nudi or Baraha", akruti: "Akruti" };
+export const LAYOUT_NAMES = { nudi: "Nudi or Baraha", akruti: "Akruti", "shree-lipi": "Shree-Lipi" };
 
 /**
  * Replaces "auto" in every segment with 1 layout, chosen over all their text

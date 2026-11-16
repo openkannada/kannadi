@@ -59,7 +59,8 @@ mod tests {
         let extra = [("my font".to_string(), Layout::Akruti)];
         assert_eq!(layout("\"My Font\"", &extra), Some(Layout::Akruti));
         assert_eq!(layout("BRH Kannada", &extra), Some(Layout::Nudi));
-        assert_eq!(layout("Shree-Kan-0850", &[]), None);
+        assert_eq!(layout("Shree-Kan-0850", &[]), Some(Layout::ShreeLipi));
+        assert_eq!(layout("Shree-Kan-0851", &[]), None);
         assert!(!is_legacy("Arial", &extra));
     }
 

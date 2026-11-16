@@ -106,6 +106,6 @@ Nudi and Baraha ANSI share 1 layout, `Layout::Nudi`; `nudi_to_unicode` and `unic
 
 ## Open questions
 
-1. Which other legacy layouts appear in real documents. So far, Nudi and Baraha ANSI fonts share 1 layout, and Akruti has its own.
+1. Which other legacy layouts appear in real documents. So far, Nudi and Baraha ANSI fonts share 1 layout, and Akruti and Shree-Lipi each have their own.
 2. Whether Word 97 DOC files are common enough to read directly, or whether users should save as DOCX first.
 3. Whether TXT input needs automatic font detection in version 1.

@@ -5,7 +5,7 @@
 //! - [`modernize()`]: map Old Kannada letters (ೞ, ಱ, ೝ) to modern ones.
 //! - [`transliterate()`]: Kannada to and from ISO 15919, IAST and Baraha phonetic.
 //! - [`numerals`]: Kannada digits.
-//! - [`legacy`]: legacy font text (Nudi, Baraha, Akruti) to and from Unicode.
+//! - [`legacy`]: legacy font text (Nudi, Baraha, Akruti, Shree-Lipi) to and from Unicode.
 //! - [`phonetic`]: sound-alike keys for fuzzy search and loose Latin typing.
 //!
 //! ```

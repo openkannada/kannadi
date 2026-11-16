@@ -1,9 +1,14 @@
 use kannadi::legacy::{decode_windows_1252, from_unicode, to_unicode, Layout, Options};
 
 /// The golden fixture of each layout, with the fewest rows it must have.
-const FIXTURES: [(Layout, &str, usize); 2] = [
+const FIXTURES: [(Layout, &str, usize); 3] = [
     (Layout::Nudi, include_str!("fixtures/nudi.tsv"), 10),
     (Layout::Akruti, include_str!("fixtures/akruti.tsv"), 100),
+    (
+        Layout::ShreeLipi,
+        include_str!("fixtures/shree-lipi.tsv"),
+        100,
+    ),
 ];
 
 /// The legacy text, expected Unicode and source of each fixture row.
@@ -70,6 +75,15 @@ fn government_pages_encode_as_typed() {
 fn most_akruti_words_encode_as_typed() {
     let (same, total) = typed_back(Layout::Akruti);
     assert!(total >= 500, "{total}");
+    assert!(same * 100 >= total * 95, "{same} of {total}");
+}
+
+/// Shree-Lipi typists also stored some clusters in more than 1 way, such as ್ಟ್ರ as
+/// 1 glyph or 2, so most fixture words, not all, encode as typed.
+#[test]
+fn most_shree_lipi_words_encode_as_typed() {
+    let (same, total) = typed_back(Layout::ShreeLipi);
+    assert!(total >= 700, "{total}");
     assert!(same * 100 >= total * 95, "{same} of {total}");
 }
 

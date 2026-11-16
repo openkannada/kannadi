@@ -5,7 +5,7 @@ import init, * as wasm from "../pkg/kannadi_wasm.js";
 export { init };
 
 /**
- * Converts legacy font text in `layout` ("nudi", "akruti", or "auto" for the
+ * Converts legacy font text in `layout` ("nudi", "akruti", "shree-lipi", or "auto" for the
  * layout the text reads best in). Unknown glyph offsets are UTF-16 code units in
  * the output. The result says which layout was used.
  * @returns {{text: string, unknown: number[], layout: string}}

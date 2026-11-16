@@ -709,6 +709,23 @@ mod tests {
         assert_eq!(e.text, "qೀ");
     }
 
+    fn shree(text: &str) -> Vec<u8> {
+        let e = from_unicode(text, Layout::ShreeLipi);
+        assert!(e.is_clean(), "{e:?}");
+        e.text
+            .chars()
+            .map(|c| windows_1252_byte(c).expect("Windows-1252 character"))
+            .collect()
+    }
+
+    #[test]
+    fn shree_lipi_writes_as_typists_did() {
+        assert_eq!(shree("ಕನ್ನಡ"), [0x50, 0xDC, 0xAE, 0xDC, 0xB0, 0x76, 0xDC]);
+        assert_eq!(shree("ಮಾಮು"), [0xCA, 0xDC, 0xDE, 0xCA, 0xDC, 0xE1, 0xE1]);
+        assert_eq!(shree("ಲಕ್ಷ"), [0xC6, 0x50, 0xDC, 0xD2]);
+        assert_eq!(shree("ಕ-ಕ"), [0x50, 0xDC, 0x26, 0x50, 0xDC]);
+    }
+
     #[test]
     fn kannada_digits_use_the_layout_glyphs() {
         assert_eq!(akruti("೧೨೯"), [0x81, 0x82, 0x89]);
