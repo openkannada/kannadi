@@ -4,8 +4,12 @@
 const LEGACY_CHAR = /[¡-ÿŒœŠšŸŽžƒˆ˜–—‘-„†-•…‰‹›€™]/gu;
 const KANNADA_CHAR = /[ಀ-೿]/gu;
 const NON_SPACE = /\S/gu;
-// Legacy font families. Nudi's Unicode fonts carry "Uni" in their names.
-const LEGACY_FONT = /^(?!.*uni)\s*['"]?(nudi|brh\b|baraha)/i;
+// Legacy font families and their layouts. Nudi's Unicode fonts carry "Uni" in
+// their names.
+const LEGACY_FONTS = [
+  [/^(?!.*uni)\s*['"]?(nudi|brh\b|baraha)/i, "nudi"],
+  [/^\s*['"]?akruti\s*knd\s*padma/i, "akruti"],
+];
 
 const count = (text, pattern) => (text.match(pattern) || []).length;
 
@@ -21,9 +25,22 @@ export function looksLegacy(text) {
   return legacy / count(text, NON_SPACE) >= 0.4;
 }
 
-/** True for a Nudi or Baraha ANSI font family name, such as "BRH Kannada". */
+/**
+ * The layout of the first legacy family in a font-family list, such as "nudi"
+ * for "BRH Kannada" or "akruti" for "AkrutiKndPadma", or null.
+ */
+export function legacyLayout(family) {
+  if (typeof family !== "string") return null;
+  for (const f of family.split(",")) {
+    const found = LEGACY_FONTS.find(([pattern]) => pattern.test(f.trim()));
+    if (found) return found[1];
+  }
+  return null;
+}
+
+/** True for a legacy font family name, such as "BRH Kannada". */
 export function isLegacyFont(family) {
-  return typeof family === "string" && family.split(",").some((f) => LEGACY_FONT.test(f.trim()));
+  return legacyLayout(family) !== null;
 }
 
 /**
@@ -41,10 +58,12 @@ export function decodeBytes(bytes, decodeWindows1252) {
 }
 
 /**
- * Joins text segments, converting the legacy ones. Adjacent segments of the
- * same kind are merged first, so a syllable split across Word runs converts whole.
- * @param {{text: string, legacy: boolean}[]} segments
- * @param {(text: string) => {text: string, unknown: number[]}} convert
+ * Joins text segments, converting the legacy ones. A segment's `legacy` is false,
+ * a layout name, or "auto" for legacy text in an unknown font. Adjacent segments
+ * of the same kind are merged first, so a syllable split across Word runs
+ * converts whole.
+ * @param {{text: string, legacy: false | string}[]} segments
+ * @param {(text: string, layout: string) => {text: string, unknown: number[]}} convert
  * @returns {{text: string, unknown: number[], converted: number}}
  */
 export function joinSegments(segments, convert) {
@@ -60,7 +79,7 @@ export function joinSegments(segments, convert) {
   let converted = 0;
   for (const s of merged) {
     if (s.legacy) {
-      const result = convert(s.text);
+      const result = convert(s.text, s.legacy);
       for (const offset of result.unknown) unknown.push(text.length + offset);
       text += result.text;
       converted += s.text.length;

@@ -29,6 +29,10 @@ assert.equal(withUnknown.unknown.length, 2);
 for (const at of withUnknown.unknown) assert.equal(withUnknown.text[at], "õ");
 
 assert.equal(kannadi.convertLegacy("1956", { kannadaDigits: true }).text, "೧೯೫೬");
+assert.equal(kannadi.convertLegacy("dâ}â", { layout: "akruti" }).text, "ಕನ");
+assert.equal(kannadi.convertLegacy("dâ}â").text, "ಕನ");
+assert.equal(kannadi.convertLegacy(NUDI).text, UNICODE);
+assert.throws(() => kannadi.convertLegacy("PÀ", { layout: "klingon" }), /unknown layout/);
 assert.equal(kannadi.convertLegacy("¥ÁægÀ0¨sÀ").text, "ಪ್ರಾರಂಭ");
 assert.equal(kannadi.convertLegacy("¥ÁægÀ0¨sÀ", { zeroAsAnusvara: false }).text, "ಪ್ರಾರ0ಭ");
 

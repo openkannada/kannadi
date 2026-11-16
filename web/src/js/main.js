@@ -79,12 +79,13 @@ function plural(n, one, many) {
   return `${n.toLocaleString("en-IN")} ${n === 1 ? one : many}`;
 }
 
-const convert = (text) => kannadi.convertLegacy(text, { zeroAsAnusvara: settings.zero, kannadaDigits: settings.digits });
+const convert = (text, layout = "auto") =>
+  kannadi.convertLegacy(text, { zeroAsAnusvara: settings.zero, kannadaDigits: settings.digits, layout });
 
 function report(result, what) {
   const issues = result.unknown.length;
   say(
-    `${what}: ${plural(result.converted ?? 0, "character", "characters")} converted from Nudi or Baraha.` +
+    `${what}: ${plural(result.converted ?? 0, "character", "characters")} converted from Nudi, Baraha or Akruti.` +
       (issues ? ` ${plural(issues, "unknown glyph", "unknown glyphs")} to check.` : ""),
   );
 }
@@ -136,7 +137,7 @@ function saveSettings() {
   save();
 }
 
-/** Inserts text at the selection, converting it first when it looks like Nudi or Baraha. */
+/** Inserts text at the selection, converting it first when it looks like legacy font text. */
 function insert(result, what) {
   const sel = editor.selection() ?? { start: editor.text.length, end: editor.text.length };
   editor.replace(sel.start, sel.end, result.text);
@@ -434,7 +435,7 @@ function restore() {
     fileName = saved.fileName ?? "kannada";
     say(
       looksLegacy(saved.text)
-        ? "Restored your last document. Some of it still looks like Nudi or Baraha: select it and choose Convert."
+        ? "Restored your last document. Some of it still looks like Nudi, Baraha or Akruti: select it and choose Convert."
         : "Restored your last document from this browser.",
     );
   } else {

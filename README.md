@@ -85,7 +85,7 @@ let converted = to_unicode("dâ}â", Layout::Akruti, &Options::default());
 assert_eq!(converted.text, "ಕನ");
 ```
 
-The Akruti table was derived from the fonts embedded in public PDFs and checked against the pages; [docs/akruti.md](docs/akruti.md) has the method and results. The command-line tool and the editor page read Nudi and Baraha only for now.
+The Akruti table was derived from the fonts embedded in public PDFs and checked against the pages; [docs/akruti.md](docs/akruti.md) has the method and results. The editor page reads Akruti too: by font name in DOCX and HTML files, and by the layout that converts best for pasted text. `legacy::best_layout` makes that choice.
 
 `legacy::unicode_to_nudi` goes the other way, for documents that must still be printed in a legacy font:
 
@@ -105,7 +105,7 @@ assert!(encoded.is_clean());
 
 [web/](web/) is a static Kannada editor that runs in the browser. The crate runs as WebAssembly through the bindings in [crates/kannadi-wasm](crates/kannadi-wasm), so text never leaves the device.
 
-- Paste text, or open a TXT, DOCX or HTML file. Nudi and Baraha text is converted to Unicode. In DOCX and HTML files, only text set in a Nudi or Baraha font is converted.
+- Paste text, or open a TXT, DOCX or HTML file. Nudi, Baraha and Akruti text is converted to Unicode. In DOCX and HTML files, only text set in one of their fonts is converted.
 - Unknown glyphs and malformed syllables are marked in the text and listed beside it. Selecting one offers checked fixes, or a replacement typed in Baraha letters.
 - Type Kannada with Baraha or ISO 15919 letters.
 - Normalize, modernize Old Kannada letters, and count aksharas and words.

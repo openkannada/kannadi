@@ -5,14 +5,16 @@ import init, * as wasm from "../pkg/kannadi_wasm.js";
 export { init };
 
 /**
- * Converts Nudi or Baraha text. Unknown glyph offsets are UTF-16 code units in the output.
+ * Converts legacy font text in `layout` ("nudi", "akruti", or "auto" for the
+ * layout the text reads best in). Unknown glyph offsets are UTF-16 code units in
+ * the output.
  * @returns {{text: string, unknown: number[]}}
  */
-export function convertLegacy(text, { kannadaDigits = false, zeroAsAnusvara = true } = {}) {
+export function convertLegacy(text, { kannadaDigits = false, zeroAsAnusvara = true, layout = "auto" } = {}) {
   const options = new wasm.NudiOptions();
   options.kannadaDigits = kannadaDigits;
   options.zeroAsAnusvara = zeroAsAnusvara;
-  const result = wasm.nudiToUnicode(text, options);
+  const result = wasm.toUnicode(text, layout === "auto" ? wasm.bestLayout(text) : layout, options);
   options.free();
   const out = {
     text: result.text,

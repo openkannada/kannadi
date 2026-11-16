@@ -13,6 +13,7 @@ import {
   escapeMarkup,
   isLegacyFont,
   joinSegments,
+  legacyLayout,
   looksLegacy,
   nudiNotes,
   shiftAnchors,
@@ -37,6 +38,12 @@ test("legacy text is told apart from English and Unicode Kannada", () => {
 test("legacy font names", () => {
   for (const f of ["BRH Kannada", "Nudi 01 e", "'Nudi Akshar'", "Baraha Kan", "Arial, BRH Kannada"]) assert.ok(isLegacyFont(f), f);
   for (const f of ["Arial", "Nirmala UI", "NudiUni01e", "Nudi Unicode 01", "Tunga", undefined, null]) assert.ok(!isLegacyFont(f), f);
+  assert.equal(legacyLayout("BRH Kannada"), "nudi");
+  assert.equal(legacyLayout("AkrutiKndPadmaDemi"), "akruti");
+  assert.equal(legacyLayout("'Akruti Knd Padma', serif"), "akruti");
+  assert.equal(legacyLayout("Arial, Nudi 01 e"), "nudi");
+  assert.equal(legacyLayout("AkrutiKndPadmini"), null);
+  assert.equal(legacyLayout("Arial"), null);
 });
 
 test("diff finds the single edit", () => {
@@ -95,13 +102,17 @@ test("anchors move with edits and drop when edited away", () => {
   assert.deepEqual(shiftAnchors(anchors, diff(before, deleted), deleted), [{ offset: 7, glyph: "õ" }]);
 });
 
-test("segments merge before converting, and offsets point into the output", () => {
-  const convert = (text) => ({ text: text.toUpperCase(), unknown: [text.indexOf("q")].filter((i) => i >= 0) });
+test("segments of 1 layout merge before converting, and offsets point into the output", () => {
+  const layouts = [];
+  const convert = (text, layout) => {
+    layouts.push(layout);
+    return { text: text.toUpperCase(), unknown: [text.indexOf("q")].filter((i) => i >= 0) };
+  };
   const joined = joinSegments(
     [
       { text: "Hi ", legacy: false },
-      { text: "ab", legacy: true },
-      { text: "qc", legacy: true },
+      { text: "ab", legacy: "nudi" },
+      { text: "qc", legacy: "nudi" },
       { text: "", legacy: false },
       { text: " end", legacy: false },
     ],
@@ -110,6 +121,17 @@ test("segments merge before converting, and offsets point into the output", () =
   assert.equal(joined.text, "Hi ABQC end");
   assert.deepEqual(joined.unknown, [5]);
   assert.equal(joined.converted, 4);
+  assert.deepEqual(layouts, ["nudi"]);
+  const mixed = joinSegments(
+    [
+      { text: "ab", legacy: "nudi" },
+      { text: "cd", legacy: "akruti" },
+      { text: "ef", legacy: "auto" },
+    ],
+    convert,
+  );
+  assert.equal(mixed.text, "ABCDEF");
+  assert.deepEqual(layouts.slice(1), ["nudi", "akruti", "auto"]);
 });
 
 test("word count and code points", () => {
@@ -146,6 +168,15 @@ async function docx(body, styles = "") {
   ]);
 }
 
+test("docx runs carry the layout of their font", async () => {
+  const body = `<w:p>${run("PÀ", "Nudi 01 e")}${run("dâ}â", "AkrutiKndPadmaDemi")}${run("Hi", "Arial")}</w:p>`;
+  assert.deepEqual(await readDocx(await docx(body, "")), [
+    { text: "PÀ", legacy: "nudi" },
+    { text: "dâ}â", legacy: "akruti" },
+    { text: "Hi", legacy: false },
+  ]);
+});
+
 test("docx runs are legacy by run font, character style, paragraph style or default", async () => {
   const styles =
     '<w:docDefaults><w:rPrDefault><w:rPr><w:rFonts w:ascii="Times New Roman"/></w:rPr></w:rPrDefault></w:docDefaults>' +
@@ -160,10 +191,10 @@ test("docx runs are legacy by run font, character style, paragraph style or defa
   const segments = await readDocx(await docx(body, styles));
   assert.deepEqual(segments, [
     { text: "English ", legacy: false },
-    { text: "PÀ£À", legacy: true },
-    { text: "ßqÀ", legacy: true },
+    { text: "PÀ£À", legacy: "nudi" },
+    { text: "ßqÀ", legacy: "nudi" },
     { text: "\n", legacy: false },
-    { text: "¤ÃqÀÄ", legacy: true },
+    { text: "¤ÃqÀÄ", legacy: "nudi" },
     { text: "Eng", legacy: false },
     { text: "\t", legacy: false },
     { text: "\n", legacy: false },
@@ -191,7 +222,7 @@ test("docx tracked format changes and bad character references", async () => {
     '<w:r><w:rPr><w:rFonts w:ascii="BRH Kannada"/><w:rPrChange><w:rPr><w:rFonts w:ascii="Arial"/></w:rPr></w:rPrChange></w:rPr><w:t>PÀ</w:t></w:r>';
   const segments = await readDocx(await docx(`<w:p>${tracked}${run("&#x110000;&#65;")}</w:p>`));
   assert.deepEqual(segments, [
-    { text: "PÀ", legacy: true },
+    { text: "PÀ", legacy: "nudi" },
     { text: "\uFFFDA", legacy: false },
   ]);
 });

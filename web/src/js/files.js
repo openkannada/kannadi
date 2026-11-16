@@ -1,7 +1,7 @@
 // Opening TXT, HTML and DOCX files as editor text, and saving the editor text
 // as TXT, HTML or DOCX.
 import { readDocx, writeDocx } from "./docx.js";
-import { decodeBytes, escapeMarkup, isLegacyFont, joinSegments, looksLegacy } from "./text.js";
+import { decodeBytes, escapeMarkup, joinSegments, legacyLayout, looksLegacy } from "./text.js";
 
 const BLOCK = new Set([
   "ADDRESS", "ARTICLE", "ASIDE", "BLOCKQUOTE", "DD", "DIV", "DL", "DT", "FIGCAPTION", "FIGURE", "FOOTER",
@@ -23,33 +23,37 @@ function parseHtml(html) {
   return new DOMParser().parseFromString(renamed, "text/html");
 }
 
-/** Class names and tag names that style rules in the page set in a legacy font. */
+/** Class names and tag names that style rules in the page set in a legacy font, with its layout. */
 function legacySelectors(doc) {
-  const classes = new Set();
-  const tags = new Set();
+  const classes = new Map();
+  const tags = new Map();
   for (const style of doc.querySelectorAll(`textarea[${STYLE}]`)) {
     const css = style.textContent.replace(/\/\*[\s\S]*?\*\//g, "").replace(/<!--|-->/g, "");
     for (const [, selectors, body] of css.matchAll(/([^{}@]+)\{([^}]*)\}/g)) {
-      const family = body.match(FONT_FAMILY)?.[1];
-      if (!isLegacyFont(family)) continue;
+      const layout = legacyLayout(body.match(FONT_FAMILY)?.[1]);
+      if (!layout) continue;
       for (const selector of selectors.split(",")) {
         const [, tag, cls] = selector.trim().match(/^([a-z0-9]*)(?:\.([\w-]+))?$/i) ?? [];
-        if (cls) classes.add(cls);
-        else if (tag) tags.add(tag.toUpperCase());
+        if (cls) classes.set(cls, layout);
+        else if (tag) tags.set(tag.toUpperCase(), layout);
       }
     }
   }
   return { classes, tags };
 }
 
+/** The layout of the legacy font an element sets, false for another font, or null for none. */
 function elementFont(el, selectors) {
-  if (el.tagName === "FONT" && el.hasAttribute("face")) return isLegacyFont(el.getAttribute("face"));
+  if (el.tagName === "FONT" && el.hasAttribute("face")) return legacyLayout(el.getAttribute("face")) ?? false;
   const family = el.getAttribute(STYLE)?.match(FONT_FAMILY)?.[1];
-  if (family) return isLegacyFont(family);
-  if ([...el.classList].some((c) => selectors.classes.has(c))) return true;
-  if (selectors.tags.has(el.tagName)) return true;
-  return null;
+  if (family) return legacyLayout(family) ?? false;
+  const cls = [...el.classList].find((c) => selectors.classes.has(c));
+  if (cls) return selectors.classes.get(cls);
+  return selectors.tags.get(el.tagName) ?? null;
 }
+
+/** "auto" for text that looks like legacy glyph codes in an unknown font, else false. */
+const byLooks = (text) => (looksLegacy(text) ? "auto" : false);
 
 /**
  * Reads an HTML document as segments, 1 block per line, with white space
@@ -97,10 +101,10 @@ export function htmlSegments(doc) {
     const lines = segments.map((s) => s.text).join("").split("\n");
     return lines.flatMap((line, i) => [
       ...(i ? [{ text: "\n", legacy: false }] : []),
-      { text: line, legacy: looksLegacy(line) },
+      { text: line, legacy: byLooks(line) },
     ]);
   }
-  return segments.map(({ text, font }) => ({ text, legacy: font === true || (font === null && looksLegacy(text)) }));
+  return segments.map(({ text, font }) => ({ text, legacy: font === null ? byLooks(text) : font }));
 }
 
 /**
@@ -119,7 +123,7 @@ export async function openFile(file, { convert, decodeWindows1252 }) {
   if (name.endsWith(".html") || name.endsWith(".htm") || /^\s*<(!doctype|html)/i.test(text)) {
     return joinSegments(htmlSegments(parseHtml(text)), convert);
   }
-  return joinSegments([{ text, legacy: looksLegacy(text) }], convert);
+  return joinSegments([{ text, legacy: byLooks(text) }], convert);
 }
 
 /** Pasted clipboard data as editor text. */
@@ -128,7 +132,7 @@ export function pasted(html, plain, convert) {
     const segments = htmlSegments(parseHtml(html));
     if (segments.some((s) => s.legacy)) return joinSegments(segments, convert);
   }
-  return joinSegments([{ text: plain, legacy: looksLegacy(plain) }], convert);
+  return joinSegments([{ text: plain, legacy: byLooks(plain) }], convert);
 }
 
 const HTML_TEMPLATE = (title, body) => `<!doctype html>

@@ -82,7 +82,7 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
   </fieldset>
   <div class="tools" role="toolbar" aria-label="Text tools">
     <button type="button" id="new" title="Start an empty document; undo brings the last one back">New</button>
-    <button type="button" id="convert" title="Convert the selection, or the whole document, from Nudi or Baraha">Convert Nudi</button>
+    <button type="button" id="convert" title="Convert the selection, or the whole document, from Nudi, Baraha or Akruti">Convert Nudi</button>
     <button type="button" id="normalize" title="Fix vowel signs typed in parts and doubled marks">Normalize</button>
     <button type="button" id="modernize" title="Change ೞ, ಱ and ೝ to modern letters">Modernize</button>
     <fieldset class="segmented">
@@ -106,7 +106,7 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
 <!-- page:lead -->
 <!-- /page:lead -->
         <ol class="empty-steps">
-          <li>Pasted Nudi and Baraha text turns into Unicode by itself.</li>
+          <li>Pasted Nudi, Baraha and Akruti text turns into Unicode by itself.</li>
           <li>Red marks a glyph that could not be converted. Amber marks a broken syllable. Select one to fix it.</li>
           <li>Choose <b>Baraha letters</b> above to type <span lang="kn">ಕನ್ನಡ</span> as <kbd>kannaDa</kbd>.</li>
         </ol>
@@ -123,7 +123,7 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
       </section>
       <section class="options" aria-labelledby="options-heading">
         <h2 id="options-heading">When converting</h2>
-        <label><input type="checkbox" id="auto-convert" checked> <span>Convert pasted Nudi and Baraha</span></label>
+        <label><input type="checkbox" id="auto-convert" checked> <span>Convert pasted legacy text</span></label>
         <label><input type="checkbox" id="zero" checked> <span>Read 0 inside a word as anusvara: <span lang="kn">ಪ್ರಾರ0ಭ</span> to <span lang="kn">ಪ್ರಾರಂಭ</span></span></label>
         <label><input type="checkbox" id="digits"> <span>Kannada digits, for Nudi fonts whose names end in k</span></label>
       </section>

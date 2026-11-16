@@ -113,6 +113,27 @@ pub fn nudi_to_unicode(text: &str, options: &Options) -> Conversion {
     to_unicode(text, Layout::Nudi, options)
 }
 
+/// The layout `text` reads best in: the one whose conversion has the fewest unknown
+/// glyphs and malformed syllables, the first in [`Layout::ALL`] on a tie. Use it
+/// for legacy text whose font is not known, such as pasted text.
+///
+/// ```
+/// use kannadi::legacy::{best_layout, Layout};
+///
+/// assert_eq!(best_layout("PÀ£ÀßqÀ"), Layout::Nudi);
+/// assert_eq!(best_layout("dâ}â"), Layout::Akruti);
+/// ```
+pub fn best_layout(text: &str) -> Layout {
+    let problems = |layout: Layout| {
+        let c = to_unicode(text, layout, &Options::default());
+        c.unknown.len() + c.malformed.len()
+    };
+    Layout::ALL
+        .into_iter()
+        .min_by_key(|&layout| problems(layout))
+        .unwrap_or(Layout::Nudi)
+}
+
 /// Byte offsets in legacy `text` where a syllable or other character starts, in
 /// order, always including 0 for text that is not empty. Text split only at
 /// these offsets converts piece by piece the same way as whole, apart from a zero
@@ -646,5 +667,18 @@ mod tests {
                 }
             }
         }
+    }
+
+    #[test]
+    fn the_best_layout_has_the_fewest_problems() {
+        assert_eq!(best_layout("PÀ£ÀßqÀ"), Layout::Nudi);
+        assert_eq!(best_layout("ಸರ್ಕಾರ"), Layout::Nudi);
+        assert_eq!(
+            best_layout(&decode_windows_1252(&[
+                0xC9, 0xE2, 0x64, 0xD6, 0xCB, 0x70, 0xE2
+            ])),
+            Layout::Akruti
+        );
+        assert_eq!(best_layout(""), Layout::Nudi);
     }
 }
