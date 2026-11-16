@@ -57,14 +57,30 @@ export function decodeBytes(bytes, decodeWindows1252) {
   }
 }
 
+/** What the page calls each layout. */
+export const LAYOUT_NAMES = { nudi: "Nudi or Baraha", akruti: "Akruti" };
+
+/**
+ * Replaces "auto" in every segment with 1 layout, chosen over all their text
+ * together, so a document is not read in 2 layouts by chance.
+ * @param {{text: string, legacy: false | string}[]} segments
+ * @param {(text: string) => string} bestLayout
+ */
+export function resolveAuto(segments, bestLayout) {
+  const auto = segments.filter((s) => s.legacy === "auto");
+  if (!auto.length) return segments;
+  const layout = bestLayout(auto.map((s) => s.text).join("\n"));
+  return segments.map((s) => (s.legacy === "auto" ? { ...s, legacy: layout } : s));
+}
+
 /**
  * Joins text segments, converting the legacy ones. A segment's `legacy` is false,
  * a layout name, or "auto" for legacy text in an unknown font. Adjacent segments
  * of the same kind are merged first, so a syllable split across Word runs
  * converts whole.
  * @param {{text: string, legacy: false | string}[]} segments
- * @param {(text: string, layout: string) => {text: string, unknown: number[]}} convert
- * @returns {{text: string, unknown: number[], converted: number}}
+ * @param {(text: string, layout: string) => {text: string, unknown: number[], layout: string}} convert
+ * @returns {{text: string, unknown: number[], converted: number, layouts: string[]}}
  */
 export function joinSegments(segments, convert) {
   const merged = [];
@@ -77,9 +93,11 @@ export function joinSegments(segments, convert) {
   let text = "";
   const unknown = [];
   let converted = 0;
+  const layouts = new Set();
   for (const s of merged) {
     if (s.legacy) {
       const result = convert(s.text, s.legacy);
+      layouts.add(result.layout ?? s.legacy);
       for (const offset of result.unknown) unknown.push(text.length + offset);
       text += result.text;
       converted += s.text.length;
@@ -87,7 +105,7 @@ export function joinSegments(segments, convert) {
       text += s.text;
     }
   }
-  return { text, unknown, converted };
+  return { text, unknown, converted, layouts: [...layouts] };
 }
 
 const CHUNK = 4096;

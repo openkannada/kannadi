@@ -14,6 +14,7 @@ import {
   isLegacyFont,
   joinSegments,
   legacyLayout,
+  resolveAuto,
   looksLegacy,
   nudiNotes,
   shiftAnchors,
@@ -72,8 +73,9 @@ test("ranges move with edits and drop when touched", () => {
 
 test("plain text that needs no conversion is kept exactly", () => {
   const convert = () => assert.fail("nothing to convert");
+  const bestLayout = () => assert.fail("nothing to judge");
   for (const text of ["    indented code\n\n\n\nend ", "ಕನ್ನಡ  ನಾಡು\r\n\t", " "]) {
-    assert.deepEqual(pasted("", text, convert), { text, unknown: [], converted: 0 });
+    assert.deepEqual(pasted("", text, { convert, bestLayout }), { text, unknown: [], converted: 0, layouts: [] });
   }
 });
 
@@ -119,6 +121,7 @@ test("segments of 1 layout merge before converting, and offsets point into the o
     convert,
   );
   assert.equal(joined.text, "Hi ABQC end");
+  assert.deepEqual(joined.layouts, ["nudi"]);
   assert.deepEqual(joined.unknown, [5]);
   assert.equal(joined.converted, 4);
   assert.deepEqual(layouts, ["nudi"]);
@@ -132,6 +135,26 @@ test("segments of 1 layout merge before converting, and offsets point into the o
   );
   assert.equal(mixed.text, "ABCDEF");
   assert.deepEqual(layouts.slice(1), ["nudi", "akruti", "auto"]);
+});
+
+test("auto segments get 1 layout, chosen over all their text", () => {
+  const seen = [];
+  const bestLayout = (text) => {
+    seen.push(text);
+    return "akruti";
+  };
+  const segments = [
+    { text: "ab", legacy: "auto" },
+    { text: " ", legacy: false },
+    { text: "cd", legacy: "auto" },
+    { text: "ef", legacy: "nudi" },
+  ];
+  assert.deepEqual(
+    resolveAuto(segments, bestLayout).map((s) => s.legacy),
+    ["akruti", false, "akruti", "nudi"],
+  );
+  assert.deepEqual(seen, ["ab\ncd"]);
+  assert.equal(resolveAuto([{ text: "x", legacy: false }], () => assert.fail("no auto text")).length, 1);
 });
 
 test("word count and code points", () => {

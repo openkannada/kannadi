@@ -114,8 +114,10 @@ pub fn nudi_to_unicode(text: &str, options: &Options) -> Conversion {
 }
 
 /// The layout `text` reads best in: the one whose conversion has the fewest unknown
-/// glyphs and malformed syllables, the first in [`Layout::ALL`] on a tie. Use it
-/// for legacy text whose font is not known, such as pasted text.
+/// glyphs and malformed syllables, then the fewest viramas, then the first in
+/// [`Layout::ALL`]. Use it for legacy text whose font is not known, such as
+/// pasted text. Short text can read cleanly in more than 1 layout; the more text,
+/// the surer the choice.
 ///
 /// ```
 /// use kannadi::legacy::{best_layout, Layout};
@@ -124,13 +126,16 @@ pub fn nudi_to_unicode(text: &str, options: &Options) -> Conversion {
 /// assert_eq!(best_layout("dâ}â"), Layout::Akruti);
 /// ```
 pub fn best_layout(text: &str) -> Layout {
-    let problems = |layout: Layout| {
+    // On a tie, fewer viramas wins: legacy text read in the wrong layout often
+    // comes out as a run of clusters, such as ದ್ಬ್ಟ for ಅಥವಾ.
+    let score = |layout: Layout| {
         let c = to_unicode(text, layout, &Options::default());
-        c.unknown.len() + c.malformed.len()
+        let viramas = c.text.chars().filter(|&ch| ch == VIRAMA).count();
+        (c.unknown.len() + c.malformed.len(), viramas)
     };
     Layout::ALL
         .into_iter()
-        .min_by_key(|&layout| problems(layout))
+        .min_by_key(|&layout| score(layout))
         .unwrap_or(Layout::Nudi)
 }
 

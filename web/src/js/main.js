@@ -3,7 +3,7 @@ import { Composer } from "./compose.js";
 import { DocEditor } from "./editor.js";
 import { exportBlob, openFile, pasted } from "./files.js";
 import { Issues } from "./issues.js";
-import { countWords, looksLegacy, nudiNotes } from "./text.js";
+import { countWords, LAYOUT_NAMES, looksLegacy, nudiNotes } from "./text.js";
 
 // From a Karnataka RDPR scheme page, Dec 2002, set in BRH Kannada:
 // https://web.archive.org/web/20021227171554/http://www.kar.nic.in:80/rdpr/kan-www/Schemes/Chapter-1/Matter/1_2(M).htm
@@ -82,10 +82,18 @@ function plural(n, one, many) {
 const convert = (text, layout = "auto") =>
   kannadi.convertLegacy(text, { zeroAsAnusvara: settings.zero, kannadaDigits: settings.digits, layout });
 
+const io = { convert, bestLayout: kannadi.bestLayout, decodeWindows1252: kannadi.decodeWindows1252 };
+
+/** "Nudi or Baraha", "Akruti", or both, for the layouts a result was read in. */
+function layoutNames(layouts = []) {
+  const names = layouts.map((l) => LAYOUT_NAMES[l] ?? l);
+  return names.length ? names.join(" and ") : "a legacy font";
+}
+
 function report(result, what) {
   const issues = result.unknown.length;
   say(
-    `${what}: ${plural(result.converted ?? 0, "character", "characters")} converted from Nudi, Baraha or Akruti.` +
+    `${what}: ${plural(result.converted ?? 0, "character", "characters")} converted from ${layoutNames(result.layouts)}.` +
       (issues ? ` ${plural(issues, "unknown glyph", "unknown glyphs")} to check.` : ""),
   );
 }
@@ -149,7 +157,7 @@ function insert(result, what) {
 async function open(file) {
   if (!file) return;
   try {
-    const result = await openFile(file, { convert, decodeWindows1252: kannadi.decodeWindows1252 });
+    const result = await openFile(file, io);
     issues.clear();
     editor.setText(result.text);
     issues.addUnknown(result.unknown);
@@ -219,7 +227,8 @@ function convertSelection() {
   const result = convert(editor.text.slice(start, end));
   editor.replace(start, end, result.text);
   issues.addUnknown(result.unknown.map((o) => start + o));
-  report({ ...result, converted: end - start }, whole ? "Converted the document" : "Converted the selection");
+  const done = { ...result, converted: end - start, layouts: [result.layout] };
+  report(done, whole ? "Converted the document" : "Converted the selection");
 }
 
 function setMode(mode, remember = true) {
@@ -270,7 +279,7 @@ function wire() {
       insert({ text: plain, unknown: [] });
       return;
     }
-    const result = pasted(html, plain, convert);
+    const result = pasted(html, plain, io);
     const start = insert(result, "Pasted");
     if (result.converted) {
       say(ui.messageText.textContent, {
@@ -326,7 +335,7 @@ function wire() {
   });
 
   $("sample").addEventListener("click", () => {
-    const result = { ...convert(SAMPLE), converted: SAMPLE.length };
+    const result = { ...convert(SAMPLE, "nudi"), converted: SAMPLE.length };
     issues.clear();
     editor.setText(result.text);
     issues.addUnknown(result.unknown);

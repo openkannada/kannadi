@@ -7,18 +7,24 @@ export { init };
 /**
  * Converts legacy font text in `layout` ("nudi", "akruti", or "auto" for the
  * layout the text reads best in). Unknown glyph offsets are UTF-16 code units in
- * the output.
- * @returns {{text: string, unknown: number[]}}
+ * the output. The result says which layout was used.
+ * @returns {{text: string, unknown: number[], layout: string}}
  */
 export function convertLegacy(text, { kannadaDigits = false, zeroAsAnusvara = true, layout = "auto" } = {}) {
+  const used = layout === "auto" ? wasm.bestLayout(text) : layout;
   const options = new wasm.NudiOptions();
   options.kannadaDigits = kannadaDigits;
   options.zeroAsAnusvara = zeroAsAnusvara;
-  const result = wasm.toUnicode(text, layout === "auto" ? wasm.bestLayout(text) : layout, options);
-  options.free();
+  let result;
+  try {
+    result = wasm.toUnicode(text, used, options);
+  } finally {
+    options.free();
+  }
   const out = {
     text: result.text,
     unknown: Array.from(result.unknownInText),
+    layout: used,
   };
   result.free();
   return out;
@@ -50,6 +56,7 @@ export function fixes(text, start, end) {
   });
 }
 
+export const bestLayout = wasm.bestLayout;
 export const transliterate = wasm.transliterate;
 export const normalize = wasm.normalize;
 export const modernize = wasm.modernize;
