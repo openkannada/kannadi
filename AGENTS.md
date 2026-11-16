@@ -19,6 +19,7 @@ web/build.sh && node web/test/smoke.mjs                 # WebAssembly build and 
 node --test web/test/units.mjs                          # page modules
 python3 web/serve.py 8000                               # serve web/dist locally
 cargo run --example nudi -- file.txt                    # convert a legacy text file
+cargo run -p kannadi-cli -- to-unicode docs/ --out out/ # batch convert
 cd tools/fontqa && uv run pytest && uv run ruff check . # font shaping tests (Python)
 ```
 
@@ -45,6 +46,11 @@ crates/kannadi/
   data/nudi.tsv       the legacy glyph table, as data
   tests/              golden fixtures, property tests, differential test
   examples/           demo, and a command-line converter for legacy files
+crates/kannadi-cli/   the `kannadi` binary: batch conversion of files and folders
+  src/files.rs        which files to convert and where each one goes
+  src/convert.rs      1 piece of text in either direction, with its issues
+  src/report.rs       the per-file report
+  src/txt.rs          plain text files
 crates/kannadi-wasm/  wasm-bindgen bindings for the page; offsets in UTF-16 code units
 web/
   src/                the static editor page: HTML, CSS, fonts (OFL), JavaScript
