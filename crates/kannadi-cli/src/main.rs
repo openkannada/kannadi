@@ -6,6 +6,7 @@ mod edits;
 mod files;
 mod fonts;
 mod html;
+mod pdf;
 mod report;
 mod txt;
 
@@ -54,8 +55,8 @@ enum Command {
 
 #[derive(Args)]
 struct Common {
-    /// Files and folders to convert. Folders are searched for .txt, .htm, .html
-    /// and .docx files.
+    /// Files and folders to convert. Folders are searched for .txt, .htm, .html,
+    /// .docx and .pdf files. PDF text goes to NAME.pdf.txt, to Unicode only.
     #[arg(required = true)]
     inputs: Vec<PathBuf>,
     /// Folder to write the converted files to.
@@ -154,6 +155,7 @@ fn convert_job(job: &Job, settings: &Settings) -> Result<Report> {
         Format::Txt => txt::convert_file(&bytes, settings)?,
         Format::Html => html::convert_file(&bytes, settings)?,
         Format::Docx => docx::convert_file(&bytes, settings)?,
+        Format::Pdf => pdf::convert_file(&bytes, settings)?,
     };
     if let Some(dir) = job.output.parent() {
         std::fs::create_dir_all(dir).with_context(|| format!("creating {}", dir.display()))?;

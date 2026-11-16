@@ -55,6 +55,7 @@ crates/kannadi-cli/   the `kannadi` binary: batch conversion of files and folder
   src/txt.rs          plain text files
   src/html/           HTML: a small tokenizer, CSS font rules, character references
   src/docx/           DOCX: styles, and paragraphs, runs and text found by position
+  src/pdf.rs          PDF text: fonts, positions and legacy detection
 crates/kannadi-wasm/  wasm-bindgen bindings for the page; offsets in UTF-16 code units
 web/
   src/                the static editor page: HTML, CSS, fonts (OFL), JavaScript

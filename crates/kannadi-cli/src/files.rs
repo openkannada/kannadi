@@ -10,6 +10,7 @@ pub enum Format {
     Txt,
     Html,
     Docx,
+    Pdf,
 }
 
 impl Format {
@@ -19,7 +20,20 @@ impl Format {
             "txt" => Some(Format::Txt),
             "htm" | "html" => Some(Format::Html),
             "docx" => Some(Format::Docx),
+            "pdf" => Some(Format::Pdf),
             _ => None,
+        }
+    }
+
+    /// Where a converted file goes. PDF text is written as `NAME.pdf.txt`.
+    fn output(self, path: PathBuf) -> PathBuf {
+        match self {
+            Format::Pdf => {
+                let mut name = path.into_os_string();
+                name.push(".txt");
+                PathBuf::from(name)
+            }
+            _ => path,
         }
     }
 }
@@ -69,7 +83,7 @@ pub fn plan(inputs: &[PathBuf], out: &Path) -> Result<Plan> {
                 };
                 let relative = file.strip_prefix(input).unwrap_or(&file);
                 plan.jobs.push(Job {
-                    output: out.join(&name).join(relative),
+                    output: format.output(out.join(&name).join(relative)),
                     input: file,
                     format,
                 });
@@ -81,7 +95,7 @@ pub fn plan(inputs: &[PathBuf], out: &Path) -> Result<Plan> {
             let name = input.file_name().unwrap_or_default();
             plan.jobs.push(Job {
                 input: input.clone(),
-                output: out.join(name),
+                output: format.output(out.join(name)),
                 format,
             });
         }
@@ -190,14 +204,19 @@ mod tests {
         std::fs::create_dir_all(docs.join("sub")).unwrap();
         std::fs::write(docs.join("a.txt"), "").unwrap();
         std::fs::write(docs.join("sub/B.TXT"), "").unwrap();
-        std::fs::write(docs.join("c.pdf"), "").unwrap();
+        std::fs::write(docs.join("c.xlsx"), "").unwrap();
+        std::fs::write(docs.join("d.pdf"), "").unwrap();
         std::fs::write(docs.join(".hidden.txt"), "").unwrap();
         let out = tmp.path().join("out");
         let plan = plan(&[docs], &out).unwrap();
         let outputs: Vec<PathBuf> = plan.jobs.iter().map(|j| j.output.clone()).collect();
         assert_eq!(
             outputs,
-            [out.join("docs/a.txt"), out.join("docs/sub/B.TXT")]
+            [
+                out.join("docs/a.txt"),
+                out.join("docs/d.pdf.txt"),
+                out.join("docs/sub/B.TXT")
+            ]
         );
         assert_eq!(plan.skipped, 2);
     }
@@ -268,8 +287,8 @@ mod tests {
         let file = tmp.path().join("a.txt");
         std::fs::write(&file, "").unwrap();
         assert!(plan(std::slice::from_ref(&file), tmp.path()).is_err());
-        let pdf = tmp.path().join("a.pdf");
-        std::fs::write(&pdf, "").unwrap();
-        assert!(plan(&[pdf], &tmp.path().join("out")).is_err());
+        let sheet = tmp.path().join("a.xlsx");
+        std::fs::write(&sheet, "").unwrap();
+        assert!(plan(&[sheet], &tmp.path().join("out")).is_err());
     }
 }

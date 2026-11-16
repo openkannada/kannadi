@@ -40,13 +40,18 @@ impl Report {
 
     /// Counts by kind, such as "2 unknown glyphs, 1 malformed syllable".
     pub fn summary(&self) -> String {
-        [Kind::UnknownGlyph, Kind::Malformed, Kind::Unencodable]
-            .into_iter()
-            .map(|k| (k, self.count(k)))
-            .filter(|&(_, n)| n > 0)
-            .map(|(k, n)| format!("{n} {}", if n == 1 { k.label() } else { k.plural() }))
-            .collect::<Vec<_>>()
-            .join(", ")
+        [
+            Kind::UnknownGlyph,
+            Kind::Malformed,
+            Kind::Unencodable,
+            Kind::NotConverted,
+        ]
+        .into_iter()
+        .map(|k| (k, self.count(k)))
+        .filter(|&(_, n)| n > 0)
+        .map(|(k, n)| format!("{n} {}", if n == 1 { k.label() } else { k.plural() }))
+        .collect::<Vec<_>>()
+        .join(", ")
     }
 
     pub fn to_tsv(&self) -> String {
