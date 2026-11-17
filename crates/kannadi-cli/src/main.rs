@@ -27,7 +27,7 @@ use report::Report;
 /// and Unicode back to Nudi.
 ///
 /// Each converted file gets a report next to it, FILE.report.tsv, when anything
-/// could not be converted cleanly.
+/// could not be converted cleanly or the result has likely typos.
 struct Cli {
     #[command(subcommand)]
     command: Command,
@@ -69,7 +69,7 @@ struct Common {
     #[arg(short, long)]
     out: PathBuf,
     /// Exit with status 1 if any file has unknown glyphs, malformed syllables or
-    /// unencodable characters.
+    /// unencodable characters. Likely typos do not count.
     #[arg(long)]
     strict: bool,
     /// Font for converted text in HTML and DOCX: Noto Sans Kannada by default for
@@ -157,8 +157,10 @@ fn run(common: &Common, settings: &Settings) -> Result<Outcome> {
         match convert_job(job, settings) {
             Ok(report) => {
                 converted += 1;
-                if !report.is_empty() {
+                if report.has_problems() {
                     with_issues += 1;
+                }
+                if !report.is_empty() {
                     eprintln!("{}: {}", job.input.display(), report.summary());
                 }
             }
