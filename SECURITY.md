@@ -1,6 +1,6 @@
 # Security
 
-Please report a security problem by email to prasad@luminik.io, not in a public issue. Say what is affected, how to reproduce it, and which version or commit you used.
+Please report security problems privately, by email to prasad@luminik.io or through GitHub's private vulnerability reporting on this repository. Say what is affected, how to reproduce it, and which version or commit you used.
 
 Once a fix is released, the report can be made public, with credit if you want it.
 
