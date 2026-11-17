@@ -275,8 +275,8 @@ struct PageReader<'d, 'f> {
     current: Option<&'d Dictionary>,
     /// The last string shown: its font, bytes and start on the page.
     last_string: Option<(usize, Vec<u8>, f32, f32)>,
-    /// Fonts, sizes and transformations saved by `q`, restored by `Q`.
-    saved: Vec<(Option<&'d Dictionary>, f32, Matrix)>,
+    /// Fonts, sizes, leadings and transformations saved by `q`, restored by `Q`.
+    saved: Vec<(Option<&'d Dictionary>, f32, f32, Matrix)>,
     lost: usize,
     operations_left: usize,
 }
@@ -318,12 +318,10 @@ impl<'d> PageReader<'d, '_> {
                 // Acrobat Distiller moves to the next part of a line with a
                 // leading of 0, which stays on the baseline.
                 "T*" | "'" | "\"" => self.pen.move_by(0.0, -self.pen.leading),
-                "q" => self.saved.push((self.current, self.pen.size, self.pen.ctm)),
+                "q" => self.saved.push(self.state()),
                 "Q" => {
-                    if let Some((font, size, ctm)) = self.saved.pop() {
-                        self.current = font;
-                        self.pen.size = size;
-                        self.pen.ctm = ctm;
+                    if let Some(state) = self.saved.pop() {
+                        self.restore(state);
                     }
                 }
                 "cm" => {
@@ -336,11 +334,11 @@ impl<'d> PageReader<'d, '_> {
                         let mut inner: Vec<&Dictionary> = form.resources.into_iter().collect();
                         inner.extend_from_slice(resources);
                         // A form is drawn inside its own `q` and `Q`.
-                        let (font, size, ctm) = (self.current, self.pen.size, self.pen.ctm);
+                        let state = self.state();
                         let saved = std::mem::take(&mut self.saved);
-                        self.pen.ctm = form.matrix.then(ctm);
+                        self.pen.ctm = form.matrix.then(state.3);
                         let walked = self.walk(&form.operations, &inner, depth + 1);
-                        (self.current, self.pen.size, self.pen.ctm) = (font, size, ctm);
+                        self.restore(state);
                         self.saved = saved;
                         walked?;
                     }
@@ -353,6 +351,18 @@ impl<'d> PageReader<'d, '_> {
             }
         }
         Ok(())
+    }
+
+    /// The part of the graphics state the reader follows, as `q` saves it.
+    fn state(&self) -> (Option<&'d Dictionary>, f32, f32, Matrix) {
+        (self.current, self.pen.size, self.pen.leading, self.pen.ctm)
+    }
+
+    fn restore(&mut self, (font, size, leading, ctm): (Option<&'d Dictionary>, f32, f32, Matrix)) {
+        self.current = font;
+        self.pen.size = size;
+        self.pen.leading = leading;
+        self.pen.ctm = ctm;
     }
 
     fn break_line(&mut self) {

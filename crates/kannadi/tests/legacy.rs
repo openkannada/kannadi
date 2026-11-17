@@ -102,7 +102,7 @@ fn most_nudi_b_words_encode_as_typed() {
 fn most_kan_eng_words_encode_as_typed() {
     let (same, total) = typed_back(Layout::KanEng);
     assert!(total >= 300, "{total}");
-    assert!(same * 100 >= total * 85, "{same} of {total}");
+    assert!(same * 100 >= total * 90, "{same} of {total}");
 }
 
 /// How many clean fixture words encode back to the bytes typed, of how many.

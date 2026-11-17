@@ -31,6 +31,7 @@ Command-line tool (`kannadi-cli`):
 - PDF: extracts text and converts text in legacy fonts, including fonts renumbered behind a ToUnicode map.
 - PDF: Ghostscript's glyph names `c<n>` are read as code n; strings drawn several times a fraction of a point apart, to look bold, are read once; short text in a font with a hidden name is not taken as a layout that draws Latin.
 - PDF: `T*`, `'` and `"` move down by the text leading, as `TL` and `TD` set it, so the parts of a line that Acrobat Distiller draws with a leading of 0 stay on 1 line.
+- PDF: the CID copy Acrobat makes of a WinAnsi font, for glyphs at codes Windows-1252 leaves undefined and at AD and B5, is read back to those codes, so its glyphs join the words around them. Named legacy CID fonts have their ToUnicode map read.
 - Akruti in every format: font names give each run's layout in HTML, DOCX and PDF; `to-unicode --layout akruti` for text files; `--legacy-font "NAME=akruti"`. In PDFs, glyph names `G<n>` in renumbered lists are read as code n, fonts with hidden names are judged in each layout, and a gap that would break a syllable adds no space.
 
 Editor page and bindings:

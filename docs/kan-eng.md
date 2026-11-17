@@ -18,13 +18,13 @@ Several glyphs sit at 2 codes, such as ಂ at F9 and 8C, the subscript ಕ at 7E
 
 The PDFs were fetched from the Internet Archive: 45 budget papers of 2002 to 2014 that embed Kan-Eng fonts, such as the [2003 errata](https://web.archive.org/web/20030812181515/http://www.kar.nic.in:80/finance/bud2003/errata2003-04.pdf), the [2005 budget overview](https://web.archive.org/web/20051212212136/http://kar.nic.in:80/finance/bud2005/budover05-06.pdf) and the [2002 guarantees statement](https://web.archive.org/web/20060517074014/http://kar.nic.in:80/finance/bud2002/guar.pdf). They were made with Acrobat PDFMaker for Excel and Acrobat Distiller, which embed each font as a TrueType subset with WinAnsi encoding.
 
-Acrobat cannot put a glyph at a code Windows-1252 leaves undefined (81, 8D, 8F, 90 and 9D), or at AD, in a WinAnsi font, so it moves those glyphs into a second, CID-keyed copy of the font. The copy's ToUnicode map gives the undefined codes back as U+0081 and so on, and AD as U+2212. The copy has no cmap, but its glyph IDs are the code minus 30, as in every subset's own cmap from 7E to C0, which confirms each code. Each subset's cmap table is cut short, so the other glyphs were read from its Macintosh table.
+Acrobat cannot put a glyph at a code Windows-1252 leaves undefined (81, 8D, 8F, 90 and 9D), or at AD or B5, in a WinAnsi font, so it moves those glyphs into a second, CID-keyed copy of the font. The copy's ToUnicode map gives the undefined codes back as U+0081 and so on, and AD as U+2212. The copy has no cmap, but its glyph IDs are the code minus 30 (decimal: code 0x81, 129, is glyph 99), as in every subset's own cmap from 7E to C0, which confirms each code. Each subset's cmap table is cut short, so the other glyphs were read from its Macintosh table.
 
 ## Method
 
 1. Extract each paper's Kannada lines with their codes in drawing order, joining the glyphs of the CID copy back into the words they belong to.
 2. Render each glyph of the embedded subsets at its code, and read it.
-3. Settle each code from the words it appears in. 81 (ಆ), 9D (ಚ), 90 (the subscript ಮ) and AD (the subscript ಣ) were read from ಆಯವ್ಯಯ, ವೆಚ್ಚ, ಚೆನ್ನಮ್ಮ, ಸಣ್ಣ and ಉಣ್ಣೆ. 8D (ಃ) was read by its shape; its 1 use is a typing error.
+3. Settle each code from the words it appears in. 81 (ಆ), 9D (ಚ), 90 (the subscript ಮ) and AD (the subscript ಣ) were read from ಆಯವ್ಯಯ, ವೆಚ್ಚ, ಚೆನ್ನಮ್ಮ, and ಸಣ್ಣ, ಉಣ್ಣೆ and ಕೃಷ್ಣ. 8D (ಃ) was read by its shape; its 1 use is a typing error.
 4. Convert all the lines, and read every unknown glyph and malformed syllable against the codes rendered with the embedded glyphs.
 5. Pick fixture lines that cover the table, render each next to its conversion, and read them side by side.
 
@@ -37,7 +37,7 @@ Acrobat cannot put a glyph at a code Windows-1252 leaves undefined (81, 8D, 8F, 
 | Fixture words that encode back to the bytes typed | 340 of 373 (91.2%) |
 | All words that encode back to the bytes typed | 1,895 of 2,295 (82.6%); the rest use the other code of a glyph at 2 codes, or put a subscript before the head stroke |
 | Whole fixture lines that `best_layout` gives another layout | 0 of 118 |
-| The 45 papers through `kannadi to-unicode`, all their fonts | 416,330 Kannada characters, 856 unknown glyphs, 3,199 malformed syllables; before this layout, 382,212, 2,199 and 8,491 |
+| The 45 papers through `kannadi to-unicode`, all their fonts | 416,411 Kannada characters, 810 unknown glyphs, 3,185 malformed syllables; before this layout, 382,212, 2,199 and 8,491 |
 
 The problems left in the 833 lines were read against the glyphs: words the source typed wrongly, a syllable a table cell split, and the 1 use of ಃ. The `kannadi to-unicode` figures cover every font in the papers, Nudi B-Akshara among them, whose PDFMaker tables draw some syllables off the line.
 
@@ -48,5 +48,6 @@ The fixture is [kan-eng.tsv](../crates/kannadi/tests/fixtures/kan-eng.tsv), with
 ## Limits
 
 - Letters the documents do not use, such as ಊ, ಔ, ಙ, ಛ, ಝ and ಞ as full letters, have no entry. The encoder reports them as unencodable.
+- Some forms the encoder writes appear in no document, so they are untested against a page: ಭ with no vowel sign (BE FB DC) and ಮೋ (C9 E5 E1 DE E0; the 1 document use is C9 E5 E3 E0).
 - A visible virama typed before the next consonant, as in ಕೌನ್ಸಿಲ್‌ಗಳು, comes out with no ZWNJ, so Unicode fonts draw a conjunct there. The other layouts do the same.
 - Text drawn in a rotated table cell keeps its order only when the PDF draws it in reading order.
