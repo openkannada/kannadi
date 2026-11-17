@@ -30,6 +30,8 @@
 //! - `read`: a way of typing that is read but never written, such as a sign
 //!   typed after a space.
 
+use std::sync::OnceLock;
+
 use crate::chars::{class, Class, VIRAMA};
 
 use super::{windows_1252, Layout};
@@ -92,9 +94,18 @@ fn contents(layout: Layout) -> &'static str {
 
 /// Whether the layout's table keeps the ASCII letters as Latin letters.
 pub(super) fn draws_latin(layout: Layout) -> bool {
-    rows(layout).iter().any(
-        |row| matches!(&row.entry, Entry::Literal(l) if l.chars().all(|c| c.is_ascii_alphabetic())),
-    )
+    static LATIN: OnceLock<Vec<bool>> = OnceLock::new();
+    let latin = LATIN.get_or_init(|| {
+        Layout::ALL
+            .iter()
+            .map(|&l| {
+                rows(l).iter().any(|row| {
+                    matches!(&row.entry, Entry::Literal(v) if v.chars().all(|c| c.is_ascii_alphabetic()))
+                })
+            })
+            .collect()
+    });
+    latin[layout as usize]
 }
 
 /// The rows of a layout's table in table order.
@@ -208,7 +219,7 @@ mod tests {
     #[test]
     fn the_built_in_tables_parse() {
         for layout in Layout::ALL {
-            assert!(rows(layout).len() > 100, "{layout}");
+            assert!(rows(layout).len() > 150, "{layout}");
         }
     }
 }

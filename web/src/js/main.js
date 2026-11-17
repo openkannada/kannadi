@@ -449,7 +449,7 @@ function restore() {
     fileName = saved.fileName ?? "kannada";
     say(
       looksLegacy(saved.text)
-        ? "Restored your last document. Some of it still looks like Nudi, Baraha, Akruti or Shree-Lipi: select it and choose Convert."
+        ? "Restored your last document. Some of it still looks like Nudi, Baraha, Nudi B-Akshara, Akruti or Shree-Lipi: select it and choose Convert."
         : "Restored your last document from this browser.",
     );
   } else {

@@ -324,7 +324,12 @@ pub fn glyph_codes(doc: &Document, font: &Dictionary) -> Option<Vec<char>> {
 
 /// The code in a glyph name `G<n>`, with n from 0 to 255 written in decimal.
 fn code_name(name: &[u8]) -> Option<u8> {
-    let digits = name.strip_prefix(b"G")?;
+    numbered(name, b"G")
+}
+
+/// The code in a glyph name made of `prefix` and 1 to 3 decimal digits, up to 255.
+fn numbered(name: &[u8], prefix: &[u8]) -> Option<u8> {
+    let digits = name.strip_prefix(prefix)?;
     if digits.is_empty() || digits.len() > 3 || !digits.iter().all(u8::is_ascii_digit) {
         return None;
     }
@@ -339,11 +344,7 @@ fn glyph(name: &[u8]) -> Option<char> {
             .next();
     }
     // Ghostscript names a glyph with no standard name `c` and its code in decimal.
-    if let Some(code) = name
-        .strip_prefix('c')
-        .filter(|d| (1..=3).contains(&d.len()) && d.bytes().all(|b| b.is_ascii_digit()))
-        .and_then(|d| d.parse::<u8>().ok())
-    {
+    if let Some(code) = numbered(name.as_bytes(), b"c") {
         return decode_windows_1252(&[code]).chars().next();
     }
     let hex = name.strip_prefix("uni").filter(|h| h.len() == 4)?;

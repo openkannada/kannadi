@@ -293,6 +293,23 @@ mod tests {
         assert_eq!(text, "ಕನ್ನಡ ಕನ್ನಡ\n");
     }
 
+    #[test]
+    fn a_string_repeated_further_away_or_in_another_font_is_kept() {
+        let mut content = b"BT /F1 10 Tf 72 700 Td (".to_vec();
+        content.extend_from_slice(KANNADA);
+        content.extend_from_slice(b") Tj 1.5 0 Td (");
+        content.extend_from_slice(KANNADA);
+        content.extend_from_slice(b") Tj /F2 10 Tf 0 0 Td (");
+        content.extend_from_slice(KANNADA);
+        content.extend_from_slice(b") Tj ET");
+        let fonts = vec![
+            ("F1", simple_font("Nudi 01 e")),
+            ("F2", simple_font("BRH Kannada")),
+        ];
+        let (text, _) = run(&pdf(fonts, &content));
+        assert_eq!(text.matches("ಕನ್ನಡ").count(), 3, "{text}");
+    }
+
     /// ರಹೀಮ್ ಖಾನ್, from a Legislative Assembly member page of 2011, in a font whose
     /// name the PDF dropped. Its `Differences` list names ಂ's code `c129`.
     #[test]

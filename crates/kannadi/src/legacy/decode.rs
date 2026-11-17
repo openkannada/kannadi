@@ -662,6 +662,8 @@ mod tests {
             (&[0xBE, 0xB0, 0xD1], "ಭಾ"),
             (&[0x42, 0x4A, 0x50, 0x20, 0xB1, 0xD2], "BJP ಣಿ"),
             (&[0xA6, 0xD0, 0xD4], "ಯ"),
+            (&[0xBA, 0x20, 0xA6, 0xD0, 0xD4], "ನಿಯ"),
+            (&[0xBA, 0x20, 0x20, 0xA6, 0xD0, 0xD4], "ನಿ  ಯ"),
             (&[0x81, 0xA6, 0xD9, 0xD6, 0xD3], "ಯೋ"),
             (&[0xA4, 0xD0, 0xA5, 0xD4, 0xD6], "ಝೂ"),
             (&[0x8F, 0xA2, 0xD1], "ಓಜಾ"),
@@ -753,22 +755,27 @@ mod tests {
     }
 
     /// Every row of every table reads without an unknown glyph: letters and
-    /// literals alone, the rest after a consonant.
+    /// literals alone, the rest, and rows typed after a space, after a consonant.
     #[test]
     fn every_table_row_reads() {
         for layout in Layout::ALL {
             let carrier = super::super::from_unicode("ಪ", layout).text;
             for row in rows(layout) {
-                let input = match row.entry {
-                    Entry::Letter(_) | Entry::Base(_) | Entry::Literal(_) | Entry::Ignore => {
-                        row.key.clone()
-                    }
-                    _ => format!("{carrier}{}", row.key),
+                let after_space = row.key.starts_with(char::is_whitespace);
+                let alone = matches!(
+                    row.entry,
+                    Entry::Letter(_) | Entry::Base(_) | Entry::Literal(_) | Entry::Ignore
+                );
+                let input = if alone && !after_space {
+                    row.key.clone()
+                } else {
+                    format!("{carrier}{}", row.key)
                 };
                 let c = to_unicode(&input, layout, &Options::default());
                 assert!(c.unknown.is_empty(), "{layout} {:?}: {c:?}", row.key);
                 if let Entry::Letter(value) | Entry::Literal(value) = &row.entry {
-                    let expected: String = value.nfc().collect();
+                    let before = if after_space { "ಪ" } else { "" };
+                    let expected: String = format!("{before}{value}").nfc().collect();
                     assert_eq!(c.text, expected, "{layout} {:?}", row.key);
                 }
             }

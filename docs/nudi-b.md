@@ -19,7 +19,7 @@ It stores Kannada the way the other layouts do, at its own codes: a consonant sh
 All fetched from the Internet Archive:
 
 - The 5 member pages of the 13th Assembly that the Archive holds: [13mem/50.pdf](http://web.archive.org/web/20150427105120/http://kla.kar.nic.in/13mem/50.pdf), [13mem/75.pdf](http://web.archive.org/web/20160304030357/http://kla.kar.nic.in/13mem/75.pdf), [assembly/member/13mem/40.pdf](http://web.archive.org/web/20140929094100/http://kla.kar.nic.in/assembly/member/13mem/40.pdf), [52.pdf](http://web.archive.org/web/20150317110005/http://kla.kar.nic.in/assembly/member/13mem/52.pdf) and [62.pdf](http://web.archive.org/web/20160929091548/http://kla.kar.nic.in/assembly/member/13mem/62.pdf), made with PScript5 and Ghostscript 8.15 in October 2011. Ghostscript renumbered the font's codes from 1 but kept a `Differences` list whose glyph names (`currency`, `Eth`, and `c129` for a code with no standard name) give each glyph's original code.
-- 18 Karnataka budget papers of 2007 to 2014 on `kar.nic.in/finance` and 4 Assembly papers that name the font NudiB-Akshar, among them the [2011 budget speech](http://web.archive.org/web/20110304213411/http://www.kar.nic.in:80/finance/bud2011/bspkan2011.pdf), the demand books and the statements of expenditure.
+- 18 Karnataka budget papers of 2007 to 2014 on `kar.nic.in/finance` and 4 Legislative Assembly papers of 2013 to 2017 that name the font NudiB-Akshar, among them the [2011 budget speech](http://web.archive.org/web/20110304213411/http://www.kar.nic.in:80/finance/bud2011/bspkan2011.pdf), the demand books and the statements of expenditure.
 
 The 233 member pages of the 14th Assembly use other Nudi fonts.
 
@@ -36,13 +36,13 @@ The 233 member pages of the 14th Assembly use other Nudi fonts.
 |---|---|
 | Member pages | 161 distinct Kannada lines, 4,569 glyphs: 0 unknown glyphs, 0 malformed syllables |
 | Budget and Assembly papers | 10,214 distinct lines, 639,208 glyphs: 65 unknown glyphs, 113 malformed syllables |
-| Fixture lines read against the embedded glyphs | 191 lines from 15 documents, all equal |
+| Fixture lines read against the embedded glyphs | 190 lines from 15 documents, all equal |
 | Fixture words that encode back to the bytes typed | 552 of 577 (95.7%) |
-| Whole fixture lines that `best_layout` gives another layout | 0 of 191 |
+| Whole fixture lines that `best_layout` gives another layout | 0 of 190 |
 
 The remaining problems read against the glyphs were the documents' own: a mahaprana mark typed on ವ, a word split at a line end, a vowel sign at the start of a line. The budget papers' lines exclude subsets that the PDF maker renumbered with no `Differences` list, whose codes are not the font's.
 
-Many budget papers, made with Acrobat Distiller or an Oracle PDF driver, have no glyph for code 81, which Windows-1252 leaves undefined. On those pages ಂ shows as a gap (ಸ ಖ್ಯೆ for ಸಂಖ್ಯೆ) and ಯ without its circle; the text keeps the gap, as the page does, and the table reads ಯ without its circle.
+Many budget papers, made with Acrobat Distiller or an Oracle PDF driver, have no glyph for code 81, which Windows-1252 leaves undefined, and write a space for it. On those pages ಂ shows as a gap (ಸ ಖ್ಯೆ for ಸಂಖ್ಯೆ), and ಯ shows without its circle after a gap. ಂ is lost: the text keeps the gap, as the page does. ಯ is recovered: right after a syllable, the space and the rest of the glyph read as ಯ joined to that syllable (ಅಭಿಯಾಚನೆ, not ಅಭಿ ಯಾಚನೆ); after a real gap, the text keeps the gap and reads ಯ. Where a word starting with ಯ follows another word with no gap of its own, as in some table headings, the 2 words join.
 
 Single words often read cleanly in Nudi too, as the 2 layouts share many shapes at nearby codes, so `best_layout` needs a line or more of text to tell them apart.
 
@@ -50,5 +50,5 @@ The fixture is [nudi-b.tsv](../crates/kannadi/tests/fixtures/nudi-b.tsv), with t
 
 ## Limits
 
-- Letters the documents do not use, such as ಙ and the subscript ಶ, have no entry; the encoder writes a consonant whose subscript has no glyph as a half form with a visible virama.
+- Letters the documents do not use, such as ಊ, ಙ, ಞ as a full letter and the subscripts ಖ, ಝ and ಶ, have no entry. ಊ and ಞ are reported as unencodable; the encoder writes a consonant whose subscript has no glyph as a half form with a visible virama.
 - Budget tables made with PDFMaker for Excel draw some syllables a little off the line, and the PDF reader splits those words across lines, so they read as malformed.

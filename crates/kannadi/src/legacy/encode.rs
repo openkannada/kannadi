@@ -309,18 +309,28 @@ impl Parts {
     /// virama. Both read back as the same Unicode.
     fn split_at_missing_subscript(self, glyphs: &Glyphs) -> Vec<Parts> {
         let arka = usize::from(self.consonants.len() > 1 && self.consonants[0].1 == RA);
+        // A subscript with only conditional glyphs, such as one written after another
+        // subscript, may have none to write here, so it counts as missing.
+        let writable = |c: &char| {
+            glyphs
+                .ottus
+                .get(c)
+                .is_some_and(|o| o.iter().any(|choice| choice.prefer == Prefer::Otherwise))
+        };
         let missing = self.consonants[arka..]
             .iter()
             .skip(1)
-            .position(|(_, c)| !glyphs.ottus.contains_key(c));
+            .position(|(_, c)| !writable(c));
         let Some(j) = missing.filter(|_| glyphs.signs.contains_key(&VIRAMA)) else {
             return vec![self];
         };
         let at = arka + 1 + j;
         let mut rest = self;
+        let consonants: Vec<(usize, char)> = rest.consonants.drain(..at).collect();
+        let virama_at = consonants.last().map_or(0, |&(i, c)| i + c.len_utf8());
         let first = Parts {
-            consonants: rest.consonants.drain(..at).collect(),
-            signs: vec![(rest.consonants[0].0, VIRAMA)],
+            consonants,
+            signs: vec![(virama_at, VIRAMA)],
             ..Parts::default()
         };
         let mut parts = vec![first];
@@ -767,6 +777,10 @@ mod tests {
         assert!(e.is_clean(), "{e:?}");
         let bytes: Vec<u8> = e.text.chars().filter_map(windows_1252_byte).collect();
         assert_eq!(bytes, [0x91, 0xFD, 0xC6, 0xD0]);
+        let shree = from_unicode("ಬುಡ್ಢ", Layout::ShreeLipi);
+        assert!(shree.is_clean(), "{shree:?}");
+        let back = to_unicode(&shree.text, Layout::ShreeLipi, &Options::default());
+        assert_eq!(back.text, "ಬುಡ್ಢ");
         assert_eq!(encode("ಕ್ಗ"), [0x50, 0xC0, 0xCE]);
     }
 

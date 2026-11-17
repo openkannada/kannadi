@@ -17,7 +17,7 @@
 #   bspkan2011.pdf. Its subset has the same
 #   outline as the member pages' font at 78 of the 82 codes both use.
 # Each glyph was identified by eye, then checked in context: the text of the member
-# pages and of 11,430 distinct lines of the budget papers was converted, and every
+# pages and of 10,214 distinct lines of the budget papers was converted, and every
 # unknown glyph and malformed syllable was read against the codes rendered with the
 # embedded glyphs. docs/nudi-b.md has the method and results.
 #
@@ -103,8 +103,13 @@ C0 D9 D6	letter	ಮೊ
 81 A6 D9 D6	letter	ಯೊ
 81 A6 D0 A6	base	ಯ
 # Many PDFs, made with Acrobat Distiller or an Oracle PDF driver, have no glyph for code
-# 81, which Windows-1252 leaves undefined, so ಯ shows without its circle after a gap.
-# The rest still draws ಯ.
+# 81, which Windows-1252 leaves undefined, and write a space for it, so ಯ shows without
+# its circle after a gap, inside a word as at its start. After a syllable the space
+# is read as the lost circle; elsewhere the rest of the glyph still reads as ಯ.
+20 A6 D0 D4	letter	ಯ	read
+20 A6 D9 D4	letter	ಯೆ	read
+20 A6 D9 D6	letter	ಯೊ	read
+20 A6 D0 A6	base	ಯ	read
 A6 D0 D4	letter	ಯ	read
 A6 D9 D4	letter	ಯೆ	read
 A6 D9 D6	letter	ಯೊ	read
