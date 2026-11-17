@@ -11,143 +11,143 @@
 # subscript ಯ. The source column names the habit. Together the lines use every glyph
 # sequence of the newspaper excerpts this file held before, and some the table reads
 # that those excerpts did not use.
-CA DC E1 D9 E6 57 DD C6 A8 DC C8 C9 20 D6 DC DA DB BF E1 20 C3 DC D3 E6 A4 57 DC D9 DC E1 20 50 E6 D3 DC C3 DD 57 DC E1 F1 DC A4 CA E6 2C 20 CA DC E1 50 DC 52 D9 DC E1 20 CD DD C7 E6 57 E6 20 D6 E6 E3 E0 57 DC C6 E1 20 50 DC D0 DC 72 B1 DC 76 DC E1 F1 DD A4 C3 E6 2E	ಮಳೆಗಾಲದಲ್ಲಿ ಹಳ್ಳಿಯ ರಸ್ತೆಗಳು ಕೆಸರಾಗುತ್ತವೆ, ಮಕ್ಕಳು ಶಾಲೆಗೆ ಹೋಗಲು ಕಷ್ಟಪಡುತ್ತಾರೆ.	written for this fixture
-44 20 CA DC D0 DC EC 20 CA DC E1 E1 ED 57 DD C3 DC E1 20 CA DC E1 D9 E6 20 B8 E6 E0 57 DC AE E6 20 9F ED A9 E0 F1 E6 E0 3F	ಈ ವರ್ಷ ಮುಂಗಾರು ಮಳೆ ಬೇಗನೆ ಬಂದೀತೇ?	written for this fixture
-57 DC C5 ED A5 DD C6 BF E1 A8 DC C8 C9 20 D6 E6 E3 D3 DC 20 B1 DC E2 D3 DC A4 50 DC 57 DC D9 DC 20 B1 DC C5 A8 DC CD DC EC AE DC	ಗ್ರಂಥಾಲಯದಲ್ಲಿ ಹೊಸ ಪುಸ್ತಕಗಳ ಪ್ರದರ್ಶನ	written for this fixture
-CD DC AF CA DD C3 DC 20 B8 E6 DA 57 E6 59 20 31 30 20 57 DC ED 70 E6 57 E6 20 46 C4 AE DC 20 50 E6 C3 E6 BF E1 20 A8 DC 76 DC A8 DC C8 C9 20 D3 DC CC 61 DC 66 F1 DD 20 41 BC BF DE AE DC 20 AE DC 76 E6 BF E1 C8 A8 E6 2E	ಶನಿವಾರ ಬೆಳಿಗ್ಗೆ 10 ಗಂಟೆಗೆ ಊರಿನ ಕೆರೆಯ ದಡದಲ್ಲಿ ಸ್ವಚ್ಛತಾ ಅಭಿಯಾನ ನಡೆಯಲಿದೆ.	written for this fixture
-41 69 6A BF E1 20 41 76 DC E1 57 E6 CA DC E1 AE E6 C0 E1 ED A8 DC 3A 20 C3 DD 58 20 C3 E6 E3 71 72 20 CA DC E1 F1 DC E1 A4 20 50 DD C0 E1 20 61 DC 71 B0	ಅಜ್ಜಿಯ ಅಡುಗೆಮನೆಯಿಂದ: ರಾಗಿ ರೊಟ್ಟಿ ಮತ್ತು ಕಾಯಿ ಚಟ್ನಿ	written for this fixture
-F1 DD C0 E1 20 CA DC DE 77 A8 DC 20 D6 E6 E3 E0 DA 57 E6 BF E1 20 C3 DC E1 62 57 E6 20 D3 DC CA DC DE AE DC CA DD A8 DC E1 A8 DC E1 20 B8 E6 E0 C3 E6 20 48 AF A8 E6 3F	ತಾಯಿ ಮಾಡಿದ ಹೋಳಿಗೆಯ ರುಚಿಗೆ ಸಮಾನವಾದುದು ಬೇರೆ ಏನಿದೆ?	written for this fixture
-50 DC EA D1 20 CA E6 E1 E0 D9 DC 50 E6 52 20 32 35 20 D6 DC DA DB 57 DC D9 DC 20 C3 E6 E7 F1 DC C3 DC E1 20 9F ED A9 A8 DC AA C3 DC E1 2E	ಕೃಷಿ ಮೇಳಕ್ಕೆ 25 ಹಳ್ಳಿಗಳ ರೈತರು ಬಂದಿದ್ದರು.	written for this fixture
-D3 DD CA DC BF E1 CA DC 20 57 E6 E3 9F BA C3 DC A8 DC 20 9F D9 DC 50 E6 C0 E1 ED A8 DC 20 CA DC E1 7E A1 AE DC 20 B4 DC C6 CA DC F1 DC A4 F1 E6 20 D6 E6 61 DC E1 63 F1 DC A4 A8 E6 20 47 ED A8 DC E1 20 F1 DC 67 6E C3 DC E1 20 D6 E6 E0 DA A8 DC C3 DC E1 2E	ಸಾವಯವ ಗೊಬ್ಬರದ ಬಳಕೆಯಿಂದ ಮಣ್ಣಿನ ಫಲವತ್ತತೆ ಹೆಚ್ಚುತ್ತದೆ ಎಂದು ತಜ್ಞರು ಹೇಳಿದರು.	written for this fixture
-41 77 50 E6 20 CA DC E1 F1 DC E1 A4 20 F1 E6 ED 58 AE DC 20 B8 E6 C7 E6 20 44 20 CA DD C3 DC 20 D3 DC CC C6 B3 20 48 C4 A8 E6	ಅಡಿಕೆ ಮತ್ತು ತೆಂಗಿನ ಬೆಲೆ ಈ ವಾರ ಸ್ವಲ್ಪ ಏರಿದೆ	written for this fixture
-CB 68 DD 6E AE DC 20 CE 50 DC D2 50 DC C3 DC 20 50 DD C3 DD C2 57 DD C3 DC 3A 20 B1 DC C5 C1 E3 E0 57 DC 57 DC D9 DC 20 CA DC E1 E3 C6 50 DC 20 B1 DD 73 DC	ವಿಜ್ಞಾನ ಶಿಕ್ಷಕರ ಕಾರ್ಯಾಗಾರ: ಪ್ರಯೋಗಗಳ ಮೂಲಕ ಪಾಠ	written for this fixture; ರ್ಯಾ typed as ರಾ with the subscript ಯ
-CA DC E1 50 DC 52 DA 57 E6 20 57 DC 7E F1 DC 20 50 DC C8 D3 DC C6 E1 20 42 6F 57 DC D9 DC E1 20 CA DC E1 F1 DC E1 A4 20 50 DC A5 E6 57 DC D9 DC E1 20 45 B1 DC BF E1 E1 50 DC A4 2E	ಮಕ್ಕಳಿಗೆ ಗಣಿತ ಕಲಿಸಲು ಆಟಗಳು ಮತ್ತು ಕಥೆಗಳು ಉಪಯುಕ್ತ.	written for this fixture
-AE DC CA DC E1 BE 20 CD DD C7 E6 BF E1 20 51 C5 50 E6 70 85 20 F1 DC ED 76 DC 20 69 C7 DD C9 20 CA DC E1 6F 72 A8 DC 20 B1 DC ED A8 DC C2 A8 DC C8 C9 20 57 E6 A9 AA F1 DC E1 21	ನಮ್ಮ ಶಾಲೆಯ ಕ್ರಿಕೆಟ್ ತಂಡ ಜಿಲ್ಲಾ ಮಟ್ಟದ ಪಂದ್ಯದಲ್ಲಿ ಗೆದ್ದಿತು!	written for this fixture
-B4 DC E2 70 DD BA C7 85 20 42 6F 57 DD C3 DC C4 57 E6 20 D6 E6 E3 D3 DC 20 CA E6 E1 E7 A8 DD AE DC 20 D4 A8 DC 9C CA DD 58 A8 E6	ಫುಟ್ಬಾಲ್ ಆಟಗಾರರಿಗೆ ಹೊಸ ಮೈದಾನ ಸಿದ್ಧವಾಗಿದೆ	written for this fixture
-4B A8 DC E1 CA DC 20 D6 DC CA DD C2 D3 DC 20 B8 E6 D9 E6 D4 50 E6 E3 DA DB 3A 20 A9 AE DC 50 E6 52 20 50 DC AF D0 DC 75 20 32 30 20 AF CB E1 D0 DC 20 4B A9 2E	ಓದುವ ಹವ್ಯಾಸ ಬೆಳೆಸಿಕೊಳ್ಳಿ: ದಿನಕ್ಕೆ ಕನಿಷ್ಠ 20 ನಿಮಿಷ ಓದಿ.	written for this fixture
-22 4A D9 E6 DB BF E1 20 B1 DC E2 D3 DC A4 50 DC 20 4A D9 E6 DB BF E1 20 57 E6 D9 E6 BF E1 27 20 47 ED 9F 20 CA DC DE F1 DC E1 20 AF 67 2E	‘ಒಳ್ಳೆಯ ಪುಸ್ತಕ ಒಳ್ಳೆಯ ಗೆಳೆಯ’ ಎಂಬ ಮಾತು ನಿಜ.	written for this fixture
-9F D3 85 20 AF C7 DD AA 7C A8 DC 20 9F DA 20 D6 E6 E3 D3 DC 20 42 D3 DC B3 F1 E6 C5 20 42 C3 DC ED BB DC	ಬಸ್ ನಿಲ್ದಾಣದ ಬಳಿ ಹೊಸ ಆಸ್ಪತ್ರೆ ಆರಂಭ	written for this fixture
-CA E6 E7 A8 DC C2 C3 DC 20 D3 DC C6 D6 E6 3A 20 B9 D4 C8 AE DC C8 C9 20 D6 E6 61 DC E1 63 20 AF E0 C3 DC E1 20 50 DC E1 77 C0 E1 C4 2E	ವೈದ್ಯರ ಸಲಹೆ: ಬಿಸಿಲಿನಲ್ಲಿ ಹೆಚ್ಚು ನೀರು ಕುಡಿಯಿರಿ.	written for this fixture
-CA E6 E1 E7 D3 DC E3 C3 DC E1 B6 B8 E6 ED 57 DC D9 DC E3 C3 DC E1 20 C3 E6 E7 C6 E1 20 D3 DC ED 61 DD C3 DC 20 AE DD D9 E6 20 47 C3 DC 76 DC E1 20 57 DC ED 70 E6 20 F1 DC 76 DC	ಮೈಸೂರು–ಬೆಂಗಳೂರು ರೈಲು ಸಂಚಾರ ನಾಳೆ ಎರಡು ಗಂಟೆ ತಡ	written for this fixture
-B1 DC C5 CA DD D4 57 DC C4 57 E6 20 CA DC DE D7 A3 20 50 E6 E0 ED A8 DC C5 20 D3 E6 E3 E0 CA DC E1 CA DD C3 DC A9 ED A8 DC 20 CD DC E1 50 DC C5 CA DD C3 DC A8 DC CA DC C3 E6 57 E6 20 F1 E6 C3 E6 A9 C3 DC E1 F1 DC A4 A8 E6 2E	ಪ್ರವಾಸಿಗರಿಗೆ ಮಾಹಿತಿ ಕೇಂದ್ರ ಸೋಮವಾರದಿಂದ ಶುಕ್ರವಾರದವರೆಗೆ ತೆರೆದಿರುತ್ತದೆ.	written for this fixture
-D6 DC ED B2 BF E1 20 50 DC C8 C9 AE DC 20 C3 DC A5 DC 20 AE E6 E3 E0 76 DC C6 E1 20 D3 DD CB C3 DD C3 DC E1 20 67 AE DC 20 9F C3 DC E1 F1 DD A4 C3 E6 2E	ಹಂಪಿಯ ಕಲ್ಲಿನ ರಥ ನೋಡಲು ಸಾವಿರಾರು ಜನ ಬರುತ್ತಾರೆ.	written for this fixture
-50 DC C3 DD CA DC DA BF E1 C8 C9 20 CB E1 E0 AE DC E1 57 DD C4 50 E6 57 E6 20 47 C3 DC 76 DC E1 20 A3 ED 57 DC D9 DC E1 20 AF D0 E6 E0 AB DC	ಕರಾವಳಿಯಲ್ಲಿ ಮೀನುಗಾರಿಕೆಗೆ ಎರಡು ತಿಂಗಳು ನಿಷೇಧ	written for this fixture
-D3 DC CA DC E1 E1 A8 DC C5 20 A3 E0 C3 DC A8 DC C8 C9 20 D3 DC E3 BF DE EC D3 DC A4 20 AE E6 E3 E0 76 DC E1 CA DC E2 A8 E6 E0 20 4A ED A8 DC E1 20 D3 DC ED F1 E6 E3 E0 D0 DC 2E	ಸಮುದ್ರ ತೀರದಲ್ಲಿ ಸೂರ್ಯಾಸ್ತ ನೋಡುವುದೇ ಒಂದು ಸಂತೋಷ.	written for this fixture
-BF E1 50 DC D2 57 DD AE DC A8 DC 20 61 E6 ED 76 E6 BF E1 20 D3 DC A8 DC E1 AA 20 C3 DD A3 C5 C0 E1 77 E0 20 50 E6 E0 DA D3 DC E1 A3 A4 F1 DC E1 A4	ಯಕ್ಷಗಾನದ ಚೆಂಡೆಯ ಸದ್ದು ರಾತ್ರಿಯಿಡೀ ಕೇಳಿಸುತ್ತಿತ್ತು	written for this fixture
-A8 DC D3 DC C3 DD 20 D6 DC 9F BA A8 DC C8 C9 20 42 AE E6 57 DC D9 DC 20 CA E6 E1 C3 DC CA DC 7E 57 E6 20 41 A8 DC E1 BD F1 DC CA DD 58 F1 DC E1 A4 2E	ದಸರಾ ಹಬ್ಬದಲ್ಲಿ ಆನೆಗಳ ಮೆರವಣಿಗೆ ಅದ್ಭುತವಾಗಿತ್ತು.	written for this fixture
-A9 E0 B1 DD CA DC DA 57 E6 20 CA DC E1 AE E6 CA DC E1 AE E6 BF E1 C8 C9 20 D6 DC 7C F1 E6 57 DC D9 DC 20 B8 E6 D9 DC 50 DC E1	ದೀಪಾವಳಿಗೆ ಮನೆಮನೆಯಲ್ಲಿ ಹಣತೆಗಳ ಬೆಳಕು	written for this fixture
-BF E1 E1 57 DD A9 BF E1 ED A8 DC E1 20 B8 E6 E0 CA DC E2 20 B8 E6 C6 C9 20 D6 DC ED 61 DC E1 CA DC 20 D3 DC ED B1 DC C5 A8 DD BF E1 CB A8 E6 2E	ಯುಗಾದಿಯಂದು ಬೇವು ಬೆಲ್ಲ ಹಂಚುವ ಸಂಪ್ರದಾಯವಿದೆ.	written for this fixture
-D3 DC ED 50 DD C5 ED A3 BF E1 20 47 D9 DC E1 DB 20 B8 E6 C6 C9 A8 DC 20 D4 D7 20 47 C6 C9 C4 57 DC E3 20 43 D0 DC 72	ಸಂಕ್ರಾಂತಿಯ ಎಳ್ಳು ಬೆಲ್ಲದ ಸಿಹಿ ಎಲ್ಲರಿಗೂ ಇಷ್ಟ	written for this fixture
-57 DD C5 CA DC E1 20 B1 DC ED 61 DD C0 E1 A3 20 D3 DC BB E6 BF E1 C8 C9 20 50 DC E1 77 BF E1 E1 CA DC 20 AF E0 C4 AE DC 20 D3 DC CA DC E1 D3 E6 C2 BF E1 20 61 DC 61 E6 EC	ಗ್ರಾಮ ಪಂಚಾಯಿತಿ ಸಭೆಯಲ್ಲಿ ಕುಡಿಯುವ ನೀರಿನ ಸಮಸ್ಯೆಯ ಚರ್ಚೆ	written for this fixture
-50 E6 C3 E6 57 E6 20 D6 E6 E3 D3 DC 20 50 DD C6 E1 CA E6 3A 20 D6 DC F1 DC E1 A4 20 D6 DC DA DB 57 DC DA 57 E6 20 AF E0 C3 DD CA DC C4	ಕೆರೆಗೆ ಹೊಸ ಕಾಲುವೆ: ಹತ್ತು ಹಳ್ಳಿಗಳಿಗೆ ನೀರಾವರಿ	written for this fixture
-D3 DC 50 DD EC C4 20 CD DD C7 E6 57 DC DA 57 E6 20 50 DC ED B1 DC E4 C2 6F C3 85 57 DC D9 DC 20 50 E6 E3 76 DC E1 57 E6	ಸರ್ಕಾರಿ ಶಾಲೆಗಳಿಗೆ ಕಂಪ್ಯೂಟರ್ಗಳ ಕೊಡುಗೆ	written for this fixture; ರ್ typed as ರ with ್ before ಗ
-43 ED 6F AE E6 EC 70 85 AE DC C8 C9 20 50 DC AE DC B0 76 DC 20 4B A8 DC E1 57 DC C3 DC 20 D3 DC ED 54 E6 C2 20 48 C3 DC E1 A3 A4 A8 E6 C1 E1 E0 3F	ಇಂಟರ್ನೆಟ್ನಲ್ಲಿ ಕನ್ನಡ ಓದುಗರ ಸಂಖ್ಯೆ ಏರುತ್ತಿದೆಯೇ?	written for this fixture; ಟ್ typed with ್ before ನ
-CA E6 E3 B8 E6 E7 C7 85 AE DC C8 C9 20 50 DC AE DC B0 76 DC 20 70 E6 E7 B1 85 20 CA DC DE 76 DC E1 CA DC E2 A8 DC E1 20 44 57 DC 20 D3 DC E1 C6 BB DC	ಮೊಬೈಲ್ನಲ್ಲಿ ಕನ್ನಡ ಟೈಪ್ ಮಾಡುವುದು ಈಗ ಸುಲಭ	written for this fixture; ಲ್ typed with ್ before ನ
-D6 DC D9 E6 BF E1 20 A8 DD 53 C7 E6 57 DC D9 DC AE DC E1 B0 20 BF E1 E3 AF 50 E6 E3 E0 76 85 57 E6 20 9F A8 DC C8 D3 DC E1 CA DC 20 50 E6 C6 D3 DC 20 AE DC 76 E6 BF E1 E1 A3 A4 A8 E6 2E	ಹಳೆಯ ದಾಖಲೆಗಳನ್ನು ಯೂನಿಕೋಡ್ಗೆ ಬದಲಿಸುವ ಕೆಲಸ ನಡೆಯುತ್ತಿದೆ.	written for this fixture; ಡ್ typed with ್ before ಗ
-B8 DD C2 ED 50 85 AE DC C8 C9 20 54 DD F1 E6 20 F1 E6 C3 E6 BF E1 C6 E1 20 42 AB DD C3 85 20 D3 DC ED 54 E6 C2 20 B8 E6 E0 50 DC E1	ಬ್ಯಾಂಕ್ನಲ್ಲಿ ಖಾತೆ ತೆರೆಯಲು ಆಧಾರ್ ಸಂಖ್ಯೆ ಬೇಕು	written for this fixture; ಕ್ typed with ್ before ನ
-41 ED 61 E6 20 50 DC 61 E6 E0 C4 BF E1 20 D3 DC CA DC E1 BF E1 3A 20 B8 E6 DA 57 E6 59 20 39 20 C4 ED A8 DC 20 D3 DC ED 68 E6 20 35 20 C3 DC CA DC C3 E6 57 E6	ಅಂಚೆ ಕಚೇರಿಯ ಸಮಯ: ಬೆಳಿಗ್ಗೆ 9 ರಿಂದ ಸಂಜೆ 5 ರವರೆಗೆ	written for this fixture
-B1 E6 E4 C8 E0 D3 85 20 73 DD 4F E6 BF E1 20 D6 DC A3 A4 C3 DC 20 D3 DC ED 61 DD C3 DC 20 A9 E0 B1 DC 20 50 E6 71 72 A8 E6	ಪೊಲೀಸ್ ಠಾಣೆಯ ಹತ್ತಿರ ಸಂಚಾರ ದೀಪ ಕೆಟ್ಟಿದೆ	written for this fixture
-C3 DC D3 E6 A4 20 41 B1 DC 5B DD F1 DC 3A 20 43 9F BA C4 57 E6 20 57 DD BF E1	ರಸ್ತೆ ಅಪಘಾತ: ಇಬ್ಬರಿಗೆ ಗಾಯ	written for this fixture
-5A 6F AE E6 BF E1 20 9F 57 E6 59 20 D3 DC A7 DA E0 BF E1 C3 DC E1 20 A8 DC E3 C3 DC E1 20 AF E0 77 A8 DD AA C3 E6 2E	ಘಟನೆಯ ಬಗ್ಗೆ ಸ್ಥಳೀಯರು ದೂರು ನೀಡಿದ್ದಾರೆ.	written for this fixture
-54 DD C8 20 AF CA E6 E0 CD DC AE DC 57 DC D9 DC C8 C9 20 50 DC D3 DC 20 47 D3 E6 BF E1 B8 E6 E0 77	ಖಾಲಿ ನಿವೇಶನಗಳಲ್ಲಿ ಕಸ ಎಸೆಯಬೇಡಿ	written for this fixture
-46 C3 DC 20 D6 DC 9F BA 50 E6 52 20 53 61 DC E1 EC 20 47 D0 DC E1 72 3F 20 D3 DC BB E6 BF E1 C8 C9 20 C7 E6 50 DC 52 20 CA DC E1 ED 76 DC AE E6	ಊರ ಹಬ್ಬಕ್ಕೆ ಖರ್ಚು ಎಷ್ಟು? ಸಭೆಯಲ್ಲಿ ಲೆಕ್ಕ ಮಂಡನೆ	written for this fixture
-41 A3 A6 57 DC DA 57 E6 20 D3 DD CC 57 DC F1 DC 20 50 E6 E3 E0 C4 20 CA DC E1 50 DC 52 D9 DC E1 20 D6 DD 77 A8 DC C3 DC E1	ಅತಿಥಿಗಳಿಗೆ ಸ್ವಾಗತ ಕೋರಿ ಮಕ್ಕಳು ಹಾಡಿದರು	written for this fixture
-41 BC AE DC ED A8 DC AE DD 20 D3 DC CA DC DE C3 DC ED BB DC A8 DC C8 C9 20 D7 C4 BF E1 20 CE 50 DC D2 50 DC C4 57 E6 20 D3 DC AE DD BE AE DC	ಅಭಿನಂದನಾ ಸಮಾರಂಭದಲ್ಲಿ ಹಿರಿಯ ಶಿಕ್ಷಕರಿಗೆ ಸನ್ಮಾನ	written for this fixture
-49 A8 DC E1 20 A9 AE DC 57 DC D9 DC 20 62 F1 DC C5 50 DC C7 DD 20 CE B9 C3 DC 20 CA DC E1 E1 50 DD A4 BF E1	ಐದು ದಿನಗಳ ಚಿತ್ರಕಲಾ ಶಿಬಿರ ಮುಕ್ತಾಯ	written for this fixture
-48 50 E6 20 47 ED A8 DC E1 20 50 E6 E0 D9 DC E1 CA DC 20 CA DC E1 50 DC 52 D9 E6 E0 20 CA DC E1 E1 ED A8 E6 20 CB 68 DD 6E AF 57 DC D9 DD 57 DC E1 F1 DD A4 C3 E6 2E	ಏಕೆ ಎಂದು ಕೇಳುವ ಮಕ್ಕಳೇ ಮುಂದೆ ವಿಜ್ಞಾನಿಗಳಾಗುತ್ತಾರೆ.	written for this fixture
-4A ED A8 DC E1 20 58 76 DC 20 AE E6 77 2C 20 4A ED A8 DC E1 20 AE E6 C3 DC D9 DC E1 20 50 E6 E3 77	ಒಂದು ಗಿಡ ನೆಡಿ, ಒಂದು ನೆರಳು ಕೊಡಿ	written for this fixture
-42 D0 DD 79 DC 20 CA DC DE D3 DC A8 DC C8 C9 20 57 DD DA 20 68 E6 E3 E0 C3 DD 58 20 B9 E0 D3 DC E1 F1 DC A4 A8 E6	ಆಷಾಢ ಮಾಸದಲ್ಲಿ ಗಾಳಿ ಜೋರಾಗಿ ಬೀಸುತ್ತದೆ	written for this fixture
-A8 DC EA 79 DC CA DD A8 DC 20 AF AB DD EC C3 DC 20 CA DC E1 F1 DC E1 A4 20 AF D0 E6 75 20 43 A8 DC AA C3 E6 20 BF E1 CD DC D3 DC E1 D5 20 53 62 F1 DC 2E	ದೃಢವಾದ ನಿರ್ಧಾರ ಮತ್ತು ನಿಷ್ಠೆ ಇದ್ದರೆ ಯಶಸ್ಸು ಖಚಿತ.	written for this fixture
-D6 DC 7E A1 AE DC 20 41 ED 57 DC 77 BF E1 C8 C9 20 CA DC DE CB AE DC 20 D6 DC 7E A1 57 E6 20 BB DD C4 E0 20 B8 E6 E0 77 50 E6	ಹಣ್ಣಿನ ಅಂಗಡಿಯಲ್ಲಿ ಮಾವಿನ ಹಣ್ಣಿಗೆ ಭಾರೀ ಬೇಡಿಕೆ	written for this fixture
-D3 DC 7C A1 20 45 A9 AA CA E6 E1 57 DC DA 57 E6 20 B8 DD C2 ED 50 85 20 D3 DD C6 A8 DC 20 9F 77 78 20 43 DA 50 E6	ಸಣ್ಣ ಉದ್ದಿಮೆಗಳಿಗೆ ಬ್ಯಾಂಕ್ ಸಾಲದ ಬಡ್ಡಿ ಇಳಿಕೆ	written for this fixture
-D6 DC 7C CA DC AE DC E1 B0 20 45 DA D3 DC E1 CA DC E2 A8 DC E1 20 D6 E6 E0 57 E6 3F 20 49 A8 DC E1 20 D3 DC C3 DC D9 DC 20 D3 DC C6 D6 E6 57 DC D9 DC E1	ಹಣವನ್ನು ಉಳಿಸುವುದು ಹೇಗೆ? ಐದು ಸರಳ ಸಲಹೆಗಳು	written for this fixture
-CA DC E1 7E B1 DD C6 A8 DC 20 CB A8 DD C2 A6 EC 57 DC D9 DC 20 51 C3 DC E1 62 F1 DC C5 50 E6 52 20 B1 DC C5 CD DC D4 A4	ಮಣಿಪಾಲದ ವಿದ್ಯಾರ್ಥಿಗಳ ಕಿರುಚಿತ್ರಕ್ಕೆ ಪ್ರಶಸ್ತಿ	written for this fixture
-B2 51 B0 50 85 57 E6 20 D6 E6 E3 E0 A8 DC 20 CA DC E1 50 DC 52 D9 DC E1 20 D3 DC ED 68 E6 20 D3 DC E1 C3 DC 51 D2 F1 DC CA DD 58 20 CA DC E1 AE E6 57 E6 20 CA DC E1 C3 DC DA A8 DC C3 DC E1	ಪಿಕ್ನಿಕ್ಗೆ ಹೋದ ಮಕ್ಕಳು ಸಂಜೆ ಸುರಕ್ಷಿತವಾಗಿ ಮನೆಗೆ ಮರಳಿದರು	written for this fixture; ಕ್ typed with ್ before ಗ
-71 50 E6 70 85 20 A8 DC C3 DC 20 48 C4 50 E6 57 E6 20 B1 DC C5 BF DE 7E 50 DC C3 DC 20 42 50 E6 D2 E0 B1 DC	ಟಿಕೆಟ್ ದರ ಏರಿಕೆಗೆ ಪ್ರಯಾಣಿಕರ ಆಕ್ಷೇಪ	written for this fixture
-D7 C4 BF E1 20 AE DD 57 DC C4 50 DC C4 57 E6 20 45 62 F1 DC 20 50 DC 7E A1 AE DC 20 F1 DC B1 DD D3 DC 4F E6	ಹಿರಿಯ ನಾಗರಿಕರಿಗೆ ಉಚಿತ ಕಣ್ಣಿನ ತಪಾಸಣೆ	written for this fixture
-CA DC E1 D9 E6 20 AF E0 C3 DC E1 20 50 E6 E3 BF E1 E1 C9 3A 20 B1 DC C5 A3 20 CA DC E1 AE E6 BF E1 C6 E3 C9 20 D3 DD AB DC C2	ಮಳೆ ನೀರು ಕೊಯ್ಲು: ಪ್ರತಿ ಮನೆಯಲ್ಲೂ ಸಾಧ್ಯ	written for this fixture
-D3 DD AB DC C2 CA DD A8 DC D0 DC E1 72 20 B1 DD C9 D4 72 50 85 20 9F D9 DC 50 E6 20 50 DC 77 CA E6 E1 20 CA DC DE 76 E6 E3 E0 7C	ಸಾಧ್ಯವಾದಷ್ಟು ಪ್ಲಾಸ್ಟಿಕ್ ಬಳಕೆ ಕಡಿಮೆ ಮಾಡೋಣ	written for this fixture
-D6 DC D4 C3 DC E1 20 45 DA D4 2C 20 45 D4 C3 DC E1 20 45 DA D4	ಹಸಿರು ಉಳಿಸಿ, ಉಸಿರು ಉಳಿಸಿ	written for this fixture
-CA DC E1 57 DC E1 CB AE DC 20 CA E6 E3 A8 DC C6 20 D6 E6 68 E6 6A 20 F1 DD C0 E1 57 E6 20 CA DC E1 C3 E6 BF E1 C7 DD 57 DC A8 DC 20 50 DC D2 7C	ಮಗುವಿನ ಮೊದಲ ಹೆಜ್ಜೆ ತಾಯಿಗೆ ಮರೆಯಲಾಗದ ಕ್ಷಣ	written for this fixture
-CA DC E5 E8 AE DC CA DD 58 20 50 E6 C6 D3 DC 20 CA DC DE 76 DC E1 CA DC CA DC C3 E6 E0 20 D6 E6 61 DC E1 63 20 D3 DD 97 D3 DC E1 F1 DD A4 C3 E6	ಮೌನವಾಗಿ ಕೆಲಸ ಮಾಡುವವರೇ ಹೆಚ್ಚು ಸಾಧಿಸುತ್ತಾರೆ	written for this fixture
-D3 E8 C6 BB DC C2 57 DC DA C6 C9 A8 DC 20 D6 DC DA DB 57 DC D9 DC C8 C9 20 50 E8 CD DC C6 20 F1 DC C3 DC B8 E6 E0 A3 20 50 E6 E0 ED A8 DC C5	ಸೌಲಭ್ಯಗಳಿಲ್ಲದ ಹಳ್ಳಿಗಳಲ್ಲಿ ಕೌಶಲ ತರಬೇತಿ ಕೇಂದ್ರ	written for this fixture
-C1 E3 E0 67 AE E6 BF E1 20 CA E6 61 DC 63 20 33 2E 38 20 50 E6 E3 E0 71 20 C3 DC E3 B1 DD C0 E1	ಯೋಜನೆಯ ವೆಚ್ಚ 3.8 ಕೋಟಿ ರೂಪಾಯಿ	written for this fixture
-F1 DC E1 CA DC E1 50 DC E3 C3 DC E1 20 69 C7 E6 C9 BF E1 20 C3 E6 E7 F1 DC C4 57 E6 20 B8 E6 D9 E6 20 CB CA E6 E1 20 D6 DC 7C 20 B9 76 DC E1 57 DC 76 E6	ತುಮಕೂರು ಜಿಲ್ಲೆಯ ರೈತರಿಗೆ ಬೆಳೆ ವಿಮೆ ಹಣ ಬಿಡುಗಡೆ	written for this fixture
-D6 DC CA DD CA DC DE AE DC 3A 20 50 DC C3 DD CA DC DA BF E1 C8 C9 20 BB DD C4 E0 20 CA DC E1 D9 E6 2C 20 4A D9 DC AE DD 77 AE DC C8 C9 20 CA E6 E3 E0 76 DC 20 50 DC CB A8 DC 20 CA DD F1 DD CA DC C3 DC 7C	ಹವಾಮಾನ: ಕರಾವಳಿಯಲ್ಲಿ ಭಾರೀ ಮಳೆ, ಒಳನಾಡಿನಲ್ಲಿ ಮೋಡ ಕವಿದ ವಾತಾವರಣ	written for this fixture
-57 DC C4 D0 DC 75 20 F1 DD B1 DC CA DC DE AE DC 20 33 31 2C 20 50 DC AF D0 DC 75 20 32 32 20 77 58 C5	ಗರಿಷ್ಠ ತಾಪಮಾನ 31, ಕನಿಷ್ಠ 22 ಡಿಗ್ರಿ	written for this fixture
-62 50 DC 52 CA DC E1 57 DC D9 DC E3 C4 AE DC 20 50 DD B5 20 F1 E6 E3 E0 6F 57 DC D9 DC C8 C9 20 50 E6 E3 BF E1 E1 C9 20 42 C3 DC ED BB DC	ಚಿಕ್ಕಮಗಳೂರಿನ ಕಾಫಿ ತೋಟಗಳಲ್ಲಿ ಕೊಯ್ಲು ಆರಂಭ	written for this fixture
-B4 DC C6 B1 DC E2 D0 DC B3 20 B1 DC C5 A8 DC CD DC EC AE DC 50 E6 52 20 C7 DD C7 85 B8 DD 57 85 20 D3 DC 67 E1 6A	ಫಲಪುಷ್ಪ ಪ್ರದರ್ಶನಕ್ಕೆ ಲಾಲ್ಬಾಗ್ ಸಜ್ಜು	written for this fixture; ಲ್ typed with ್ before ಬ
-64 DD BF DE 62 F1 DC C5 20 D3 DC B3 AB E6 EC 57 E6 20 41 69 EC 20 42 D6 DD CC AE DC	ಛಾಯಾಚಿತ್ರ ಸ್ಪರ್ಧೆಗೆ ಅರ್ಜಿ ಆಹ್ವಾನ	written for this fixture
-64 DC A3 C5 20 CA DC E1 C3 E6 BF E1 B8 E6 E0 77 2C 20 D3 DC ED 68 E6 20 CA DC E1 D9 E6 20 9F C3 DC 9F D6 DC E1 A8 DC E1	ಛತ್ರಿ ಮರೆಯಬೇಡಿ, ಸಂಜೆ ಮಳೆ ಬರಬಹುದು	written for this fixture
-45 F1 DC D5 CA DC A8 DC 20 41 ED 57 DC CA DD 58 20 CA DC E1 E3 C3 DC E1 20 A9 AE DC 20 D3 DD ED D3 DC A2 A3 50 DC 20 50 DD BF E1 EC 50 DC C5 CA DC E1	ಉತ್ಸವದ ಅಂಗವಾಗಿ ಮೂರು ದಿನ ಸಾಂಸ್ಕೃತಿಕ ಕಾರ್ಯಕ್ರಮ	written for this fixture; ್ಕೃ typed as 1 glyph
-D3 DC ED D3 DC A2 F1 DC 20 CA DC E1 F1 DC E1 A4 20 50 DC AE DC B0 76 DC 20 CD DD D3 DC AE DC 57 DC D9 DC 20 41 AB DC C2 BF E1 AE DC	ಸಂಸ್ಕೃತ ಮತ್ತು ಕನ್ನಡ ಶಾಸನಗಳ ಅಧ್ಯಯನ	written for this fixture; ್ಕೃ typed as 1 glyph
-CA DC E1 D6 DD C3 DD D0 DC F3 A8 DC 20 57 DC 77 BF E1 C8 C9 20 D6 E6 E3 D3 DC 20 61 E6 50 E6 E3 B3 E0 D3 85 72	ಮಹಾರಾಷ್ಟ್ರದ ಗಡಿಯಲ್ಲಿ ಹೊಸ ಚೆಕ್ಪೋಸ್ಟ್	written for this fixture; ್ಟ್ರ typed as 1 glyph
-C3 DD D1 72 86 E0 BF E1 20 D6 E6 A8 DD AA C4 20 CB D3 DC A4 C3 DC 4F E6 20 50 DD CA DC E1 57 DD C4 20 CB D9 DC ED 9F	ರಾಷ್ಟ್ರೀಯ ಹೆದ್ದಾರಿ ವಿಸ್ತರಣೆ ಕಾಮಗಾರಿ ವಿಳಂಬ	written for this fixture
-D3 DC F1 DC C2 20 D6 E6 E0 D9 DC E1 CA DC E2 A8 DC E1 20 50 DC D0 DC 72 2C 20 42 A8 DC C3 E6 20 41 57 DC F1 DC C2 2E	ಸತ್ಯ ಹೇಳುವುದು ಕಷ್ಟ, ಆದರೆ ಅಗತ್ಯ.	written for this fixture
-D6 DC E1 61 DC E1 63 20 CA DC E1 D9 E6 57 E6 20 B8 E6 D9 E6 20 D6 DD AF	ಹುಚ್ಚು ಮಳೆಗೆ ಬೆಳೆ ಹಾನಿ	written for this fixture
-CA E6 E1 62 63 AE DC 20 D6 DD 76 DC E1 20 50 E6 E0 D9 DC E1 F1 DD A4 20 41 67 6A 20 AF A8 E6 AA 57 E6 20 68 DD C4 A8 DC C3 DC E1	ಮೆಚ್ಚಿನ ಹಾಡು ಕೇಳುತ್ತಾ ಅಜ್ಜ ನಿದ್ದೆಗೆ ಜಾರಿದರು	written for this fixture
-41 57 DC 59 A8 DC 20 B8 E6 C7 E6 BF E1 20 41 ED 57 DC 77 57 DC D9 DC 20 CA DC E1 E1 ED A8 E6 20 45 A8 DC AA A8 DC 20 D3 DD C6 E1	ಅಗ್ಗದ ಬೆಲೆಯ ಅಂಗಡಿಗಳ ಮುಂದೆ ಉದ್ದದ ಸಾಲು	written for this fixture
-D6 DC DA DB BF E1 20 D3 DC ED F1 E6 BF E1 C8 C9 20 F1 DC C3 DC 50 DD C4 2C 20 D6 DC 7C E1 A1 2C 20 D6 DC E3 CA DC E2 20 47 C6 C9 CA DC E4 20 D4 57 DC E1 F1 DC A4 CA E6 2E	ಹಳ್ಳಿಯ ಸಂತೆಯಲ್ಲಿ ತರಕಾರಿ, ಹಣ್ಣು, ಹೂವು ಎಲ್ಲವೂ ಸಿಗುತ್ತವೆ.	written for this fixture
-B1 DC E2 6F 72 20 CA DC E1 50 DC 52 DA 57 E6 20 B1 E8 D1 72 50 DC 20 42 D6 DD C3 DC 3A 20 CA E6 E3 D9 DC 50 E6 20 50 DD D9 DC E1 2C 20 D6 DD C6 E1 2C 20 D6 DC 7C E1 A1	ಪುಟ್ಟ ಮಕ್ಕಳಿಗೆ ಪೌಷ್ಟಿಕ ಆಹಾರ: ಮೊಳಕೆ ಕಾಳು, ಹಾಲು, ಹಣ್ಣು	written for this fixture
-BF E1 E1 A8 DC 9C 20 B8 E6 E0 76 DC 2C 20 CD DD ED A3 20 B8 E6 E0 50 DC E1	ಯುದ್ಧ ಬೇಡ, ಶಾಂತಿ ಬೇಕು	written for this fixture
-CD DC E1 A8 DC 9C 20 50 DC E1 77 BF E1 E1 CA DC 20 AF E0 C4 AE DC 20 5A 6F 50 DC 20 45 A8 DD 5E 6F AE E6	ಶುದ್ಧ ಕುಡಿಯುವ ನೀರಿನ ಘಟಕ ಉದ್ಘಾಟನೆ	written for this fixture
-CB CD DC CC 20 B1 DC C4 D3 DC C3 DC 20 A9 AE DC A8 DC ED A8 DC E1 20 35 30 30 20 D3 DC D4 57 DC D9 DC 20 AE E6 76 DC E1 CB 50 E6	ವಿಶ್ವ ಪರಿಸರ ದಿನದಂದು 500 ಸಸಿಗಳ ನೆಡುವಿಕೆ	written for this fixture
-D3 DC CC ED F1 DC 20 CA DC E1 AE E6 20 50 DC 6F E1 72 CA DC 20 50 DC AE DC D3 DC E1 20 AE DC AE DC D3 DD C0 E1 F1 DC E1	ಸ್ವಂತ ಮನೆ ಕಟ್ಟುವ ಕನಸು ನನಸಾಯಿತು	written for this fixture
-D6 E6 E3 D3 DC 20 D3 E6 E0 F1 DC E1 CA E6 C0 E1 ED A8 DC 20 47 C3 DC 76 DC E1 20 46 C3 DC E1 57 DC D9 DC 20 AE DC 76 DC E1 CB AE DC 20 A8 DC E3 C3 DC 20 50 DC 77 CA E6 E1	ಹೊಸ ಸೇತುವೆಯಿಂದ ಎರಡು ಊರುಗಳ ನಡುವಿನ ದೂರ ಕಡಿಮೆ	written for this fixture
-42 F1 DC BE CB CD DD CC D3 DC CA E6 E0 20 57 E6 C6 E1 CB AE DC 20 CA E6 E3 A8 DC C6 20 CA E6 E1 71 72 C6 E1	ಆತ್ಮವಿಶ್ವಾಸವೇ ಗೆಲುವಿನ ಮೊದಲ ಮೆಟ್ಟಿಲು	written for this fixture
-67 AE DC BE A9 AE DC A8 DC 20 CD DC E1 BB DD CD DC BF E1 57 DC D9 DC E1 2C 20 41 CA DC E1 BE 21	ಜನ್ಮದಿನದ ಶುಭಾಶಯಗಳು, ಅಮ್ಮ!	written for this fixture
-9F C5 D6 DC BE 58 C4 20 B8 E6 6F 72 A8 DC C8 C9 20 61 DD C3 DC 7C	ಬ್ರಹ್ಮಗಿರಿ ಬೆಟ್ಟದಲ್ಲಿ ಚಾರಣ	written for this fixture
-50 E6 E3 76 DC 58 AE DC 20 51 F1 DC A4 D9 E6 20 D6 DC 7E A1 57 E6 20 A8 E6 E0 CD DC A8 DC C7 E6 C9 E0 20 D6 E6 D3 DC C3 DC E1	ಕೊಡಗಿನ ಕಿತ್ತಳೆ ಹಣ್ಣಿಗೆ ದೇಶದಲ್ಲೇ ಹೆಸರು	written for this fixture
-AE DC CA DC E1 BE 20 46 C4 AE DC 20 57 DC C5 ED A5 DD C6 BF E1 50 E6 52 20 31 30 30 20 CA DC D0 DC EC	ನಮ್ಮ ಊರಿನ ಗ್ರಂಥಾಲಯಕ್ಕೆ 100 ವರ್ಷ	written for this fixture
-B1 DC E2 D3 DC A4 50 DC 20 4B A8 DC E1 CA DC 20 D3 DC B3 AB E6 EC BF E1 C8 C9 20 38 20 AE E6 E0 20 F1 DC C3 DC 57 DC A3 BF E1 20 D6 DC E1 76 DC E1 58 20 B1 DC C5 A5 DC CA DC E1	ಪುಸ್ತಕ ಓದುವ ಸ್ಪರ್ಧೆಯಲ್ಲಿ 8 ನೇ ತರಗತಿಯ ಹುಡುಗಿ ಪ್ರಥಮ	written for this fixture
-B1 DC C4 E0 50 E6 D2 BF E1 20 B4 DC C8 F1 DD ED CD DC 20 67 E3 AE 85 20 31 34 20 C3 DC ED A8 DC E1 20 B1 DC C5 50 DC 6F	ಪರೀಕ್ಷೆಯ ಫಲಿತಾಂಶ ಜೂನ್ 14 ರಂದು ಪ್ರಕಟ	written for this fixture
-B5 70 85 20 42 58 C3 DC C6 E1 20 A9 AE DC CA DC E4 20 AE DC 77 57 E6 20 CA DC DE 77	ಫಿಟ್ ಆಗಿರಲು ದಿನವೂ ನಡಿಗೆ ಮಾಡಿ	written for this fixture
-42 B5 E0 D3 85 57 E6 20 D6 E6 E3 E0 57 DC E1 CA DC 20 A8 DD C4 BF E1 C8 C9 20 70 DD C5 B5 50 85 20 68 DD CA DC E5 85	ಆಫೀಸ್ಗೆ ಹೋಗುವ ದಾರಿಯಲ್ಲಿ ಟ್ರಾಫಿಕ್ ಜಾಮ್	written for this fixture; ಸ್ typed with ್ before ಗ
-76 DD 50 DC 72 C3 85 20 D3 DC C6 D6 E6 20 43 C6 C9 A8 E6 20 4C D0 DC 97 20 F1 E6 57 E6 A8 DC E1 50 E6 E3 D9 DC DB B8 E6 E0 77	ಡಾಕ್ಟರ್ ಸಲಹೆ ಇಲ್ಲದೆ ಔಷಧಿ ತೆಗೆದುಕೊಳ್ಳಬೇಡಿ	written for this fixture
-4D E1 F1 DC E1 CA DC DE AE DC 50 E6 52 20 F1 DC 50 DC 52 ED F1 E6 20 42 D6 DD C3 DC 20 9F A8 DC C8 D4	ಋತುಮಾನಕ್ಕೆ ತಕ್ಕಂತೆ ಆಹಾರ ಬದಲಿಸಿ	written for this fixture
-4D E1 D1 20 CA DC E1 E1 AF 57 DC D9 DC 20 50 DC A5 E6 57 DC D9 DC AE DC E1 B0 20 41 69 6A 20 D6 E6 E0 D9 DC E1 A3 A4 A8 DC AA C3 DC E1	ಋಷಿ ಮುನಿಗಳ ಕಥೆಗಳನ್ನು ಅಜ್ಜಿ ಹೇಳುತ್ತಿದ್ದರು	written for this fixture
-CA E6 E1 E0 5A 57 DC D9 DC 20 CA DC E1 C3 E6 C0 E1 ED A8 DC 20 61 DC ED A8 DC C5 20 43 7C E1 51 A8 DC	ಮೇಘಗಳ ಮರೆಯಿಂದ ಚಂದ್ರ ಇಣುಕಿದ	written for this fixture
-57 E6 68 E6 6A BF E1 20 5C C7 85 20 5C C7 85 20 D3 DC A9 AA 57 E6 20 CA DC E1 57 DC E1 20 AE DC 51 52 F1 DC E1	ಗೆಜ್ಜೆಯ ಘಿಲ್ ಘಿಲ್ ಸದ್ದಿಗೆ ಮಗು ನಕ್ಕಿತು	written for this fixture
-CA E6 E3 A8 DC C6 20 A9 AE DC 20 CD DD C7 E6 57 E6 20 D6 E6 E3 C3 DC 6F 20 CA DC E1 57 DC E1 CB AE DC 20 50 DC 7C A1 C8 C9 20 50 DC E1 F1 DC E3 D6 DC C6	ಮೊದಲ ದಿನ ಶಾಲೆಗೆ ಹೊರಟ ಮಗುವಿನ ಕಣ್ಣಲ್ಲಿ ಕುತೂಹಲ	written for this fixture
-9F 7C A1 20 9F 7C A1 A8 DC 20 57 DD DA B1 DC 6F 57 DC D9 DC E1 20 42 50 DD CD DC A8 DC C8 C9 20 D6 DD C3 DD 77 A8 DC CA DC E2	ಬಣ್ಣ ಬಣ್ಣದ ಗಾಳಿಪಟಗಳು ಆಕಾಶದಲ್ಲಿ ಹಾರಾಡಿದವು	written for this fixture
-50 E6 E7 CA DC E1 57 DC 59 A8 DC 20 D4 E0 C3 E6 57 DC DA 57 E6 20 CA DC E1 F1 E6 A4 20 B8 E6 E0 77 50 E6	ಕೈಮಗ್ಗದ ಸೀರೆಗಳಿಗೆ ಮತ್ತೆ ಬೇಡಿಕೆ	written for this fixture
-CA DC E1 AE E6 BF E1 C7 E6 C9 E0 20 CA E6 E1 E7 D3 DC E3 C3 DC E1 20 B1 DD 50 85 20 CA DC DE 76 DC E1 CA DC 20 CB AB DD AE DC	ಮನೆಯಲ್ಲೇ ಮೈಸೂರು ಪಾಕ್ ಮಾಡುವ ವಿಧಾನ	written for this fixture
-B8 E6 E7 50 85 20 D3 DC CA DD C3 DC C3 DC E1 20 D6 E6 C7 E6 BE 70 85 20 AB DC C4 D3 DC E1 CA DC E2 A8 DC E1 20 50 DC 76 DD 78 BF E1	ಬೈಕ್ ಸವಾರರು ಹೆಲ್ಮೆಟ್ ಧರಿಸುವುದು ಕಡ್ಡಾಯ	written for this fixture
-D6 E6 C7 E6 BE 70 85 20 43 C6 C9 A8 DC 20 34 30 20 D3 DC CA DD C3 DC C4 57 E6 20 A8 DC ED 76 DC	ಹೆಲ್ಮೆಟ್ ಇಲ್ಲದ 40 ಸವಾರರಿಗೆ ದಂಡ	written for this fixture
-CA DC E1 E1 ED A9 AE DC 20 D3 E6 E3 E0 CA DC E1 CA DD C3 DC 20 F1 DD 3E 20 B1 DC ED 61 DD C0 E1 A3 20 D3 DC BB E6	ಮುಂದಿನ ಸೋಮವಾರ ತಾ। ಪಂಚಾಯಿತಿ ಸಭೆ	written for this fixture
-D3 DC A7 D9 DC 3A 20 D3 DC 50 DD EC C4 20 B1 E8 C5 79 DC CD DD C7 E6 2C 20 CA DD 76 85 EC 20 AE DC ED 3E 20 32	ಸ್ಥಳ: ಸರ್ಕಾರಿ ಪ್ರೌಢಶಾಲೆ, ವಾರ್ಡ್ ನಂ। 2	written for this fixture
-50 DD BF E1 EC 50 DC C5 CA DC E1 20 D3 DC ED 68 E6 20 36 2E 33 30 20 50 E6 52 20 28 47 C6 C9 C4 57 DC E3 20 D3 DD CC 57 DC F1 DC 29	ಕಾರ್ಯಕ್ರಮ ಸಂಜೆ 6.30 ಕ್ಕೆ (ಎಲ್ಲರಿಗೂ ಸ್ವಾಗತ)	written for this fixture
-D3 DC D6 DD BF E1 CA DD 7E 3A 20 31 38 30 30 20 34 32 35 20 39 38 37 36	ಸಹಾಯವಾಣಿ: 1800 425 9876	written for this fixture
-45 76 DC E1 B2 B6 CA DC E1 ED 57 DC D9 DC E3 C3 DC E1 20 9F D3 85 20 D3 DC CA DC E1 BF E1 A8 DC C8 C9 20 9F A8 DC C7 DD CA DC 4F E6	ಉಡುಪಿ–ಮಂಗಳೂರು ಬಸ್ ಸಮಯದಲ್ಲಿ ಬದಲಾವಣೆ	written for this fixture
-D6 DD D3 DC AE DC B6 D3 DC 50 DC C7 E6 E0 CD DC B1 DC E2 C3 DC 20 C3 E6 E7 C6 E1 20 CA DC DE 57 DC EC 20 A8 DC E1 C3 DC D4 A4	ಹಾಸನ–ಸಕಲೇಶಪುರ ರೈಲು ಮಾರ್ಗ ದುರಸ್ತಿ	written for this fixture
-50 DC AE DC B0 76 DC 20 50 DC C8 C0 E1 C4 20 26 20 45 62 F1 DC 20 F1 DC C3 DC 57 DC A3 57 DC D9 DC E1 20 B1 DC C5 A3 20 BB DD AE DC E1 CA DD C3 DC	ಕನ್ನಡ ಕಲಿಯಿರಿ - ಉಚಿತ ತರಗತಿಗಳು ಪ್ರತಿ ಭಾನುವಾರ	written for this fixture
-D6 DC F1 DC E1 A4 26 D6 DC AE E6 B0 C3 DC 76 DC E1 20 CA DC D0 DC EC A8 DC 20 CA DC E1 50 DC 52 DA 57 E6 20 44 67 E1 20 F1 DC C3 DC B8 E6 E0 A3	ಹತ್ತು-ಹನ್ನೆರಡು ವರ್ಷದ ಮಕ್ಕಳಿಗೆ ಈಜು ತರಬೇತಿ	written for this fixture
-B8 E6 D9 DC 58 AE DC 20 45 B1 DD D6 DD C3 DC 50 E6 52 20 43 77 C9 26 CA DC 76 E6 2C 20 CA DC E1 AB DD C2 D6 DC B0 20 41 AE DC B0 26 D3 DD C3 DC E1	ಬೆಳಗಿನ ಉಪಾಹಾರಕ್ಕೆ ಇಡ್ಲಿ-ವಡೆ, ಮಧ್ಯಾಹ್ನ ಅನ್ನ-ಸಾರು	written for this fixture
-41 50 DC 52 20 F1 DC ED 58 BF E1 C3 DC E1 20 D3 E6 E0 C4 20 C3 DC ED 57 E6 E3 E0 C8 20 B9 77 D4 A8 DC C3 DC E1	ಅಕ್ಕ ತಂಗಿಯರು ಸೇರಿ ರಂಗೋಲಿ ಬಿಡಿಸಿದರು	written for this fixture
-62 AE DC B0 A8 DC 20 B8 E6 C7 E6 20 CA DC E1 F1 E6 A4 20 43 DA 50 E6	ಚಿನ್ನದ ಬೆಲೆ ಮತ್ತೆ ಇಳಿಕೆ	written for this fixture
-CA DC C2 CA DC D3 E6 A7 20 D3 DC C4 C0 E1 C6 C9 20 47 ED A8 DC E1 20 A8 DC E3 C3 DC E1 CA DC 20 9F A8 DC C6 E1 20 AE DD CA E6 E0 20 9F A8 DC C7 DD 57 E6 E3 E0 7C	ವ್ಯವಸ್ಥೆ ಸರಿಯಿಲ್ಲ ಎಂದು ದೂರುವ ಬದಲು ನಾವೇ ಬದಲಾಗೋಣ	written for this fixture
-D3 DC A7 DA E0 BF E1 20 50 DC C7 DD CB A8 DC C3 DC 20 CA DC 7C EC 62 F1 DC C5 57 DC D9 DC 20 B1 DC C5 A8 DC CD DC EC AE DC	ಸ್ಥಳೀಯ ಕಲಾವಿದರ ವರ್ಣಚಿತ್ರಗಳ ಪ್ರದರ್ಶನ	written for this fixture
-BF DE CA DC 20 46 C4 AE DC 20 68 DD F1 E6 C5 20 AF CA DC E1 57 E6 20 43 D0 DC 72 3F	ಯಾವ ಊರಿನ ಜಾತ್ರೆ ನಿಮಗೆ ಇಷ್ಟ?	written for this fixture
-BF DE C3 DC E3 20 43 C6 C9 A8 DC 20 B9 E0 A9 BF E1 C8 C9 20 AE DD C0 E1 C1 E3 ED A8 DC E1 20 B8 E6 E3 57 DC D9 DC E1 A3 A4 F1 DC E1 A4	ಯಾರೂ ಇಲ್ಲದ ಬೀದಿಯಲ್ಲಿ ನಾಯಿಯೊಂದು ಬೊಗಳುತ್ತಿತ್ತು	written for this fixture
-B1 DC C5 C1 E3 E0 67 AE DC CB C6 C9 A8 DC 20 61 DC 61 E6 EC 58 ED F1 DC 20 50 E6 C6 D3 DC CA E6 E0 20 CA E6 E1 E0 C6 E1	ಪ್ರಯೋಜನವಿಲ್ಲದ ಚರ್ಚೆಗಿಂತ ಕೆಲಸವೇ ಮೇಲು	written for this fixture
-CA DC E1 AE E6 C1 E1 E0 20 CA E6 E3 A8 DC C6 20 B1 DD 73 DC CD DD C7 E6 2C 20 F1 DD C0 E1 C1 E1 E0 20 CA E6 E3 A8 DC C6 20 57 DC E1 C3 DC E1	ಮನೆಯೇ ಮೊದಲ ಪಾಠಶಾಲೆ, ತಾಯಿಯೇ ಮೊದಲ ಗುರು	written for this fixture
-D3 DC ED 58 E0 F1 DC 20 CE B9 C3 DC A8 DC C8 C9 20 CB E0 4F E6 20 CA DC E1 F1 DC E1 A4 20 50 E6 E3 D9 DC C6 E1 20 50 DC C8 50 E6	ಸಂಗೀತ ಶಿಬಿರದಲ್ಲಿ ವೀಣೆ ಮತ್ತು ಕೊಳಲು ಕಲಿಕೆ	written for this fixture
-CA DC E1 D7 D9 DD 20 D3 DC CC D3 DC D6 DD BF E1 20 D3 DC ED 5A 57 DC DA 57 E6 20 D3 DD C6 20 D3 E8 C6 BB DC C2	ಮಹಿಳಾ ಸ್ವಸಹಾಯ ಸಂಘಗಳಿಗೆ ಸಾಲ ಸೌಲಭ್ಯ	written for this fixture
-50 DC 76 DC C6 20 A3 E0 C3 DC A8 DC 20 CA DC E1 C3 DC DA AE DC C8 C9 20 42 CA E6 E1 20 CA E6 E3 70 E6 72 57 DC D9 DC E1 20 B1 DC F1 E6 A4	ಕಡಲ ತೀರದ ಮರಳಿನಲ್ಲಿ ಆಮೆ ಮೊಟ್ಟೆಗಳು ಪತ್ತೆ	written for this fixture
-AE DC CB C6 E1 20 57 DC C4 20 B9 62 63 20 50 DC E1 7E BF E1 E1 CA DC E2 A8 DC AE DC E1 B0 20 AE E6 E3 E0 77 A9 AA E0 C3 DD 3F	ನವಿಲು ಗರಿ ಬಿಚ್ಚಿ ಕುಣಿಯುವುದನ್ನು ನೋಡಿದ್ದೀರಾ?	written for this fixture
-50 DD 77 AE DC 20 B8 E6 ED 51 20 AE DC ED A9 D3 DC C6 E1 20 41 C3 DC 7C C2 20 D4 9F BA ED A9 BF E1 20 CD DC C5 CA DC E1	ಕಾಡಿನ ಬೆಂಕಿ ನಂದಿಸಲು ಅರಣ್ಯ ಸಿಬ್ಬಂದಿಯ ಶ್ರಮ	written for this fixture
-D6 DC E1 C8 20 57 DC 7C A3 BF E1 20 CA DC C3 DC A9 20 B9 76 DC E1 57 DC 76 E6 3A 20 D3 DC ED 54 E6 C2 20 48 C4 50 E6	ಹುಲಿ ಗಣತಿಯ ವರದಿ ಬಿಡುಗಡೆ: ಸಂಖ್ಯೆ ಏರಿಕೆ	written for this fixture
-68 DD AE DC B1 DC A8 DC 20 D6 DD 76 DC E1 57 DC D9 DC 20 D3 DC ED 57 DC C5 D6 DC 20 B1 DC E2 D3 DC A4 50 DC 20 C3 DC E3 B1 DC A8 DC C8 C9	ಜಾನಪದ ಹಾಡುಗಳ ಸಂಗ್ರಹ ಪುಸ್ತಕ ರೂಪದಲ್ಲಿ	written for this fixture
-D4 AF CA DC DE 20 CA DC E1 ED A9 C3 DC A8 DC C8 C9 20 50 DC AE DC B0 76 DC 20 62 F1 DC C5 50 E6 52 20 D6 E8 D3 85 B4 DC E2 C7 85 20 B1 DC C5 A8 DC CD DC EC AE DC	ಸಿನಿಮಾ ಮಂದಿರದಲ್ಲಿ ಕನ್ನಡ ಚಿತ್ರಕ್ಕೆ ಹೌಸ್ಫುಲ್ ಪ್ರದರ್ಶನ	written for this fixture; ಸ್ typed with ್ before ಫ
-41 7C A1 20 F1 DC CA DC E1 BE ED A9 C3 DC 20 67 57 DC D9 DC 20 46 C3 DC 20 D7 C4 BF E1 C3 DC 20 CA DC E1 E1 ED A8 E6 20 43 F1 DC C2 A5 DC EC	ಅಣ್ಣ ತಮ್ಮಂದಿರ ಜಗಳ ಊರ ಹಿರಿಯರ ಮುಂದೆ ಇತ್ಯರ್ಥ	written for this fixture
-C6 51 D2 24 BE E0 20 B1 DC E4 68 E6 57 E6 20 D6 DC E3 CB AE DC 20 41 C6 ED 50 DD C3 DC	ಲಕ್ಷ್ಮೀ ಪೂಜೆಗೆ ಹೂವಿನ ಅಲಂಕಾರ	written for this fixture; wide blank 24 before the subscript ಮ
-D3 DD AB DC 24 C2 CB C6 C9 20 47 ED 9F 20 B1 DC A8 DC CA E6 E0 20 41 CA DC AF 57 E6 20 57 E6 E3 A3 A4 C6 C9	ಸಾಧ್ಯವಿಲ್ಲ ಎಂಬ ಪದವೇ ಅವನಿಗೆ ಗೊತ್ತಿಲ್ಲ	written for this fixture; wide blank 24 before the subscript ಯ
-57 DD C5 CB E1 E0 7C 20 42 C3 E6 E3 E0 57 DC 24 C2 20 CE B9 C3 DC 50 E6 52 20 BB DD C4 E0 20 D3 DC B3 ED A8 DC AE E6	ಗ್ರಾಮೀಣ ಆರೋಗ್ಯ ಶಿಬಿರಕ್ಕೆ ಭಾರೀ ಸ್ಪಂದನೆ	written for this fixture; wide blank 24 before the subscript ಯ
-D3 DD CC F1 DC ED F1 DC C5 E9 20 A9 AE DD 61 DC C3 DC 4F E6 57 E6 20 CD DD C7 E6 57 DC D9 DC C8 C9 20 D4 A8 DC 9C F1 E6	ಸ್ವಾತಂತ್ರ್ಯ ದಿನಾಚರಣೆಗೆ ಶಾಲೆಗಳಲ್ಲಿ ಸಿದ್ಧತೆ	written for this fixture
-50 DC AE DD EC 6F 50 DC 20 C3 DD 68 E6 E3 C2 E0 F1 DC D5 CA DC A8 DC ED A8 DC E1 20 AE DD 76 DC 58 E0 F1 E6 20 57 DD BF E1 AE DC	ಕರ್ನಾಟಕ ರಾಜ್ಯೋತ್ಸವದಂದು ನಾಡಗೀತೆ ಗಾಯನ	written for this fixture
-CA E6 E7 FE DD AF 50 DC 20 CA DC E1 AE E6 E3 E0 BB DD CA DC 20 B8 E6 D9 E6 D3 DC E1 CA DC E2 A8 DC E1 20 CE 50 DC D2 7C A8 DC 20 57 DC E1 C4	ವೈಜ್ಞಾನಿಕ ಮನೋಭಾವ ಬೆಳೆಸುವುದು ಶಿಕ್ಷಣದ ಗುರಿ	written for this fixture; ಜ್ಞ typed as 1 glyph
-B1 DC 51 D2 20 CB E0 50 DC D2 4F E6 57 E6 20 C3 DC ED 57 DC AE DC A3 6F E1 72 20 D3 DC E3 50 DC A4 20 D3 DC A7 D9 DC	ಪಕ್ಷಿ ವೀಕ್ಷಣೆಗೆ ರಂಗನತಿಟ್ಟು ಸೂಕ್ತ ಸ್ಥಳ	written for this fixture
-FB DC CA E6 E1 20 50 E6 E0 D9 DC E1 CA DC E2 A8 DC E1 20 A8 E8 9F EC C6 C2 CA DC C6 C9	ಕ್ಷಮೆ ಕೇಳುವುದು ದೌರ್ಬಲ್ಯವಲ್ಲ	written for this fixture; ಕ್ಷ typed as 1 glyph
-D3 DC D6 DC 50 DD C3 DC 20 D3 E6 E3 D3 DD E7 71 BF E1 20 CA DD D1 EC 50 DC 20 D3 DC BB E6 20 BB DD AE DC E1 CA DD C3 DC	ಸಹಕಾರ ಸೊಸೈಟಿಯ ವಾರ್ಷಿಕ ಸಭೆ ಭಾನುವಾರ	written for this fixture; ೈ typed as ಾ with ೖ
-47 D3 85 47 D3 85 47 C7 85 D4 20 B1 DC C4 E0 50 E6 D2 57 E6 20 D4 A8 DC 9C F1 E6 20 D6 E6 E0 57 E6 3F	ಎಸ್ಎಸ್ಎಲ್ಸಿ ಪರೀಕ್ಷೆಗೆ ಸಿದ್ಧತೆ ಹೇಗೆ?	written for this fixture; ಲ್ typed with ್ before ಸ
-D6 E6 E3 D3 DC 20 D4 D3 DC 72 CA DC E5 85 AE DC C8 C9 20 41 69 EC 20 D3 DC C8 C9 D3 DC C6 E1 20 B4 DD CA DC E5 85 EC AE DC 20 B1 DC C5 A3 20 B8 E6 E0 50 DC E1	ಹೊಸ ಸಿಸ್ಟಮ್ನಲ್ಲಿ ಅರ್ಜಿ ಸಲ್ಲಿಸಲು ಫಾರ್ಮ್ನ ಪ್ರತಿ ಬೇಕು	written for this fixture; ಮ್ typed with ್ before ನ
+CA DC E1 D9 E6 57 DD C6 A8 DC C8 C9 20 D6 DC DA DB BF E1 20 C3 DC D3 E6 A4 57 DC D9 DC E1 20 50 E6 D3 DC C3 DD 57 DC E1 F1 DC A4 CA E6 2C 20 CA DC E1 50 DC 52 D9 DC E1 20 CD DD C7 E6 57 E6 20 D6 E6 E3 E0 57 DC C6 E1 20 50 DC D0 DC 72 B1 DC 76 DC E1 F1 DD A4 C3 E6 2E	ಮಳೆಗಾಲದಲ್ಲಿ ಹಳ್ಳಿಯ ರಸ್ತೆಗಳು ಕೆಸರಾಗುತ್ತವೆ, ಮಕ್ಕಳು ಶಾಲೆಗೆ ಹೋಗಲು ಕಷ್ಟಪಡುತ್ತಾರೆ.	written for kannadi
+44 20 CA DC D0 DC EC 20 CA DC E1 E1 ED 57 DD C3 DC E1 20 CA DC E1 D9 E6 20 B8 E6 E0 57 DC AE E6 20 9F ED A9 E0 F1 E6 E0 3F	ಈ ವರ್ಷ ಮುಂಗಾರು ಮಳೆ ಬೇಗನೆ ಬಂದೀತೇ?	written for kannadi
+57 DC C5 ED A5 DD C6 BF E1 A8 DC C8 C9 20 D6 E6 E3 D3 DC 20 B1 DC E2 D3 DC A4 50 DC 57 DC D9 DC 20 B1 DC C5 A8 DC CD DC EC AE DC	ಗ್ರಂಥಾಲಯದಲ್ಲಿ ಹೊಸ ಪುಸ್ತಕಗಳ ಪ್ರದರ್ಶನ	written for kannadi
+CD DC AF CA DD C3 DC 20 B8 E6 DA 57 E6 59 20 31 30 20 57 DC ED 70 E6 57 E6 20 46 C4 AE DC 20 50 E6 C3 E6 BF E1 20 A8 DC 76 DC A8 DC C8 C9 20 D3 DC CC 61 DC 66 F1 DD 20 41 BC BF DE AE DC 20 AE DC 76 E6 BF E1 C8 A8 E6 2E	ಶನಿವಾರ ಬೆಳಿಗ್ಗೆ 10 ಗಂಟೆಗೆ ಊರಿನ ಕೆರೆಯ ದಡದಲ್ಲಿ ಸ್ವಚ್ಛತಾ ಅಭಿಯಾನ ನಡೆಯಲಿದೆ.	written for kannadi
+41 69 6A BF E1 20 41 76 DC E1 57 E6 CA DC E1 AE E6 C0 E1 ED A8 DC 3A 20 C3 DD 58 20 C3 E6 E3 71 72 20 CA DC E1 F1 DC E1 A4 20 50 DD C0 E1 20 61 DC 71 B0	ಅಜ್ಜಿಯ ಅಡುಗೆಮನೆಯಿಂದ: ರಾಗಿ ರೊಟ್ಟಿ ಮತ್ತು ಕಾಯಿ ಚಟ್ನಿ	written for kannadi
+F1 DD C0 E1 20 CA DC DE 77 A8 DC 20 D6 E6 E3 E0 DA 57 E6 BF E1 20 C3 DC E1 62 57 E6 20 D3 DC CA DC DE AE DC CA DD A8 DC E1 A8 DC E1 20 B8 E6 E0 C3 E6 20 48 AF A8 E6 3F	ತಾಯಿ ಮಾಡಿದ ಹೋಳಿಗೆಯ ರುಚಿಗೆ ಸಮಾನವಾದುದು ಬೇರೆ ಏನಿದೆ?	written for kannadi
+50 DC EA D1 20 CA E6 E1 E0 D9 DC 50 E6 52 20 32 35 20 D6 DC DA DB 57 DC D9 DC 20 C3 E6 E7 F1 DC C3 DC E1 20 9F ED A9 A8 DC AA C3 DC E1 2E	ಕೃಷಿ ಮೇಳಕ್ಕೆ 25 ಹಳ್ಳಿಗಳ ರೈತರು ಬಂದಿದ್ದರು.	written for kannadi
+D3 DD CA DC BF E1 CA DC 20 57 E6 E3 9F BA C3 DC A8 DC 20 9F D9 DC 50 E6 C0 E1 ED A8 DC 20 CA DC E1 7E A1 AE DC 20 B4 DC C6 CA DC F1 DC A4 F1 E6 20 D6 E6 61 DC E1 63 F1 DC A4 A8 E6 20 47 ED A8 DC E1 20 F1 DC 67 6E C3 DC E1 20 D6 E6 E0 DA A8 DC C3 DC E1 2E	ಸಾವಯವ ಗೊಬ್ಬರದ ಬಳಕೆಯಿಂದ ಮಣ್ಣಿನ ಫಲವತ್ತತೆ ಹೆಚ್ಚುತ್ತದೆ ಎಂದು ತಜ್ಞರು ಹೇಳಿದರು.	written for kannadi
+41 77 50 E6 20 CA DC E1 F1 DC E1 A4 20 F1 E6 ED 58 AE DC 20 B8 E6 C7 E6 20 44 20 CA DD C3 DC 20 D3 DC CC C6 B3 20 48 C4 A8 E6	ಅಡಿಕೆ ಮತ್ತು ತೆಂಗಿನ ಬೆಲೆ ಈ ವಾರ ಸ್ವಲ್ಪ ಏರಿದೆ	written for kannadi
+CB 68 DD 6E AE DC 20 CE 50 DC D2 50 DC C3 DC 20 50 DD C3 DD C2 57 DD C3 DC 3A 20 B1 DC C5 C1 E3 E0 57 DC 57 DC D9 DC 20 CA DC E1 E3 C6 50 DC 20 B1 DD 73 DC	ವಿಜ್ಞಾನ ಶಿಕ್ಷಕರ ಕಾರ್ಯಾಗಾರ: ಪ್ರಯೋಗಗಳ ಮೂಲಕ ಪಾಠ	written for kannadi; ರ್ಯಾ typed as ರಾ with the subscript ಯ
+CA DC E1 50 DC 52 DA 57 E6 20 57 DC 7E F1 DC 20 50 DC C8 D3 DC C6 E1 20 42 6F 57 DC D9 DC E1 20 CA DC E1 F1 DC E1 A4 20 50 DC A5 E6 57 DC D9 DC E1 20 45 B1 DC BF E1 E1 50 DC A4 2E	ಮಕ್ಕಳಿಗೆ ಗಣಿತ ಕಲಿಸಲು ಆಟಗಳು ಮತ್ತು ಕಥೆಗಳು ಉಪಯುಕ್ತ.	written for kannadi
+AE DC CA DC E1 BE 20 CD DD C7 E6 BF E1 20 51 C5 50 E6 70 85 20 F1 DC ED 76 DC 20 69 C7 DD C9 20 CA DC E1 6F 72 A8 DC 20 B1 DC ED A8 DC C2 A8 DC C8 C9 20 57 E6 A9 AA F1 DC E1 21	ನಮ್ಮ ಶಾಲೆಯ ಕ್ರಿಕೆಟ್ ತಂಡ ಜಿಲ್ಲಾ ಮಟ್ಟದ ಪಂದ್ಯದಲ್ಲಿ ಗೆದ್ದಿತು!	written for kannadi
+B4 DC E2 70 DD BA C7 85 20 42 6F 57 DD C3 DC C4 57 E6 20 D6 E6 E3 D3 DC 20 CA E6 E1 E7 A8 DD AE DC 20 D4 A8 DC 9C CA DD 58 A8 E6	ಫುಟ್ಬಾಲ್ ಆಟಗಾರರಿಗೆ ಹೊಸ ಮೈದಾನ ಸಿದ್ಧವಾಗಿದೆ	written for kannadi
+4B A8 DC E1 CA DC 20 D6 DC CA DD C2 D3 DC 20 B8 E6 D9 E6 D4 50 E6 E3 DA DB 3A 20 A9 AE DC 50 E6 52 20 50 DC AF D0 DC 75 20 32 30 20 AF CB E1 D0 DC 20 4B A9 2E	ಓದುವ ಹವ್ಯಾಸ ಬೆಳೆಸಿಕೊಳ್ಳಿ: ದಿನಕ್ಕೆ ಕನಿಷ್ಠ 20 ನಿಮಿಷ ಓದಿ.	written for kannadi
+22 4A D9 E6 DB BF E1 20 B1 DC E2 D3 DC A4 50 DC 20 4A D9 E6 DB BF E1 20 57 E6 D9 E6 BF E1 27 20 47 ED 9F 20 CA DC DE F1 DC E1 20 AF 67 2E	‘ಒಳ್ಳೆಯ ಪುಸ್ತಕ ಒಳ್ಳೆಯ ಗೆಳೆಯ’ ಎಂಬ ಮಾತು ನಿಜ.	written for kannadi
+9F D3 85 20 AF C7 DD AA 7C A8 DC 20 9F DA 20 D6 E6 E3 D3 DC 20 42 D3 DC B3 F1 E6 C5 20 42 C3 DC ED BB DC	ಬಸ್ ನಿಲ್ದಾಣದ ಬಳಿ ಹೊಸ ಆಸ್ಪತ್ರೆ ಆರಂಭ	written for kannadi
+CA E6 E7 A8 DC C2 C3 DC 20 D3 DC C6 D6 E6 3A 20 B9 D4 C8 AE DC C8 C9 20 D6 E6 61 DC E1 63 20 AF E0 C3 DC E1 20 50 DC E1 77 C0 E1 C4 2E	ವೈದ್ಯರ ಸಲಹೆ: ಬಿಸಿಲಿನಲ್ಲಿ ಹೆಚ್ಚು ನೀರು ಕುಡಿಯಿರಿ.	written for kannadi
+CA E6 E1 E7 D3 DC E3 C3 DC E1 B6 B8 E6 ED 57 DC D9 DC E3 C3 DC E1 20 C3 E6 E7 C6 E1 20 D3 DC ED 61 DD C3 DC 20 AE DD D9 E6 20 47 C3 DC 76 DC E1 20 57 DC ED 70 E6 20 F1 DC 76 DC	ಮೈಸೂರು–ಬೆಂಗಳೂರು ರೈಲು ಸಂಚಾರ ನಾಳೆ ಎರಡು ಗಂಟೆ ತಡ	written for kannadi
+B1 DC C5 CA DD D4 57 DC C4 57 E6 20 CA DC DE D7 A3 20 50 E6 E0 ED A8 DC C5 20 D3 E6 E3 E0 CA DC E1 CA DD C3 DC A9 ED A8 DC 20 CD DC E1 50 DC C5 CA DD C3 DC A8 DC CA DC C3 E6 57 E6 20 F1 E6 C3 E6 A9 C3 DC E1 F1 DC A4 A8 E6 2E	ಪ್ರವಾಸಿಗರಿಗೆ ಮಾಹಿತಿ ಕೇಂದ್ರ ಸೋಮವಾರದಿಂದ ಶುಕ್ರವಾರದವರೆಗೆ ತೆರೆದಿರುತ್ತದೆ.	written for kannadi
+D6 DC ED B2 BF E1 20 50 DC C8 C9 AE DC 20 C3 DC A5 DC 20 AE E6 E3 E0 76 DC C6 E1 20 D3 DD CB C3 DD C3 DC E1 20 67 AE DC 20 9F C3 DC E1 F1 DD A4 C3 E6 2E	ಹಂಪಿಯ ಕಲ್ಲಿನ ರಥ ನೋಡಲು ಸಾವಿರಾರು ಜನ ಬರುತ್ತಾರೆ.	written for kannadi
+50 DC C3 DD CA DC DA BF E1 C8 C9 20 CB E1 E0 AE DC E1 57 DD C4 50 E6 57 E6 20 47 C3 DC 76 DC E1 20 A3 ED 57 DC D9 DC E1 20 AF D0 E6 E0 AB DC	ಕರಾವಳಿಯಲ್ಲಿ ಮೀನುಗಾರಿಕೆಗೆ ಎರಡು ತಿಂಗಳು ನಿಷೇಧ	written for kannadi
+D3 DC CA DC E1 E1 A8 DC C5 20 A3 E0 C3 DC A8 DC C8 C9 20 D3 DC E3 BF DE EC D3 DC A4 20 AE E6 E3 E0 76 DC E1 CA DC E2 A8 E6 E0 20 4A ED A8 DC E1 20 D3 DC ED F1 E6 E3 E0 D0 DC 2E	ಸಮುದ್ರ ತೀರದಲ್ಲಿ ಸೂರ್ಯಾಸ್ತ ನೋಡುವುದೇ ಒಂದು ಸಂತೋಷ.	written for kannadi
+BF E1 50 DC D2 57 DD AE DC A8 DC 20 61 E6 ED 76 E6 BF E1 20 D3 DC A8 DC E1 AA 20 C3 DD A3 C5 C0 E1 77 E0 20 50 E6 E0 DA D3 DC E1 A3 A4 F1 DC E1 A4	ಯಕ್ಷಗಾನದ ಚೆಂಡೆಯ ಸದ್ದು ರಾತ್ರಿಯಿಡೀ ಕೇಳಿಸುತ್ತಿತ್ತು	written for kannadi
+A8 DC D3 DC C3 DD 20 D6 DC 9F BA A8 DC C8 C9 20 42 AE E6 57 DC D9 DC 20 CA E6 E1 C3 DC CA DC 7E 57 E6 20 41 A8 DC E1 BD F1 DC CA DD 58 F1 DC E1 A4 2E	ದಸರಾ ಹಬ್ಬದಲ್ಲಿ ಆನೆಗಳ ಮೆರವಣಿಗೆ ಅದ್ಭುತವಾಗಿತ್ತು.	written for kannadi
+A9 E0 B1 DD CA DC DA 57 E6 20 CA DC E1 AE E6 CA DC E1 AE E6 BF E1 C8 C9 20 D6 DC 7C F1 E6 57 DC D9 DC 20 B8 E6 D9 DC 50 DC E1	ದೀಪಾವಳಿಗೆ ಮನೆಮನೆಯಲ್ಲಿ ಹಣತೆಗಳ ಬೆಳಕು	written for kannadi
+BF E1 E1 57 DD A9 BF E1 ED A8 DC E1 20 B8 E6 E0 CA DC E2 20 B8 E6 C6 C9 20 D6 DC ED 61 DC E1 CA DC 20 D3 DC ED B1 DC C5 A8 DD BF E1 CB A8 E6 2E	ಯುಗಾದಿಯಂದು ಬೇವು ಬೆಲ್ಲ ಹಂಚುವ ಸಂಪ್ರದಾಯವಿದೆ.	written for kannadi
+D3 DC ED 50 DD C5 ED A3 BF E1 20 47 D9 DC E1 DB 20 B8 E6 C6 C9 A8 DC 20 D4 D7 20 47 C6 C9 C4 57 DC E3 20 43 D0 DC 72	ಸಂಕ್ರಾಂತಿಯ ಎಳ್ಳು ಬೆಲ್ಲದ ಸಿಹಿ ಎಲ್ಲರಿಗೂ ಇಷ್ಟ	written for kannadi
+57 DD C5 CA DC E1 20 B1 DC ED 61 DD C0 E1 A3 20 D3 DC BB E6 BF E1 C8 C9 20 50 DC E1 77 BF E1 E1 CA DC 20 AF E0 C4 AE DC 20 D3 DC CA DC E1 D3 E6 C2 BF E1 20 61 DC 61 E6 EC	ಗ್ರಾಮ ಪಂಚಾಯಿತಿ ಸಭೆಯಲ್ಲಿ ಕುಡಿಯುವ ನೀರಿನ ಸಮಸ್ಯೆಯ ಚರ್ಚೆ	written for kannadi
+50 E6 C3 E6 57 E6 20 D6 E6 E3 D3 DC 20 50 DD C6 E1 CA E6 3A 20 D6 DC F1 DC E1 A4 20 D6 DC DA DB 57 DC DA 57 E6 20 AF E0 C3 DD CA DC C4	ಕೆರೆಗೆ ಹೊಸ ಕಾಲುವೆ: ಹತ್ತು ಹಳ್ಳಿಗಳಿಗೆ ನೀರಾವರಿ	written for kannadi
+D3 DC 50 DD EC C4 20 CD DD C7 E6 57 DC DA 57 E6 20 50 DC ED B1 DC E4 C2 6F C3 85 57 DC D9 DC 20 50 E6 E3 76 DC E1 57 E6	ಸರ್ಕಾರಿ ಶಾಲೆಗಳಿಗೆ ಕಂಪ್ಯೂಟರ್ಗಳ ಕೊಡುಗೆ	written for kannadi; ರ್ typed as ರ with ್ before ಗ
+43 ED 6F AE E6 EC 70 85 AE DC C8 C9 20 50 DC AE DC B0 76 DC 20 4B A8 DC E1 57 DC C3 DC 20 D3 DC ED 54 E6 C2 20 48 C3 DC E1 A3 A4 A8 E6 C1 E1 E0 3F	ಇಂಟರ್ನೆಟ್ನಲ್ಲಿ ಕನ್ನಡ ಓದುಗರ ಸಂಖ್ಯೆ ಏರುತ್ತಿದೆಯೇ?	written for kannadi; ಟ್ typed with ್ before ನ
+CA E6 E3 B8 E6 E7 C7 85 AE DC C8 C9 20 50 DC AE DC B0 76 DC 20 70 E6 E7 B1 85 20 CA DC DE 76 DC E1 CA DC E2 A8 DC E1 20 44 57 DC 20 D3 DC E1 C6 BB DC	ಮೊಬೈಲ್ನಲ್ಲಿ ಕನ್ನಡ ಟೈಪ್ ಮಾಡುವುದು ಈಗ ಸುಲಭ	written for kannadi; ಲ್ typed with ್ before ನ
+D6 DC D9 E6 BF E1 20 A8 DD 53 C7 E6 57 DC D9 DC AE DC E1 B0 20 BF E1 E3 AF 50 E6 E3 E0 76 85 57 E6 20 9F A8 DC C8 D3 DC E1 CA DC 20 50 E6 C6 D3 DC 20 AE DC 76 E6 BF E1 E1 A3 A4 A8 E6 2E	ಹಳೆಯ ದಾಖಲೆಗಳನ್ನು ಯೂನಿಕೋಡ್ಗೆ ಬದಲಿಸುವ ಕೆಲಸ ನಡೆಯುತ್ತಿದೆ.	written for kannadi; ಡ್ typed with ್ before ಗ
+B8 DD C2 ED 50 85 AE DC C8 C9 20 54 DD F1 E6 20 F1 E6 C3 E6 BF E1 C6 E1 20 42 AB DD C3 85 20 D3 DC ED 54 E6 C2 20 B8 E6 E0 50 DC E1	ಬ್ಯಾಂಕ್ನಲ್ಲಿ ಖಾತೆ ತೆರೆಯಲು ಆಧಾರ್ ಸಂಖ್ಯೆ ಬೇಕು	written for kannadi; ಕ್ typed with ್ before ನ
+41 ED 61 E6 20 50 DC 61 E6 E0 C4 BF E1 20 D3 DC CA DC E1 BF E1 3A 20 B8 E6 DA 57 E6 59 20 39 20 C4 ED A8 DC 20 D3 DC ED 68 E6 20 35 20 C3 DC CA DC C3 E6 57 E6	ಅಂಚೆ ಕಚೇರಿಯ ಸಮಯ: ಬೆಳಿಗ್ಗೆ 9 ರಿಂದ ಸಂಜೆ 5 ರವರೆಗೆ	written for kannadi
+B1 E6 E4 C8 E0 D3 85 20 73 DD 4F E6 BF E1 20 D6 DC A3 A4 C3 DC 20 D3 DC ED 61 DD C3 DC 20 A9 E0 B1 DC 20 50 E6 71 72 A8 E6	ಪೊಲೀಸ್ ಠಾಣೆಯ ಹತ್ತಿರ ಸಂಚಾರ ದೀಪ ಕೆಟ್ಟಿದೆ	written for kannadi
+C3 DC D3 E6 A4 20 41 B1 DC 5B DD F1 DC 3A 20 43 9F BA C4 57 E6 20 57 DD BF E1	ರಸ್ತೆ ಅಪಘಾತ: ಇಬ್ಬರಿಗೆ ಗಾಯ	written for kannadi
+5A 6F AE E6 BF E1 20 9F 57 E6 59 20 D3 DC A7 DA E0 BF E1 C3 DC E1 20 A8 DC E3 C3 DC E1 20 AF E0 77 A8 DD AA C3 E6 2E	ಘಟನೆಯ ಬಗ್ಗೆ ಸ್ಥಳೀಯರು ದೂರು ನೀಡಿದ್ದಾರೆ.	written for kannadi
+54 DD C8 20 AF CA E6 E0 CD DC AE DC 57 DC D9 DC C8 C9 20 50 DC D3 DC 20 47 D3 E6 BF E1 B8 E6 E0 77	ಖಾಲಿ ನಿವೇಶನಗಳಲ್ಲಿ ಕಸ ಎಸೆಯಬೇಡಿ	written for kannadi
+46 C3 DC 20 D6 DC 9F BA 50 E6 52 20 53 61 DC E1 EC 20 47 D0 DC E1 72 3F 20 D3 DC BB E6 BF E1 C8 C9 20 C7 E6 50 DC 52 20 CA DC E1 ED 76 DC AE E6	ಊರ ಹಬ್ಬಕ್ಕೆ ಖರ್ಚು ಎಷ್ಟು? ಸಭೆಯಲ್ಲಿ ಲೆಕ್ಕ ಮಂಡನೆ	written for kannadi
+41 A3 A6 57 DC DA 57 E6 20 D3 DD CC 57 DC F1 DC 20 50 E6 E3 E0 C4 20 CA DC E1 50 DC 52 D9 DC E1 20 D6 DD 77 A8 DC C3 DC E1	ಅತಿಥಿಗಳಿಗೆ ಸ್ವಾಗತ ಕೋರಿ ಮಕ್ಕಳು ಹಾಡಿದರು	written for kannadi
+41 BC AE DC ED A8 DC AE DD 20 D3 DC CA DC DE C3 DC ED BB DC A8 DC C8 C9 20 D7 C4 BF E1 20 CE 50 DC D2 50 DC C4 57 E6 20 D3 DC AE DD BE AE DC	ಅಭಿನಂದನಾ ಸಮಾರಂಭದಲ್ಲಿ ಹಿರಿಯ ಶಿಕ್ಷಕರಿಗೆ ಸನ್ಮಾನ	written for kannadi
+49 A8 DC E1 20 A9 AE DC 57 DC D9 DC 20 62 F1 DC C5 50 DC C7 DD 20 CE B9 C3 DC 20 CA DC E1 E1 50 DD A4 BF E1	ಐದು ದಿನಗಳ ಚಿತ್ರಕಲಾ ಶಿಬಿರ ಮುಕ್ತಾಯ	written for kannadi
+48 50 E6 20 47 ED A8 DC E1 20 50 E6 E0 D9 DC E1 CA DC 20 CA DC E1 50 DC 52 D9 E6 E0 20 CA DC E1 E1 ED A8 E6 20 CB 68 DD 6E AF 57 DC D9 DD 57 DC E1 F1 DD A4 C3 E6 2E	ಏಕೆ ಎಂದು ಕೇಳುವ ಮಕ್ಕಳೇ ಮುಂದೆ ವಿಜ್ಞಾನಿಗಳಾಗುತ್ತಾರೆ.	written for kannadi
+4A ED A8 DC E1 20 58 76 DC 20 AE E6 77 2C 20 4A ED A8 DC E1 20 AE E6 C3 DC D9 DC E1 20 50 E6 E3 77	ಒಂದು ಗಿಡ ನೆಡಿ, ಒಂದು ನೆರಳು ಕೊಡಿ	written for kannadi
+42 D0 DD 79 DC 20 CA DC DE D3 DC A8 DC C8 C9 20 57 DD DA 20 68 E6 E3 E0 C3 DD 58 20 B9 E0 D3 DC E1 F1 DC A4 A8 E6	ಆಷಾಢ ಮಾಸದಲ್ಲಿ ಗಾಳಿ ಜೋರಾಗಿ ಬೀಸುತ್ತದೆ	written for kannadi
+A8 DC EA 79 DC CA DD A8 DC 20 AF AB DD EC C3 DC 20 CA DC E1 F1 DC E1 A4 20 AF D0 E6 75 20 43 A8 DC AA C3 E6 20 BF E1 CD DC D3 DC E1 D5 20 53 62 F1 DC 2E	ದೃಢವಾದ ನಿರ್ಧಾರ ಮತ್ತು ನಿಷ್ಠೆ ಇದ್ದರೆ ಯಶಸ್ಸು ಖಚಿತ.	written for kannadi
+D6 DC 7E A1 AE DC 20 41 ED 57 DC 77 BF E1 C8 C9 20 CA DC DE CB AE DC 20 D6 DC 7E A1 57 E6 20 BB DD C4 E0 20 B8 E6 E0 77 50 E6	ಹಣ್ಣಿನ ಅಂಗಡಿಯಲ್ಲಿ ಮಾವಿನ ಹಣ್ಣಿಗೆ ಭಾರೀ ಬೇಡಿಕೆ	written for kannadi
+D3 DC 7C A1 20 45 A9 AA CA E6 E1 57 DC DA 57 E6 20 B8 DD C2 ED 50 85 20 D3 DD C6 A8 DC 20 9F 77 78 20 43 DA 50 E6	ಸಣ್ಣ ಉದ್ದಿಮೆಗಳಿಗೆ ಬ್ಯಾಂಕ್ ಸಾಲದ ಬಡ್ಡಿ ಇಳಿಕೆ	written for kannadi
+D6 DC 7C CA DC AE DC E1 B0 20 45 DA D3 DC E1 CA DC E2 A8 DC E1 20 D6 E6 E0 57 E6 3F 20 49 A8 DC E1 20 D3 DC C3 DC D9 DC 20 D3 DC C6 D6 E6 57 DC D9 DC E1	ಹಣವನ್ನು ಉಳಿಸುವುದು ಹೇಗೆ? ಐದು ಸರಳ ಸಲಹೆಗಳು	written for kannadi
+CA DC E1 7E B1 DD C6 A8 DC 20 CB A8 DD C2 A6 EC 57 DC D9 DC 20 51 C3 DC E1 62 F1 DC C5 50 E6 52 20 B1 DC C5 CD DC D4 A4	ಮಣಿಪಾಲದ ವಿದ್ಯಾರ್ಥಿಗಳ ಕಿರುಚಿತ್ರಕ್ಕೆ ಪ್ರಶಸ್ತಿ	written for kannadi
+B2 51 B0 50 85 57 E6 20 D6 E6 E3 E0 A8 DC 20 CA DC E1 50 DC 52 D9 DC E1 20 D3 DC ED 68 E6 20 D3 DC E1 C3 DC 51 D2 F1 DC CA DD 58 20 CA DC E1 AE E6 57 E6 20 CA DC E1 C3 DC DA A8 DC C3 DC E1	ಪಿಕ್ನಿಕ್ಗೆ ಹೋದ ಮಕ್ಕಳು ಸಂಜೆ ಸುರಕ್ಷಿತವಾಗಿ ಮನೆಗೆ ಮರಳಿದರು	written for kannadi; ಕ್ typed with ್ before ಗ
+71 50 E6 70 85 20 A8 DC C3 DC 20 48 C4 50 E6 57 E6 20 B1 DC C5 BF DE 7E 50 DC C3 DC 20 42 50 E6 D2 E0 B1 DC	ಟಿಕೆಟ್ ದರ ಏರಿಕೆಗೆ ಪ್ರಯಾಣಿಕರ ಆಕ್ಷೇಪ	written for kannadi
+D7 C4 BF E1 20 AE DD 57 DC C4 50 DC C4 57 E6 20 45 62 F1 DC 20 50 DC 7E A1 AE DC 20 F1 DC B1 DD D3 DC 4F E6	ಹಿರಿಯ ನಾಗರಿಕರಿಗೆ ಉಚಿತ ಕಣ್ಣಿನ ತಪಾಸಣೆ	written for kannadi
+CA DC E1 D9 E6 20 AF E0 C3 DC E1 20 50 E6 E3 BF E1 E1 C9 3A 20 B1 DC C5 A3 20 CA DC E1 AE E6 BF E1 C6 E3 C9 20 D3 DD AB DC C2	ಮಳೆ ನೀರು ಕೊಯ್ಲು: ಪ್ರತಿ ಮನೆಯಲ್ಲೂ ಸಾಧ್ಯ	written for kannadi
+D3 DD AB DC C2 CA DD A8 DC D0 DC E1 72 20 B1 DD C9 D4 72 50 85 20 9F D9 DC 50 E6 20 50 DC 77 CA E6 E1 20 CA DC DE 76 E6 E3 E0 7C	ಸಾಧ್ಯವಾದಷ್ಟು ಪ್ಲಾಸ್ಟಿಕ್ ಬಳಕೆ ಕಡಿಮೆ ಮಾಡೋಣ	written for kannadi
+D6 DC D4 C3 DC E1 20 45 DA D4 2C 20 45 D4 C3 DC E1 20 45 DA D4	ಹಸಿರು ಉಳಿಸಿ, ಉಸಿರು ಉಳಿಸಿ	written for kannadi
+CA DC E1 57 DC E1 CB AE DC 20 CA E6 E3 A8 DC C6 20 D6 E6 68 E6 6A 20 F1 DD C0 E1 57 E6 20 CA DC E1 C3 E6 BF E1 C7 DD 57 DC A8 DC 20 50 DC D2 7C	ಮಗುವಿನ ಮೊದಲ ಹೆಜ್ಜೆ ತಾಯಿಗೆ ಮರೆಯಲಾಗದ ಕ್ಷಣ	written for kannadi
+CA DC E5 E8 AE DC CA DD 58 20 50 E6 C6 D3 DC 20 CA DC DE 76 DC E1 CA DC CA DC C3 E6 E0 20 D6 E6 61 DC E1 63 20 D3 DD 97 D3 DC E1 F1 DD A4 C3 E6	ಮೌನವಾಗಿ ಕೆಲಸ ಮಾಡುವವರೇ ಹೆಚ್ಚು ಸಾಧಿಸುತ್ತಾರೆ	written for kannadi
+D3 E8 C6 BB DC C2 57 DC DA C6 C9 A8 DC 20 D6 DC DA DB 57 DC D9 DC C8 C9 20 50 E8 CD DC C6 20 F1 DC C3 DC B8 E6 E0 A3 20 50 E6 E0 ED A8 DC C5	ಸೌಲಭ್ಯಗಳಿಲ್ಲದ ಹಳ್ಳಿಗಳಲ್ಲಿ ಕೌಶಲ ತರಬೇತಿ ಕೇಂದ್ರ	written for kannadi
+C1 E3 E0 67 AE E6 BF E1 20 CA E6 61 DC 63 20 33 2E 38 20 50 E6 E3 E0 71 20 C3 DC E3 B1 DD C0 E1	ಯೋಜನೆಯ ವೆಚ್ಚ 3.8 ಕೋಟಿ ರೂಪಾಯಿ	written for kannadi
+F1 DC E1 CA DC E1 50 DC E3 C3 DC E1 20 69 C7 E6 C9 BF E1 20 C3 E6 E7 F1 DC C4 57 E6 20 B8 E6 D9 E6 20 CB CA E6 E1 20 D6 DC 7C 20 B9 76 DC E1 57 DC 76 E6	ತುಮಕೂರು ಜಿಲ್ಲೆಯ ರೈತರಿಗೆ ಬೆಳೆ ವಿಮೆ ಹಣ ಬಿಡುಗಡೆ	written for kannadi
+D6 DC CA DD CA DC DE AE DC 3A 20 50 DC C3 DD CA DC DA BF E1 C8 C9 20 BB DD C4 E0 20 CA DC E1 D9 E6 2C 20 4A D9 DC AE DD 77 AE DC C8 C9 20 CA E6 E3 E0 76 DC 20 50 DC CB A8 DC 20 CA DD F1 DD CA DC C3 DC 7C	ಹವಾಮಾನ: ಕರಾವಳಿಯಲ್ಲಿ ಭಾರೀ ಮಳೆ, ಒಳನಾಡಿನಲ್ಲಿ ಮೋಡ ಕವಿದ ವಾತಾವರಣ	written for kannadi
+57 DC C4 D0 DC 75 20 F1 DD B1 DC CA DC DE AE DC 20 33 31 2C 20 50 DC AF D0 DC 75 20 32 32 20 77 58 C5	ಗರಿಷ್ಠ ತಾಪಮಾನ 31, ಕನಿಷ್ಠ 22 ಡಿಗ್ರಿ	written for kannadi
+62 50 DC 52 CA DC E1 57 DC D9 DC E3 C4 AE DC 20 50 DD B5 20 F1 E6 E3 E0 6F 57 DC D9 DC C8 C9 20 50 E6 E3 BF E1 E1 C9 20 42 C3 DC ED BB DC	ಚಿಕ್ಕಮಗಳೂರಿನ ಕಾಫಿ ತೋಟಗಳಲ್ಲಿ ಕೊಯ್ಲು ಆರಂಭ	written for kannadi
+B4 DC C6 B1 DC E2 D0 DC B3 20 B1 DC C5 A8 DC CD DC EC AE DC 50 E6 52 20 C7 DD C7 85 B8 DD 57 85 20 D3 DC 67 E1 6A	ಫಲಪುಷ್ಪ ಪ್ರದರ್ಶನಕ್ಕೆ ಲಾಲ್ಬಾಗ್ ಸಜ್ಜು	written for kannadi; ಲ್ typed with ್ before ಬ
+64 DD BF DE 62 F1 DC C5 20 D3 DC B3 AB E6 EC 57 E6 20 41 69 EC 20 42 D6 DD CC AE DC	ಛಾಯಾಚಿತ್ರ ಸ್ಪರ್ಧೆಗೆ ಅರ್ಜಿ ಆಹ್ವಾನ	written for kannadi
+64 DC A3 C5 20 CA DC E1 C3 E6 BF E1 B8 E6 E0 77 2C 20 D3 DC ED 68 E6 20 CA DC E1 D9 E6 20 9F C3 DC 9F D6 DC E1 A8 DC E1	ಛತ್ರಿ ಮರೆಯಬೇಡಿ, ಸಂಜೆ ಮಳೆ ಬರಬಹುದು	written for kannadi
+45 F1 DC D5 CA DC A8 DC 20 41 ED 57 DC CA DD 58 20 CA DC E1 E3 C3 DC E1 20 A9 AE DC 20 D3 DD ED D3 DC A2 A3 50 DC 20 50 DD BF E1 EC 50 DC C5 CA DC E1	ಉತ್ಸವದ ಅಂಗವಾಗಿ ಮೂರು ದಿನ ಸಾಂಸ್ಕೃತಿಕ ಕಾರ್ಯಕ್ರಮ	written for kannadi; ್ಕೃ typed as 1 glyph
+D3 DC ED D3 DC A2 F1 DC 20 CA DC E1 F1 DC E1 A4 20 50 DC AE DC B0 76 DC 20 CD DD D3 DC AE DC 57 DC D9 DC 20 41 AB DC C2 BF E1 AE DC	ಸಂಸ್ಕೃತ ಮತ್ತು ಕನ್ನಡ ಶಾಸನಗಳ ಅಧ್ಯಯನ	written for kannadi; ್ಕೃ typed as 1 glyph
+CA DC E1 D6 DD C3 DD D0 DC F3 A8 DC 20 57 DC 77 BF E1 C8 C9 20 D6 E6 E3 D3 DC 20 61 E6 50 E6 E3 B3 E0 D3 85 72	ಮಹಾರಾಷ್ಟ್ರದ ಗಡಿಯಲ್ಲಿ ಹೊಸ ಚೆಕ್ಪೋಸ್ಟ್	written for kannadi; ್ಟ್ರ typed as 1 glyph
+C3 DD D1 72 86 E0 BF E1 20 D6 E6 A8 DD AA C4 20 CB D3 DC A4 C3 DC 4F E6 20 50 DD CA DC E1 57 DD C4 20 CB D9 DC ED 9F	ರಾಷ್ಟ್ರೀಯ ಹೆದ್ದಾರಿ ವಿಸ್ತರಣೆ ಕಾಮಗಾರಿ ವಿಳಂಬ	written for kannadi
+D3 DC F1 DC C2 20 D6 E6 E0 D9 DC E1 CA DC E2 A8 DC E1 20 50 DC D0 DC 72 2C 20 42 A8 DC C3 E6 20 41 57 DC F1 DC C2 2E	ಸತ್ಯ ಹೇಳುವುದು ಕಷ್ಟ, ಆದರೆ ಅಗತ್ಯ.	written for kannadi
+D6 DC E1 61 DC E1 63 20 CA DC E1 D9 E6 57 E6 20 B8 E6 D9 E6 20 D6 DD AF	ಹುಚ್ಚು ಮಳೆಗೆ ಬೆಳೆ ಹಾನಿ	written for kannadi
+CA E6 E1 62 63 AE DC 20 D6 DD 76 DC E1 20 50 E6 E0 D9 DC E1 F1 DD A4 20 41 67 6A 20 AF A8 E6 AA 57 E6 20 68 DD C4 A8 DC C3 DC E1	ಮೆಚ್ಚಿನ ಹಾಡು ಕೇಳುತ್ತಾ ಅಜ್ಜ ನಿದ್ದೆಗೆ ಜಾರಿದರು	written for kannadi
+41 57 DC 59 A8 DC 20 B8 E6 C7 E6 BF E1 20 41 ED 57 DC 77 57 DC D9 DC 20 CA DC E1 E1 ED A8 E6 20 45 A8 DC AA A8 DC 20 D3 DD C6 E1	ಅಗ್ಗದ ಬೆಲೆಯ ಅಂಗಡಿಗಳ ಮುಂದೆ ಉದ್ದದ ಸಾಲು	written for kannadi
+D6 DC DA DB BF E1 20 D3 DC ED F1 E6 BF E1 C8 C9 20 F1 DC C3 DC 50 DD C4 2C 20 D6 DC 7C E1 A1 2C 20 D6 DC E3 CA DC E2 20 47 C6 C9 CA DC E4 20 D4 57 DC E1 F1 DC A4 CA E6 2E	ಹಳ್ಳಿಯ ಸಂತೆಯಲ್ಲಿ ತರಕಾರಿ, ಹಣ್ಣು, ಹೂವು ಎಲ್ಲವೂ ಸಿಗುತ್ತವೆ.	written for kannadi
+B1 DC E2 6F 72 20 CA DC E1 50 DC 52 DA 57 E6 20 B1 E8 D1 72 50 DC 20 42 D6 DD C3 DC 3A 20 CA E6 E3 D9 DC 50 E6 20 50 DD D9 DC E1 2C 20 D6 DD C6 E1 2C 20 D6 DC 7C E1 A1	ಪುಟ್ಟ ಮಕ್ಕಳಿಗೆ ಪೌಷ್ಟಿಕ ಆಹಾರ: ಮೊಳಕೆ ಕಾಳು, ಹಾಲು, ಹಣ್ಣು	written for kannadi
+BF E1 E1 A8 DC 9C 20 B8 E6 E0 76 DC 2C 20 CD DD ED A3 20 B8 E6 E0 50 DC E1	ಯುದ್ಧ ಬೇಡ, ಶಾಂತಿ ಬೇಕು	written for kannadi
+CD DC E1 A8 DC 9C 20 50 DC E1 77 BF E1 E1 CA DC 20 AF E0 C4 AE DC 20 5A 6F 50 DC 20 45 A8 DD 5E 6F AE E6	ಶುದ್ಧ ಕುಡಿಯುವ ನೀರಿನ ಘಟಕ ಉದ್ಘಾಟನೆ	written for kannadi
+CB CD DC CC 20 B1 DC C4 D3 DC C3 DC 20 A9 AE DC A8 DC ED A8 DC E1 20 35 30 30 20 D3 DC D4 57 DC D9 DC 20 AE E6 76 DC E1 CB 50 E6	ವಿಶ್ವ ಪರಿಸರ ದಿನದಂದು 500 ಸಸಿಗಳ ನೆಡುವಿಕೆ	written for kannadi
+D3 DC CC ED F1 DC 20 CA DC E1 AE E6 20 50 DC 6F E1 72 CA DC 20 50 DC AE DC D3 DC E1 20 AE DC AE DC D3 DD C0 E1 F1 DC E1	ಸ್ವಂತ ಮನೆ ಕಟ್ಟುವ ಕನಸು ನನಸಾಯಿತು	written for kannadi
+D6 E6 E3 D3 DC 20 D3 E6 E0 F1 DC E1 CA E6 C0 E1 ED A8 DC 20 47 C3 DC 76 DC E1 20 46 C3 DC E1 57 DC D9 DC 20 AE DC 76 DC E1 CB AE DC 20 A8 DC E3 C3 DC 20 50 DC 77 CA E6 E1	ಹೊಸ ಸೇತುವೆಯಿಂದ ಎರಡು ಊರುಗಳ ನಡುವಿನ ದೂರ ಕಡಿಮೆ	written for kannadi
+42 F1 DC BE CB CD DD CC D3 DC CA E6 E0 20 57 E6 C6 E1 CB AE DC 20 CA E6 E3 A8 DC C6 20 CA E6 E1 71 72 C6 E1	ಆತ್ಮವಿಶ್ವಾಸವೇ ಗೆಲುವಿನ ಮೊದಲ ಮೆಟ್ಟಿಲು	written for kannadi
+67 AE DC BE A9 AE DC A8 DC 20 CD DC E1 BB DD CD DC BF E1 57 DC D9 DC E1 2C 20 41 CA DC E1 BE 21	ಜನ್ಮದಿನದ ಶುಭಾಶಯಗಳು, ಅಮ್ಮ!	written for kannadi
+9F C5 D6 DC BE 58 C4 20 B8 E6 6F 72 A8 DC C8 C9 20 61 DD C3 DC 7C	ಬ್ರಹ್ಮಗಿರಿ ಬೆಟ್ಟದಲ್ಲಿ ಚಾರಣ	written for kannadi
+50 E6 E3 76 DC 58 AE DC 20 51 F1 DC A4 D9 E6 20 D6 DC 7E A1 57 E6 20 A8 E6 E0 CD DC A8 DC C7 E6 C9 E0 20 D6 E6 D3 DC C3 DC E1	ಕೊಡಗಿನ ಕಿತ್ತಳೆ ಹಣ್ಣಿಗೆ ದೇಶದಲ್ಲೇ ಹೆಸರು	written for kannadi
+AE DC CA DC E1 BE 20 46 C4 AE DC 20 57 DC C5 ED A5 DD C6 BF E1 50 E6 52 20 31 30 30 20 CA DC D0 DC EC	ನಮ್ಮ ಊರಿನ ಗ್ರಂಥಾಲಯಕ್ಕೆ 100 ವರ್ಷ	written for kannadi
+B1 DC E2 D3 DC A4 50 DC 20 4B A8 DC E1 CA DC 20 D3 DC B3 AB E6 EC BF E1 C8 C9 20 38 20 AE E6 E0 20 F1 DC C3 DC 57 DC A3 BF E1 20 D6 DC E1 76 DC E1 58 20 B1 DC C5 A5 DC CA DC E1	ಪುಸ್ತಕ ಓದುವ ಸ್ಪರ್ಧೆಯಲ್ಲಿ 8 ನೇ ತರಗತಿಯ ಹುಡುಗಿ ಪ್ರಥಮ	written for kannadi
+B1 DC C4 E0 50 E6 D2 BF E1 20 B4 DC C8 F1 DD ED CD DC 20 67 E3 AE 85 20 31 34 20 C3 DC ED A8 DC E1 20 B1 DC C5 50 DC 6F	ಪರೀಕ್ಷೆಯ ಫಲಿತಾಂಶ ಜೂನ್ 14 ರಂದು ಪ್ರಕಟ	written for kannadi
+B5 70 85 20 42 58 C3 DC C6 E1 20 A9 AE DC CA DC E4 20 AE DC 77 57 E6 20 CA DC DE 77	ಫಿಟ್ ಆಗಿರಲು ದಿನವೂ ನಡಿಗೆ ಮಾಡಿ	written for kannadi
+42 B5 E0 D3 85 57 E6 20 D6 E6 E3 E0 57 DC E1 CA DC 20 A8 DD C4 BF E1 C8 C9 20 70 DD C5 B5 50 85 20 68 DD CA DC E5 85	ಆಫೀಸ್ಗೆ ಹೋಗುವ ದಾರಿಯಲ್ಲಿ ಟ್ರಾಫಿಕ್ ಜಾಮ್	written for kannadi; ಸ್ typed with ್ before ಗ
+76 DD 50 DC 72 C3 85 20 D3 DC C6 D6 E6 20 43 C6 C9 A8 E6 20 4C D0 DC 97 20 F1 E6 57 E6 A8 DC E1 50 E6 E3 D9 DC DB B8 E6 E0 77	ಡಾಕ್ಟರ್ ಸಲಹೆ ಇಲ್ಲದೆ ಔಷಧಿ ತೆಗೆದುಕೊಳ್ಳಬೇಡಿ	written for kannadi
+4D E1 F1 DC E1 CA DC DE AE DC 50 E6 52 20 F1 DC 50 DC 52 ED F1 E6 20 42 D6 DD C3 DC 20 9F A8 DC C8 D4	ಋತುಮಾನಕ್ಕೆ ತಕ್ಕಂತೆ ಆಹಾರ ಬದಲಿಸಿ	written for kannadi
+4D E1 D1 20 CA DC E1 E1 AF 57 DC D9 DC 20 50 DC A5 E6 57 DC D9 DC AE DC E1 B0 20 41 69 6A 20 D6 E6 E0 D9 DC E1 A3 A4 A8 DC AA C3 DC E1	ಋಷಿ ಮುನಿಗಳ ಕಥೆಗಳನ್ನು ಅಜ್ಜಿ ಹೇಳುತ್ತಿದ್ದರು	written for kannadi
+CA E6 E1 E0 5A 57 DC D9 DC 20 CA DC E1 C3 E6 C0 E1 ED A8 DC 20 61 DC ED A8 DC C5 20 43 7C E1 51 A8 DC	ಮೇಘಗಳ ಮರೆಯಿಂದ ಚಂದ್ರ ಇಣುಕಿದ	written for kannadi
+57 E6 68 E6 6A BF E1 20 5C C7 85 20 5C C7 85 20 D3 DC A9 AA 57 E6 20 CA DC E1 57 DC E1 20 AE DC 51 52 F1 DC E1	ಗೆಜ್ಜೆಯ ಘಿಲ್ ಘಿಲ್ ಸದ್ದಿಗೆ ಮಗು ನಕ್ಕಿತು	written for kannadi
+CA E6 E3 A8 DC C6 20 A9 AE DC 20 CD DD C7 E6 57 E6 20 D6 E6 E3 C3 DC 6F 20 CA DC E1 57 DC E1 CB AE DC 20 50 DC 7C A1 C8 C9 20 50 DC E1 F1 DC E3 D6 DC C6	ಮೊದಲ ದಿನ ಶಾಲೆಗೆ ಹೊರಟ ಮಗುವಿನ ಕಣ್ಣಲ್ಲಿ ಕುತೂಹಲ	written for kannadi
+9F 7C A1 20 9F 7C A1 A8 DC 20 57 DD DA B1 DC 6F 57 DC D9 DC E1 20 42 50 DD CD DC A8 DC C8 C9 20 D6 DD C3 DD 77 A8 DC CA DC E2	ಬಣ್ಣ ಬಣ್ಣದ ಗಾಳಿಪಟಗಳು ಆಕಾಶದಲ್ಲಿ ಹಾರಾಡಿದವು	written for kannadi
+50 E6 E7 CA DC E1 57 DC 59 A8 DC 20 D4 E0 C3 E6 57 DC DA 57 E6 20 CA DC E1 F1 E6 A4 20 B8 E6 E0 77 50 E6	ಕೈಮಗ್ಗದ ಸೀರೆಗಳಿಗೆ ಮತ್ತೆ ಬೇಡಿಕೆ	written for kannadi
+CA DC E1 AE E6 BF E1 C7 E6 C9 E0 20 CA E6 E1 E7 D3 DC E3 C3 DC E1 20 B1 DD 50 85 20 CA DC DE 76 DC E1 CA DC 20 CB AB DD AE DC	ಮನೆಯಲ್ಲೇ ಮೈಸೂರು ಪಾಕ್ ಮಾಡುವ ವಿಧಾನ	written for kannadi
+B8 E6 E7 50 85 20 D3 DC CA DD C3 DC C3 DC E1 20 D6 E6 C7 E6 BE 70 85 20 AB DC C4 D3 DC E1 CA DC E2 A8 DC E1 20 50 DC 76 DD 78 BF E1	ಬೈಕ್ ಸವಾರರು ಹೆಲ್ಮೆಟ್ ಧರಿಸುವುದು ಕಡ್ಡಾಯ	written for kannadi
+D6 E6 C7 E6 BE 70 85 20 43 C6 C9 A8 DC 20 34 30 20 D3 DC CA DD C3 DC C4 57 E6 20 A8 DC ED 76 DC	ಹೆಲ್ಮೆಟ್ ಇಲ್ಲದ 40 ಸವಾರರಿಗೆ ದಂಡ	written for kannadi
+CA DC E1 E1 ED A9 AE DC 20 D3 E6 E3 E0 CA DC E1 CA DD C3 DC 20 F1 DD 3E 20 B1 DC ED 61 DD C0 E1 A3 20 D3 DC BB E6	ಮುಂದಿನ ಸೋಮವಾರ ತಾ। ಪಂಚಾಯಿತಿ ಸಭೆ	written for kannadi
+D3 DC A7 D9 DC 3A 20 D3 DC 50 DD EC C4 20 B1 E8 C5 79 DC CD DD C7 E6 2C 20 CA DD 76 85 EC 20 AE DC ED 3E 20 32	ಸ್ಥಳ: ಸರ್ಕಾರಿ ಪ್ರೌಢಶಾಲೆ, ವಾರ್ಡ್ ನಂ। 2	written for kannadi
+50 DD BF E1 EC 50 DC C5 CA DC E1 20 D3 DC ED 68 E6 20 36 2E 33 30 20 50 E6 52 20 28 47 C6 C9 C4 57 DC E3 20 D3 DD CC 57 DC F1 DC 29	ಕಾರ್ಯಕ್ರಮ ಸಂಜೆ 6.30 ಕ್ಕೆ (ಎಲ್ಲರಿಗೂ ಸ್ವಾಗತ)	written for kannadi
+D3 DC D6 DD BF E1 CA DD 7E 3A 20 31 38 30 30 20 34 32 35 20 39 38 37 36	ಸಹಾಯವಾಣಿ: 1800 425 9876	written for kannadi
+45 76 DC E1 B2 B6 CA DC E1 ED 57 DC D9 DC E3 C3 DC E1 20 9F D3 85 20 D3 DC CA DC E1 BF E1 A8 DC C8 C9 20 9F A8 DC C7 DD CA DC 4F E6	ಉಡುಪಿ–ಮಂಗಳೂರು ಬಸ್ ಸಮಯದಲ್ಲಿ ಬದಲಾವಣೆ	written for kannadi
+D6 DD D3 DC AE DC B6 D3 DC 50 DC C7 E6 E0 CD DC B1 DC E2 C3 DC 20 C3 E6 E7 C6 E1 20 CA DC DE 57 DC EC 20 A8 DC E1 C3 DC D4 A4	ಹಾಸನ–ಸಕಲೇಶಪುರ ರೈಲು ಮಾರ್ಗ ದುರಸ್ತಿ	written for kannadi
+50 DC AE DC B0 76 DC 20 50 DC C8 C0 E1 C4 20 26 20 45 62 F1 DC 20 F1 DC C3 DC 57 DC A3 57 DC D9 DC E1 20 B1 DC C5 A3 20 BB DD AE DC E1 CA DD C3 DC	ಕನ್ನಡ ಕಲಿಯಿರಿ - ಉಚಿತ ತರಗತಿಗಳು ಪ್ರತಿ ಭಾನುವಾರ	written for kannadi
+D6 DC F1 DC E1 A4 26 D6 DC AE E6 B0 C3 DC 76 DC E1 20 CA DC D0 DC EC A8 DC 20 CA DC E1 50 DC 52 DA 57 E6 20 44 67 E1 20 F1 DC C3 DC B8 E6 E0 A3	ಹತ್ತು-ಹನ್ನೆರಡು ವರ್ಷದ ಮಕ್ಕಳಿಗೆ ಈಜು ತರಬೇತಿ	written for kannadi
+B8 E6 D9 DC 58 AE DC 20 45 B1 DD D6 DD C3 DC 50 E6 52 20 43 77 C9 26 CA DC 76 E6 2C 20 CA DC E1 AB DD C2 D6 DC B0 20 41 AE DC B0 26 D3 DD C3 DC E1	ಬೆಳಗಿನ ಉಪಾಹಾರಕ್ಕೆ ಇಡ್ಲಿ-ವಡೆ, ಮಧ್ಯಾಹ್ನ ಅನ್ನ-ಸಾರು	written for kannadi
+41 50 DC 52 20 F1 DC ED 58 BF E1 C3 DC E1 20 D3 E6 E0 C4 20 C3 DC ED 57 E6 E3 E0 C8 20 B9 77 D4 A8 DC C3 DC E1	ಅಕ್ಕ ತಂಗಿಯರು ಸೇರಿ ರಂಗೋಲಿ ಬಿಡಿಸಿದರು	written for kannadi
+62 AE DC B0 A8 DC 20 B8 E6 C7 E6 20 CA DC E1 F1 E6 A4 20 43 DA 50 E6	ಚಿನ್ನದ ಬೆಲೆ ಮತ್ತೆ ಇಳಿಕೆ	written for kannadi
+CA DC C2 CA DC D3 E6 A7 20 D3 DC C4 C0 E1 C6 C9 20 47 ED A8 DC E1 20 A8 DC E3 C3 DC E1 CA DC 20 9F A8 DC C6 E1 20 AE DD CA E6 E0 20 9F A8 DC C7 DD 57 E6 E3 E0 7C	ವ್ಯವಸ್ಥೆ ಸರಿಯಿಲ್ಲ ಎಂದು ದೂರುವ ಬದಲು ನಾವೇ ಬದಲಾಗೋಣ	written for kannadi
+D3 DC A7 DA E0 BF E1 20 50 DC C7 DD CB A8 DC C3 DC 20 CA DC 7C EC 62 F1 DC C5 57 DC D9 DC 20 B1 DC C5 A8 DC CD DC EC AE DC	ಸ್ಥಳೀಯ ಕಲಾವಿದರ ವರ್ಣಚಿತ್ರಗಳ ಪ್ರದರ್ಶನ	written for kannadi
+BF DE CA DC 20 46 C4 AE DC 20 68 DD F1 E6 C5 20 AF CA DC E1 57 E6 20 43 D0 DC 72 3F	ಯಾವ ಊರಿನ ಜಾತ್ರೆ ನಿಮಗೆ ಇಷ್ಟ?	written for kannadi
+BF DE C3 DC E3 20 43 C6 C9 A8 DC 20 B9 E0 A9 BF E1 C8 C9 20 AE DD C0 E1 C1 E3 ED A8 DC E1 20 B8 E6 E3 57 DC D9 DC E1 A3 A4 F1 DC E1 A4	ಯಾರೂ ಇಲ್ಲದ ಬೀದಿಯಲ್ಲಿ ನಾಯಿಯೊಂದು ಬೊಗಳುತ್ತಿತ್ತು	written for kannadi
+B1 DC C5 C1 E3 E0 67 AE DC CB C6 C9 A8 DC 20 61 DC 61 E6 EC 58 ED F1 DC 20 50 E6 C6 D3 DC CA E6 E0 20 CA E6 E1 E0 C6 E1	ಪ್ರಯೋಜನವಿಲ್ಲದ ಚರ್ಚೆಗಿಂತ ಕೆಲಸವೇ ಮೇಲು	written for kannadi
+CA DC E1 AE E6 C1 E1 E0 20 CA E6 E3 A8 DC C6 20 B1 DD 73 DC CD DD C7 E6 2C 20 F1 DD C0 E1 C1 E1 E0 20 CA E6 E3 A8 DC C6 20 57 DC E1 C3 DC E1	ಮನೆಯೇ ಮೊದಲ ಪಾಠಶಾಲೆ, ತಾಯಿಯೇ ಮೊದಲ ಗುರು	written for kannadi
+D3 DC ED 58 E0 F1 DC 20 CE B9 C3 DC A8 DC C8 C9 20 CB E0 4F E6 20 CA DC E1 F1 DC E1 A4 20 50 E6 E3 D9 DC C6 E1 20 50 DC C8 50 E6	ಸಂಗೀತ ಶಿಬಿರದಲ್ಲಿ ವೀಣೆ ಮತ್ತು ಕೊಳಲು ಕಲಿಕೆ	written for kannadi
+CA DC E1 D7 D9 DD 20 D3 DC CC D3 DC D6 DD BF E1 20 D3 DC ED 5A 57 DC DA 57 E6 20 D3 DD C6 20 D3 E8 C6 BB DC C2	ಮಹಿಳಾ ಸ್ವಸಹಾಯ ಸಂಘಗಳಿಗೆ ಸಾಲ ಸೌಲಭ್ಯ	written for kannadi
+50 DC 76 DC C6 20 A3 E0 C3 DC A8 DC 20 CA DC E1 C3 DC DA AE DC C8 C9 20 42 CA E6 E1 20 CA E6 E3 70 E6 72 57 DC D9 DC E1 20 B1 DC F1 E6 A4	ಕಡಲ ತೀರದ ಮರಳಿನಲ್ಲಿ ಆಮೆ ಮೊಟ್ಟೆಗಳು ಪತ್ತೆ	written for kannadi
+AE DC CB C6 E1 20 57 DC C4 20 B9 62 63 20 50 DC E1 7E BF E1 E1 CA DC E2 A8 DC AE DC E1 B0 20 AE E6 E3 E0 77 A9 AA E0 C3 DD 3F	ನವಿಲು ಗರಿ ಬಿಚ್ಚಿ ಕುಣಿಯುವುದನ್ನು ನೋಡಿದ್ದೀರಾ?	written for kannadi
+50 DD 77 AE DC 20 B8 E6 ED 51 20 AE DC ED A9 D3 DC C6 E1 20 41 C3 DC 7C C2 20 D4 9F BA ED A9 BF E1 20 CD DC C5 CA DC E1	ಕಾಡಿನ ಬೆಂಕಿ ನಂದಿಸಲು ಅರಣ್ಯ ಸಿಬ್ಬಂದಿಯ ಶ್ರಮ	written for kannadi
+D6 DC E1 C8 20 57 DC 7C A3 BF E1 20 CA DC C3 DC A9 20 B9 76 DC E1 57 DC 76 E6 3A 20 D3 DC ED 54 E6 C2 20 48 C4 50 E6	ಹುಲಿ ಗಣತಿಯ ವರದಿ ಬಿಡುಗಡೆ: ಸಂಖ್ಯೆ ಏರಿಕೆ	written for kannadi
+68 DD AE DC B1 DC A8 DC 20 D6 DD 76 DC E1 57 DC D9 DC 20 D3 DC ED 57 DC C5 D6 DC 20 B1 DC E2 D3 DC A4 50 DC 20 C3 DC E3 B1 DC A8 DC C8 C9	ಜಾನಪದ ಹಾಡುಗಳ ಸಂಗ್ರಹ ಪುಸ್ತಕ ರೂಪದಲ್ಲಿ	written for kannadi
+D4 AF CA DC DE 20 CA DC E1 ED A9 C3 DC A8 DC C8 C9 20 50 DC AE DC B0 76 DC 20 62 F1 DC C5 50 E6 52 20 D6 E8 D3 85 B4 DC E2 C7 85 20 B1 DC C5 A8 DC CD DC EC AE DC	ಸಿನಿಮಾ ಮಂದಿರದಲ್ಲಿ ಕನ್ನಡ ಚಿತ್ರಕ್ಕೆ ಹೌಸ್ಫುಲ್ ಪ್ರದರ್ಶನ	written for kannadi; ಸ್ typed with ್ before ಫ
+41 7C A1 20 F1 DC CA DC E1 BE ED A9 C3 DC 20 67 57 DC D9 DC 20 46 C3 DC 20 D7 C4 BF E1 C3 DC 20 CA DC E1 E1 ED A8 E6 20 43 F1 DC C2 A5 DC EC	ಅಣ್ಣ ತಮ್ಮಂದಿರ ಜಗಳ ಊರ ಹಿರಿಯರ ಮುಂದೆ ಇತ್ಯರ್ಥ	written for kannadi
+C6 51 D2 24 BE E0 20 B1 DC E4 68 E6 57 E6 20 D6 DC E3 CB AE DC 20 41 C6 ED 50 DD C3 DC	ಲಕ್ಷ್ಮೀ ಪೂಜೆಗೆ ಹೂವಿನ ಅಲಂಕಾರ	written for kannadi; wide blank 24 before the subscript ಮ
+D3 DD AB DC 24 C2 CB C6 C9 20 47 ED 9F 20 B1 DC A8 DC CA E6 E0 20 41 CA DC AF 57 E6 20 57 E6 E3 A3 A4 C6 C9	ಸಾಧ್ಯವಿಲ್ಲ ಎಂಬ ಪದವೇ ಅವನಿಗೆ ಗೊತ್ತಿಲ್ಲ	written for kannadi; wide blank 24 before the subscript ಯ
+57 DD C5 CB E1 E0 7C 20 42 C3 E6 E3 E0 57 DC 24 C2 20 CE B9 C3 DC 50 E6 52 20 BB DD C4 E0 20 D3 DC B3 ED A8 DC AE E6	ಗ್ರಾಮೀಣ ಆರೋಗ್ಯ ಶಿಬಿರಕ್ಕೆ ಭಾರೀ ಸ್ಪಂದನೆ	written for kannadi; wide blank 24 before the subscript ಯ
+D3 DD CC F1 DC ED F1 DC C5 E9 20 A9 AE DD 61 DC C3 DC 4F E6 57 E6 20 CD DD C7 E6 57 DC D9 DC C8 C9 20 D4 A8 DC 9C F1 E6	ಸ್ವಾತಂತ್ರ್ಯ ದಿನಾಚರಣೆಗೆ ಶಾಲೆಗಳಲ್ಲಿ ಸಿದ್ಧತೆ	written for kannadi
+50 DC AE DD EC 6F 50 DC 20 C3 DD 68 E6 E3 C2 E0 F1 DC D5 CA DC A8 DC ED A8 DC E1 20 AE DD 76 DC 58 E0 F1 E6 20 57 DD BF E1 AE DC	ಕರ್ನಾಟಕ ರಾಜ್ಯೋತ್ಸವದಂದು ನಾಡಗೀತೆ ಗಾಯನ	written for kannadi
+CA E6 E7 FE DD AF 50 DC 20 CA DC E1 AE E6 E3 E0 BB DD CA DC 20 B8 E6 D9 E6 D3 DC E1 CA DC E2 A8 DC E1 20 CE 50 DC D2 7C A8 DC 20 57 DC E1 C4	ವೈಜ್ಞಾನಿಕ ಮನೋಭಾವ ಬೆಳೆಸುವುದು ಶಿಕ್ಷಣದ ಗುರಿ	written for kannadi; ಜ್ಞ typed as 1 glyph
+B1 DC 51 D2 20 CB E0 50 DC D2 4F E6 57 E6 20 C3 DC ED 57 DC AE DC A3 6F E1 72 20 D3 DC E3 50 DC A4 20 D3 DC A7 D9 DC	ಪಕ್ಷಿ ವೀಕ್ಷಣೆಗೆ ರಂಗನತಿಟ್ಟು ಸೂಕ್ತ ಸ್ಥಳ	written for kannadi
+FB DC CA E6 E1 20 50 E6 E0 D9 DC E1 CA DC E2 A8 DC E1 20 A8 E8 9F EC C6 C2 CA DC C6 C9	ಕ್ಷಮೆ ಕೇಳುವುದು ದೌರ್ಬಲ್ಯವಲ್ಲ	written for kannadi; ಕ್ಷ typed as 1 glyph
+D3 DC D6 DC 50 DD C3 DC 20 D3 E6 E3 D3 DD E7 71 BF E1 20 CA DD D1 EC 50 DC 20 D3 DC BB E6 20 BB DD AE DC E1 CA DD C3 DC	ಸಹಕಾರ ಸೊಸೈಟಿಯ ವಾರ್ಷಿಕ ಸಭೆ ಭಾನುವಾರ	written for kannadi; ೈ typed as ಾ with ೖ
+47 D3 85 47 D3 85 47 C7 85 D4 20 B1 DC C4 E0 50 E6 D2 57 E6 20 D4 A8 DC 9C F1 E6 20 D6 E6 E0 57 E6 3F	ಎಸ್ಎಸ್ಎಲ್ಸಿ ಪರೀಕ್ಷೆಗೆ ಸಿದ್ಧತೆ ಹೇಗೆ?	written for kannadi; ಲ್ typed with ್ before ಸ
+D6 E6 E3 D3 DC 20 D4 D3 DC 72 CA DC E5 85 AE DC C8 C9 20 41 69 EC 20 D3 DC C8 C9 D3 DC C6 E1 20 B4 DD CA DC E5 85 EC AE DC 20 B1 DC C5 A3 20 B8 E6 E0 50 DC E1	ಹೊಸ ಸಿಸ್ಟಮ್ನಲ್ಲಿ ಅರ್ಜಿ ಸಲ್ಲಿಸಲು ಫಾರ್ಮ್ನ ಪ್ರತಿ ಬೇಕು	written for kannadi; ಮ್ typed with ್ before ನ
