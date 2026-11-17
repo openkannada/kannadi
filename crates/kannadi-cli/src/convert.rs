@@ -120,7 +120,8 @@ pub struct Issue {
 
 pub struct Converted {
     pub text: String,
-    /// In order of position.
+    /// By line. Within a line, unknown glyphs come first in input order, then
+    /// malformed syllables and likely typos in output order.
     pub issues: Vec<Issue>,
 }
 
@@ -369,6 +370,25 @@ mod tests {
                 (Kind::Malformed, "ಾ"),
                 (Kind::Malformed, "ರ್ಋ"),
                 (Kind::LikelyTypo, "ಋ for ರ್ಋ (ra-virama-vocalic-r)"),
+            ]
+        );
+    }
+
+    #[test]
+    fn rows_keep_line_order_across_crlf_lines() {
+        let c = convert(
+            "Á \u{F1}\r\ngÀÈ\r\n\u{F1}",
+            Layout::Nudi,
+            &to_unicode_settings(),
+        );
+        let found: Vec<(usize, Kind)> = c.issues.iter().map(|i| (i.line, i.kind)).collect();
+        assert_eq!(
+            found,
+            [
+                (1, Kind::UnknownGlyph),
+                (1, Kind::Malformed),
+                (2, Kind::LikelyTypo),
+                (3, Kind::UnknownGlyph),
             ]
         );
     }

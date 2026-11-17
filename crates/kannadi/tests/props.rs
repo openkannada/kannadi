@@ -317,12 +317,25 @@ proptest! {
         for t in &found {
             prop_assert!(t.range.start >= end && t.range.start < t.range.end, "{:?}", text);
             prop_assert!(text.is_char_boundary(t.range.start) && text.is_char_boundary(t.range.end));
+            let spelled = match t.rule {
+                typos::Rule::RaVocalicR => "ರೃ",
+                typos::Rule::RaViramaVocalicR => "ರ್ಋ",
+                _ => unreachable!(),
+            };
+            prop_assert_eq!(&text[t.range.clone()], spelled);
+            prop_assert_eq!(t.replacement, "ಋ");
             fixed.push_str(&text[end..t.range.start]);
             fixed.push_str(t.replacement);
             end = t.range.end;
         }
         fixed.push_str(&text[end..]);
         prop_assert!(typos::find(&fixed).is_empty(), "{:?} gave {:?}", text, fixed);
+        // Every ರ್ಋ that is a word of its own, with no joiner or mark around it, is found.
+        for word in text.split(' ') {
+            if word == "ರ್ಋ" {
+                prop_assert!(found.iter().any(|t| t.rule == typos::Rule::RaViramaVocalicR), "{:?}", text);
+            }
+        }
     }
 
     #[test]
