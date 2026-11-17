@@ -1,6 +1,7 @@
 //! Converts 1 piece of text in either direction and lists what went wrong.
 
 use kannadi::legacy::{from_unicode, to_unicode, windows_1252_byte, Layout, Options};
+use kannadi::typos;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Direction {
@@ -76,15 +77,23 @@ pub enum Kind {
     /// Text left out because it cannot be read, such as a PDF font whose glyph
     /// codes were renumbered.
     NotConverted,
+    /// Well-formed text that is often a typing mistake; a suggestion only.
+    LikelyTypo,
 }
 
 impl Kind {
+    /// False for suggestions, which do not make a file count as having issues.
+    pub fn is_problem(self) -> bool {
+        self != Kind::LikelyTypo
+    }
+
     pub fn label(self) -> &'static str {
         match self {
             Kind::UnknownGlyph => "unknown glyph",
             Kind::Malformed => "malformed syllable",
             Kind::Unencodable => "unencodable",
             Kind::NotConverted => "part not converted",
+            Kind::LikelyTypo => "likely typo",
         }
     }
 
@@ -94,6 +103,7 @@ impl Kind {
             Kind::Malformed => "malformed syllables",
             Kind::Unencodable => "unencodable characters",
             Kind::NotConverted => "parts not converted",
+            Kind::LikelyTypo => "likely typos",
         }
     }
 }
@@ -110,7 +120,8 @@ pub struct Issue {
 
 pub struct Converted {
     pub text: String,
-    /// In order of position.
+    /// By line. Within a line, unknown glyphs come first in input order, then
+    /// malformed syllables and likely typos in output order.
     pub issues: Vec<Issue>,
 }
 
@@ -125,7 +136,7 @@ pub fn convert(text: &str, layout: Layout, settings: &Settings) -> Converted {
             let unknown = c.unknown.iter().map(|u| {
                 let around = to_unicode(window(text, &input, u.offset), layout, &options).text;
                 (
-                    u.offset,
+                    (0, u.offset),
                     Issue {
                         kind: Kind::UnknownGlyph,
                         line: input.line(u.offset),
@@ -134,22 +145,29 @@ pub fn convert(text: &str, layout: Layout, settings: &Settings) -> Converted {
                     },
                 )
             });
-            // Malformed ranges are in the output; their input position is unknown,
-            // so they sort by line after the unknown glyphs of that line.
-            let malformed = c.malformed.iter().map(|r| {
-                let line = output.line(r.start);
-                (
-                    input.start(line),
-                    Issue {
-                        kind: Kind::Malformed,
-                        line,
-                        detail: c.text[r.clone()].to_string(),
-                        context: window(&c.text, &output, r.start).to_string(),
-                    },
-                )
+            // Malformed ranges and typos are in the output, whose positions cannot be
+            // compared with input offsets, so they follow the unknown glyphs of their line.
+            let found = |kind, at: usize, detail| {
+                let issue = Issue {
+                    kind,
+                    line: output.line(at),
+                    detail,
+                    context: window(&c.text, &output, at).to_string(),
+                };
+                ((1, at), issue)
+            };
+            let malformed = c
+                .malformed
+                .iter()
+                .map(|r| found(Kind::Malformed, r.start, c.text[r.clone()].to_string()));
+            let typos = typos::find(&c.text).into_iter().map(|t| {
+                let spelled = &c.text[t.range.clone()];
+                let detail = format!("{} for {spelled} ({})", t.replacement, t.rule.name());
+                found(Kind::LikelyTypo, t.range.start, detail)
             });
+            let issues = in_order(unknown.chain(malformed).chain(typos));
             Converted {
-                issues: in_order(unknown.chain(malformed)),
+                issues,
                 text: c.text,
             }
         }
@@ -159,7 +177,7 @@ pub fn convert(text: &str, layout: Layout, settings: &Settings) -> Converted {
                 let context = window(text, &input, at).to_string();
                 let line = input.line(at);
                 (
-                    at,
+                    (0, at),
                     Issue {
                         kind,
                         line,
@@ -184,8 +202,9 @@ pub fn convert(text: &str, layout: Layout, settings: &Settings) -> Converted {
     }
 }
 
-fn in_order(issues: impl Iterator<Item = (usize, Issue)>) -> Vec<Issue> {
-    let mut issues: Vec<(usize, Issue)> = issues.collect();
+/// Sorts by line, then by the key: (0, input offset) or (1, output offset).
+fn in_order(issues: impl Iterator<Item = ((u8, usize), Issue)>) -> Vec<Issue> {
+    let mut issues: Vec<((u8, usize), Issue)> = issues.collect();
     issues.sort_by_key(|(at, issue)| (issue.line, *at));
     issues.into_iter().map(|(_, issue)| issue).collect()
 }
@@ -311,6 +330,73 @@ mod tests {
         );
         assert_eq!(c.issues[1].detail, "glyph F1");
         assert_eq!(c.issues[1].context, "ಕ\u{F1}");
+    }
+
+    #[test]
+    fn to_unicode_suggests_likely_typos_after_other_issues() {
+        // Nudi ಋ (49 C4) with an arkavattu (F0), then ರ (gÀ) with ೃ (È).
+        let c = convert("IÄð\ngÀÈ", Layout::Nudi, &to_unicode_settings());
+        assert_eq!(c.text, "ರ್ಋ\nರೃ");
+        let found: Vec<(usize, Kind, &str)> = c
+            .issues
+            .iter()
+            .map(|i| (i.line, i.kind, i.detail.as_str()))
+            .collect();
+        assert_eq!(
+            found,
+            [
+                (1, Kind::Malformed, "ರ್ಋ"),
+                (1, Kind::LikelyTypo, "ಋ for ರ್ಋ (ra-virama-vocalic-r)"),
+                (2, Kind::LikelyTypo, "ಋ for ರೃ (ra-vocalic-r)"),
+            ]
+        );
+        assert_eq!(c.issues[2].context, "ರೃ");
+    }
+
+    #[test]
+    fn rows_from_the_output_follow_the_unknown_glyphs_of_their_line_in_position_order() {
+        // ರೃ, then a stray ಾ, then an unknown glyph, then ರ್ಋ.
+        let c = convert("gÀÈ Á \u{F1} IÄð", Layout::Nudi, &to_unicode_settings());
+        let kinds: Vec<(Kind, &str)> = c
+            .issues
+            .iter()
+            .map(|i| (i.kind, i.detail.as_str()))
+            .collect();
+        assert_eq!(
+            kinds,
+            [
+                (Kind::UnknownGlyph, "glyph F1"),
+                (Kind::LikelyTypo, "ಋ for ರೃ (ra-vocalic-r)"),
+                (Kind::Malformed, "ಾ"),
+                (Kind::Malformed, "ರ್ಋ"),
+                (Kind::LikelyTypo, "ಋ for ರ್ಋ (ra-virama-vocalic-r)"),
+            ]
+        );
+    }
+
+    #[test]
+    fn rows_keep_line_order_across_crlf_lines() {
+        let c = convert(
+            "Á \u{F1}\r\ngÀÈ\r\n\u{F1}",
+            Layout::Nudi,
+            &to_unicode_settings(),
+        );
+        let found: Vec<(usize, Kind)> = c.issues.iter().map(|i| (i.line, i.kind)).collect();
+        assert_eq!(
+            found,
+            [
+                (1, Kind::UnknownGlyph),
+                (1, Kind::Malformed),
+                (2, Kind::LikelyTypo),
+                (3, Kind::UnknownGlyph),
+            ]
+        );
+    }
+
+    #[test]
+    fn to_nudi_does_not_suggest_typos() {
+        let c = convert("ನೈರೃತ್ಯ", Layout::Nudi, &settings(Direction::ToNudi));
+        assert!(c.issues.is_empty(), "{:?}", c.issues);
     }
 
     #[test]

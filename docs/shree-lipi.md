@@ -1,17 +1,17 @@
 # Shree-Lipi and Akruti: sources and method
 
-Status: checked on 17 November 2026. Akruti is built: see [akruti.md](akruti.md). Shree-Lipi is built for Shree-Kan-0850: see [The Shree-Lipi table](#the-shree-lipi-table). The rules below say how layout tables are derived. They record the maintainer's decisions of 16 and 17 November 2026 and are not legal advice.
+Status: checked on 17 November 2026. Akruti is built: see [akruti.md](akruti.md). Shree-Lipi is built for Shree-Kan-0850: see [The Shree-Lipi table](#the-shree-lipi-table). The rules below say how layout tables are derived. They were settled on 16 and 17 November 2026 and are not legal advice.
 
 ## Summary
 
 - Shree-Lipi (Modular Infotech; fonts named `Shree-Kan-0850` and similar) is a widely used Kannada layout besides Nudi and Baraha. No public code page for it was found.
 - No PDF with a real Shree-Lipi font name was found among the Karnataka sources checked, including the 98 archived Kannada Acts on `dpal.kar.nic.in` (Akruti, Nudi and BRH fonts only). The Udayavani newspaper's web pages of 2003 and 2004 set their text in `Shree-Kan-0850` and served the font to readers. The Shree-Lipi table was derived from that font and checked on those pages. See [Searching for Shree-Lipi sources](#searching-for-shree-lipi-sources).
 - Akruti (`AkrutiKndPadma`) appears with its real font name in public Karnataka PDFs. It is a separate layout from Nudi and needs its own table. Its sources are confirmed, so it can start before Shree-Lipi.
-- Asking Modular Infotech to publish the Shree-Lipi code page under an open license would avoid derivation. That is a decision for the maintainer.
+- Asking Modular Infotech to publish the Shree-Lipi code page under an open license would avoid derivation. That is still an open decision; see [Open decisions](#open-decisions).
 
 ## Rules for deriving a layout table
 
-- A table maps each glyph code to the Kannada it draws. The maintainer treats that mapping as factual data, so it may be derived by rendering a font, whether the font is installed or embedded in a public document, and by reading the font's glyph names and encodings.
+- A table maps each glyph code to the Kannada it draws. That mapping is factual data, so it may be derived by rendering a font, whether the font is installed or embedded in a public document, and by reading the font's glyph names and encodings.
 - Font programs, and glyph outlines extracted from them, are never committed or redistributed. Only the table is.
 - Each table's header records how it was derived: the fonts and documents, and the method. See `crates/kannadi/data/nudi.tsv` and `crates/kannadi/data/akruti.tsv`.
 - Do not download Shree-Lipi or Akruti font files from any source other than the vendor, or a publisher that served the font to readers with its public pages, as Udayavani did (decided on 17 November 2026).
@@ -65,7 +65,7 @@ Checked on 16 November 2026, with the Akruti work.
 - **Web search.** Searches for PDFs naming `Shree-Kan` fonts found only font shops and converters.
 - **Prajavani.** Its pages of 2003 to 2008 use SHREE_DECCAN and Shree_DecMod, which do not read in the Shree-Lipi table. See [other-layouts.md](other-layouts.md#newspaper-fonts-on-archived-pages).
 
-The maintainer decided on 17 November 2026 that the font Udayavani served with its pages may be rendered to build the table, with the pages to check it. The table below was built that way.
+Under the rules above, the font Udayavani served with its pages may be rendered to build the table, and the pages can check it. The table below was built that way.
 
 ## The Shree-Lipi table
 
@@ -128,7 +128,7 @@ A table covers the codes that appear in the collected documents. Rare conjunct g
 
 A table is ready when every code seen in the collected documents has a checked entry or is marked unknown, and the golden fixture has at least 100 lines from 3 or more documents that convert with no differences. A Kannada reader's check of the fixture is still to be done for Akruti and Shree-Lipi.
 
-## Decisions for the maintainer
+## Open decisions
 
 1. Whether to ask Modular Infotech to publish the Shree-Lipi code page under an open license, such as CC0 for the data. The research found `support@modular-infotech.com` as a contact; it was not contacted. Modular offers its own conversion tool, so it may decline.
 2. A Kannada reader's check of the 125 Akruti and 140 Shree-Lipi fixture lines.

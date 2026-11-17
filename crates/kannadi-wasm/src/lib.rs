@@ -622,6 +622,12 @@ mod tests {
         assert_eq!(found[0].replacement(), "ಋ");
         assert_eq!(found[0].rule(), "ra-vocalic-r");
         assert!(typos("ನೈಋತ್ಯ").is_empty());
+        let text = "😀 ನೈರ್ಋತ್ಯ";
+        let found = typos(text);
+        let units: Vec<u16> = text.encode_utf16().collect();
+        let span = &units[found[0].start as usize..found[0].end as usize];
+        assert_eq!(String::from_utf16(span).unwrap(), "ರ್ಋ");
+        assert_eq!(found[0].rule(), "ra-virama-vocalic-r");
     }
 
     #[test]
