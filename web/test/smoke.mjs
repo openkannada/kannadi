@@ -171,12 +171,15 @@ try {
   rmSync(copy, { recursive: true, force: true });
 }
 
-// Dark mode is defined twice, for the system setting and for the theme
-// toggle; both must set the same tokens to the same values.
-const tokens = (block) => Object.fromEntries([...block.matchAll(/(--[\w-]+):\s*([^;]+);/g)].map((m) => [m[1], m[2].trim()]));
-const systemDark = css.match(/:root:not\(\[data-theme="light"\]\)\s*\{([^}]*)\}/)[1];
-const toggleDark = css.match(/:root\[data-theme="dark"\]\s*\{([^}]*)\}/)[1];
-assert.deepEqual(tokens(toggleDark), tokens(systemDark));
-assert.ok(Object.keys(tokens(systemDark)).length > 20);
+// The page takes its colors from the Open Kannada tokens: tokens.css loads first, every color in it is
+// 1 light-dark() pair, and style.css only maps its own names onto those tokens.
+const html = readFileSync(join(dist, "index.html"), "utf8");
+assert.ok(html.indexOf('href="tokens.css"') > 0 && html.indexOf('href="tokens.css"') < html.indexOf('href="style.css"'), "tokens.css loads before style.css");
+const designTokens = readFileSync(join(dist, "tokens.css"), "utf8");
+assert.match(designTokens, /--primary: light-dark\(oklch\(/);
+assert.match(designTokens, /:root\[data-theme="dark"\] \{\s*color-scheme: dark;/);
+const pageRoot = css.match(/:root \{([^}]*)\}/)[1];
+assert.doesNotMatch(pageRoot, /#[0-9a-f]{3,8}\b|rgb\(|oklch\(\s*\d/i, "style.css defines no colors of its own");
+assert.doesNotMatch(css, /prefers-color-scheme: dark/, "dark mode comes from the tokens' light-dark() pairs");
 
 console.log("web smoke test passed");

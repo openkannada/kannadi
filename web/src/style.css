@@ -1,4 +1,4 @@
-/* Route board: bottle-green enamel board, Karnataka-yellow route disc, white sheet. */
+/* The kannadi editor page in the Open Kannada design language: a sheet under a bar of glass, over turmeric, kumkuma and indigo fields. Tokens are in tokens.css. */
 
 @font-face {
   font-family: "Noto Sans Kannada";
@@ -42,91 +42,35 @@
 }
 
 :root {
-  --ground: #edf1ef;
-  --sheet: #ffffff;
-  --ink: #14201b;
-  --ink-2: #47564f;
-  --rule: #cdd7d2;
-  --rule-strong: #9fb0a8;
-  --board: #0c4a36;
-  --board-raised: #125a43;
-  --board-ink: #ffffff;
-  --board-ink-2: #c3e2d4;
-  --board-well: #08321f;
-  --disc: #ffcc00;
-  --disc-ink: #0c2a1f;
-  --focus: #0c4a36;
-  --unknown: #c8102e;
-  --unknown-bg: #fde3e7;
-  --malformed-line: #9a5c00;
-  --malformed-bg: #ffecb8;
-  --composing: #0c4a36;
-  --line: #0c4a36;
-  --line-ink: #ffffff;
-  --badge-ink: #ffffff;
-  --shadow: 0 1px 2px rgb(12 42 31 / 0.06), 0 12px 32px -16px rgb(12 74 54 / 0.28);
-  --radius: 10px;
-  --sans: "Noto Sans Kannada", "Nirmala UI", "Kannada Sangam MN", system-ui, sans-serif;
-  --serif: "Noto Serif Kannada", "Noto Sans Kannada", "Nirmala UI", serif;
+  /* The page's names, mapped onto the Open Kannada tokens in tokens.css. */
+  --ground: var(--background);
+  --sheet: var(--card);
+  --ink: var(--foreground);
+  --ink-2: var(--muted-foreground);
+  --rule: var(--border);
+  --rule-strong: color-mix(in oklch, var(--border), var(--foreground) 22%);
+  --board-ink: var(--foreground);
+  --board-ink-2: var(--muted-foreground);
+  --board-raised: oklch(from var(--foreground) l c h / 0.07);
+  --board-well: oklch(from var(--foreground) l c h / 0.06);
+  --disc: var(--primary);
+  --disc-ink: var(--primary-foreground);
+  --focus: var(--ring);
+  --unknown: var(--mark-unknown-line);
+  --unknown-bg: var(--mark-unknown);
+  --malformed-line: var(--mark-malformed-line);
+  --malformed-bg: var(--mark-malformed);
+  --composing: var(--primary);
+  --line: var(--primary);
+  --line-ink: var(--primary-foreground);
+  --badge-ink: var(--primary-foreground);
+  --shadow: var(--shadow-sheet);
+  --pill: 999px;
+  --sans: var(--type-sans);
+  --serif: var(--type-serif);
   --doc-font: var(--sans);
-  --board-h: 4rem;
+  --board-h: 4.5rem;
   --route-h: 5.4rem;
-  color-scheme: light;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --ground: #0c1311;
-    --sheet: #131b18;
-    --ink: #e5eee9;
-    --ink-2: #a3b5ad;
-    --rule: #26332e;
-    --rule-strong: #3e4f48;
-    --board: #0f4a37;
-    --board-raised: #145a43;
-    --board-ink: #f2f8f5;
-    --board-ink-2: #a9cfbf;
-    --board-well: #05241a;
-    --disc: #ffd23f;
-    --disc-ink: #0a2018;
-    --focus: #ffd23f;
-    --unknown: #ff8395;
-    --unknown-bg: #4d1621;
-    --malformed-line: #ffb13b;
-    --malformed-bg: #42300b;
-    --composing: #7fd8b0;
-    --line: #4fae86;
-    --line-ink: #0a2018;
-    --badge-ink: #0a2018;
-    --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 16px 40px -20px rgb(0 0 0 / 0.7);
-    color-scheme: dark;
-  }
-}
-:root[data-theme="dark"] {
-  --ground: #0c1311;
-  --sheet: #131b18;
-  --ink: #e5eee9;
-  --ink-2: #a3b5ad;
-  --rule: #26332e;
-  --rule-strong: #3e4f48;
-  --board: #0f4a37;
-  --board-raised: #145a43;
-  --board-ink: #f2f8f5;
-  --board-ink-2: #a9cfbf;
-  --board-well: #05241a;
-  --disc: #ffd23f;
-  --disc-ink: #0a2018;
-  --focus: #ffd23f;
-  --unknown: #ff8395;
-  --unknown-bg: #4d1621;
-  --malformed-line: #ffb13b;
-  --malformed-bg: #42300b;
-  --composing: #7fd8b0;
-  --line: #4fae86;
-  --line-ink: #0a2018;
-  --badge-ink: #0a2018;
-  --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 16px 40px -20px rgb(0 0 0 / 0.7);
-  color-scheme: dark;
 }
 
 :root[data-font="serif"] { --doc-font: var(--serif); }
@@ -139,6 +83,17 @@ body {
   color: var(--ink);
   font: 400 0.9375rem/1.6 var(--sans);
   font-variant-numeric: tabular-nums;
+}
+body::before {
+  content: "";
+  position: fixed;
+  inset: -20vmax;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(38vmax 30vmax at 82% 8%, var(--field-turmeric), transparent 70%),
+    radial-gradient(34vmax 30vmax at 8% 38%, var(--field-indigo), transparent 70%),
+    radial-gradient(30vmax 26vmax at 70% 92%, var(--field-kumkuma), transparent 70%);
 }
 a { color: inherit; text-underline-offset: 0.18em; }
 :focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 4px; }
@@ -175,36 +130,41 @@ kbd {
 
 /* The board */
 .board {
-  --focus: var(--disc);
   position: sticky;
-  top: 0;
+  top: 0.5rem;
   z-index: 30;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: 1rem;
-  min-height: var(--board-h);
-  padding: 0.5rem max(1rem, calc((100vw - 84rem) / 2));
-  background: var(--board);
+  min-height: 3.5rem;
+  margin: 0.5rem max(0.5rem, calc((100vw - 85rem) / 2)) 0;
+  padding: 0.4rem 0.5rem 0.4rem 0.6rem;
+  border-radius: var(--pill);
   color: var(--board-ink);
-  box-shadow: inset 0 -1px 0 rgb(255 255 255 / 0.08), 0 1px 0 rgb(0 0 0 / 0.2);
+}
+
+/* Liquid Glass: the board, its menu and the status bar float over the page; the rest is solid. */
+.board, .menu-list, .status {
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  border: 1px solid var(--glass-edge);
+  box-shadow: inset 0 1.25px 0 var(--glass-rim), inset 0 -1px 0 var(--glass-rim-low), inset 0 12px 22px -16px var(--glass-specular), var(--shadow-float);
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .board, .menu-list, .status { background: var(--glass-solid); }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .board, .menu-list, .status { background: var(--glass-solid); -webkit-backdrop-filter: none; backdrop-filter: none; }
 }
 .brand { display: flex; align-items: center; gap: 0.7rem; text-decoration: none; }
-.disc {
-  display: grid;
-  place-items: center;
-  width: 2.6rem;
-  height: 2.6rem;
-  border-radius: 50%;
-  background: var(--disc);
-  color: var(--disc-ink);
-  font-size: 1.45rem;
-  font-weight: 700;
-  line-height: 1;
-  box-shadow: inset 0 0 0 2px rgb(0 0 0 / 0.12);
-}
+.mark { width: 2.5rem; height: 2.5rem; flex: none; }
+.mark .logo-tile { fill: var(--primary); }
+.mark .logo-on { fill: var(--primary-foreground); }
+.mark .logo-on-line { stroke: var(--primary-foreground); }
 .brand-words { display: grid; line-height: 1.1; }
-.brand-kn { font-size: 1.45rem; font-weight: 700; letter-spacing: 0; }
+.brand-kn { font-size: 1.375rem; font-weight: 650; letter-spacing: 0; }
 .brand-en { font-size: 0.8125rem; color: var(--board-ink-2); white-space: nowrap; }
 
 .message {
@@ -215,8 +175,8 @@ kbd {
   min-height: 2.5rem;
   padding: 0.35rem 0.5rem 0.35rem 0.9rem;
   background: var(--board-well);
-  border-radius: 6px;
-  box-shadow: inset 0 1px 3px rgb(0 0 0 / 0.35);
+  border-radius: var(--pill);
+  box-shadow: inset 0 1px 2px oklch(from var(--foreground) l c h / 0.08);
   overflow: hidden;
 }
 .message p {
@@ -236,7 +196,7 @@ kbd {
   flex: none;
   padding: 0.3rem 0.7rem;
   border: 0;
-  border-radius: 5px;
+  border-radius: var(--pill);
   background: var(--disc);
   color: var(--disc-ink);
   font-weight: 600;
@@ -251,17 +211,18 @@ kbd {
   gap: 0.4rem;
   min-height: 2.5rem;
   padding: 0 0.85rem;
-  border: 1px solid rgb(255 255 255 / 0.32);
-  border-radius: 6px;
+  border: 1px solid transparent;
+  border-radius: var(--pill);
   background: transparent;
   color: var(--board-ink);
   font-weight: 600;
   cursor: pointer;
   list-style: none;
-  transition: background-color 150ms ease-out, border-color 150ms ease-out;
+  transition: background-color var(--duration-quick) var(--ease-out), box-shadow var(--duration-quick) var(--ease-out), transform var(--duration-morph) var(--ease-spring);
 }
 .plate::-webkit-details-marker { display: none; }
-.plate:hover { background: var(--board-raised); border-color: rgb(255 255 255 / 0.55); }
+.plate:hover { background: var(--board-raised); box-shadow: inset 0 1px 0 var(--glass-rim-low); }
+.plate:active { transform: scale(0.94); transition-duration: var(--duration-quick), var(--duration-quick), 90ms; }
 .plate.icon { width: 2.5rem; padding: 0; justify-content: center; }
 .plate svg, .tools svg { width: 1.15rem; height: 1.15rem; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
 .plate svg .fill { fill: currentColor; stroke: none; }
@@ -277,25 +238,21 @@ kbd {
   display: grid;
   min-width: 13rem;
   padding: 0.35rem;
-  background: var(--sheet);
   color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
+  border-radius: calc(var(--radius) + 6px);
 }
-.menu-list { --focus: var(--line); }
 .menu-list button {
   display: flex;
   justify-content: space-between;
   gap: 1rem;
   padding: 0.6rem 0.75rem;
   border: 0;
-  border-radius: 6px;
+  border-radius: calc(var(--radius) - 4px);
   background: none;
   text-align: left;
   cursor: pointer;
 }
-.menu-list button:hover { background: var(--ground); }
+.menu-list button:hover { background: var(--accent); color: var(--accent-foreground); }
 .menu-list small { color: var(--ink-2); }
 .menu-list #copy { border-top: 1px solid var(--rule); margin-top: 0.25rem; }
 
@@ -310,8 +267,6 @@ kbd {
   justify-content: space-between;
   gap: 0.75rem 2rem;
   padding: 0.6rem max(1rem, calc((100vw - 84rem) / 2));
-  background: var(--sheet);
-  border-bottom: 1px solid var(--rule);
 }
 .route { display: flex; align-items: center; gap: 1rem; margin: 0; padding: 0; border: 0; min-width: 0; }
 .route legend { float: left; margin-right: 0.5rem; font-weight: 600; color: var(--ink-2); }
@@ -364,22 +319,22 @@ kbd {
 .tools > button, .segmented label, .empty button, .pop-actions button, .pop-replace button, dialog button {
   min-height: 2.25rem;
   padding: 0.3rem 0.8rem;
-  border: 1px solid var(--rule-strong);
-  border-radius: 6px;
+  border: 1px solid var(--rule);
+  border-radius: var(--pill);
   background: var(--sheet);
   color: var(--ink);
   font-weight: 600;
   font-size: 0.875rem;
   cursor: pointer;
-  transition: background-color 150ms ease-out, border-color 150ms ease-out;
+  transition: background-color var(--duration-quick) var(--ease-out), border-color var(--duration-quick) var(--ease-out), transform var(--duration-morph) var(--ease-spring);
 }
-.tools > button:hover, .segmented label:hover, .empty button:hover, .pop-actions button:hover { background: var(--ground); border-color: var(--line); }
-.tools > button:active { transform: translateY(1px); }
+.tools > button:hover, .segmented label:hover, .empty button:hover, .pop-actions button:hover { background: var(--accent); border-color: var(--rule); color: var(--accent-foreground); }
+.tools > button:active { transform: scale(0.95); transition-duration: var(--duration-quick), var(--duration-quick), 90ms; }
 .segmented { display: inline-flex; margin: 0 0 0 0.4rem; padding: 0; border: 0; }
 .segmented input { position: absolute; opacity: 0; pointer-events: none; }
 .segmented label { display: inline-flex; align-items: center; border-radius: 0; }
-.segmented label:first-of-type { border-radius: 6px 0 0 6px; }
-.segmented label:last-of-type { border-radius: 0 6px 6px 0; margin-left: -1px; }
+.segmented label:first-of-type { border-radius: var(--pill) 0 0 var(--pill); }
+.segmented label:last-of-type { border-radius: 0 var(--pill) var(--pill) 0; margin-left: -1px; }
 .segmented input:checked + label { background: var(--line); border-color: var(--line); color: var(--line-ink); }
 .segmented label[for="font-serif"] { font-family: var(--serif); }
 .segmented input:focus-visible + label { outline: 3px solid var(--focus); outline-offset: 1px; position: relative; }
@@ -405,18 +360,18 @@ h3 { font-size: 1rem; margin: 1.6rem 0 0.25rem; }
   padding: 2.5rem clamp(1.25rem, 5vw, 3.5rem) 3rem;
   background: var(--sheet);
   border: 1px solid var(--rule);
-  border-radius: var(--radius);
+  border-radius: 1.75rem;
   box-shadow: var(--shadow);
 }
 .sheet:focus-within { border-color: var(--rule-strong); }
-body.dragging .sheet { outline: 3px dashed var(--board); outline-offset: 4px; }
+body.dragging .sheet { outline: 3px dashed var(--primary); outline-offset: 4px; }
 .doc {
   min-height: 52vh;
   max-width: 68ch;
   outline: none;
   font-family: var(--doc-font);
-  font-size: 1.1875rem;
-  line-height: 1.95;
+  font-size: var(--type-doc);
+  line-height: var(--type-doc-leading);
   white-space: pre-wrap;
   overflow-wrap: anywhere;
   caret-color: var(--focus);
@@ -527,21 +482,20 @@ body.dragging .sheet { outline: 3px dashed var(--board); outline-offset: 4px; }
 .options { display: grid; gap: 0.5rem; }
 .options h2 { margin-bottom: 0.2rem; }
 .options label { display: flex; gap: 0.55rem; align-items: baseline; font-size: 0.875rem; cursor: pointer; }
-.options input { accent-color: var(--board); width: 1rem; height: 1rem; flex: none; }
+.options input { accent-color: var(--primary); width: 1rem; height: 1rem; flex: none; }
 
 /* Status bar */
 .status {
-  --focus: var(--disc);
   position: sticky;
-  bottom: 0;
+  bottom: 0.5rem;
   z-index: 20;
   display: flex;
   flex-wrap: wrap;
   gap: 0.25rem 1.5rem;
   align-items: center;
-  margin: 1.25rem -1rem 0;
-  padding: 0.55rem max(1rem, calc((100% - 82rem) / 2));
-  background: var(--board);
+  margin: 1.25rem 0 0.5rem;
+  padding: 0.55rem 1.25rem;
+  border-radius: var(--pill);
   color: var(--board-ink-2);
   font-size: 0.8125rem;
 }
@@ -557,8 +511,6 @@ body.dragging .sheet { outline: 3px dashed var(--board); outline-offset: 4px; }
 .prose li { margin: 0.5rem 0; }
 .prose li::marker { color: var(--line); font-weight: 700; }
 .prose p a { color: var(--line); font-weight: 600; }
-:root[data-theme="dark"] .prose p a { color: var(--disc); }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .prose p a { color: var(--disc); } }
 
 /* Typing chart: each letter is a small route plate with its spellings. */
 .chart {
@@ -680,11 +632,15 @@ dialog {
   color: var(--ink);
   box-shadow: var(--shadow);
 }
-dialog::backdrop { background: rgb(8 30 22 / 0.55); }
+dialog::backdrop { background: oklch(0.17 0.03 277 / 0.5); }
 .keys { display: grid; grid-template-columns: auto 1fr; gap: 0.6rem 1.25rem; margin: 1rem 0; }
 .keys dt { white-space: nowrap; }
 .keys dd { margin: 0; }
 dialog button { margin-top: 1rem; }
+
+@media (min-width: 48rem) {
+  .doc { font-size: var(--type-doc-wide); }
+}
 
 /* Narrow screens */
 @media (max-width: 60rem) {
@@ -695,7 +651,8 @@ dialog button { margin-top: 1rem; }
   :root { --board-h: 6.25rem; }
   .board { grid-template-columns: auto auto; gap: 0.5rem; padding-top: 0.5rem; padding-bottom: 0.5rem; }
   .brand-kn { font-size: 1.2rem; }
-  .disc { width: 2.2rem; height: 2.2rem; font-size: 1.2rem; }
+  .board { border-radius: 1.75rem; }
+  .mark { width: 2.2rem; height: 2.2rem; }
   .board-actions { justify-self: end; }
   .plate { padding: 0 0.6rem; }
   .plate span { display: none; }
@@ -707,9 +664,8 @@ dialog button { margin-top: 1rem; }
   .stops label { min-width: 0; }
   .intro { padding-top: 1.25rem; }
   h1 { font-size: 1.3rem; }
-  .sheet { padding: 1.5rem 1.25rem 2rem; border-radius: 8px; }
+  .sheet { padding: 1.5rem 1.25rem 2rem; border-radius: 1.25rem; }
   .empty { inset: 1.25rem 1rem auto; }
-  .doc { font-size: 1.125rem; }
   .popover {
     left: 0 !important;
     right: 0;
@@ -721,7 +677,7 @@ dialog button { margin-top: 1rem; }
     overflow: auto;
     padding-bottom: max(1rem, env(safe-area-inset-bottom));
   }
-  .status { gap: 0.15rem 1rem; }
+  .status { gap: 0.15rem 1rem; border-radius: 1.25rem; }
   .status .saved { flex-basis: 100%; margin-left: 0; }
 }
 
