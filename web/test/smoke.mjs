@@ -184,5 +184,9 @@ assert.doesNotMatch(css, /prefers-color-scheme: dark/, "dark mode comes from the
 const defined = new Set([...`${designTokens}\n${css}`.matchAll(/(--[\w-]+)\s*:/g)].map((m) => m[1]));
 const undefinedVars = [...new Set([...css.matchAll(/var\((--[\w-]+)/g)].map((m) => m[1]))].filter((v) => !defined.has(v));
 assert.deepEqual(undefinedVars, [], "every custom property style.css uses is defined");
+const fallback = css.match(/@supports not \(color: light-dark\(#000, #fff\)\) \{\s*:root \{([^}]*)\}/)?.[1] ?? "";
+for (const name of ["--primary", "--card", "--foreground", "--mark-unknown-line", "--mark-malformed"]) {
+  assert.match(fallback, new RegExp(`${name}: #[0-9a-f]{6,8};`), `browsers without light-dark() get a plain ${name}`);
+}
 
 console.log("web smoke test passed");
