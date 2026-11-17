@@ -1,3 +1,5 @@
+<img src="https://raw.githubusercontent.com/openkannada/kannadi/main/docs/images/logo.svg" width="72" height="72" alt="The kannadi logo: the Kannada letter ಕ and its reflection in a mirror, on an indigo tile.">
+
 # kannadi
 
 Convert Kannada documents typed in the legacy Nudi, Baraha, Nudi B-Akshara, Kan-Eng, Akruti and Shree-Lipi fonts to Unicode, and back. kannadi is a Rust library, a command-line tool that converts whole folders of TXT, HTML, DOCX and PDF files, and an editor that runs in the browser.
@@ -274,3 +276,5 @@ Not covered by the MIT license:
 - the Noto fonts in `web/src/fonts/`, which are under the SIL Open Font License (`web/src/fonts/OFL.txt`).
 
 If kannadi helps your project, a mention or a link to [prasad.tech](https://prasad.tech) is appreciated.
+
+Part of [Open Kannada](https://github.com/openkannada), free and open-source tools that make Kannada work properly on computers.
