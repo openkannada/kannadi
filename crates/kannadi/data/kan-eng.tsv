@@ -12,10 +12,10 @@
 # fetched from the Internet Archive. Acrobat put the glyphs at codes Windows-1252
 # leaves undefined, and at AD, in a second, CID-keyed copy of each font, whose
 # ToUnicode map gives the code (U+009D for 9D, U+2212 for AD). The copy's glyph IDs
-# are the code minus 30 (decimal), as in every subset's own cmap from 7E to C0. Those codes were
-# read from the words they appear in: 81 ಆ (ಆಯವ್ಯಯ), 9D ಚ (ವೆಚ್ಚ), 90 subscript ಮ
-# (ಚೆನ್ನಮ್ಮ), AD subscript ಣ (ಸಣ್ಣ, ಉಣ್ಣೆ, ಕೃಷ್ಣ); 8D ಃ by its shape, as its 1 use is a typing
-# error. Each glyph was identified by eye, then checked in context: the papers'
+# are the code minus 30 (decimal), as in every subset's own cmap from 7E to C0.
+# Those codes were read from the words they appear in: 81 ಆ (ಆಯವ್ಯಯ), 9D ಚ
+# (ವೆಚ್ಚ), 90 subscript ಮ (ಚೆನ್ನಮ್ಮ), AD subscript ಣ (ಸಣ್ಣ, ಉಣ್ಣೆ, ಕೃಷ್ಣ); 8D ಃ by
+# its shape, as its 1 use is a typing error. Each glyph was identified by eye, then checked in context: the papers'
 # Kannada text, 833 distinct lines in drawing order, was converted, and every unknown
 # glyph and malformed syllable was read against the codes rendered with the embedded
 # glyphs.

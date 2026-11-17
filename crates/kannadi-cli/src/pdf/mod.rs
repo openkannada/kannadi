@@ -686,7 +686,8 @@ endcmap\nCMapName currentdict /CMap defineresource pop\nend\nend\n";
             b"BT /F1 12 Tf 14 TL 72 700 Td (P\xC0) Tj ET BT 72 600 Td (P\xC0) Tj T* (P\xC0) Tj ET";
         let (text, _) = run(&pdf(vec![("F1", simple_font("BRHKannada"))], kept));
         assert_eq!(text, "ಕ\nಕ\nಕ\n");
-        let restored = b"BT /F1 12 Tf 72 700 Td (P) Tj q 14 TL Q T* (\xC0) Tj ET";
+        let restored =
+            b"BT /F1 12 Tf 72 700 Td (P) Tj ET q BT 14 TL ET Q BT 72 700 Td T* (\xC0) Tj ET";
         let (text, _) = run(&pdf(vec![("F1", simple_font("BRHKannada"))], restored));
         assert_eq!(text, "ಕ\n");
     }
@@ -753,6 +754,14 @@ endcmap\nCMapName currentdict /CMap defineresource pop\nend\nend\n";
         let form = b"BT /F3 12 Tf 72 650 Td (x) Tj ET";
         let (text, _) = run(&page_with_form(page, form, false));
         assert_eq!(text, "x\nಕ\n");
+    }
+
+    #[test]
+    fn a_form_keeps_its_leading_to_itself() {
+        let page = b"BT /F1 12 Tf 72 700 Td (P) Tj ET /X Do BT 72 700 Td T* (\xC0) Tj ET";
+        let form = b"BT 14 TL ET";
+        let (text, _) = run(&page_with_form(page, form, false));
+        assert_eq!(text, "ಕ\n");
     }
 
     #[test]
