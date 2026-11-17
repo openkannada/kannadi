@@ -189,7 +189,7 @@ const llms = [
   "",
   ...PAGES.map((p) => `- [${p.h1}](${hasSite ? site + p.path : p.path || "./"}): ${plain(p.description)}`),
   "",
-  "Source: https://github.com/prasadus92/kannadi (MIT).",
+  "Source: https://github.com/openkannada/kannadi (MIT).",
 ];
 writeFileSync(join(dist, "llms.txt"), llms.join("\n") + "\n");
 

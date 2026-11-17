@@ -20,7 +20,7 @@ const ACCURACY = {
 const WHO = {
   shared: true,
   q: "Who made this?",
-  a: 'It is built on <a href="https://github.com/prasadus92/kannadi">kannadi</a>, an open-source Rust library for Kannada text by Prasad Subrahmanya, released under the MIT license. The fonts are Noto Sans Kannada and Noto Serif Kannada, under the SIL Open Font License.',
+  a: 'It is built on <a href="https://github.com/openkannada/kannadi">kannadi</a>, an open-source Rust library for Kannada text by Prasad Subrahmanya, released under the MIT license. The fonts are Noto Sans Kannada and Noto Serif Kannada, under the SIL Open Font License.',
 };
 const CONVERT_STEPS = [
   "Open your file with <b>Open</b>, or copy the text from Word and paste it into the sheet. Word files keep their fonts, so only the text set in Nudi, Baraha, Nudi B-Akshara, Kan-Eng, Akruti or Shree-Lipi fonts is converted.",
