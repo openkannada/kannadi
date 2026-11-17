@@ -27,6 +27,12 @@ path = ["docs/images/**", "web/src/og/**", "web/src/favicon.svg"]
 SPDX-FileCopyrightText = "2026 The Open Kannada Authors"
 SPDX-License-Identifier = "CC-BY-4.0"
 
+# Editor screenshots: our page, showing lines of a 2002 Karnataka government web page.
+[[annotations]]
+path = "docs/images/editor*.png"
+SPDX-FileCopyrightText = ["2026 The Open Kannada Authors", "Government of Karnataka"]
+SPDX-License-Identifier = "CC-BY-4.0 AND LicenseRef-Excerpts"
+
 [[annotations]]
 path = "web/src/fonts/**"
 SPDX-FileCopyrightText = "2022 The Noto Project Authors (https://github.com/notofonts/kannada)"

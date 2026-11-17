@@ -60,7 +60,7 @@ These are test inputs for PDF text extraction.
 Checked on 16 November 2026, with the Akruti work.
 
 - **Karnataka Acts.** All 98 archived Kannada Acts and Ordinances on `dpal.kar.nic.in` were downloaded and their fonts listed. Those of 2001 to 2003 use AkrutiKndPadma; later ones use Nudi 01 e, Nudi 03 e, Nudi Akshara, NudiB-Akshar and BRH Kannada. 1 Act of 2003 also uses AkliteKndPadmini, a layout of its own. None uses a Shree-Lipi font.
-- **Udayavani, 2003.** The newspaper's archived home page (`199.74.239.15/udayavani/home.asp`, Internet Archive, April 2003) sets its Kannada in `<font face="Shree-Kan-0850">`, with text such as `ÃÜã±ÜñÝÃÝ`. The site offered the font to readers as `SHREE850.ttf` and as the embedded web font `SHREEKA0.eot`. These pages are Shree-Lipi text with a known font name, so they can check a table. They carry no glyph images, so they cannot build one alone.
+- **Udayavani, 2003.** The newspaper's archived home page (`199.74.239.15/udayavani/home.asp`, Internet Archive, April 2003) sets its Kannada as glyph codes in `<font face="Shree-Kan-0850">`. In that font ಮಳೆಗಾಲ is stored as `ÊÜáÙæWÝÆ`, as the table below encodes it. The site offered the font to readers as `SHREE850.ttf` and as the embedded web font `SHREEKA0.eot`. These pages are Shree-Lipi text with a known font name, so they can check a table. They carry no glyph images, so they cannot build one alone.
 - **Legislative Assembly member pages.** The unnamed font in `13mem/50.pdf` is Nudi B-Akshara, described above.
 - **Web search.** Searches for PDFs naming `Shree-Kan` fonts found only font shops and converters.
 
@@ -103,7 +103,7 @@ Codes the font has but no page used are left out, and are reported as unknown if
 
 Of the 20 malformed syllables, 12 are ಆ್ಯ, the way these pages write the vowel of English "and" (ಆ್ಯಂಡ್, ಆ್ಯಂಟನಿ); the converter keeps it and reports it, as Unicode has no valid syllable for it. The other 8 are the pages' own typing errors: ೖ on ಮೊ and ನೊ for ಮೊಯ್ಲಿ and ನೊಯ್ಡಾ, ರು with ೖ, a stray ಾ, and a consonant with no head stroke. 3 words have the subscript ನ typed twice with 24 between; they read as 2 subscripts, as they would draw.
 
-The fixture is [shree-lipi.tsv](../crates/kannadi/tests/fixtures/shree-lipi.tsv). Until 17 November 2026 it held 130 lines of the Udayavani pages. They were replaced with 140 lines written for kannadi and encoded with this table, so that no newspaper text is kept. 22 words of them were then retyped by hand the way the pages typed such words, so the fixture still tests those habits; the source column of each line names its habit. The new lines use every glyph sequence the newspaper lines used. The figures above for pages, text, unknown glyphs and malformed syllables are from the newspaper pages, which are not in this repository.
+The fixture is [shree-lipi.tsv](../crates/kannadi/tests/fixtures/shree-lipi.tsv). Until 17 November 2026 it held 130 lines of the Udayavani pages. They were replaced with 140 lines written for kannadi and encoded with this table, so that no newspaper text is kept. 22 words of them were then retyped by hand the way the pages typed such words, so the fixture still tests those habits; the source column of each line names its habit. The new lines use every code and table entry the newspaper lines used. The figures above for pages, text, unknown glyphs and malformed syllables are from the newspaper pages, which are not in this repository.
 
 ### Limits
 

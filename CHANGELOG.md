@@ -61,7 +61,7 @@ Project:
 
 ### Changed
 
-- The Shree-Lipi fixture holds 140 lines written for kannadi and encoded with its own table, with 22 words retyped in the typing habits of the newspaper pages. It replaces 130 lines of Udayavani pages and uses every glyph sequence they used.
+- The Shree-Lipi fixture holds 140 lines written for kannadi and encoded with its own table, with 22 words retyped in the typing habits of the newspaper pages. It replaces 130 lines of Udayavani pages and uses every code and table entry they used.
 
 ### Fixed
 
