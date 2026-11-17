@@ -55,7 +55,13 @@ Font tools:
 
 Project:
 
-- MIT license, `CITATION.cff`, `AGENTS.md` and `CONTRIBUTING.md`.
+- `CITATION.cff`, `AGENTS.md` and `CONTRIBUTING.md`.
+- Licenses: code and glyph tables under MIT OR Apache-2.0 (`LICENSE-MIT`, `LICENSE-APACHE`), docs under CC BY 4.0, copyright "The Open Kannada Authors". `REUSE.toml` gives the license of every file, `NOTICE.md` lists third-party material, and `TRADEMARKS.md` says how the names and logo may be used.
+- Contributions are signed off under the Developer Certificate of Origin. CI checks the `Signed-off-by` line of each commit in a pull request, and runs `reuse lint`.
+
+### Changed
+
+- The Shree-Lipi fixture holds 140 lines written for kannadi and encoded with its own table, with 22 words retyped in the typing habits of the newspaper pages. It replaces 130 lines of Udayavani pages and uses every code and table entry they used.
 
 ### Fixed
 

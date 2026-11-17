@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 The Open Kannada Authors
+# SPDX-License-Identifier: MIT OR Apache-2.0
+#
 # Shree-Lipi Kannada glyph table: Shree-Kan-0850.
 #
 # The format is described in src/legacy/table.rs. Codes are Windows-1252 bytes.

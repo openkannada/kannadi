@@ -123,12 +123,13 @@ Principles:
 - Every behavior change gets a test.
 - For each new rule, remove the rule, confirm a test fails, then restore it.
 - Use property tests for round trips and invariants. Add a golden fixture for real text.
-- Fixtures from public documents are short excerpts. Record the source URL with each.
+- Fixtures from public documents are short excerpts. Record the source URL with each. Do not add newspaper or other commercial text: write the lines yourself and encode them with the layout's table, as `tests/fixtures/shree-lipi.tsv` does.
+- Every file needs a license in `REUSE.toml` or an SPDX header. Check with `uvx reuse@6.3.0 lint`.
 
 ## Pull requests
 
 - Branch from `main`. Never push to `main`.
-- Commits are signed. Commit messages and PR bodies carry no AI attribution lines.
+- Commits are signed and signed off (`git commit -S -s`): every commit needs a `Signed-off-by` line under the [Developer Certificate of Origin](https://developercertificate.org/). Commit messages and PR bodies carry no AI attribution lines.
 - The PR body says what changed, why, how it was verified, and what was refactored.
 - Every PR gets an independent review covering bugs and design quality. Fix the findings, then merge with a squash when CI is green.
 
