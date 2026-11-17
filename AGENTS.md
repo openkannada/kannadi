@@ -4,7 +4,7 @@ Instructions for anyone changing this repository, human or AI agent. Read this b
 
 ## What this is
 
-A Rust library for Kannada text: akshara segmentation, normalization, transliteration, numerals, and conversion of legacy Nudi, Baraha, Akruti and Shree-Lipi font text to Unicode. The main goal is converting legacy documents correctly, with measured accuracy.
+A Rust library for Kannada text: akshara segmentation, normalization, transliteration, numerals, and conversion of legacy Nudi, Baraha, Nudi B-Akshara, Akruti and Shree-Lipi font text to Unicode. The main goal is converting legacy documents correctly, with measured accuracy.
 
 ## Commands
 
@@ -49,6 +49,7 @@ crates/kannadi/
   data/nudi.tsv       the Nudi and Baraha ANSI glyph table, as data
   data/akruti.tsv     the Akruti glyph table
   data/shree-lipi.tsv the Shree-Lipi glyph table
+  data/nudi-b.tsv     the Nudi B-Akshara glyph table
   tests/              golden fixtures, property tests, differential test
   examples/           demo, and a command-line converter for legacy files
 crates/kannadi-cli/   the `kannadi` binary: batch conversion of files and folders

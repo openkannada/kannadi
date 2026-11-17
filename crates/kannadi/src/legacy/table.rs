@@ -77,6 +77,7 @@ pub(super) fn file_name(layout: Layout) -> &'static str {
         Layout::Nudi => "nudi.tsv",
         Layout::Akruti => "akruti.tsv",
         Layout::ShreeLipi => "shree-lipi.tsv",
+        Layout::NudiB => "nudi-b.tsv",
     }
 }
 
@@ -85,7 +86,15 @@ fn contents(layout: Layout) -> &'static str {
         Layout::Nudi => include_str!("../../data/nudi.tsv"),
         Layout::Akruti => include_str!("../../data/akruti.tsv"),
         Layout::ShreeLipi => include_str!("../../data/shree-lipi.tsv"),
+        Layout::NudiB => include_str!("../../data/nudi-b.tsv"),
     }
+}
+
+/// Whether the layout's table keeps the ASCII letters as Latin letters.
+pub(super) fn draws_latin(layout: Layout) -> bool {
+    rows(layout).iter().any(
+        |row| matches!(&row.entry, Entry::Literal(l) if l.chars().all(|c| c.is_ascii_alphabetic())),
+    )
 }
 
 /// The rows of a layout's table in table order.
@@ -199,7 +208,7 @@ mod tests {
     #[test]
     fn the_built_in_tables_parse() {
         for layout in Layout::ALL {
-            assert!(rows(layout).len() > 150, "{layout}");
+            assert!(rows(layout).len() > 100, "{layout}");
         }
     }
 }

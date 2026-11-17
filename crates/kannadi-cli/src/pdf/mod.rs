@@ -279,6 +279,39 @@ mod tests {
     const KANNADA: &[u8] = b"P\xC0\xA3\xC0\xDFq\xC0";
 
     #[test]
+    fn strings_overprinted_for_bold_are_read_once() {
+        let mut content = b"BT /F1 12 Tf 72 700 Td (".to_vec();
+        content.extend_from_slice(KANNADA);
+        content.extend_from_slice(b") Tj -0.24 -0.24 Td (");
+        content.extend_from_slice(KANNADA);
+        content.extend_from_slice(b") Tj 0.24 0 Td (");
+        content.extend_from_slice(KANNADA);
+        content.extend_from_slice(b") Tj 100 0 Td (");
+        content.extend_from_slice(KANNADA);
+        content.extend_from_slice(b") Tj ET");
+        let (text, _) = run(&pdf(vec![("F1", simple_font("Nudi 01 e"))], &content));
+        assert_eq!(text, "ಕನ್ನಡ ಕನ್ನಡ\n");
+    }
+
+    /// ರಹೀಮ್ ಖಾನ್, from a Legislative Assembly member page of 2011, in a font whose
+    /// name the PDF dropped. Its `Differences` list names ಂ's code `c129`.
+    #[test]
+    fn a_hidden_font_in_the_assembly_layout_is_read_by_its_text() {
+        let mut font = simple_font("TTE10AECA0t00");
+        font.set(
+            "Encoding",
+            dictionary! { "Differences" => vec![Object::Integer(1), Object::Name(b"c129".to_vec())] },
+        );
+        let content =
+            b"BT /F1 12 Tf 72 700 Td (\xA4\xD0\xCD\xD3\xC0\xD0\xA6\xFD \x94\xD1\xB9\xFD) Tj \
+            0 -20 Td (\xB3\xD0\x01\xB7\xD9\x01\xA6\xD0\xD4 \xCC\xD9\xCA\xD0\xA4\xD0\xD4 \
+            \xC0\xD9\xD6\xCC\xD0\xC0\xD0\xD4\xB7\xFD \x94\xD1\xB9\xFD) Tj ET";
+        let (text, report) = run(&pdf(vec![("F1", font)], content));
+        assert_eq!(text, "ರಹೀಮ್ ಖಾನ್\nತಂದೆಯ ಹೆಸರು ಮೊಹಮದ್ ಖಾನ್\n");
+        assert!(report.rows.is_empty(), "{:?}", report.rows);
+    }
+
+    #[test]
     fn named_legacy_fonts_convert_and_others_stay() {
         let mut content = b"BT /F1 12 Tf 72 700 Td (".to_vec();
         content.extend_from_slice(KANNADA);
@@ -411,7 +444,7 @@ endcmap\nCMapName currentdict /CMap defineresource pop\nend\nend\n";
         let mut bytes = Vec::new();
         doc.save_to(&mut bytes).unwrap();
         let (text, _) = run(&bytes);
-        assert_eq!(text, "ಕನ್ನಡಕನ್ನಡ\nಕನ್ನಡ\nಕನ್ನಡ\n");
+        assert_eq!(text, "ಕನ್ನಡ\nಕನ್ನಡ\nಕನ್ನಡ\n");
     }
 
     #[test]

@@ -7,7 +7,7 @@ use super::Layout;
 /// are ignored.
 ///
 /// - [`Layout::Nudi`]: the ANSI Nudi fonts up to version 5 (Nudi 01 e, Nudi
-///   Akshara, Nudi B-Akshara) and Baraha's BRH fonts for Kannada. The Unicode
+///   Akshara) and Baraha's BRH fonts for Kannada. The Unicode
 ///   Nudi fonts, such as Nudi Parijatha, names that say Uni or Unicode, and
 ///   Baraha's BRH fonts for other scripts are not legacy Kannada fonts.
 /// - [`Layout::Akruti`]: AkrutiKndPadma and its weights. Other Akruti Kannada
@@ -15,6 +15,7 @@ use super::Layout;
 /// - [`Layout::ShreeLipi`]: Shree-Kan-0850, also with a style word such as Bold
 ///   after it. Other Shree-Kan numbers were not checked; [`is_legacy_font`] still
 ///   knows them.
+/// - [`Layout::NudiB`]: Nudi B-Akshara (NudiB-Akshar), the bilingual Nudi font.
 ///
 /// ```
 /// use kannadi::legacy::{font_layout, Layout};
@@ -22,6 +23,7 @@ use super::Layout;
 /// assert_eq!(font_layout("BRH Kannada"), Some(Layout::Nudi));
 /// assert_eq!(font_layout("AkrutiKndPadmaDemi"), Some(Layout::Akruti));
 /// assert_eq!(font_layout("Shree-Kan-0850"), Some(Layout::ShreeLipi));
+/// assert_eq!(font_layout("NudiB-Akshar"), Some(Layout::NudiB));
 /// assert_eq!(font_layout("Nudi Parijatha"), None);
 /// ```
 pub fn font_layout(name: &str) -> Option<Layout> {
@@ -31,6 +33,9 @@ pub fn font_layout(name: &str) -> Option<Layout> {
     }
     if let Some(rest) = key.strip_prefix("brh") {
         return (!BRH_OTHER_SCRIPTS.iter().any(|s| rest.starts_with(s))).then_some(Layout::Nudi);
+    }
+    if key.starts_with("nudibakshar") {
+        return Some(Layout::NudiB);
     }
     if key.starts_with("akrutikndpadma") {
         return Some(Layout::Akruti);
@@ -43,7 +48,7 @@ pub fn font_layout(name: &str) -> Option<Layout> {
     }
     let rest = key.strip_prefix("nudi")?;
     let numbered = rest.len() >= 3 && rest[..2].bytes().all(|b| b.is_ascii_digit());
-    (numbered || rest.starts_with("akshar") || rest.starts_with("bakshar")).then_some(Layout::Nudi)
+    (numbered || rest.starts_with("akshar")).then_some(Layout::Nudi)
 }
 
 /// True for a font that stores Kannada as glyph codes in place of letters: the
@@ -119,13 +124,24 @@ mod tests {
             "Nudi 05 k",
             "NudiAkshara",
             "Nudi Akshar-14",
-            "Nudi B-Akshara",
             "BRH Kannada",
             "BRHKannada-Bold",
             "\"BRH Sirigannada\"",
             "brh kasturi",
         ] {
             assert_eq!(font_layout(f), Some(Layout::Nudi), "{f}");
+        }
+    }
+
+    #[test]
+    fn nudi_b_akshara_fonts() {
+        for f in [
+            "NudiB-Akshar",
+            "Nudi B-Akshara",
+            "NudiB-Akshar,Bold",
+            "nudi b akshar",
+        ] {
+            assert_eq!(font_layout(f), Some(Layout::NudiB), "{f}");
         }
     }
 

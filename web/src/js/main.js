@@ -89,7 +89,7 @@ const io = {
   decodeWindows1252: kannadi.decodeWindows1252,
 };
 
-/** "Nudi or Baraha", "Akruti", "Shree-Lipi", or several, for the layouts a result was read in. */
+/** "Nudi or Baraha", "Nudi B-Akshara", "Akruti", "Shree-Lipi", or several, for the layouts a result was read in. */
 function layoutNames(layouts = []) {
   const names = layouts.map((l) => LAYOUT_NAMES[l] ?? l);
   return names.length ? names.join(", and from ") : "a legacy font";

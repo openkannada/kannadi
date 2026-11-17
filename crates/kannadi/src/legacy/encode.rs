@@ -86,7 +86,11 @@ pub fn from_unicode(text: &str, layout: Layout) -> Encoding {
             malformed.push(offset..offset + akshara.text.len());
         }
         match Parts::of(&chars) {
-            Some(parts) => writer.consonant(&parts),
+            Some(parts) => {
+                for part in parts.split_at_missing_subscript(writer.glyphs) {
+                    writer.consonant(&part);
+                }
+            }
             None => chars.iter().for_each(|&c| writer.single(c)),
         }
         offset += akshara.text.len();
@@ -296,6 +300,32 @@ impl Parts {
             }
         }
         Some(parts)
+    }
+}
+
+impl Parts {
+    /// The akshara as written: whole, or, where the layout has no glyph for a
+    /// subscript consonant, split before it, the part before ending in a visible
+    /// virama. Both read back as the same Unicode.
+    fn split_at_missing_subscript(self, glyphs: &Glyphs) -> Vec<Parts> {
+        let arka = usize::from(self.consonants.len() > 1 && self.consonants[0].1 == RA);
+        let missing = self.consonants[arka..]
+            .iter()
+            .skip(1)
+            .position(|(_, c)| !glyphs.ottus.contains_key(c));
+        let Some(j) = missing.filter(|_| glyphs.signs.contains_key(&VIRAMA)) else {
+            return vec![self];
+        };
+        let at = arka + 1 + j;
+        let mut rest = self;
+        let first = Parts {
+            consonants: rest.consonants.drain(..at).collect(),
+            signs: vec![(rest.consonants[0].0, VIRAMA)],
+            ..Parts::default()
+        };
+        let mut parts = vec![first];
+        parts.extend(rest.split_at_missing_subscript(glyphs));
+        parts
     }
 }
 
@@ -729,6 +759,15 @@ mod tests {
         assert_eq!(shree("ಝೆ"), [0xC3, 0xE6, 0x6B, 0xE1]);
         let dollar = from_unicode("$", Layout::ShreeLipi);
         assert_eq!(dollar.unencodable.len(), 1);
+    }
+
+    #[test]
+    fn a_subscript_the_layout_cannot_draw_is_written_after_a_virama() {
+        let e = from_unicode("ಕ್ಶ", Layout::NudiB);
+        assert!(e.is_clean(), "{e:?}");
+        let bytes: Vec<u8> = e.text.chars().filter_map(windows_1252_byte).collect();
+        assert_eq!(bytes, [0x91, 0xFD, 0xC6, 0xD0]);
+        assert_eq!(encode("ಕ್ಗ"), [0x50, 0xC0, 0xCE]);
     }
 
     #[test]

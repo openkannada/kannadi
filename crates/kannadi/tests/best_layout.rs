@@ -50,6 +50,33 @@ fn single_words_mostly_find_their_layout() {
     );
 }
 
+/// Whole lines carry enough text to tell the layouts apart, the Assembly layout's
+/// included, whose single words often read cleanly in Nudi too.
+#[test]
+fn whole_lines_find_their_layout() {
+    for (table, layout) in [
+        (include_str!("fixtures/nudi.tsv"), Layout::Nudi),
+        (include_str!("fixtures/akruti.tsv"), Layout::Akruti),
+        (include_str!("fixtures/shree-lipi.tsv"), Layout::ShreeLipi),
+        (include_str!("fixtures/nudi-b.tsv"), Layout::NudiB),
+    ] {
+        for row in table
+            .lines()
+            .filter(|l| !l.is_empty() && !l.starts_with('#'))
+        {
+            let bytes: Vec<u8> = row
+                .split('\t')
+                .next()
+                .unwrap()
+                .split_whitespace()
+                .map(|h| u8::from_str_radix(h, 16).unwrap())
+                .collect();
+            let line = decode_windows_1252(&bytes);
+            assert_eq!(best_layout(&line), layout, "{line}");
+        }
+    }
+}
+
 /// The corpus was not used to choose the rule.
 #[test]
 fn corpus_words_find_their_layout() {

@@ -1,7 +1,7 @@
 use kannadi::legacy::{decode_windows_1252, from_unicode, to_unicode, Layout, Options};
 
 /// The golden fixture of each layout, with the fewest rows it must have.
-const FIXTURES: [(Layout, &str, usize); 3] = [
+const FIXTURES: [(Layout, &str, usize); 4] = [
     (Layout::Nudi, include_str!("fixtures/nudi.tsv"), 10),
     (Layout::Akruti, include_str!("fixtures/akruti.tsv"), 100),
     (
@@ -9,6 +9,7 @@ const FIXTURES: [(Layout, &str, usize); 3] = [
         include_str!("fixtures/shree-lipi.tsv"),
         100,
     ),
+    (Layout::NudiB, include_str!("fixtures/nudi-b.tsv"), 100),
 ];
 
 /// The legacy text, expected Unicode and source of each fixture row.
@@ -84,6 +85,13 @@ fn most_akruti_words_encode_as_typed() {
 fn most_shree_lipi_words_encode_as_typed() {
     let (same, total) = typed_back(Layout::ShreeLipi);
     assert!(total >= 700, "{total}");
+    assert!(same * 100 >= total * 95, "{same} of {total}");
+}
+
+#[test]
+fn most_nudi_b_words_encode_as_typed() {
+    let (same, total) = typed_back(Layout::NudiB);
+    assert!(total >= 400, "{total}");
     assert!(same * 100 >= total * 95, "{same} of {total}");
 }
 

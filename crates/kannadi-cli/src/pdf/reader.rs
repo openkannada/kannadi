@@ -72,6 +72,7 @@ pub fn read_page(
         lines: vec![Vec::new()],
         pen: Pen::default(),
         current: None,
+        last_string: None,
         saved: Vec::new(),
         lost: 0,
         operations_left: MAX_OPERATIONS,
@@ -118,6 +119,10 @@ impl Matrix {
             e * p + f * r + t,
             e * q + f * s + u,
         ])
+    }
+
+    fn x(self, x: f32, y: f32) -> f32 {
+        self.0[0] * x + self.0[2] * y + self.0[4]
     }
 
     fn y(self, x: f32, y: f32) -> f32 {
@@ -232,6 +237,15 @@ impl Pen {
         self.ctm.y(self.x, self.y)
     }
 
+    /// Where the next string starts on the page, and the font size there.
+    fn page_point(&self) -> (f32, f32, f32) {
+        (
+            self.ctm.x(self.x, self.y),
+            self.page_y(),
+            self.em() * self.ctm.scale(),
+        )
+    }
+
     /// Whether a string starting here leaves a word gap after the last one.
     fn gap(&self) -> bool {
         self.end.is_some_and(|end| self.x - end > 0.2 * self.em())
@@ -256,6 +270,8 @@ struct PageReader<'d, 'f> {
     lines: Vec<Line>,
     pen: Pen,
     current: Option<&'d Dictionary>,
+    /// The last string shown: its font, bytes and start on the page.
+    last_string: Option<(usize, Vec<u8>, f32, f32)>,
     /// Fonts, sizes and transformations saved by `q`, restored by `Q`.
     saved: Vec<(Option<&'d Dictionary>, f32, Matrix)>,
     lost: usize,
@@ -423,6 +439,10 @@ impl<'d> PageReader<'d, '_> {
                     self.pen.advance(-n);
                 }
                 Shown::Bytes(bytes) => {
+                    if self.overprints(index, bytes) {
+                        self.pen.advance(widths.advance(bytes));
+                        continue;
+                    }
                     if self.pen.gap() {
                         self.push(Piece::Space, index);
                     }
@@ -442,6 +462,20 @@ impl<'d> PageReader<'d, '_> {
                 }
             }
         }
+    }
+
+    /// Whether `bytes` repeat the last string in the same font, starting within a
+    /// tenth of the font size of it: the copies some PDF makers draw, a little
+    /// apart, to make text look bold.
+    fn overprints(&mut self, font: usize, bytes: &[u8]) -> bool {
+        let (x, y, em) = self.pen.page_point();
+        let repeat = self.last_string.as_ref().is_some_and(|(f, b, px, py)| {
+            *f == font && b == bytes && (x - px).abs().max((y - py).abs()) < 0.1 * em
+        });
+        if !repeat && !bytes.is_empty() {
+            self.last_string = Some((font, bytes.to_vec(), x, y));
+        }
+        repeat
     }
 
     fn push(&mut self, piece: Piece, font: usize) {

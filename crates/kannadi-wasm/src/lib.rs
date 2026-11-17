@@ -112,7 +112,7 @@ pub fn nudi_to_unicode(text: &str, options: &NudiOptions) -> Conversion {
 }
 
 /// Converts text typed in a legacy font with the layout named `layout`, such as
-/// `"nudi"`, `"akruti"` or `"shree-lipi"`, to Unicode Kannada. See [`legacy::to_unicode`].
+/// `"nudi"`, `"nudi-b"`, `"akruti"` or `"shree-lipi"`, to Unicode Kannada. See [`legacy::to_unicode`].
 #[wasm_bindgen(js_name = toUnicode)]
 pub fn to_unicode(text: &str, layout: &str, options: &NudiOptions) -> Result<Conversion, JsError> {
     Ok(convert(text, layout.parse()?, options))
@@ -472,6 +472,7 @@ mod tests {
             assert!(!is_legacy_font(f), "{f}");
         }
         assert_eq!(font_layout("Shree-Kan-0850").as_deref(), Some("shree-lipi"));
+        assert_eq!(font_layout("NudiB-Akshar").as_deref(), Some("nudi-b"));
         assert!(is_legacy_font("Shree-Kan-0851"));
         assert!(draws_kannada_digits("Nudi 04 k"));
     }
