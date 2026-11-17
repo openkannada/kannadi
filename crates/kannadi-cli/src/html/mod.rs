@@ -301,36 +301,29 @@ impl Walker<'_> {
     }
 
     /// Adds rows for the issues of the piece of `decoded` that starts at byte
-    /// `piece_start`, each on the line of the source text where it sits.
+    /// `piece_start`, each on the line of the source text where it sits. A newline
+    /// written as a character reference, such as `&#10;`, is not a line break in
+    /// the file.
     fn rows(&mut self, source: &str, decoded: &Decoded, piece_start: usize, issues: &[Issue]) {
+        let piece_lines: Vec<usize> = std::iter::once(piece_start)
+            .chain(
+                decoded.text[piece_start..]
+                    .match_indices('\n')
+                    .map(|(i, _)| piece_start + i + 1),
+            )
+            .collect();
+        let source_breaks: Vec<usize> = source.match_indices('\n').map(|(i, _)| i).collect();
         for issue in issues {
-            let location = format!(
-                "line {}",
-                self.source_line(source, decoded, piece_start, issue.line)
-            );
-            self.report.rows.push(Row::new(location, issue));
+            let at = piece_lines
+                .get(issue.line - 1)
+                .copied()
+                .unwrap_or(decoded.text.len());
+            let in_source = decoded.source_offset(at);
+            let line = self.line + source_breaks.partition_point(|&b| b < in_source);
+            self.report
+                .rows
+                .push(Row::new(format!("line {line}"), issue));
         }
-    }
-
-    /// The file line of 1-based line `line` of the piece. A newline written as a
-    /// character reference, such as `&#10;`, is not a line break in the file.
-    fn source_line(
-        &self,
-        source: &str,
-        decoded: &Decoded,
-        piece_start: usize,
-        line: usize,
-    ) -> usize {
-        let piece = &decoded.text[piece_start..];
-        let at = match line.checked_sub(2) {
-            Some(n) => piece
-                .match_indices('\n')
-                .nth(n)
-                .map_or(decoded.text.len(), |(i, _)| piece_start + i + 1),
-            None => piece_start,
-        };
-        let in_source = decoded.source_offset(at).min(source.len());
-        self.line + source[..in_source].matches('\n').count()
     }
 
     fn finish(mut self) -> (Vec<u8>, Report) {
