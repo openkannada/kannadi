@@ -7,7 +7,7 @@ version = "0.1.0"
 edition = "2021"
 rust-version = "1.75"
 license = "MIT"
-repository = "https://github.com/prasadus92/kannadi"
+repository = "https://github.com/openkannada/kannadi"
 authors = ["Prasad Subrahmanya <prasadus92@gmail.com>"]
 
 # Used by web/build.sh for the converter page.
