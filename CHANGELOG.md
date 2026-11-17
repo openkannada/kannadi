@@ -22,6 +22,8 @@ Library (`kannadi`):
 - `chars::Class::is_mark`.
 - Sound-alike keys (`phonetic::key`, `keys`, `latin_key`) at 3 levels, for fuzzy search and for suggesting Kannada words from loosely typed Latin letters: "namaskara" and ನಮಸ್ಕಾರ share a medium key. `kannadi-wasm` exports `phoneticKey` and `latinKey`, so the editor page can use them.
 
+- Likely typos (`typos::typos`, `typos::fix_typos`): ರೃ at the start of a syllable is flagged with ಋ as the fix, as in ನೈರೃತ್ಯ for ನೈಋತ್ಯ. `kannadi-wasm` exports `typos`, with UTF-16 offsets, for editors that mark them.
+
 Command-line tool (`kannadi-cli`):
 
 - `kannadi to-unicode` and `kannadi to-nudi` for files and folders, with a per-file report of problems and `--strict`.
