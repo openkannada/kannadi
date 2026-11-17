@@ -252,7 +252,7 @@ pub fn fixes(text: &str, start: u32, end: u32) -> Vec<Fix> {
 }
 
 /// A likely typing mistake in well-formed text: replace `start..end` with
-/// `replacement`. See [`kannadi::typos::typos`].
+/// `replacement`. See [`kannadi::typos::find`].
 #[wasm_bindgen]
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Typo {
@@ -283,7 +283,7 @@ impl Typo {
 #[wasm_bindgen]
 pub fn typos(text: &str) -> Vec<Typo> {
     let mut cursor = Utf16Cursor::new(text);
-    kannadi::typos::typos(text)
+    kannadi::typos::find(text)
         .into_iter()
         .map(|t| Typo {
             start: cursor.at(t.range.start),

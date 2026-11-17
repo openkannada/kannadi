@@ -7,7 +7,7 @@
 //! - [`numerals`]: Kannada digits.
 //! - [`legacy`]: legacy font text (Nudi, Baraha, Akruti, Shree-Lipi) to and from Unicode.
 //! - [`phonetic`]: sound-alike keys for fuzzy search and loose Latin typing.
-//! - [`typos`]: well-formed spellings that are likely typing mistakes, such as ರೃ for ಋ.
+//! - [`typos`]: well-formed spellings that are often typing mistakes, such as ರೃ for ಋ.
 //!
 //! ```
 //! use kannadi::{transliterate, Scheme};
