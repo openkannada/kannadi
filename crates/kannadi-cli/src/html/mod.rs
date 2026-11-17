@@ -18,6 +18,7 @@ use crate::edits::apply;
 use crate::fonts::first_family;
 use crate::report::{Report, Row};
 use crate::txt::read_text;
+use entities::Decoded;
 use tokens::{tokenize, Attr, RawKind, Tag, Token};
 
 pub fn convert_file(bytes: &[u8], settings: &Settings) -> Result<(Vec<u8>, Report)> {
@@ -256,9 +257,9 @@ impl Walker<'_> {
         let layout = self.stack.last().and_then(|o| o.layout);
         match (self.settings.direction, layout) {
             (Direction::ToUnicode(_), Some(layout)) => {
-                let text = entities::decode(source).text;
-                let converted = convert(&text, layout, self.settings);
-                self.rows(self.line, &converted.issues);
+                let decoded = entities::decode(source);
+                let converted = convert(&decoded.text, layout, self.settings);
+                self.rows(source, &decoded, 0, &converted.issues);
                 self.out.push_str(&entities::escape(&converted.text, None));
             }
             (Direction::ToNudi, None) => self.wrap_kannada(source),
@@ -280,8 +281,7 @@ impl Walker<'_> {
                 self.settings.text_layout,
                 self.settings,
             );
-            let line = self.line + source[..start].matches('\n').count();
-            self.rows(line, &converted.issues);
+            self.rows(source, &decoded, run.start, &converted.issues);
             self.out.push_str(&format!(
                 "<span style=\"font-family:'{font}'\">{}</span>",
                 entities::escape(&converted.text, None)
@@ -300,11 +300,29 @@ impl Walker<'_> {
         self.settings.fonts.unicode_family(list, quote)
     }
 
-    /// Adds rows for the issues of a piece of text that starts on `line`.
-    fn rows(&mut self, line: usize, issues: &[Issue]) {
+    /// Adds rows for the issues of the piece of `decoded` that starts at byte
+    /// `piece_start`, each on the line of the source text where it sits. A newline
+    /// written as a character reference, such as `&#10;`, is not a line break in
+    /// the file.
+    fn rows(&mut self, source: &str, decoded: &Decoded, piece_start: usize, issues: &[Issue]) {
+        let piece_lines: Vec<usize> = std::iter::once(piece_start)
+            .chain(
+                decoded.text[piece_start..]
+                    .match_indices('\n')
+                    .map(|(i, _)| piece_start + i + 1),
+            )
+            .collect();
+        let source_breaks: Vec<usize> = source.match_indices('\n').map(|(i, _)| i).collect();
         for issue in issues {
-            let location = format!("line {}", line + issue.line - 1);
-            self.report.rows.push(Row::new(location, issue));
+            let at = piece_lines
+                .get(issue.line - 1)
+                .copied()
+                .unwrap_or(decoded.text.len());
+            let in_source = decoded.source_offset(at);
+            let line = self.line + source_breaks.partition_point(|&b| b < in_source);
+            self.report
+                .rows
+                .push(Row::new(format!("line {line}"), issue));
         }
     }
 
@@ -535,6 +553,43 @@ mod tests {
         let (_, report) = run(html, Direction::ToUnicode(Options::default()));
         assert_eq!(report.rows[0].kind, Kind::UnknownGlyph);
         assert_eq!(report.rows[0].location, "line 3");
+    }
+
+    #[test]
+    fn a_newline_written_as_a_reference_does_not_move_the_line() {
+        let html = "<p><font face=\"Nudi 01 e\">PÀ&#10;Á</font></p>\n<p><font face=\"Nudi 01 e\">PÀ\u{F1}</font></p>";
+        let (_, report) = run(html, Direction::ToUnicode(Options::default()));
+        let rows: Vec<(&str, Kind)> = report
+            .rows
+            .iter()
+            .map(|r| (r.location.as_str(), r.kind))
+            .collect();
+        assert_eq!(
+            rows,
+            [("line 1", Kind::Malformed), ("line 2", Kind::UnknownGlyph)]
+        );
+    }
+
+    #[test]
+    fn literal_newlines_inside_a_font_still_count() {
+        let html = "<font face=\"Nudi 01 e\">PÀ\r\n&#10;\nÁ</font>";
+        let (_, report) = run(html, Direction::ToUnicode(Options::default()));
+        assert_eq!(report.rows[0].location, "line 3");
+    }
+
+    #[test]
+    fn to_nudi_lines_ignore_newline_references() {
+        let html = "<p>ಕ&#10;ಕೇೂ</p>\n<p>ಌ</p>";
+        let (_, report) = run(html, Direction::ToNudi);
+        let rows: Vec<(&str, Kind)> = report
+            .rows
+            .iter()
+            .map(|r| (r.location.as_str(), r.kind))
+            .collect();
+        assert_eq!(
+            rows,
+            [("line 1", Kind::Malformed), ("line 2", Kind::Unencodable)]
+        );
     }
 
     #[test]
