@@ -8,7 +8,7 @@ Convert Kannada documents typed in the legacy Nudi, Baraha, Nudi B-Akshara, Kan-
 
 <p>
   <img src="https://raw.githubusercontent.com/openkannada/kannadi/main/docs/images/editor.png" width="78%" alt="The kannadi editor in a browser after pasting 4 lines from a 2002 Karnataka government page typed in a Baraha font. The text is now Unicode Kannada. 1 glyph the converter could not place and 1 malformed syllable are marked in the third line and listed under Problems.">
-  <img src="https://raw.githubusercontent.com/openkannada/kannadi/main/docs/images/editor-phone.png" width="19%" alt="The same 4 lines in the editor on a phone in dark mode, with the paste notice at the top, the 2 problems listed below the text, and the akshara, word and character counts at the bottom.">
+  <img src="https://raw.githubusercontent.com/openkannada/kannadi/main/docs/images/editor-phone.png" width="19%" alt="The same 4 lines in the editor on a phone in dark mode, with the paste notice in the glass bar at the top, the Problems panel below the text, and the akshara, word and character counts in the glass bar at the bottom.">
 </p>
 
 ## Why

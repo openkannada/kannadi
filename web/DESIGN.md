@@ -1,62 +1,75 @@
 # Editor page design
 
-The page is a tool: people convert old Nudi documents and type Kannada. The design must keep that task clear. The source of truth is `src/style.css`; this note says why it looks the way it does.
+The page is a tool: people convert old Nudi documents and type Kannada. The design must keep that task clear.
 
-## World
-
-KSRTC bus route boards: bottle-green enamel boards with white lettering, Kannada set large and English small beneath it, a Karnataka-yellow route disc, and stops drawn as dots on a line.
-
-- The **board** (top bar and status bar) carries the name, the message panel and the document actions.
-- The **route strip** shows the typing modes as stops on a line.
-- The **sheet** is plain white (dark: near-black green). The document sits on it, nothing else.
-- The **problems rail** draws each unknown glyph and malformed syllable as a stop on a vertical line.
-
-Red marks a glyph the converter could not place. Amber marks a syllable that cannot be valid. These 2 colors mean only that, everywhere: inline marks, rail stops, popover samples.
+It follows the Open Kannada design language, shared by every Open Kannada surface, so this page and the Open Kannada site look like 1 product. This note covers what is particular to this page. The source of truth for the page's own rules is `src/style.css`.
 
 ## Tokens
 
-All colors are custom properties on `:root`, redefined for dark mode both under `prefers-color-scheme` and `[data-theme="dark"]`. The smoke test checks that the 2 dark blocks match.
+`src/tokens.css` is a copy of the Open Kannada design tokens. Do not edit it here; when the tokens change, copy the new file across. It loads before `style.css`.
 
-| Token | Light | Dark | Use |
-|---|---|---|---|
-| `--ground` / `--sheet` | #edf1ef / #fff | #0c1311 / #131b18 | page and document |
-| `--ink` / `--ink-2` | #14201b / #47564f | #e5eee9 / #a3b5ad | text; secondary text is 6.8:1 or more |
-| `--board` / `--board-well` | #0c4a36 / #08321f | #0f4a37 / #05241a | board and message panel |
-| `--disc` | #ffcc00 | #ffd23f | route disc, active stop, focus on the board |
-| `--line` / `--line-ink` | #0c4a36 / #fff | #4fae86 / #0a2018 | route lines, selected states, primary buttons |
-| `--unknown` / `--unknown-bg` | #c8102e / #fde3e7 | #ff8395 / #4d1621 | unknown glyphs |
-| `--malformed-line` / `--malformed-bg` | #9a5c00 / #ffecb8 | #ffb13b / #42300b | malformed syllables |
-| `--focus` | #0c4a36 | #ffd23f | focus rings on the sheet |
+Every color is 1 `light-dark()` pair, so dark mode needs no second block. `data-theme="light"` or `"dark"` on `<html>` pins a theme, and with no attribute the page follows the system. `style.css` maps its own names onto the tokens in its `:root` block, with no color values there. Browsers without `light-dark()` (Safari before 17.5, Chrome before 123) get the light colors from an `@supports` fallback. The smoke test checks that `tokens.css` loads first, that the `:root` block holds no colors, and that every custom property `style.css` uses is defined.
 
-Rules that keep contrast at WCAG AA:
-- Never put `--board` on `--sheet` in dark mode; it is 1.4:1. Use `--line`.
-- Inside a white menu on the board, reset `--focus` to `--line`; yellow on white is 1.5:1.
-- Text on `--unknown` uses `--badge-ink`; text on `--line` uses `--line-ink`.
+| Page name | Token | Use |
+|---|---|---|
+| `--ground`, `--sheet` | `--background`, `--card` | page and document |
+| `--ink`, `--ink-2` | `--foreground`, `--muted-foreground` | text and secondary text |
+| `--line`, `--disc` | `--primary` | route lines, the chosen stop, primary buttons, links |
+| `--unknown`, `--unknown-bg` | `--mark-unknown-line`, `--mark-unknown` | unknown glyphs |
+| `--malformed-line`, `--malformed-bg` | `--mark-malformed-line`, `--mark-malformed` | malformed syllables |
+| `--focus` | `--ring` | focus rings |
 
-## Type
+Rose and amber mean only "look at this in your text": inline marks, problem stops and popover samples.
 
-1 family: Noto Sans Kannada (variable, self-hosted subsets, OFL), with Noto Serif Kannada as the document's serif option. The Kannada subset is preloaded; the serif files load only when chosen.
+## Layout
 
-- Document: 1.1875rem, line height 1.95 for ottaksharas; 1.125rem on phones.
-- UI: 0.9375rem; labels 0.8125rem. Headings in a fixed rem scale near 1.2.
-- Board name: Kannada 1.45rem bold over English 0.8125rem.
+- **The board** is a bar of Liquid Glass floating at the top, with the kannadi mirror mark, the message panel and the document actions. On phones the message moves to a second row.
+- **The route strip** shows the typing modes as stops on an indigo line; the chosen stop fills. It scrolls with the page.
+- **The sheet** is solid, with the document on it and nothing else.
+- **The problems rail** draws each unknown glyph and malformed syllable as a stop on a vertical line.
+- **The status bar** is a glass bar at the bottom with the counts and the save state.
+- Turmeric, kumkuma and indigo fields sit fixed behind the page, so the glass has something to bend.
+
+## Glass
+
+The board and the status bar are glass: `--glass` over a backdrop blurred by `--glass-blur` and saturated by `--glass-saturate`, with a lit top rim, a faint bottom rim, a soft specular glow and `--shadow-float`. With reduced transparency, or where `backdrop-filter` is missing, they are the solid `--glass-solid`. The Save menu opens from the board and is solid `--popover`: a pane inside a glass pane cannot blur the page behind it. The light that follows the pointer and the edge refraction are left out here, to keep the page free of extra script.
+
+## Contrast
+
+Measured with the tokens in `src/tokens.css`, in light and dark mode. Every pair passes WCAG AA.
+
+| Pair | Light | Dark |
+|---|---|---|
+| Secondary text on the glass board | 6.8:1 | 7.5:1 |
+| Primary button text | 7.5:1 | 8.1:1 |
+| Badge text on `--unknown` | 5.7:1 | 8.1:1 |
+| `--badge-ink` on `--malformed-line` | 4.7:1 | 10.8:1 |
+| Focus ring on the page | 4.75:1 | 9.4:1 |
+| Focus ring on the sheet | 5.2:1 | 8.7:1 |
+| Malformed stop ring on the sheet | 4.8:1 | 10.1:1 |
+
+Text on `--unknown` and `--line` uses `--badge-ink` and `--line-ink`, never `--ink`.
 
 ## Components
 
-- Board plates: outlined white buttons, 2.5rem tall.
-- Tool buttons: outlined on the sheet, 2.25rem tall; selected segment filled `--line`.
-- Stops: 1rem dot with a 3px ring on a 3px line; the active stop fills with `--disc`.
+- Board plates: transparent pills that become a bead of glass on hover, 2.5rem tall.
+- Tool buttons: outlined pills on the page, 2.25rem tall; the selected segment is filled `--line`.
+- Stops: a 1rem dot with a 3px ring on a 3px line; the chosen stop fills with `--disc`.
 - Fix popover: next to its mark on wide screens, a bottom sheet on phones. Each fix shows the resulting word.
 - Typing chart (landing pages): each letter is a small plate with the Kannada letter large, its Baraha key in a `kbd`, and its ISO 15919 spelling small. Spellings come from the crate at build time.
 - Page links: pill-shaped plates at the end of every page.
 - Marks: CSS Custom Highlight API with a wavy underline and a tinted background. The DOM is never changed for them.
 
+## Type
+
+1 family, Noto Sans Kannada (`--type-sans`), with Noto Serif Kannada (`--type-serif`) as the document's serif option. The document is `--type-doc`, and `--type-doc-wide` from 768px, with line height `--type-doc-leading` for ottaksharas. UI text is 0.9375rem.
+
 ## Motion
 
-1 authored moment: the board message flips in (260 ms, expo out) when it changes. The popover rises 6px. Hovers fade in 150 ms. All motion stops under `prefers-reduced-motion`.
+Buttons give a little when pressed and spring back on `--ease-spring`. The board message flips in when it changes. Hovers fade in over `--duration-quick`. All motion stops under `prefers-reduced-motion`.
 
 ## Do not
 
-- Do not add a third mark color, or use red or amber for anything else.
-- Do not add eyebrows, gradient text, glass, or card grids.
+- Do not add a third mark color, or use rose or amber for anything else.
+- Do not make the sheet or the content sections glass.
 - Do not load fonts or scripts from another host; the Content-Security-Policy forbids it.
