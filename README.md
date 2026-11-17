@@ -276,3 +276,5 @@ Not covered by the MIT license:
 - the Noto fonts in `web/src/fonts/`, which are under the SIL Open Font License (`web/src/fonts/OFL.txt`).
 
 If kannadi helps your project, a mention or a link to [prasad.tech](https://prasad.tech) is appreciated.
+
+Part of [Open Kannada](https://github.com/openkannada), free and open-source tools that make Kannada work properly on computers.
