@@ -80,6 +80,8 @@ assert.equal(kannadi.fontLayout("Shree-Kan-0850"), "shree-lipi");
 assert.ok(kannadi.isLegacyFont("Shree-Kan-0851"));
 assert.equal(kannadi.fontLayout("Shree-Kan-0851"), null);
 assert.equal(kannadi.convertLegacy("PÜ®Ü°vÜ", { layout: "shree-lipi" }).text, "ಕನ್ನಡ");
+assert.equal(kannadi.fontLayout("Kan-EngPraja"), "kan-eng");
+assert.equal(kannadi.convertLegacy("ÉÜá°Üáè", { layout: "kan-eng" }).text, "ಮತ್ತು");
 assert.ok(kannadi.drawsKannadaDigits("Nudi 04 k"));
 const bytes = new Uint8Array([...NUDI].map((c) => c.charCodeAt(0) < 256 ? c.charCodeAt(0) : 0x3f));
 const txt = await openFile(new File([bytes], "page.txt"), io);

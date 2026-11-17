@@ -30,6 +30,9 @@ pub enum Source {
     Raw,
     /// The font's ToUnicode map, for subsets whose codes were renumbered.
     Mapped,
+    /// The ToUnicode map of the CID copy Acrobat makes of a WinAnsi font for the
+    /// glyphs WinAnsi cannot show, read back by [`from_acrobat_copy`].
+    AcrobatCopy,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -51,10 +54,12 @@ pub struct Font {
     read_as: Layout,
     /// The font maps codes with its own glyph list and no ToUnicode map.
     custom_codes: bool,
+    /// A Type0 font, as the copies Acrobat makes are.
+    cid: bool,
     pub kannada_digits: bool,
     /// The raw reading of all text shown in the font.
     text: String,
-    /// The ToUnicode reading, for a 1-byte font named as legacy that has a map.
+    /// The ToUnicode reading, for a font named as legacy that has a map.
     mapped: String,
     pub verdict: Verdict,
 }
@@ -91,6 +96,10 @@ impl Fonts {
             named,
             read_as: named.unwrap_or(Layout::Nudi),
             custom_codes,
+            cid: dict
+                .get(b"Subtype")
+                .and_then(Object::as_name)
+                .is_ok_and(|s| s == b"Type0"),
             no_table: named.is_none() && is_legacy_font(plain),
             kannada_digits: draws_kannada_digits(plain),
             name,
@@ -146,6 +155,8 @@ impl Fonts {
             let renumbered = looks_renumbered(&font.text);
             font.verdict = if font.no_table && looks_legacy(&font.text) {
                 Verdict::Unreadable(NO_TABLE)
+            } else if font.named.is_some() && font.cid && is_acrobat_copy(&font.mapped) {
+                Verdict::Legacy(Source::AcrobatCopy)
             } else if font.named.is_some() {
                 let mapped = Judgment::of(&font.mapped, layout);
                 // Short text: the map wins when only its reading looks like legacy codes.
@@ -278,6 +289,31 @@ pub fn looks_renumbered(text: &str) -> bool {
         last = Some(c);
     }
     letters >= 10 && symbols * 7 >= letters + symbols
+}
+
+/// The legacy code behind a character of an Acrobat copy's map. Acrobat moves the
+/// glyphs at codes Windows-1252 leaves undefined, at AD and at B5 into the copy;
+/// its map gives the undefined codes back as themselves, AD as U+2212 and B5 as
+/// U+03BC, as seen in Kan-Eng, Akruti and Nudi B-Akshara budget papers.
+fn acrobat_code(c: char) -> Option<char> {
+    match c {
+        '\u{81}' | '\u{8D}' | '\u{8F}' | '\u{90}' | '\u{9D}' => Some(c),
+        '\u{2212}' => Some('\u{AD}'),
+        '\u{3BC}' => Some('\u{B5}'),
+        _ => None,
+    }
+}
+
+fn is_acrobat_copy(text: &str) -> bool {
+    text.chars().any(|c| !c.is_whitespace())
+        && text
+            .chars()
+            .all(|c| c.is_whitespace() || acrobat_code(c).is_some())
+}
+
+/// The legacy codes of text read through an Acrobat copy's map.
+pub fn from_acrobat_copy(text: &str) -> String {
+    text.chars().map(|c| acrobat_code(c).unwrap_or(c)).collect()
 }
 
 /// Whether at least 3 in 10 visible characters are Windows-1252 characters above

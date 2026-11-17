@@ -1,6 +1,6 @@
 [package]
 name = "kannadi"
-description = "Convert Kannada text in legacy Nudi, Baraha, Akruti and Shree-Lipi fonts to Unicode and back; akshara segmentation, normalization, transliteration and numerals"
+description = "Convert Kannada text in legacy Nudi, Baraha, Nudi B-Akshara, Kan-Eng, Akruti and Shree-Lipi fonts to Unicode and back; akshara segmentation, normalization, transliteration and numerals"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true

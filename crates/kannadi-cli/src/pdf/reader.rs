@@ -172,6 +172,8 @@ struct Pen {
     line_x: f32,
     x: f32,
     y: f32,
+    /// The text leading, which `T*` moves down by.
+    leading: f32,
     /// Where the last string ended, within this text object and line.
     end: Option<f32>,
     /// The current transformation matrix, from user space to the page.
@@ -188,6 +190,7 @@ impl Default for Pen {
             line_x: 0.0,
             x: 0.0,
             y: 0.0,
+            leading: 0.0,
             end: None,
             ctm: Matrix::IDENTITY,
             last_y: None,
@@ -272,8 +275,8 @@ struct PageReader<'d, 'f> {
     current: Option<&'d Dictionary>,
     /// The last string shown: its font, bytes and start on the page.
     last_string: Option<(usize, Vec<u8>, f32, f32)>,
-    /// Fonts, sizes and transformations saved by `q`, restored by `Q`.
-    saved: Vec<(Option<&'d Dictionary>, f32, Matrix)>,
+    /// Fonts, sizes, leadings and transformations saved by `q`, restored by `Q`.
+    saved: Vec<(Option<&'d Dictionary>, f32, f32, Matrix)>,
     lost: usize,
     operations_left: usize,
 }
@@ -299,21 +302,26 @@ impl<'d> PageReader<'d, '_> {
                     self.current = name().and_then(|n| self.resource(resources, b"Font", n));
                     self.pen.size = number(1).unwrap_or(self.pen.size);
                 }
-                "Td" | "TD" => self
-                    .pen
-                    .move_by(number(0).unwrap_or(0.0), number(1).unwrap_or(0.0)),
+                "Td" | "TD" => {
+                    let ty = number(1).unwrap_or(0.0);
+                    if op.operator == "TD" {
+                        self.pen.leading = -ty;
+                    }
+                    self.pen.move_by(number(0).unwrap_or(0.0), ty);
+                }
+                "TL" => self.pen.leading = number(0).unwrap_or(self.pen.leading),
                 "Tm" => {
                     let (a, e, f) = (number(0), number(4), number(5));
                     self.pen
                         .set(a.unwrap_or(1.0), e.unwrap_or(0.0), f.unwrap_or(0.0));
                 }
-                "T*" | "'" | "\"" => self.break_line(),
-                "q" => self.saved.push((self.current, self.pen.size, self.pen.ctm)),
+                // Acrobat Distiller moves to the next part of a line with a
+                // leading of 0, which stays on the baseline.
+                "T*" | "'" | "\"" => self.pen.move_by(0.0, -self.pen.leading),
+                "q" => self.saved.push(self.state()),
                 "Q" => {
-                    if let Some((font, size, ctm)) = self.saved.pop() {
-                        self.current = font;
-                        self.pen.size = size;
-                        self.pen.ctm = ctm;
+                    if let Some(state) = self.saved.pop() {
+                        self.restore(state);
                     }
                 }
                 "cm" => {
@@ -326,11 +334,11 @@ impl<'d> PageReader<'d, '_> {
                         let mut inner: Vec<&Dictionary> = form.resources.into_iter().collect();
                         inner.extend_from_slice(resources);
                         // A form is drawn inside its own `q` and `Q`.
-                        let (font, size, ctm) = (self.current, self.pen.size, self.pen.ctm);
+                        let state = self.state();
                         let saved = std::mem::take(&mut self.saved);
-                        self.pen.ctm = form.matrix.then(ctm);
+                        self.pen.ctm = form.matrix.then(state.3);
                         let walked = self.walk(&form.operations, &inner, depth + 1);
-                        (self.current, self.pen.size, self.pen.ctm) = (font, size, ctm);
+                        self.restore(state);
                         self.saved = saved;
                         walked?;
                     }
@@ -343,6 +351,18 @@ impl<'d> PageReader<'d, '_> {
             }
         }
         Ok(())
+    }
+
+    /// The part of the graphics state the reader follows, as `q` saves it.
+    fn state(&self) -> (Option<&'d Dictionary>, f32, f32, Matrix) {
+        (self.current, self.pen.size, self.pen.leading, self.pen.ctm)
+    }
+
+    fn restore(&mut self, (font, size, leading, ctm): (Option<&'d Dictionary>, f32, f32, Matrix)) {
+        self.current = font;
+        self.pen.size = size;
+        self.pen.leading = leading;
+        self.pen.ctm = ctm;
     }
 
     fn break_line(&mut self) {
@@ -390,7 +410,8 @@ impl<'d> PageReader<'d, '_> {
                 .and_then(Object::as_name)
                 .is_ok_and(|s| s != b"Type0");
             let index = fonts.index(doc, dict, settings);
-            let raw_codes = simple && fonts.is_named_legacy(index);
+            let named = fonts.is_named_legacy(index);
+            let raw_codes = simple && named;
             let encoding = dict.get_font_encoding_with_limit(doc, LIMIT).ok();
             let by_lopdf = |b: u8| {
                 let text = Document::decode_text(encoding.as_ref()?, &[b]).ok()?;
@@ -408,11 +429,7 @@ impl<'d> PageReader<'d, '_> {
                     None
                 },
                 encoding,
-                cmap: if raw_codes {
-                    fonts.cmap(doc, dict)
-                } else {
-                    None
-                },
+                cmap: if named { fonts.cmap(doc, dict) } else { None },
                 widths: fonts.widths(doc, dict),
             }
         })

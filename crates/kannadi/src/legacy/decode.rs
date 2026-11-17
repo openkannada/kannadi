@@ -675,6 +675,35 @@ mod tests {
         }
     }
 
+    fn kan_eng(legacy: &[u8]) -> Conversion {
+        to_unicode(
+            &decode_windows_1252(legacy),
+            Layout::KanEng,
+            &Options::default(),
+        )
+    }
+
+    #[test]
+    fn kan_eng_reads_both_typings_of_ma_and_keeps_latin() {
+        for (codes, text) in [
+            (&[0xC9, 0xDC, 0xE1][..], "ಮ"),
+            (&[0xC9, 0xE5, 0xE1, 0xDE], "ಮೊ"),
+            (&[0xC9, 0xE5, 0xE3], "ಮೊ"),
+            (&[0xC9, 0xE5, 0xE3, 0xE0], "ಮೋ"),
+            (&[0xF9, 0xE1, 0xDC, 0xE1], "ಯ"),
+            (&[0xB0, 0xDD], "ತ್"),
+            (&[0xDA, 0xDC, 0xCD], "ಕ್ಷ"),
+            (&[0x81, 0x9D, 0xDC], "ಆಚ"),
+            (&[0xB0, 0xDC, 0xAD, 0xDE], "ತ್ಣಾ"),
+            (&[0xDA, 0xDC, 0x8D], "ಕಃ"),
+            (&[0x4D, 0x65, 0x67, 0x61, 0x20, 0xB0, 0xDC], "Mega ತ"),
+        ] {
+            let c = kan_eng(codes);
+            assert!(c.is_clean(), "{c:?}");
+            assert_eq!(c.text, text);
+        }
+    }
+
     #[test]
     fn a_subscript_after_a_letter_with_ra_goes_before_the_ra() {
         assert_eq!(akruti(&[0xDE, 0x22]).text, "ಶ್ಕ್ರೀ");

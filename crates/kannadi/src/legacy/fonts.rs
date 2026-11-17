@@ -16,6 +16,8 @@ use super::Layout;
 ///   after it. Other Shree-Kan numbers were not checked; [`is_legacy_font`] still
 ///   knows them.
 /// - [`Layout::NudiB`]: Nudi B-Akshara (NudiB-Akshar), the bilingual Nudi font.
+/// - [`Layout::KanEng`]: the Kan-Eng fonts (Kan-EngPraja, Kan-EngDeepa,
+///   Kan-EngKarn, Kan-EngVani, Kan-EngUsha), which share 1 layout.
 ///
 /// ```
 /// use kannadi::legacy::{font_layout, Layout};
@@ -36,6 +38,9 @@ pub fn font_layout(name: &str) -> Option<Layout> {
     }
     if key.starts_with("nudibakshar") {
         return Some(Layout::NudiB);
+    }
+    if key.starts_with("kaneng") {
+        return Some(Layout::KanEng);
     }
     if key.starts_with("akrutikndpadma") {
         return Some(Layout::Akruti);
@@ -131,6 +136,20 @@ mod tests {
         ] {
             assert_eq!(font_layout(f), Some(Layout::Nudi), "{f}");
         }
+    }
+
+    #[test]
+    fn kan_eng_fonts() {
+        for f in [
+            "Kan-EngPraja",
+            "Kan-EngDeepa,Bold",
+            "Kan-EngPrajaBold",
+            "Kan-EngKarn",
+            "Kan-EngVani",
+        ] {
+            assert_eq!(font_layout(f), Some(Layout::KanEng), "{f}");
+        }
+        assert_eq!(font_layout("KanDevraj"), None);
     }
 
     #[test]

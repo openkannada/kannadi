@@ -1,7 +1,7 @@
 use kannadi::legacy::{decode_windows_1252, from_unicode, to_unicode, Layout, Options};
 
 /// The golden fixture of each layout, with the fewest rows it must have.
-const FIXTURES: [(Layout, &str, usize); 4] = [
+const FIXTURES: [(Layout, &str, usize); 5] = [
     (Layout::Nudi, include_str!("fixtures/nudi.tsv"), 10),
     (Layout::Akruti, include_str!("fixtures/akruti.tsv"), 100),
     (
@@ -10,6 +10,7 @@ const FIXTURES: [(Layout, &str, usize); 4] = [
         100,
     ),
     (Layout::NudiB, include_str!("fixtures/nudi-b.tsv"), 100),
+    (Layout::KanEng, include_str!("fixtures/kan-eng.tsv"), 100),
 ];
 
 /// The legacy text, expected Unicode and source of each fixture row.
@@ -93,6 +94,15 @@ fn most_nudi_b_words_encode_as_typed() {
     let (same, total) = typed_back(Layout::NudiB);
     assert!(total >= 400, "{total}");
     assert!(same * 100 >= total * 95, "{same} of {total}");
+}
+
+/// The budget papers type many glyphs at 2 codes, such as ಂ at 8C and F9, and the
+/// encoder writes 1 of them.
+#[test]
+fn most_kan_eng_words_encode_as_typed() {
+    let (same, total) = typed_back(Layout::KanEng);
+    assert!(total >= 300, "{total}");
+    assert!(same * 100 >= total * 90, "{same} of {total}");
 }
 
 /// How many clean fixture words encode back to the bytes typed, of how many.

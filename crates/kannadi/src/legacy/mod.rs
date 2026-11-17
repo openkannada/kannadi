@@ -41,15 +41,19 @@ pub enum Layout {
     /// Nudi B-Akshara (NudiB-Akshar), the bilingual Nudi font: Latin at the ASCII
     /// codes, Kannada from 0x81 up, in a layout of its own.
     NudiB,
+    /// The Kan-Eng fonts, such as Kan-EngPraja and Kan-EngDeepa: bilingual, with
+    /// Latin at the ASCII letter codes and Kannada at the other codes.
+    KanEng,
 }
 
 impl Layout {
     /// Every layout, in a fixed order.
-    pub const ALL: [Layout; 4] = [
+    pub const ALL: [Layout; 5] = [
         Layout::Nudi,
         Layout::Akruti,
         Layout::ShreeLipi,
         Layout::NudiB,
+        Layout::KanEng,
     ];
 
     /// The layout's name in lowercase, as [`FromStr`] reads it.
@@ -66,6 +70,7 @@ impl Layout {
             Layout::Akruti => "akruti",
             Layout::ShreeLipi => "shree-lipi",
             Layout::NudiB => "nudi-b",
+            Layout::KanEng => "kan-eng",
         }
     }
 

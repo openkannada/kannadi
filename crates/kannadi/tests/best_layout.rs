@@ -59,6 +59,7 @@ fn whole_lines_find_their_layout() {
         (include_str!("fixtures/akruti.tsv"), Layout::Akruti),
         (include_str!("fixtures/shree-lipi.tsv"), Layout::ShreeLipi),
         (include_str!("fixtures/nudi-b.tsv"), Layout::NudiB),
+        (include_str!("fixtures/kan-eng.tsv"), Layout::KanEng),
     ] {
         for row in table
             .lines()

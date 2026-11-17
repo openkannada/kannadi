@@ -11,13 +11,15 @@ mod fonts;
 mod reader;
 mod widths;
 
+use std::borrow::Cow;
+
 use anyhow::{bail, Context, Result};
 use kannadi::legacy::{syllable_starts, to_unicode, Layout, Options};
 use lopdf::{Document, Object};
 
 use crate::convert::{convert, Direction, Issue, Kind, Settings};
 use crate::report::{Report, Row};
-use fonts::{Fonts, Source, Verdict};
+use fonts::{from_acrobat_copy, Fonts, Source, Verdict};
 use reader::{read_page, Piece};
 
 /// The most a single page or font stream may decompress to.
@@ -162,14 +164,18 @@ impl<'a> LineWriter<'a> {
             match font.verdict {
                 Verdict::Legacy(source) => {
                     let text = match (source, mapped) {
-                        (Source::Mapped, Some(mapped)) => mapped,
-                        _ => raw,
+                        (Source::Mapped, Some(mapped)) => Cow::Borrowed(mapped.as_str()),
+                        (Source::AcrobatCopy, Some(mapped)) => {
+                            Cow::Owned(from_acrobat_copy(mapped))
+                        }
+                        _ => Cow::Borrowed(raw.as_str()),
                     };
                     if text.is_empty() {
                         continue;
                     }
                     let font_reading = (font.layout(), font.kannada_digits);
-                    if font_reading == reading && gap && inside_syllable(&legacy, text, reading.0) {
+                    if font_reading == reading && gap && inside_syllable(&legacy, &text, reading.0)
+                    {
                         gap = false;
                     }
                     if font_reading != reading {
@@ -178,7 +184,7 @@ impl<'a> LineWriter<'a> {
                         reading = font_reading;
                     }
                     space(&mut gap, &mut legacy, &mut out);
-                    legacy.push_str(text);
+                    legacy.push_str(&text);
                 }
                 Verdict::Unreadable(_) => {
                     space(&mut gap, &mut legacy, &mut out);
@@ -507,6 +513,75 @@ endcmap\nCMapName currentdict /CMap defineresource pop\nend\nend\n";
         }
     }
 
+    /// A Type0 copy of the font `name` whose ToUnicode map gives CID n the n-th of
+    /// `mapped`, as Acrobat writes it, and the document that holds it.
+    fn acrobat_copy(name: &str, mapped: &[&str]) -> (Document, Dictionary) {
+        let entries: String = mapped
+            .iter()
+            .enumerate()
+            .map(|(i, u)| format!("<{:04X}> <{u}>\n", i + 1))
+            .collect();
+        let cmap = format!(
+            "begincmap\n1 begincodespacerange\n<0000> <FFFF>\nendcodespacerange\n\
+            {} beginbfchar\n{entries}endbfchar\nendcmap\n",
+            mapped.len()
+        );
+        let mut doc = Document::with_version("1.5");
+        let map = doc.add_object(Stream::new(dictionary! {}, cmap.into_bytes()));
+        let descendant = doc.add_object(dictionary! {
+            "Type" => "Font", "Subtype" => "CIDFontType2", "BaseFont" => name,
+        });
+        let copy = dictionary! {
+            "Type" => "Font", "Subtype" => "Type0", "BaseFont" => name,
+            "Encoding" => "Identity-H", "DescendantFonts" => vec![descendant.into()], "ToUnicode" => map,
+        };
+        (doc, copy)
+    }
+
+    #[test]
+    fn glyphs_acrobat_moved_to_a_cid_copy_join_their_words() {
+        let (doc, copy) = acrobat_copy("GHIJKL+Kan-EngPraja", &["009D", "2212"]);
+        let content =
+            b"BT /F1 12 Tf 72 700 Td (\xC9\xE5) Tj /F2 12 Tf <0001> Tj /F1 12 Tf (\xDC\x9C) Tj \
+            ( \xB0\xDC) Tj /F2 12 Tf <0002> Tj ET";
+        let fonts = vec![simple_font("ABCDEF+Kan-EngPraja"), copy];
+        let (text, report) = run(&pdf_with_objects(doc, fonts, content));
+        assert!(report.is_empty(), "{:?}", report.rows);
+        assert_eq!(text, "ವೆಚ್ಚ ತ್ಣ\n");
+    }
+
+    #[test]
+    fn a_simple_font_with_a_map_is_not_taken_for_an_acrobat_copy() {
+        let cmap = b"begincmap\n1 beginbfchar\n<24> <0081>\nendbfchar\nendcmap\n";
+        let mut doc = Document::with_version("1.5");
+        let map = doc.add_object(Stream::new(dictionary! {}, cmap.to_vec()));
+        let mut font = simple_font("ABCDEF+Kan-EngPraja");
+        font.set("ToUnicode", map);
+        let (text, _) = run(&pdf_with_objects(
+            doc,
+            vec![font],
+            b"BT /F1 12 Tf 72 700 Td ($) Tj ET",
+        ));
+        assert_eq!(text, "ಅ\n");
+    }
+
+    #[test]
+    fn a_copy_with_only_ad_or_b5_is_read_back() {
+        for (mapped, shown, text) in [("2212", b"\xB0\xDC", "ತ್ಣ\n"), ("03BC", b"\xDA\xDC", "ಕ್ದ\n")]
+        {
+            let (doc, copy) = acrobat_copy("GHIJKL+Kan-EngPraja", &[mapped]);
+            let content = [
+                &b"BT /F1 12 Tf 72 700 Td ("[..],
+                shown,
+                b") Tj /F2 12 Tf <0001> Tj ET",
+            ]
+            .concat();
+            let fonts = vec![simple_font("ABCDEF+Kan-EngPraja"), copy];
+            let (got, _) = run(&pdf_with_objects(doc, fonts, &content));
+            assert_eq!(got, text, "{mapped}");
+        }
+    }
+
     #[test]
     fn short_text_that_does_not_convert_cleanly_is_kept() {
         for (shown, kept) in [
@@ -587,6 +662,37 @@ endcmap\nCMapName currentdict /CMap defineresource pop\nend\nend\n";
     }
 
     #[test]
+    fn next_line_operators_move_down_by_the_leading() {
+        let content = b"BT /F1 12 Tf 14 TL 72 700 Td (P\xC0) Tj T* (P\xC0) Tj (P\xC0) ' ET";
+        let (text, _) = run(&pdf(vec![("F1", simple_font("BRHKannada"))], content));
+        assert_eq!(text, "ಕ\nಕ\nಕ\n");
+        let td = b"BT /F1 12 Tf 72 700 Td (P\xC0) Tj 0 -14 TD (P\xC0) Tj T* (P\xC0) Tj ET";
+        let (text, _) = run(&pdf(vec![("F1", simple_font("BRHKannada"))], td));
+        assert_eq!(text, "ಕ\nಕ\nಕ\n");
+        let distiller = b"BT /F1 12 Tf 72 700 Td (P) Tj 7 0 TD T* (\xC0) Tj ET";
+        let (text, _) = run(&pdf(vec![("F1", simple_font("BRHKannada"))], distiller));
+        assert_eq!(text, "ಕ\n");
+        let quote_on_the_line = b"BT /F1 12 Tf 72 700 Td (P) Tj (\xC0) ' ET";
+        let (text, _) = run(&pdf(
+            vec![("F1", simple_font("BRHKannada"))],
+            quote_on_the_line,
+        ));
+        assert_eq!(text, "ಕ\n");
+    }
+
+    #[test]
+    fn the_leading_lasts_across_text_objects_and_q_restores_it() {
+        let kept =
+            b"BT /F1 12 Tf 14 TL 72 700 Td (P\xC0) Tj ET BT 72 600 Td (P\xC0) Tj T* (P\xC0) Tj ET";
+        let (text, _) = run(&pdf(vec![("F1", simple_font("BRHKannada"))], kept));
+        assert_eq!(text, "ಕ\nಕ\nಕ\n");
+        let restored =
+            b"BT /F1 12 Tf 72 700 Td (P) Tj ET q BT 14 TL ET Q BT 72 700 Td T* (\xC0) Tj ET";
+        let (text, _) = run(&pdf(vec![("F1", simple_font("BRHKannada"))], restored));
+        assert_eq!(text, "ಕ\n");
+    }
+
+    #[test]
     fn short_legacy_text_in_an_unknown_font_is_converted() {
         let content = b"BT /F1 12 Tf 72 700 Td (\xA8s\xC1U\xC0) Tj ET";
         let (text, _) = run(&pdf(vec![("F1", simple_font("CIDFont+F1"))], content));
@@ -648,6 +754,14 @@ endcmap\nCMapName currentdict /CMap defineresource pop\nend\nend\n";
         let form = b"BT /F3 12 Tf 72 650 Td (x) Tj ET";
         let (text, _) = run(&page_with_form(page, form, false));
         assert_eq!(text, "x\nಕ\n");
+    }
+
+    #[test]
+    fn a_form_keeps_its_leading_to_itself() {
+        let page = b"BT /F1 12 Tf 72 700 Td (P) Tj ET /X Do BT 72 700 Td T* (\xC0) Tj ET";
+        let form = b"BT 14 TL ET";
+        let (text, _) = run(&page_with_form(page, form, false));
+        assert_eq!(text, "ಕ\n");
     }
 
     #[test]
