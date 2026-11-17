@@ -60,7 +60,7 @@ Version 0.1, in development.
 | Akruti to Unicode and back | To Unicode in the library, the command-line tool and the editor page; back to Akruti in the library. Checked on 908,075 glyphs from 35 documents; a Kannada reader's check of 125 lines is pending |
 | Nudi B-Akshara to Unicode and back | To Unicode in the library, the command-line tool and the editor page; back to Nudi B-Akshara in the library. Checked on 643,777 glyphs from 27 documents; a Kannada reader's check of 190 lines is pending |
 | Kan-Eng to Unicode and back | To Unicode in the library, the command-line tool and the editor page; back to Kan-Eng in the library. Checked on 21,455 glyphs from 45 budget papers; a Kannada reader's check of 118 lines is pending |
-| Shree-Lipi (Shree-Kan-0850) to Unicode and back | To Unicode in the library, the command-line tool and the editor page; back to Shree-Lipi in the library. Checked on 233,346 glyphs from 173 newspaper pages; a Kannada reader's check of 130 lines is pending |
+| Shree-Lipi (Shree-Kan-0850) to Unicode and back | To Unicode in the library, the command-line tool and the editor page; back to Shree-Lipi in the library. Checked on 233,346 glyphs from 173 newspaper pages; a Kannada reader's check of the 140 fixture lines is pending |
 | Test corpus | 207 lines from 31 government pages of 2002 in [corpus/](https://github.com/openkannada/kannadi/tree/main/corpus); a Kannada reader's check is pending |
 | Editor page that runs in the browser, with no upload | Built, not hosted yet: [web/](https://github.com/openkannada/kannadi/tree/main/web) |
 | Command-line tool for TXT, HTML, DOCX and PDF | Done; PDF to Unicode only |
@@ -268,12 +268,14 @@ The minimum supported Rust version is 1.75 for the `kannadi` library and 1.89 fo
 
 ## License
 
-The code is MIT licensed. See [LICENSE](https://github.com/openkannada/kannadi/blob/main/LICENSE).
+kannadi is free and open source. The code and the glyph tables are under the MIT license or the Apache License 2.0, at your choice: see [LICENSE-MIT](https://github.com/openkannada/kannadi/blob/main/LICENSE-MIT) and [LICENSE-APACHE](https://github.com/openkannada/kannadi/blob/main/LICENSE-APACHE). The docs are under [CC BY 4.0](https://github.com/openkannada/kannadi/blob/main/LICENSES/CC-BY-4.0.txt), and code examples in them may also be used under MIT or Apache 2.0. [REUSE.toml](https://github.com/openkannada/kannadi/blob/main/REUSE.toml) gives the license of every file, and [NOTICE.md](https://github.com/openkannada/kannadi/blob/main/NOTICE.md) lists the third-party material with its credit.
 
-Not covered by the MIT license:
-- the excerpts of Karnataka government documents in `corpus/` and in the test fixtures, which are kept as short excerpts for testing, with their sources (see the [corpus data card](https://github.com/openkannada/kannadi/blob/main/corpus/README.md));
+Not covered by these licenses:
+- the excerpts of Karnataka government documents in `corpus/` and in the test fixtures, which are kept as short excerpts for testing, with their sources (see the [corpus data card](https://github.com/openkannada/kannadi/blob/main/corpus/README.md) and the [fixtures README](https://github.com/openkannada/kannadi/blob/main/crates/kannadi/tests/fixtures/README.md));
 - the font names and copyright strings recorded in `tools/fontqa/results/`, which belong to their owners;
 - the Noto fonts in `web/src/fonts/`, which are under the SIL Open Font License (`web/src/fonts/OFL.txt`).
+
+The Shree-Lipi test lines were written for kannadi; no newspaper text is included. The names Open Kannada and kannadi, and the logo, are covered by [TRADEMARKS.md](https://github.com/openkannada/kannadi/blob/main/TRADEMARKS.md).
 
 If kannadi helps your project, a mention or a link to [prasad.tech](https://prasad.tech) is appreciated.
 

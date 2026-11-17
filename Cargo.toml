@@ -6,9 +6,9 @@ members = ["crates/kannadi", "crates/kannadi-cli", "crates/kannadi-wasm"]
 version = "0.1.0"
 edition = "2021"
 rust-version = "1.75"
-license = "MIT"
+license = "MIT OR Apache-2.0"
 repository = "https://github.com/openkannada/kannadi"
-authors = ["Prasad Subrahmanya <prasadus92@gmail.com>"]
+authors = ["The Open Kannada Authors"]
 
 # Used by web/build.sh for the converter page.
 [profile.wasm]

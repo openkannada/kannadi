@@ -16,7 +16,7 @@ Status: checked on 17 November 2026. Akruti is built: see [akruti.md](akruti.md)
 - Each table's header records how it was derived: the fonts and documents, and the method. See `crates/kannadi/data/nudi.tsv` and `crates/kannadi/data/akruti.tsv`.
 - Do not download Shree-Lipi or Akruti font files from any source other than the vendor, or a publisher that served the font to readers with its public pages, as Udayavani did (decided on 17 November 2026).
 - Do not copy tables from other converters (see [prior-art.md](prior-art.md)).
-- Keep only short excerpts of source documents, with their URLs, as for the Nudi fixtures.
+- Keep only short excerpts of source documents, with their URLs, as for the Nudi fixtures. Do not keep newspaper or other commercial text: write test lines and encode them with the table, as the Shree-Lipi fixture does.
 
 These rules are about building tables. At run time, the `kannadi` tool reads the ToUnicode maps, `Differences` lists and other font data in the user's own file to convert it; that is outside these rules.
 
@@ -97,13 +97,13 @@ Codes the font has but no page used are left out, and are reported as unknown if
 | Text | 1,660 distinct lines, 233,346 glyphs |
 | Unknown glyphs | 0 |
 | Malformed syllables | 20 |
-| Fixture lines read against the rendered font | 130 lines from 36 pages, all equal |
-| Words that encode back to the bytes typed | 28,015 of 28,786 (97.3%); in the fixture, 765 of 787 |
-| Fixture words read alone that `best_layout` gives another layout | 11 of 787 |
+| Fixture lines | 140 lines written for kannadi, all convert to the text they were written from |
+| Words that encode back to the bytes typed | 28,015 of 28,786 (97.3%); in the fixture, 728 of 750 |
+| Fixture words read alone that `best_layout` gives another layout | 12 of 750 |
 
 Of the 20 malformed syllables, 12 are ಆ್ಯ, the way these pages write the vowel of English "and" (ಆ್ಯಂಡ್, ಆ್ಯಂಟನಿ); the converter keeps it and reports it, as Unicode has no valid syllable for it. The other 8 are the pages' own typing errors: ೖ on ಮೊ and ನೊ for ಮೊಯ್ಲಿ and ನೊಯ್ಡಾ, ರು with ೖ, a stray ಾ, and a consonant with no head stroke. 3 words have the subscript ನ typed twice with 24 between; they read as 2 subscripts, as they would draw.
 
-The fixture is [shree-lipi.tsv](../crates/kannadi/tests/fixtures/shree-lipi.tsv), with the source URL of each line. The pages have no page images, so each line was checked against its codes rendered in Shree-Kan-0850.
+The fixture is [shree-lipi.tsv](../crates/kannadi/tests/fixtures/shree-lipi.tsv). Until 17 November 2026 it held 130 lines of the Udayavani pages. They were replaced with 140 lines written for kannadi and encoded with this table, so that no newspaper text is kept. 22 words of them were then retyped by hand the way the pages typed such words, so the fixture still tests those habits; the source column of each line names its habit. The new lines use every glyph sequence the newspaper lines used. The figures above for pages, text, unknown glyphs and malformed syllables are from the newspaper pages, which are not in this repository.
 
 ### Limits
 
@@ -130,5 +130,5 @@ A table is ready when every code seen in the collected documents has a checked e
 ## Decisions for the maintainer
 
 1. Whether to ask Modular Infotech to publish the Shree-Lipi code page under an open license, such as CC0 for the data. The research found `support@modular-infotech.com` as a contact; it was not contacted. Modular offers its own conversion tool, so it may decline.
-2. A Kannada reader's check of the 125 Akruti and 130 Shree-Lipi fixture lines.
+2. A Kannada reader's check of the 125 Akruti and 140 Shree-Lipi fixture lines.
 3. Where to look for Shree-Lipi documents with real font names. Candidates are publishers' and newspapers' PDF archives from before 2010, and university question papers.

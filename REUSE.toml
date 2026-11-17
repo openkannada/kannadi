@@ -1,0 +1,45 @@
+version = 1
+SPDX-PackageName = "kannadi"
+SPDX-PackageDownloadLocation = "https://github.com/openkannada/kannadi"
+
+# Code, glyph tables, tests and tool configuration.
+[[annotations]]
+path = "**"
+SPDX-FileCopyrightText = "2026 The Open Kannada Authors"
+SPDX-License-Identifier = "MIT OR Apache-2.0"
+
+# Docs we write.
+[[annotations]]
+path = "**/*.md"
+SPDX-FileCopyrightText = "2026 The Open Kannada Authors"
+SPDX-License-Identifier = "CC-BY-4.0"
+
+# Test results and the dashboard built from them. Font names and copyright strings
+# quoted from the fonts belong to their owners.
+[[annotations]]
+path = ["tools/fontqa/results/**"]
+SPDX-FileCopyrightText = "2026 The Open Kannada Authors"
+SPDX-License-Identifier = "CC-BY-4.0"
+
+# Logo, screenshots and page images. The names and logo are also covered by TRADEMARKS.md.
+[[annotations]]
+path = ["docs/images/**", "web/src/og/**", "web/src/favicon.svg"]
+SPDX-FileCopyrightText = "2026 The Open Kannada Authors"
+SPDX-License-Identifier = "CC-BY-4.0"
+
+[[annotations]]
+path = "web/src/fonts/**"
+SPDX-FileCopyrightText = "2022 The Noto Project Authors (https://github.com/notofonts/kannada)"
+SPDX-License-Identifier = "OFL-1.1"
+
+# Short excerpts of Karnataka government documents, kept for testing with their sources.
+[[annotations]]
+path = [
+  "corpus/nudi-2002.tsv",
+  "crates/kannadi/tests/fixtures/nudi.tsv",
+  "crates/kannadi/tests/fixtures/akruti.tsv",
+  "crates/kannadi/tests/fixtures/nudi-b.tsv",
+  "crates/kannadi/tests/fixtures/kan-eng.tsv",
+]
+SPDX-FileCopyrightText = "Government of Karnataka"
+SPDX-License-Identifier = "LicenseRef-Excerpts"

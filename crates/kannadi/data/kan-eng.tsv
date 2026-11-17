@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 The Open Kannada Authors
+# SPDX-License-Identifier: MIT OR Apache-2.0
+#
 # Kan-Eng glyph table: Kan-EngPraja, Kan-EngDeepa, Kan-EngKarn, Kan-EngVani and
 # Kan-EngUsha, which share 1 layout. The fonts are bilingual: Latin letters and digits
 # at the ASCII codes, Kannada at the ASCII symbol codes $ & % < ] ^ ` { } ~ and from 81

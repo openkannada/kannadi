@@ -47,9 +47,11 @@ Today, with no verified lines, the figures compare the converter with itself. Th
 
 ## License and use
 
-The pages are works of the Government of Karnataka. They carry no license statement, and the MIT license of this repository does not cover them. The corpus keeps short excerpts, 1 to 21 lines per page and 6.7 on average, for research on and testing of a converter, with the source of each line. No page is stored in full. Keeping short excerpts with their sources for research and testing is meant as fair dealing under the Indian Copyright Act, 1957.
+The pages are works of the Government of Karnataka. They carry no license statement, and the licenses of this repository do not cover them. The corpus keeps short excerpts, 1 to 21 lines per page and 6.7 on average, for research on and testing of a converter, with the source of each line. No page is stored in full. Keeping short excerpts with their sources for research and testing is meant as fair dealing under the Indian Copyright Act, 1957.
 
-To ask for an excerpt to be removed, open an issue or write to prasadus92@gmail.com.
+Source credit: Government of Karnataka, Rural Development and Panchayat Raj department and Finance department, through the Internet Archive.
+
+To ask for an excerpt to be removed, write to support@luminik.io or open an issue.
 
 ## Known gaps
 

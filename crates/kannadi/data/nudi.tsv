@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 The Open Kannada Authors
+# SPDX-License-Identifier: MIT OR Apache-2.0
+#
 # Nudi and Baraha ANSI glyph table.
 #
 # The format is described in src/legacy/table.rs.

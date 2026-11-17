@@ -16,7 +16,7 @@ A string that does not appear in `failures.csv` for a face passed every check in
 ## Collection
 
 - Run on 2026-11-16 with fontqa 0.1, HarfBuzz 15.0.0 (uharfbuzz 0.57.0), fontTools 4.68.0 and skia-pathops 0.9.2.
-- 41 fonts, 146 faces after removing byte-identical files. 35 fonts have an open license (30 OFL 1.1, 5 GPL), 3 state no license, and 3 are Apple system fonts. The sources, pinned to commits where they are Git repositories, are in `../fonts.toml`; the file hashes are in `../fonts.lock.json`.
+- 41 fonts, 146 faces after removing byte-identical files. 35 fonts have an open license (31 OFL 1.1, 4 GPL), 3 state no license, and 3 are Apple system fonts. The sources, pinned to commits where they are Git repositories, are in `../fonts.toml`; the file hashes are in `../fonts.lock.json`.
 - Faces with fewer than 40 Kannada characters in `cmap` are left out. This drops the other scripts in Apple's `SFIndia.ttc`.
 - Variable fonts are tested at their default instance only.
 
@@ -26,7 +26,7 @@ Google Fonts (11 families), GitHub repositories of the designers or projects, th
 
 ## Licenses
 
-The `license` column is what the font's own license file or name table says. Most are OFL 1.1. Gubbi and Navilu are GPL 3.0 with the font exception; Kedage and Mallige are GPL 2.0. Sampige, Cheluvi and the KaGaPa Nudi fonts state no license. Apple's fonts are proprietary. This dataset holds no font data, only test results and metadata.
+The `license` column is what the font's own license file or name table says. Most are OFL 1.1; Navilu is OFL 1.1 with the Reserved Font Name Navilu. Gubbi is GPL 3.0 with the font exception; Kedage and Mallige are GPL 2.0. Sampige, Cheluvi and the KaGaPa Nudi fonts state no license. Apple's fonts are proprietary. This dataset holds no font data, only test results and metadata.
 
 ## Limits
 
