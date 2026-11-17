@@ -181,5 +181,8 @@ assert.match(designTokens, /:root\[data-theme="dark"\] \{\s*color-scheme: dark;/
 const pageRoot = css.match(/:root \{([^}]*)\}/)[1];
 assert.doesNotMatch(pageRoot, /#[0-9a-f]{3,8}\b|rgb\(|oklch\(\s*\d/i, "style.css defines no colors of its own");
 assert.doesNotMatch(css, /prefers-color-scheme: dark/, "dark mode comes from the tokens' light-dark() pairs");
+const defined = new Set([...`${designTokens}\n${css}`.matchAll(/(--[\w-]+)\s*:/g)].map((m) => m[1]));
+const undefinedVars = [...new Set([...css.matchAll(/var\((--[\w-]+)/g)].map((m) => m[1]))].filter((v) => !defined.has(v));
+assert.deepEqual(undefinedVars, [], "every custom property style.css uses is defined");
 
 console.log("web smoke test passed");

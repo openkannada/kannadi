@@ -51,8 +51,8 @@
   --rule-strong: color-mix(in oklch, var(--border), var(--foreground) 22%);
   --board-ink: var(--foreground);
   --board-ink-2: var(--muted-foreground);
-  --board-raised: oklch(from var(--foreground) l c h / 0.07);
-  --board-well: oklch(from var(--foreground) l c h / 0.06);
+  --board-raised: color-mix(in oklch, var(--foreground) 7%, transparent);
+  --board-well: color-mix(in oklch, var(--foreground) 6%, transparent);
   --disc: var(--primary);
   --disc-ink: var(--primary-foreground);
   --focus: var(--ring);
@@ -70,7 +70,44 @@
   --serif: var(--type-serif);
   --doc-font: var(--sans);
   --board-h: 4.5rem;
-  --route-h: 5.4rem;
+}
+
+/* Browsers without light-dark() (Safari before 17.5, Chrome before 123) get the light colors, so marks and choices still show. */
+@supports not (color: light-dark(#000, #fff)) {
+  :root {
+    --background: #f3f6fa;
+    --foreground: #111622;
+    --card: #ffffff;
+    --card-foreground: #111622;
+    --popover: #fdfdff;
+    --popover-foreground: #111622;
+    --primary: #4441be;
+    --primary-foreground: #fcfcfc;
+    --secondary: #e8ebf4;
+    --secondary-foreground: #111622;
+    --muted: #eef0f4;
+    --muted-foreground: #535865;
+    --accent: #e2e7fc;
+    --accent-foreground: #222168;
+    --border: #d9dce3;
+    --input: #d9dce3;
+    --ring: #5a5edd;
+    --glass: #fafcffa8;
+    --glass-solid: #f9fafd;
+    --glass-rim: #ffffffd9;
+    --glass-rim-low: #ffffff4d;
+    --glass-specular: #ffffff8c;
+    --glass-edge: #1b21301a;
+    --field-turmeric: #fec84bb3;
+    --field-kumkuma: #ff838652;
+    --field-indigo: #8995f480;
+    --mark-unknown: #f8495f33;
+    --mark-unknown-line: #c51a38;
+    --mark-malformed: #fdbe4561;
+    --mark-malformed-line: #aa5f04;
+    --board-raised: #1116220f;
+    --board-well: #1116220f;
+  }
 }
 
 :root[data-font="serif"] { --doc-font: var(--serif); }
@@ -145,7 +182,7 @@ kbd {
 }
 
 /* Liquid Glass: the board, its menu and the status bar float over the page; the rest is solid. */
-.board, .menu-list, .status {
+.board, .status {
   background: var(--glass);
   -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
   backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
@@ -153,10 +190,10 @@ kbd {
   box-shadow: inset 0 1.25px 0 var(--glass-rim), inset 0 -1px 0 var(--glass-rim-low), inset 0 12px 22px -16px var(--glass-specular), var(--shadow-float);
 }
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .board, .menu-list, .status { background: var(--glass-solid); }
+  .board, .status { background: var(--glass-solid); }
 }
 @media (prefers-reduced-transparency: reduce) {
-  .board, .menu-list, .status { background: var(--glass-solid); -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .board, .status { background: var(--glass-solid); -webkit-backdrop-filter: none; backdrop-filter: none; }
 }
 .brand { display: flex; align-items: center; gap: 0.7rem; text-decoration: none; }
 .mark { width: 2.5rem; height: 2.5rem; flex: none; }
@@ -176,7 +213,7 @@ kbd {
   padding: 0.35rem 0.5rem 0.35rem 0.9rem;
   background: var(--board-well);
   border-radius: var(--pill);
-  box-shadow: inset 0 1px 2px oklch(from var(--foreground) l c h / 0.08);
+  box-shadow: inset 0 1px 2px color-mix(in oklch, var(--foreground) 8%, transparent);
   overflow: hidden;
 }
 .message p {
@@ -218,7 +255,7 @@ kbd {
   font-weight: 600;
   cursor: pointer;
   list-style: none;
-  transition: background-color var(--duration-quick) var(--ease-out), box-shadow var(--duration-quick) var(--ease-out), transform var(--duration-morph) var(--ease-spring);
+  transition: background-color var(--duration-quick) var(--ease-standard), box-shadow var(--duration-quick) var(--ease-standard), transform var(--duration-morph) var(--ease-spring);
 }
 .plate::-webkit-details-marker { display: none; }
 .plate:hover { background: var(--board-raised); box-shadow: inset 0 1px 0 var(--glass-rim-low); }
@@ -238,8 +275,12 @@ kbd {
   display: grid;
   min-width: 13rem;
   padding: 0.35rem;
+  /* Solid: the board is glass, and a pane inside a pane of glass cannot blur what is behind the page. */
   color: var(--ink);
+  background: var(--popover);
+  border: 1px solid var(--glass-edge);
   border-radius: calc(var(--radius) + 6px);
+  box-shadow: var(--shadow-float);
 }
 .menu-list button {
   display: flex;
@@ -258,9 +299,7 @@ kbd {
 
 /* The route strip */
 .routebar {
-  position: sticky;
-  top: var(--board-h);
-  z-index: 20;
+  position: relative;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -326,7 +365,7 @@ kbd {
   font-weight: 600;
   font-size: 0.875rem;
   cursor: pointer;
-  transition: background-color var(--duration-quick) var(--ease-out), border-color var(--duration-quick) var(--ease-out), transform var(--duration-morph) var(--ease-spring);
+  transition: background-color var(--duration-quick) var(--ease-standard), border-color var(--duration-quick) var(--ease-standard), transform var(--duration-morph) var(--ease-spring);
 }
 .tools > button:hover, .segmented label:hover, .empty button:hover, .pop-actions button:hover { background: var(--accent); border-color: var(--rule); color: var(--accent-foreground); }
 .tools > button:active { transform: scale(0.95); transition-duration: var(--duration-quick), var(--duration-quick), 90ms; }
@@ -410,10 +449,10 @@ body.dragging .sheet { outline: 3px dashed var(--primary); outline-offset: 4px; 
 /* Rail */
 .rail {
   position: sticky;
-  top: calc(var(--board-h) + var(--route-h) + 1rem);
+  top: calc(var(--board-h) + 1rem);
   display: grid;
   gap: 1rem;
-  max-height: calc(100vh - var(--board-h) - var(--route-h) - 4.5rem);
+  max-height: calc(100vh - var(--board-h) - 4.5rem);
   overflow: auto;
 }
 .rail section {
@@ -599,6 +638,7 @@ body.dragging .sheet { outline: 3px dashed var(--primary); outline-offset: 4px; 
   justify-items: start;
   gap: 0.1rem;
   min-height: 2.75rem;
+  border-radius: calc(var(--radius) - 4px);
   text-align: left;
   font-weight: 500;
 }
@@ -649,9 +689,8 @@ dialog button { margin-top: 1rem; }
 }
 @media (max-width: 40rem) {
   :root { --board-h: 6.25rem; }
-  .board { grid-template-columns: auto auto; gap: 0.5rem; padding-top: 0.5rem; padding-bottom: 0.5rem; }
+  .board { grid-template-columns: auto auto; gap: 0.5rem; padding-top: 0.5rem; padding-bottom: 0.5rem; border-radius: 1.75rem; }
   .brand-kn { font-size: 1.2rem; }
-  .board { border-radius: 1.75rem; }
   .mark { width: 2.2rem; height: 2.2rem; }
   .board-actions { justify-self: end; }
   .plate { padding: 0 0.6rem; }
