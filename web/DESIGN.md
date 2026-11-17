@@ -36,7 +36,7 @@ The board and the status bar are glass: `--glass` over a backdrop blurred by `--
 
 ## Contrast
 
-Measured with the tokens in this pull request, in light and dark mode. Every pair passes WCAG AA.
+Measured with the tokens in `src/tokens.css`, in light and dark mode. Every pair passes WCAG AA.
 
 | Pair | Light | Dark |
 |---|---|---|
