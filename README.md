@@ -5,8 +5,8 @@ Convert Kannada documents typed in the legacy Nudi, Baraha, Nudi B-Akshara, Kan-
 ಕನ್ನಡಿ (kannaḍi) means mirror.
 
 <p>
-  <img src="https://raw.githubusercontent.com/prasadus92/kannadi/main/docs/images/editor.png" width="76%" alt="The kannadi editor in a browser after pasting 4 lines from a 2002 Karnataka government page typed in a Baraha font. The text is now Unicode Kannada. The toolbar shows 2 places to check, both marked in the third line: 1 glyph the converter could not place and 1 malformed syllable.">
-  <img src="https://raw.githubusercontent.com/prasadus92/kannadi/main/docs/images/editor-phone.png" width="21%" alt="The same 4 lines in the editor on a phone in dark mode, with the akshara and word counts above the text and the toolbar at the bottom of the screen.">
+  <img src="https://raw.githubusercontent.com/prasadus92/kannadi/main/docs/images/editor.png" width="78%" alt="The kannadi editor in a browser after pasting 4 lines from a 2002 Karnataka government page typed in a Baraha font. The text is now Unicode Kannada. 1 glyph the converter could not place and 1 malformed syllable are marked in the third line and listed under Problems.">
+  <img src="https://raw.githubusercontent.com/prasadus92/kannadi/main/docs/images/editor-phone.png" width="19%" alt="The same 4 lines in the editor on a phone in dark mode, with the paste notice at the top, the 2 problems listed below the text, and the akshara, word and character counts at the bottom.">
 </p>
 
 ## Why
