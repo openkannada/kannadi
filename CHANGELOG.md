@@ -15,6 +15,9 @@ Library (`kannadi`):
 - Unicode to Nudi and Baraha ANSI (`legacy::unicode_to_nudi`), writing each akshara in the order typists stored it, with reports of unencodable characters.
 - Akruti to Unicode and back (`legacy::to_unicode` and `legacy::from_unicode` with `Layout::Akruti`), with a glyph table derived from the fonts embedded in Karnataka Acts and checked on 908,075 glyphs from 35 documents. `legacy::Layout`, `UnknownLayout` and `syllable_starts`.
 - Shree-Lipi to Unicode and back (`Layout::ShreeLipi`), with a glyph table derived from the Shree-Kan-0850 font the Udayavani newspaper served with its web pages, checked on 233,346 glyphs from 173 pages. `legacy::font_layout` gives Shree-Kan-0850 this layout; other Shree-Kan fonts stay legacy fonts with no table.
+- Nudi B-Akshara to Unicode and back (`Layout::NudiB`), with a glyph table derived from the fonts embedded in Karnataka Legislative Assembly member pages, whose PDFs dropped the font's name, and in budget papers that name it NudiB-Akshar. `legacy::font_layout` gives NudiB-Akshar this layout; earlier it was read as Nudi. `Layout::draws_latin` for layouts whose fonts keep Latin letters at the ASCII codes.
+- `legacy::best_layout` breaks ties by fewer Latin letters, then fewer viramas.
+- The encoder writes a consonant whose subscript the layout cannot draw as a half form with a visible virama.
 - `chars::Class::is_mark`.
 - Sound-alike keys (`phonetic::key`, `keys`, `latin_key`) at 3 levels, for fuzzy search and for suggesting Kannada words from loosely typed Latin letters: "namaskara" and ನಮಸ್ಕಾರ share a medium key. `kannadi-wasm` exports `phoneticKey` and `latinKey`, so the editor page can use them.
 
@@ -25,6 +28,7 @@ Command-line tool (`kannadi-cli`):
 - HTML: converts only text set in a legacy font, found from `style`, `<style>` rules and `<font face>`.
 - DOCX: converts only runs in a legacy font, following run, character and paragraph styles.
 - PDF: extracts text and converts text in legacy fonts, including fonts renumbered behind a ToUnicode map.
+- PDF: Ghostscript's glyph names `c<n>` are read as code n; strings drawn several times a fraction of a point apart, to look bold, are read once; short text in a font with a hidden name is not taken as a layout that draws Latin.
 - Akruti in every format: font names give each run's layout in HTML, DOCX and PDF; `to-unicode --layout akruti` for text files; `--legacy-font "NAME=akruti"`. In PDFs, glyph names `G<n>` in renumbered lists are read as code n, fonts with hidden names are judged in each layout, and a gap that would break a syllable adds no space.
 
 Editor page and bindings:

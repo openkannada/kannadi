@@ -38,11 +38,19 @@ pub enum Layout {
     Akruti,
     /// Shree-Lipi's Kannada fonts, such as Shree-Kan-0850.
     ShreeLipi,
+    /// Nudi B-Akshara (NudiB-Akshar), the bilingual Nudi font: Latin at the ASCII
+    /// codes, Kannada from 0x81 up, in a layout of its own.
+    NudiB,
 }
 
 impl Layout {
     /// Every layout, in a fixed order.
-    pub const ALL: [Layout; 3] = [Layout::Nudi, Layout::Akruti, Layout::ShreeLipi];
+    pub const ALL: [Layout; 4] = [
+        Layout::Nudi,
+        Layout::Akruti,
+        Layout::ShreeLipi,
+        Layout::NudiB,
+    ];
 
     /// The layout's name in lowercase, as [`FromStr`] reads it.
     ///
@@ -57,7 +65,22 @@ impl Layout {
             Layout::Nudi => "nudi",
             Layout::Akruti => "akruti",
             Layout::ShreeLipi => "shree-lipi",
+            Layout::NudiB => "nudi-b",
         }
+    }
+
+    /// True for a layout whose fonts draw Latin letters at the ASCII codes, as
+    /// [`Layout::NudiB`] does. Latin-1 text reads in such a layout with no unknown
+    /// glyphs, so a short snippet in it says little about the font.
+    ///
+    /// ```
+    /// use kannadi::legacy::Layout;
+    ///
+    /// assert!(Layout::NudiB.draws_latin());
+    /// assert!(!Layout::Nudi.draws_latin());
+    /// ```
+    pub fn draws_latin(self) -> bool {
+        table::draws_latin(self)
     }
 
     fn index(self) -> usize {

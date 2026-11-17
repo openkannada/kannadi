@@ -30,6 +30,8 @@
 //! - `read`: a way of typing that is read but never written, such as a sign
 //!   typed after a space.
 
+use std::sync::OnceLock;
+
 use crate::chars::{class, Class, VIRAMA};
 
 use super::{windows_1252, Layout};
@@ -77,6 +79,7 @@ pub(super) fn file_name(layout: Layout) -> &'static str {
         Layout::Nudi => "nudi.tsv",
         Layout::Akruti => "akruti.tsv",
         Layout::ShreeLipi => "shree-lipi.tsv",
+        Layout::NudiB => "nudi-b.tsv",
     }
 }
 
@@ -85,7 +88,24 @@ fn contents(layout: Layout) -> &'static str {
         Layout::Nudi => include_str!("../../data/nudi.tsv"),
         Layout::Akruti => include_str!("../../data/akruti.tsv"),
         Layout::ShreeLipi => include_str!("../../data/shree-lipi.tsv"),
+        Layout::NudiB => include_str!("../../data/nudi-b.tsv"),
     }
+}
+
+/// Whether the layout's table keeps the ASCII letters as Latin letters.
+pub(super) fn draws_latin(layout: Layout) -> bool {
+    static LATIN: OnceLock<Vec<bool>> = OnceLock::new();
+    let latin = LATIN.get_or_init(|| {
+        Layout::ALL
+            .iter()
+            .map(|&l| {
+                rows(l).iter().any(|row| {
+                    matches!(&row.entry, Entry::Literal(v) if v.chars().all(|c| c.is_ascii_alphabetic()))
+                })
+            })
+            .collect()
+    });
+    latin[layout as usize]
 }
 
 /// The rows of a layout's table in table order.

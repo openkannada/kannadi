@@ -167,7 +167,11 @@ impl Fonts {
             } else if looks_legacy(&font.text) {
                 let best = best_layout(&font.text);
                 let judged = Judgment::of(&font.text, best);
-                if judged.clean() || (judged.short() && judged.flawless()) {
+                // A layout that draws Latin at the ASCII codes has Kannada at most of
+                // the others, so almost any short Latin-1 snippet reads in it with no
+                // problems; such a snippet is not taken as that layout.
+                let short_usable = judged.short() && judged.flawless() && !best.draws_latin();
+                if judged.clean() || short_usable {
                     font.read_as = best;
                     Verdict::Legacy(Source::Raw)
                 } else if raw.short() {

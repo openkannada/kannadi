@@ -2,8 +2,8 @@
 //! rejects a list that names a glyph it does not know, such as `/c129`, and reads
 //! a list with no `BaseEncoding` on StandardEncoding, which misreads the codes
 //! legacy fonts use. Here WinAnsi glyph names and `uniXXXX` names give their
-//! characters, other names are read by lopdf where it can, and the rest keep their
-//! code's Windows-1252 character.
+//! characters, `c<n>` names give code n, other names are read by lopdf where it
+//! can, and the rest keep their code's Windows-1252 character.
 
 use kannadi::legacy::decode_windows_1252;
 use lopdf::{Dictionary, Document, Object};
@@ -324,7 +324,12 @@ pub fn glyph_codes(doc: &Document, font: &Dictionary) -> Option<Vec<char>> {
 
 /// The code in a glyph name `G<n>`, with n from 0 to 255 written in decimal.
 fn code_name(name: &[u8]) -> Option<u8> {
-    let digits = name.strip_prefix(b"G")?;
+    numbered(name, b"G")
+}
+
+/// The code in a glyph name made of `prefix` and 1 to 3 decimal digits, up to 255.
+fn numbered(name: &[u8], prefix: &[u8]) -> Option<u8> {
+    let digits = name.strip_prefix(prefix)?;
     if digits.is_empty() || digits.len() > 3 || !digits.iter().all(u8::is_ascii_digit) {
         return None;
     }
@@ -337,6 +342,10 @@ fn glyph(name: &[u8]) -> Option<char> {
         return decode_windows_1252(&[u8::try_from(0x20 + i).ok()?])
             .chars()
             .next();
+    }
+    // Ghostscript names a glyph with no standard name `c` and its code in decimal.
+    if let Some(code) = numbered(name.as_bytes(), b"c") {
+        return decode_windows_1252(&[code]).chars().next();
     }
     let hex = name.strip_prefix("uni").filter(|h| h.len() == 4)?;
     char::from_u32(u32::from_str_radix(hex, 16).ok()?)
@@ -359,18 +368,22 @@ mod tests {
                 Object::Name(b"uni0C95".to_vec()),
                 Object::Name(b"bullet".to_vec()),
                 Object::Name(Vec::new()),
+                Object::Name(b"fi".to_vec()),
+                Object::Name(b"c300".to_vec()),
             ] },
         };
         let table = differences(&doc, &font, |_| None).unwrap();
         assert_eq!(table[1], '¤');
         assert_eq!(table[2], 'Ð');
-        assert_eq!(table[3], '\u{3}');
+        assert_eq!(table[3], '\u{81}');
         assert_eq!(table[4], 'ಕ');
         assert_eq!(table[5], '•');
         assert_eq!(table[6], '\u{6}');
+        assert_eq!(table[7], '\u{7}');
+        assert_eq!(table[8], '\u{8}');
         assert_eq!(table[0x41], 'A');
-        let other = differences(&doc, &font, |b| (b == 3).then_some('ﬁ')).unwrap();
-        assert_eq!(other[3], 'ﬁ');
+        let other = differences(&doc, &font, |b| (b == 7).then_some('ﬁ')).unwrap();
+        assert_eq!(other[7], 'ﬁ');
     }
 
     #[test]

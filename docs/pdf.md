@@ -1,6 +1,6 @@
 # Text from PDFs typeset in legacy fonts
 
-Status: `kannadi to-unicode` reads PDF files and writes their text as `NAME.pdf.txt`, with text in Nudi, Baraha ANSI, Akruti and Shree-Lipi fonts converted to Unicode. This note says how it works, what was measured, and what does not work.
+Status: `kannadi to-unicode` reads PDF files and writes their text as `NAME.pdf.txt`, with text in Nudi, Baraha ANSI, Nudi B-Akshara, Akruti and Shree-Lipi fonts converted to Unicode. This note says how it works, what was measured, and what does not work.
 
 ## How legacy text sits in a PDF
 
@@ -27,7 +27,7 @@ A PDF shows text with operators such as `Tj` and `TJ`, which give a string of co
 These fonts are reported as `not converted`, with their text left out:
 
 - a font named as legacy whose text does not convert, which happens when codes were renumbered;
-- a font that looks like legacy Kannada but converts in no known layout, such as AkliteKndPadmini or the unnamed font of the Legislative Assembly member pages;
+- a font that looks like legacy Kannada but converts in no known layout, such as AkliteKndPadmini;
 - a font whose text is mostly rare symbols such as `! # $ % & *`, which means renumbered codes with no usable map.
 
 ## Measured on public PDFs
@@ -43,9 +43,12 @@ Run on public PDFs from Karnataka government sources, kept outside the repositor
 | 2002 budget highlights and speech, [bh2002k.pdf](http://web.archive.org/web/20040822015443/http://www.kar.nic.in:80/finance/bud2002-kan/bh2002k.pdf) and [bs2002-k.pdf](http://web.archive.org/web/20060517033426/http://kar.nic.in:80/finance/bud2002-kan/bs2002-k.pdf), 85 pages | AkrutiKndPadma TrueType subsets, WinAnsi | 2,153 Kannada lines; 1 unknown glyph and 4 malformed syllables, all typing errors in the source |
 | Karnataka Rent Act, 2001, [PDF](https://web.archive.org/web/20090409214440/http://dpal.kar.nic.in/ao2001/(34%20of%202001)%20Rent%20Act-(K).pdf), 76 pages, and 5 other Acts of 2001 to 2003 | AkrutiKndPadma Type 1C, glyphs named `G<n>`; BRH Kannada | Converted; the issues left are the source's own, and 19 lines in AkliteKndPadmini in 1 Act are reported as another layout |
 | Unicode L2/03-068 from Karnataka DIT, [PDF](https://www.unicode.org/L2/L2003/03068-kannada.pdf), 16 pages | 5 Nudi01k subsets, renumbered by pdfFactory | 47 Kannada lines read through the ToUnicode map of 1 subset, 1 malformed syllable; the other 4 subsets are charts of single glyphs, which read as malformed syllables, and are reported as renumbered |
-| Legislative Assembly member page, [13mem/50.pdf](http://web.archive.org/web/20150427105120/http://kla.kar.nic.in/13mem/50.pdf), 2 pages | Renamed TrueType subset with a `Differences` list, made by Ghostscript | Reported as another layout; not converted |
+| Legislative Assembly member pages, [13mem/50.pdf](http://web.archive.org/web/20150427105120/http://kla.kar.nic.in/13mem/50.pdf) and the other 4 archived ones | Nudi B-Akshara subsets, renamed and renumbered by Ghostscript, with glyph names such as `c129` | Read by their text in Nudi B-Akshara: all 5 convert with no problems |
+| 22 budget and Assembly papers of 2007 to 2017 that name the font NudiB-Akshar, such as the [2011 budget speech](http://web.archive.org/web/20110304213411/http://www.kar.nic.in:80/finance/bud2011/bspkan2011.pdf) | NudiB-Akshar subsets, WinAnsi | Converted in Nudi B-Akshara, where earlier versions read them as Nudi and reported them as renumbered; 3 Assembly debates of 2016 and 2017 give 715,155 Kannada characters, where earlier versions gave none |
 
-With the Shree-Lipi table added on 17 November 2026, the Legislative Assembly pages (all 5 archived ones), the Repealing and Amending Act of 2003 with its AkliteKndPadmini lines, and 6 budget and school-board PDFs in Kan-Eng and KN-Nandi fonts give the same output as before: their fonts are still reported as other layouts.
+With the Shree-Lipi table added on 17 November 2026, the Repealing and Amending Act of 2003 with its AkliteKndPadmini lines and 6 budget and school-board PDFs in Kan-Eng and KN-Nandi fonts gave the same output as before: their fonts are still reported as other layouts.
+
+Some PDF makers draw a string 4 or 5 times, a fraction of a point apart, to make it look bold. A string that repeats the last one in the same font, starting within a tenth of the font size of it, is read once. On 314 public PDFs, the changes checked by hand were repeated headings of budget tables (ವಿವರಗಳುವಿವರಗಳುವಿವರಗಳುವಿವರಗಳು) and doubled subscripts such as ಕರೆಯಲ್ಪ್ಪಡುವ, now read once.
 
 The Gazette notification also has a heading in a Unicode font whose ToUnicode map is broken; it comes out garbled, as it does in other extractors. That is not a legacy font.
 
@@ -53,7 +56,8 @@ The Gazette notification also has a heading in a Unicode font whose ToUnicode ma
 
 - **Renumbered subsets with no usable map.** Reading the font embedded in the file being converted is allowed (the maintainer's decision, 16 November 2026), and it would recover these. Match each glyph's outline against the same glyph in another subset of the document whose codes are known, or against outlines taken once from the Nudi font files. Subsetting copies outlines unchanged, so the match is exact. It is not built, because none of the public PDFs checked needs it.
 - **Why the checked PDFs do not need it.** In the Unicode L2/03-068 PDF, the 4 subsets reported as renumbered have ToUnicode maps that give legacy codes. Those maps agree on 104 of the 105 glyph outlines the subsets share. Their text is a chart of single glyphs, which reads as malformed syllables, so the tool reports it. The Gazette's fonts with stripped names are read through their maps. The Legislative Assembly page is another layout.
-- **Other layouts.** Shree-Kan fonts other than 0850 and AkliteKndPadmini have no table yet; see [shree-lipi.md](shree-lipi.md). Akruti is described in [akruti.md](akruti.md).
+- **Off-line syllables.** Budget tables made with PDFMaker for Excel draw some syllables a little off the line, and the reader splits those words across lines, so they read as malformed.
+- **Other layouts.** Shree-Kan fonts other than 0850, AkliteKndPadmini, the Kan-Eng fonts of the budget papers and C-DAC's KN-Nandi have no table yet; see [shree-lipi.md](shree-lipi.md). Akruti is described in [akruti.md](akruti.md).
 - **Reading order.** Lines follow the order the PDF draws them. Multi-column pages and tables come out in drawing order, which is usually right for government documents and sometimes not.
 - **Scanned pages.** Pages that are images have no text. They need OCR, which this crate does not do.
 - **Short legacy text in a mostly Latin font.** A font is judged by all its text. The Gazette's page header ¨sÁUÀ (ಭಾಗ) is drawn in a font that mostly shows Latin text, so it stays as it is.

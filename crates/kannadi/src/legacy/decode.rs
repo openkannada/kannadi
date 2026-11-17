@@ -114,8 +114,8 @@ pub fn nudi_to_unicode(text: &str, options: &Options) -> Conversion {
 }
 
 /// The layout `text` reads best in: the one whose conversion has the fewest unknown
-/// glyphs and malformed syllables, then the fewest viramas, then the first in
-/// [`Layout::ALL`]. Use it for legacy text whose font is not known, such as
+/// glyphs and malformed syllables, then the fewest Latin letters, then the fewest
+/// viramas, then the first in [`Layout::ALL`]. Use it for legacy text whose font is not known, such as
 /// pasted text. Short text can read cleanly in more than 1 layout; the more text,
 /// the surer the choice.
 ///
@@ -126,12 +126,15 @@ pub fn nudi_to_unicode(text: &str, options: &Options) -> Conversion {
 /// assert_eq!(best_layout("dâ}â"), Layout::Akruti);
 /// ```
 pub fn best_layout(text: &str) -> Layout {
-    // On a tie, fewer viramas wins: legacy text read in the wrong layout often
-    // comes out as a run of clusters, such as ದ್ಬ್ಟ for ಅಥವಾ.
+    // On a tie, fewer Latin letters wins, as a layout that draws Latin at the ASCII
+    // codes reads any other layout's text cleanly as English; then fewer viramas, as
+    // legacy text read in the wrong layout often comes out as a run of clusters,
+    // such as ದ್ಬ್ಟ for ಅಥವಾ.
     let score = |layout: Layout| {
         let c = to_unicode(text, layout, &Options::default());
+        let latin = c.text.chars().filter(char::is_ascii_alphabetic).count();
         let viramas = c.text.chars().filter(|&ch| ch == VIRAMA).count();
-        (c.unknown.len() + c.malformed.len(), viramas)
+        (c.unknown.len() + c.malformed.len(), latin, viramas)
     };
     Layout::ALL
         .into_iter()
@@ -637,6 +640,41 @@ mod tests {
         assert_eq!(stray.malformed.len(), 1);
     }
 
+    fn nudi_b(legacy: &[u8]) -> Conversion {
+        to_unicode(
+            &decode_windows_1252(legacy),
+            Layout::NudiB,
+            &Options::default(),
+        )
+    }
+
+    #[test]
+    fn nudi_b_builds_ma_ya_and_jha_and_keeps_latin() {
+        for (codes, text) in [
+            (&[0xC0, 0xD0, 0xD4][..], "ಮ"),
+            (&[0xC0, 0xD0, 0xA6, 0xD1], "ಮಾ"),
+            (&[0xC0, 0xD0, 0xA6, 0xFD], "ಮ್"),
+            (&[0x81, 0xA6, 0xD0, 0xD4], "ಯ"),
+            (
+                &[0xB3, 0xD0, 0x81, 0xB7, 0xD9, 0x81, 0xA6, 0xD0, 0xD4],
+                "ತಂದೆಯ",
+            ),
+            (&[0xBE, 0xB0, 0xD1], "ಭಾ"),
+            (&[0x42, 0x4A, 0x50, 0x20, 0xB1, 0xD2], "BJP ಣಿ"),
+            (&[0xA6, 0xD0, 0xD4], "ಯ"),
+            (&[0xBA, 0x20, 0xA6, 0xD0, 0xD4], "ನಿಯ"),
+            (&[0xBA, 0x20, 0x20, 0xA6, 0xD0, 0xD4], "ನಿ  ಯ"),
+            (&[0x81, 0xA6, 0xD9, 0xD6, 0xD3], "ಯೋ"),
+            (&[0xA4, 0xD0, 0xA5, 0xD4, 0xD6], "ಝೂ"),
+            (&[0x8F, 0xA2, 0xD1], "ಓಜಾ"),
+            (&[0x91, 0xD0, 0x9D, 0xD9, 0xD3], "ಕಛೇ"),
+        ] {
+            let c = nudi_b(codes);
+            assert!(c.is_clean(), "{c:?}");
+            assert_eq!(c.text, text);
+        }
+    }
+
     #[test]
     fn a_subscript_after_a_letter_with_ra_goes_before_the_ra() {
         assert_eq!(akruti(&[0xDE, 0x22]).text, "ಶ್ಕ್ರೀ");
@@ -717,22 +755,27 @@ mod tests {
     }
 
     /// Every row of every table reads without an unknown glyph: letters and
-    /// literals alone, the rest after a consonant.
+    /// literals alone, the rest, and rows typed after a space, after a consonant.
     #[test]
     fn every_table_row_reads() {
         for layout in Layout::ALL {
             let carrier = super::super::from_unicode("ಪ", layout).text;
             for row in rows(layout) {
-                let input = match row.entry {
-                    Entry::Letter(_) | Entry::Base(_) | Entry::Literal(_) | Entry::Ignore => {
-                        row.key.clone()
-                    }
-                    _ => format!("{carrier}{}", row.key),
+                let after_space = row.key.starts_with(char::is_whitespace);
+                let alone = matches!(
+                    row.entry,
+                    Entry::Letter(_) | Entry::Base(_) | Entry::Literal(_) | Entry::Ignore
+                );
+                let input = if alone && !after_space {
+                    row.key.clone()
+                } else {
+                    format!("{carrier}{}", row.key)
                 };
                 let c = to_unicode(&input, layout, &Options::default());
                 assert!(c.unknown.is_empty(), "{layout} {:?}: {c:?}", row.key);
                 if let Entry::Letter(value) | Entry::Literal(value) = &row.entry {
-                    let expected: String = value.nfc().collect();
+                    let before = if after_space { "ಪ" } else { "" };
+                    let expected: String = format!("{before}{value}").nfc().collect();
                     assert_eq!(c.text, expected, "{layout} {:?}", row.key);
                 }
             }
