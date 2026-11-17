@@ -145,8 +145,10 @@ mod tests {
     fn baraha_and_sanskrit_romanizations_of_r_and_r_vowel_are_flagged() {
         let baraha = transliterate("nair~rutya", Scheme::Baraha, Scheme::Kannada);
         let iast = transliterate("nairṛtya", Scheme::Iast, Scheme::Kannada);
+        let iso = transliterate("nairr̥tya", Scheme::Iso15919, Scheme::Kannada);
         assert_eq!(baraha, "ನೈರೃತ್ಯ");
         assert_eq!(iast, "ನೈರೃತ್ಯ");
+        assert_eq!(iso, "ನೈರೃತ್ಯ");
         assert_eq!(found(&iast), ["ರೃ"]);
     }
 
