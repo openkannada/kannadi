@@ -23,7 +23,7 @@ use report::Report;
 
 #[derive(Parser)]
 #[command(name = "kannadi", version, about)]
-/// Converts Kannada documents typed in Nudi, Baraha, Nudi B-Akshara, Akruti or Shree-Lipi fonts to Unicode,
+/// Converts Kannada documents typed in Nudi, Baraha, Nudi B-Akshara, Kan-Eng, Akruti or Shree-Lipi fonts to Unicode,
 /// and Unicode back to Nudi.
 ///
 /// Each converted file gets a report next to it, FILE.report.tsv, when anything
@@ -35,13 +35,13 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Command {
-    /// Convert Nudi, Baraha, Nudi B-Akshara, Akruti and Shree-Lipi text to Unicode.
+    /// Convert Nudi, Baraha, Nudi B-Akshara, Kan-Eng, Akruti and Shree-Lipi text to Unicode.
     ToUnicode {
         #[command(flatten)]
         common: Common,
         /// The layout of text files, and of fonts added with --legacy-font that
-        /// name none: nudi (Nudi and Baraha), nudi-b (Nudi B-Akshara), akruti or
-        /// shree-lipi.
+        /// name none: nudi (Nudi and Baraha), nudi-b (Nudi B-Akshara), kan-eng
+        /// (Kan-Eng), akruti or shree-lipi.
         #[arg(long, value_name = "LAYOUT", default_value = "nudi", value_parser = parse_layout)]
         layout: Layout,
         /// Write digits as Kannada digits, for text set in the k variants of the

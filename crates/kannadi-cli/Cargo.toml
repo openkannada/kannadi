@@ -1,6 +1,6 @@
 [package]
 name = "kannadi-cli"
-description = "Batch converter for Kannada documents typed in Nudi, Baraha ANSI, Akruti and Shree-Lipi fonts"
+description = "Batch converter for Kannada documents typed in Nudi, Baraha ANSI, Nudi B-Akshara, Kan-Eng, Akruti and Shree-Lipi fonts"
 version.workspace = true
 edition.workspace = true
 license.workspace = true

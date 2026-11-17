@@ -440,7 +440,13 @@ impl Writer<'_> {
         }
         let base = match (g.bases.get(&consonant), plain) {
             (Some(key), _) => Some(key.clone()),
-            (None, Some(p)) => g.bases.get(&p).map(|key| format!("{key}{}", aspirate())),
+            // A layout may draw the plain consonant only as a letter, as Kan-Eng draws
+            // ಬ; the mahaprana mark then goes on the letter.
+            (None, Some(p)) => g
+                .bases
+                .get(&p)
+                .or_else(|| letter(p, &[]))
+                .map(|key| format!("{key}{}", aspirate())),
             (None, None) => None,
         };
         match base {
@@ -782,6 +788,16 @@ mod tests {
         let back = to_unicode(&shree.text, Layout::ShreeLipi, &Options::default());
         assert_eq!(back.text, "ಬುಡ್ಢ");
         assert_eq!(encode("ಕ್ಗ"), [0x50, 0xC0, 0xCE]);
+    }
+
+    #[test]
+    fn an_aspirate_goes_on_a_letter_when_the_layout_has_no_base() {
+        let e = from_unicode("ಭಾಗ್ಯ", Layout::KanEng);
+        assert!(e.is_clean(), "{e:?}");
+        let bytes: Vec<u8> = e.text.chars().filter_map(windows_1252_byte).collect();
+        assert_eq!(&bytes[..3], [0xBE, 0xFB, 0xDE]);
+        let back = to_unicode(&e.text, Layout::KanEng, &Options::default());
+        assert_eq!(back.text, "ಭಾಗ್ಯ");
     }
 
     #[test]

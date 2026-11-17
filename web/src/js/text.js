@@ -53,6 +53,7 @@ export function decodeBytes(bytes, decodeWindows1252) {
 export const LAYOUT_NAMES = {
   nudi: "Nudi or Baraha",
   "nudi-b": "Nudi B-Akshara",
+  "kan-eng": "Kan-Eng",
   akruti: "Akruti",
   "shree-lipi": "Shree-Lipi",
 };

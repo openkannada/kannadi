@@ -80,6 +80,7 @@ pub(super) fn file_name(layout: Layout) -> &'static str {
         Layout::Akruti => "akruti.tsv",
         Layout::ShreeLipi => "shree-lipi.tsv",
         Layout::NudiB => "nudi-b.tsv",
+        Layout::KanEng => "kan-eng.tsv",
     }
 }
 
@@ -89,6 +90,7 @@ fn contents(layout: Layout) -> &'static str {
         Layout::Akruti => include_str!("../../data/akruti.tsv"),
         Layout::ShreeLipi => include_str!("../../data/shree-lipi.tsv"),
         Layout::NudiB => include_str!("../../data/nudi-b.tsv"),
+        Layout::KanEng => include_str!("../../data/kan-eng.tsv"),
     }
 }
 

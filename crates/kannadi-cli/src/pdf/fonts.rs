@@ -30,6 +30,9 @@ pub enum Source {
     Raw,
     /// The font's ToUnicode map, for subsets whose codes were renumbered.
     Mapped,
+    /// The ToUnicode map of the CID copy Acrobat makes of a WinAnsi font for the
+    /// glyphs WinAnsi cannot show, read back by [`from_acrobat_copy`].
+    AcrobatCopy,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -54,7 +57,7 @@ pub struct Font {
     pub kannada_digits: bool,
     /// The raw reading of all text shown in the font.
     text: String,
-    /// The ToUnicode reading, for a 1-byte font named as legacy that has a map.
+    /// The ToUnicode reading, for a font named as legacy that has a map.
     mapped: String,
     pub verdict: Verdict,
 }
@@ -146,6 +149,8 @@ impl Fonts {
             let renumbered = looks_renumbered(&font.text);
             font.verdict = if font.no_table && looks_legacy(&font.text) {
                 Verdict::Unreadable(NO_TABLE)
+            } else if font.named.is_some() && is_acrobat_copy(&font.mapped) {
+                Verdict::Legacy(Source::AcrobatCopy)
             } else if font.named.is_some() {
                 let mapped = Judgment::of(&font.mapped, layout);
                 // Short text: the map wins when only its reading looks like legacy codes.
@@ -282,6 +287,30 @@ pub fn looks_renumbered(text: &str) -> bool {
 
 /// Whether at least 3 in 10 visible characters are Windows-1252 characters above
 /// ASCII, as in legacy Kannada and rarely in other text.
+/// The legacy code behind a character of an Acrobat copy's map. Acrobat moves the
+/// glyphs at codes Windows-1252 leaves undefined, and at its soft hyphen, into the
+/// copy; its map gives the undefined codes back as themselves and the soft hyphen
+/// as U+2212, as seen in the Kan-Eng budget papers.
+fn acrobat_code(c: char) -> Option<char> {
+    match c {
+        '\u{81}' | '\u{8D}' | '\u{8F}' | '\u{90}' | '\u{9D}' => Some(c),
+        '\u{2212}' => Some('\u{AD}'),
+        _ => None,
+    }
+}
+
+fn is_acrobat_copy(text: &str) -> bool {
+    text.chars().any(|c| !c.is_whitespace())
+        && text
+            .chars()
+            .all(|c| c.is_whitespace() || acrobat_code(c).is_some())
+}
+
+/// The legacy codes of text read through an Acrobat copy's map.
+pub fn from_acrobat_copy(text: &str) -> String {
+    text.chars().map(|c| acrobat_code(c).unwrap_or(c)).collect()
+}
+
 pub fn looks_legacy(text: &str) -> bool {
     let visible: Vec<char> = text.chars().filter(|c| !c.is_whitespace()).collect();
     let high = visible
