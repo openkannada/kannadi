@@ -50,7 +50,7 @@ Unknown and malformed counts are per line of text as the PDF draws it. By font, 
 
 The remaining unknown glyphs and malformed syllables were read against the page. They are the source's own errors, such as a stray subscript, a doubled ಮ tail, a mahaprana mark on ಾ, ೃ typed for ೖ, ು typed before ೂ, and ೃ carried to the next line, or a syllable split by the PDF across 2 lines. 1 is ಯ drawn with the tail meant for ಾ and no ಾ after it; the table reads that tail as a base needing a sign, as typists used it everywhere else.
 
-The Repealing and Amending Act of 2003 also uses AkliteKndPadmini, which is a different layout. Its 19 lines are not converted. The Acts on the same site from 2004 on use Nudi.
+The Repealing and Amending Act of 2003 also uses AkliteKndPadmini, which is a different layout. Its 19 lines are not converted. The layout waits for more documents; see [other-layouts.md](other-layouts.md). The Acts on the same site from 2004 on use Nudi.
 
 The fixture is [akruti.tsv](../crates/kannadi/tests/fixtures/akruti.tsv): 125 lines from the Rent Act, State Universities Act, Reservation Act and Hindu Religious Institutions Act of 2001 and the 2002 budget highlights, with the source URL and page of each.
 
