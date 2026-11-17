@@ -34,6 +34,11 @@ impl Report {
         self.rows.is_empty()
     }
 
+    /// True if any row is a problem; likely typos are suggestions only.
+    pub fn has_problems(&self) -> bool {
+        self.rows.iter().any(|r| r.kind != Kind::LikelyTypo)
+    }
+
     pub fn count(&self, kind: Kind) -> usize {
         self.rows.iter().filter(|r| r.kind == kind).count()
     }
@@ -45,6 +50,7 @@ impl Report {
             Kind::Malformed,
             Kind::Unencodable,
             Kind::NotConverted,
+            Kind::LikelyTypo,
         ]
         .into_iter()
         .map(|k| (k, self.count(k)))
@@ -104,6 +110,24 @@ mod tests {
             "location\tkind\tdetail\tcontext\nline 2\tmalformed syllable\tಾ\ta b c \n"
         );
         assert_eq!(report.summary(), "1 malformed syllable");
+    }
+
+    #[test]
+    fn likely_typos_are_counted_but_are_not_problems() {
+        let row = |kind| Row {
+            location: "line 1".into(),
+            kind,
+            detail: String::new(),
+            context: String::new(),
+        };
+        let mut report = Report {
+            rows: vec![row(Kind::LikelyTypo), row(Kind::LikelyTypo)],
+        };
+        assert!(!report.has_problems());
+        assert_eq!(report.summary(), "2 likely typos");
+        report.rows.insert(0, row(Kind::Malformed));
+        assert!(report.has_problems());
+        assert_eq!(report.summary(), "1 malformed syllable, 2 likely typos");
     }
 
     #[test]

@@ -44,6 +44,26 @@ fn converts_a_folder_and_reports_problems() {
 }
 
 #[test]
+fn likely_typos_are_reported_without_failing_strict() {
+    let tmp = tempfile::tempdir().unwrap();
+    // ನೈರೃತ್ಯ in Nudi: well formed, with ರೃ where Kannada writes ಋ.
+    std::fs::write(tmp.path().join("t.txt"), "£ÉÊgÀÈvÀå").unwrap();
+    let run = kannadi(
+        &["to-unicode", "t.txt", "--out", "out", "--strict"],
+        tmp.path(),
+    );
+    assert_eq!(run.status.code(), Some(0), "{run:?}");
+    let report = std::fs::read_to_string(tmp.path().join("out/t.txt.report.tsv")).unwrap();
+    assert!(
+        report.contains("line 1\tlikely typo\tಋ for ರೃ (ra-vocalic-r)\tನೈರೃತ್ಯ"),
+        "{report}"
+    );
+    let stderr = String::from_utf8_lossy(&run.stderr);
+    assert!(stderr.contains("t.txt: 1 likely typo"), "{stderr}");
+    assert!(stderr.contains("0 with issues"), "{stderr}");
+}
+
+#[test]
 fn strict_passes_on_clean_input_both_ways() {
     let tmp = tempfile::tempdir().unwrap();
     std::fs::write(tmp.path().join("u.txt"), "ಕನ್ನಡ ನಾಡು").unwrap();

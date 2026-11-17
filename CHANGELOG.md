@@ -22,10 +22,12 @@ Library (`kannadi`):
 - `chars::Class::is_mark`.
 - Sound-alike keys (`phonetic::key`, `keys`, `latin_key`) at 3 levels, for fuzzy search and for suggesting Kannada words from loosely typed Latin letters: "namaskara" and ನಮಸ್ಕಾರ share a medium key. `kannadi-wasm` exports `phoneticKey` and `latinKey`, so the editor page can use them.
 - Typo suggestions (`typos::find`): ರೃ at the start of a syllable suggests ಋ, as in ನೈರೃತ್ಯ for ನೈಋತ್ಯ. Sanskrit spells r + ṛ this way, so these are suggestions only. `kannadi-wasm` exports `typos`, with UTF-16 offsets, for editors that mark them.
+- Typo rule `ra-virama-vocalic-r`: ರ್ followed by ಋ suggests ಋ, as in ನೈರ್ಋತ್ಯ for ನೈಋತ್ಯ. Nudi text with an arkavattu typed after ಋ converts to ರ್ಋ. ರ್ before other vowel letters is left alone.
 
 Command-line tool (`kannadi-cli`):
 
 - `kannadi to-unicode` and `kannadi to-nudi` for files and folders, with a per-file report of problems and `--strict`.
+- `to-unicode` reports likely typos in the converted text as suggestions. They do not make `--strict` fail.
 - Plain text, including UTF-16 and Windows-1252 input.
 - HTML: converts only text set in a legacy font, found from `style`, `<style>` rules and `<font face>`.
 - DOCX: converts only runs in a legacy font, following run, character and paragraph styles.

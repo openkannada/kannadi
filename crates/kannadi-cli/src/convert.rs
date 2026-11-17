@@ -1,6 +1,7 @@
 //! Converts 1 piece of text in either direction and lists what went wrong.
 
 use kannadi::legacy::{from_unicode, to_unicode, windows_1252_byte, Layout, Options};
+use kannadi::typos;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Direction {
@@ -76,6 +77,8 @@ pub enum Kind {
     /// Text left out because it cannot be read, such as a PDF font whose glyph
     /// codes were renumbered.
     NotConverted,
+    /// Well-formed text that is often a typing mistake; a suggestion only.
+    LikelyTypo,
 }
 
 impl Kind {
@@ -85,6 +88,7 @@ impl Kind {
             Kind::Malformed => "malformed syllable",
             Kind::Unencodable => "unencodable",
             Kind::NotConverted => "part not converted",
+            Kind::LikelyTypo => "likely typo",
         }
     }
 
@@ -94,6 +98,7 @@ impl Kind {
             Kind::Malformed => "malformed syllables",
             Kind::Unencodable => "unencodable characters",
             Kind::NotConverted => "parts not converted",
+            Kind::LikelyTypo => "likely typos",
         }
     }
 }
@@ -134,8 +139,8 @@ pub fn convert(text: &str, layout: Layout, settings: &Settings) -> Converted {
                     },
                 )
             });
-            // Malformed ranges are in the output; their input position is unknown,
-            // so they sort by line after the unknown glyphs of that line.
+            // Malformed ranges and typos are in the output; their input position is
+            // unknown, so they sort by line after the unknown glyphs of that line.
             let malformed = c.malformed.iter().map(|r| {
                 let line = output.line(r.start);
                 (
@@ -148,8 +153,25 @@ pub fn convert(text: &str, layout: Layout, settings: &Settings) -> Converted {
                     },
                 )
             });
+            let typos = typos::find(&c.text).into_iter().map(|t| {
+                let line = output.line(t.range.start);
+                (
+                    input.start(line),
+                    Issue {
+                        kind: Kind::LikelyTypo,
+                        line,
+                        detail: format!(
+                            "{} for {} ({})",
+                            t.replacement,
+                            &c.text[t.range.clone()],
+                            t.rule.name()
+                        ),
+                        context: window(&c.text, &output, t.range.start).to_string(),
+                    },
+                )
+            });
             Converted {
-                issues: in_order(unknown.chain(malformed)),
+                issues: in_order(unknown.chain(malformed).chain(typos)),
                 text: c.text,
             }
         }
@@ -311,6 +333,33 @@ mod tests {
         );
         assert_eq!(c.issues[1].detail, "glyph F1");
         assert_eq!(c.issues[1].context, "ಕ\u{F1}");
+    }
+
+    #[test]
+    fn to_unicode_suggests_likely_typos_after_other_issues() {
+        // Nudi ಋ (49 C4) with an arkavattu (F0), then ರ (gÀ) with ೃ (È).
+        let c = convert("IÄð\ngÀÈ", Layout::Nudi, &to_unicode_settings());
+        assert_eq!(c.text, "ರ್ಋ\nರೃ");
+        let found: Vec<(usize, Kind, &str)> = c
+            .issues
+            .iter()
+            .map(|i| (i.line, i.kind, i.detail.as_str()))
+            .collect();
+        assert_eq!(
+            found,
+            [
+                (1, Kind::Malformed, "ರ್ಋ"),
+                (1, Kind::LikelyTypo, "ಋ for ರ್ಋ (ra-virama-vocalic-r)"),
+                (2, Kind::LikelyTypo, "ಋ for ರೃ (ra-vocalic-r)"),
+            ]
+        );
+        assert_eq!(c.issues[2].context, "ರೃ");
+    }
+
+    #[test]
+    fn to_nudi_does_not_suggest_typos() {
+        let c = convert("ನೈರೃತ್ಯ", Layout::Nudi, &settings(Direction::ToNudi));
+        assert!(c.issues.is_empty(), "{:?}", c.issues);
     }
 
     #[test]
