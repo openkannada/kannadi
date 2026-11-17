@@ -88,10 +88,12 @@ pub fn find(text: &str) -> Vec<Typo> {
                 rule: Rule::RaVocalicR,
             });
         }
-        let before_vocalic_r = iter
-            .peek()
-            .is_some_and(|next| next.text.starts_with(VOCALIC_R) && next.is_well_formed());
-        if !after_half_form && a.text == RA_VIRAMA && before_vocalic_r {
+        if !after_half_form
+            && a.text == RA_VIRAMA
+            && iter
+                .peek()
+                .is_some_and(|next| next.text.starts_with(VOCALIC_R) && next.is_well_formed())
+        {
             out.push(Typo {
                 range: pos..pos + RA_VIRAMA.len() + VOCALIC_R.len(),
                 replacement: VOCALIC_R,

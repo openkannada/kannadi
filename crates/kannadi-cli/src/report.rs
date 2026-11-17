@@ -34,9 +34,9 @@ impl Report {
         self.rows.is_empty()
     }
 
-    /// True if any row is a problem; likely typos are suggestions only.
+    /// True if any row is a problem, as [`Kind::is_problem`] says.
     pub fn has_problems(&self) -> bool {
-        self.rows.iter().any(|r| r.kind != Kind::LikelyTypo)
+        self.rows.iter().any(|r| r.kind.is_problem())
     }
 
     pub fn count(&self, kind: Kind) -> usize {

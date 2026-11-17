@@ -82,6 +82,11 @@ pub enum Kind {
 }
 
 impl Kind {
+    /// False for suggestions, which do not make a file count as having issues.
+    pub fn is_problem(self) -> bool {
+        self != Kind::LikelyTypo
+    }
+
     pub fn label(self) -> &'static str {
         match self {
             Kind::UnknownGlyph => "unknown glyph",
@@ -130,7 +135,7 @@ pub fn convert(text: &str, layout: Layout, settings: &Settings) -> Converted {
             let unknown = c.unknown.iter().map(|u| {
                 let around = to_unicode(window(text, &input, u.offset), layout, &options).text;
                 (
-                    u.offset,
+                    (0, u.offset),
                     Issue {
                         kind: Kind::UnknownGlyph,
                         line: input.line(u.offset),
@@ -139,39 +144,29 @@ pub fn convert(text: &str, layout: Layout, settings: &Settings) -> Converted {
                     },
                 )
             });
-            // Malformed ranges and typos are in the output; their input position is
-            // unknown, so they sort by line after the unknown glyphs of that line.
-            let malformed = c.malformed.iter().map(|r| {
-                let line = output.line(r.start);
-                (
-                    input.start(line),
-                    Issue {
-                        kind: Kind::Malformed,
-                        line,
-                        detail: c.text[r.clone()].to_string(),
-                        context: window(&c.text, &output, r.start).to_string(),
-                    },
-                )
-            });
+            // Malformed ranges and typos are in the output, whose positions cannot be
+            // compared with input offsets, so they follow the unknown glyphs of their line.
+            let found = |kind, at: usize, detail| {
+                let issue = Issue {
+                    kind,
+                    line: output.line(at),
+                    detail,
+                    context: window(&c.text, &output, at).to_string(),
+                };
+                ((1, at), issue)
+            };
+            let malformed = c
+                .malformed
+                .iter()
+                .map(|r| found(Kind::Malformed, r.start, c.text[r.clone()].to_string()));
             let typos = typos::find(&c.text).into_iter().map(|t| {
-                let line = output.line(t.range.start);
-                (
-                    input.start(line),
-                    Issue {
-                        kind: Kind::LikelyTypo,
-                        line,
-                        detail: format!(
-                            "{} for {} ({})",
-                            t.replacement,
-                            &c.text[t.range.clone()],
-                            t.rule.name()
-                        ),
-                        context: window(&c.text, &output, t.range.start).to_string(),
-                    },
-                )
+                let spelled = &c.text[t.range.clone()];
+                let detail = format!("{} for {spelled} ({})", t.replacement, t.rule.name());
+                found(Kind::LikelyTypo, t.range.start, detail)
             });
+            let issues = in_order(unknown.chain(malformed).chain(typos));
             Converted {
-                issues: in_order(unknown.chain(malformed).chain(typos)),
+                issues,
                 text: c.text,
             }
         }
@@ -181,7 +176,7 @@ pub fn convert(text: &str, layout: Layout, settings: &Settings) -> Converted {
                 let context = window(text, &input, at).to_string();
                 let line = input.line(at);
                 (
-                    at,
+                    (0, at),
                     Issue {
                         kind,
                         line,
@@ -206,8 +201,9 @@ pub fn convert(text: &str, layout: Layout, settings: &Settings) -> Converted {
     }
 }
 
-fn in_order(issues: impl Iterator<Item = (usize, Issue)>) -> Vec<Issue> {
-    let mut issues: Vec<(usize, Issue)> = issues.collect();
+/// Sorts by line, then by the key: (0, input offset) or (1, output offset).
+fn in_order(issues: impl Iterator<Item = ((u8, usize), Issue)>) -> Vec<Issue> {
+    let mut issues: Vec<((u8, usize), Issue)> = issues.collect();
     issues.sort_by_key(|(at, issue)| (issue.line, *at));
     issues.into_iter().map(|(_, issue)| issue).collect()
 }
@@ -354,6 +350,27 @@ mod tests {
             ]
         );
         assert_eq!(c.issues[2].context, "ರೃ");
+    }
+
+    #[test]
+    fn rows_from_the_output_follow_the_unknown_glyphs_of_their_line_in_position_order() {
+        // ರೃ, then a stray ಾ, then an unknown glyph, then ರ್ಋ.
+        let c = convert("gÀÈ Á \u{F1} IÄð", Layout::Nudi, &to_unicode_settings());
+        let kinds: Vec<(Kind, &str)> = c
+            .issues
+            .iter()
+            .map(|i| (i.kind, i.detail.as_str()))
+            .collect();
+        assert_eq!(
+            kinds,
+            [
+                (Kind::UnknownGlyph, "glyph F1"),
+                (Kind::LikelyTypo, "ಋ for ರೃ (ra-vocalic-r)"),
+                (Kind::Malformed, "ಾ"),
+                (Kind::Malformed, "ರ್ಋ"),
+                (Kind::LikelyTypo, "ಋ for ರ್ಋ (ra-virama-vocalic-r)"),
+            ]
+        );
     }
 
     #[test]

@@ -3,7 +3,9 @@ use kannadi::legacy::{
     from_unicode, nudi_syllable_starts, nudi_to_unicode, syllable_starts, to_unicode,
     unicode_to_nudi, Layout, Options,
 };
-use kannadi::{aksharas, from_latin, modernize, normalize, numerals, split, to_latin, Scheme};
+use kannadi::{
+    aksharas, from_latin, modernize, normalize, numerals, split, to_latin, typos, Scheme,
+};
 use proptest::prelude::*;
 use unicode_normalization::UnicodeNormalization;
 
@@ -299,6 +301,28 @@ proptest! {
                 prop_assert_eq!(s[u.offset..].chars().next(), Some(u.character));
             }
         }
+    }
+
+    #[test]
+    fn typo_fixes_are_ordered_and_leave_no_typos(
+        parts in prop::collection::vec(
+            prop::sample::select(vec!["ರ", "್", "ಋ", "ೃ", "ಕ", "ಾ", "ಂ", "\u{200C}", "\u{200D}", " "]),
+            0..24,
+        )
+    ) {
+        let text: String = parts.concat();
+        let found = typos::find(&text);
+        let mut fixed = String::new();
+        let mut end = 0;
+        for t in &found {
+            prop_assert!(t.range.start >= end && t.range.start < t.range.end, "{:?}", text);
+            prop_assert!(text.is_char_boundary(t.range.start) && text.is_char_boundary(t.range.end));
+            fixed.push_str(&text[end..t.range.start]);
+            fixed.push_str(t.replacement);
+            end = t.range.end;
+        }
+        fixed.push_str(&text[end..]);
+        prop_assert!(typos::find(&fixed).is_empty(), "{:?} gave {:?}", text, fixed);
     }
 
     #[test]
