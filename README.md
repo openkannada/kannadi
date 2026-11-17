@@ -4,7 +4,10 @@ Convert Kannada documents typed in the legacy Nudi, Baraha, Nudi B-Akshara, Kan-
 
 ಕನ್ನಡಿ (kannaḍi) means mirror.
 
-![The kannadi editor after pasting 4 lines from a 2002 Karnataka government page typed in a Baraha font: the text is converted to Unicode, and the 2 places it could not convert cleanly are marked](https://raw.githubusercontent.com/prasadus92/kannadi/main/docs/images/editor.png)
+<p>
+  <img src="https://raw.githubusercontent.com/prasadus92/kannadi/main/docs/images/editor.png" width="76%" alt="The kannadi editor in a browser after pasting 4 lines from a 2002 Karnataka government page typed in a Baraha font. The text is now Unicode Kannada. The toolbar shows 2 places to check, both marked in the third line: 1 glyph the converter could not place and 1 malformed syllable.">
+  <img src="https://raw.githubusercontent.com/prasadus92/kannadi/main/docs/images/editor-phone.png" width="21%" alt="The same 4 lines in the editor on a phone in dark mode, with the akshara and word counts above the text and the toolbar at the bottom of the screen.">
+</p>
 
 ## Why
 
@@ -50,8 +53,8 @@ Version 0.1, in development.
 | Kannada numerals | Done |
 | Sound-alike keys for fuzzy search and loose Latin typing | Done |
 | Typo suggestions for well-formed text: ರೃ for ಋ | Done |
-| Nudi and Baraha to Unicode | Done, waiting on a native reader's check of 100 sample lines |
-| Unicode to Nudi and Baraha | Done |
+| Nudi and Baraha to Unicode | Done in the library, the command-line tool and the editor page; waiting on a native reader's check of 100 sample lines |
+| Unicode to Nudi and Baraha | Done in the library, the command-line tool and the editor page |
 | Akruti to Unicode and back | To Unicode in the library, the command-line tool and the editor page; back to Akruti in the library. Checked on 908,075 glyphs from 35 documents; a Kannada reader's check of 125 lines is pending |
 | Nudi B-Akshara to Unicode and back | To Unicode in the library, the command-line tool and the editor page; back to Nudi B-Akshara in the library. Checked on 643,777 glyphs from 27 documents; a Kannada reader's check of 190 lines is pending |
 | Kan-Eng to Unicode and back | To Unicode in the library, the command-line tool and the editor page; back to Kan-Eng in the library. Checked on 21,455 glyphs from 45 budget papers; a Kannada reader's check of 118 lines is pending |
