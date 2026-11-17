@@ -63,6 +63,7 @@ Checked on 16 November 2026, with the Akruti work.
 - **Udayavani, 2003.** The newspaper's archived home page (`199.74.239.15/udayavani/home.asp`, Internet Archive, April 2003) sets its Kannada as glyph codes in `<font face="Shree-Kan-0850">`. In that font ಮಳೆಗಾಲ is stored as `ÊÜáÙæWÝÆ`, as the table below encodes it. The site offered the font to readers as `SHREE850.ttf` and as the embedded web font `SHREEKA0.eot`. These pages are Shree-Lipi text with a known font name, so they can check a table. They carry no glyph images, so they cannot build one alone.
 - **Legislative Assembly member pages.** The unnamed font in `13mem/50.pdf` is Nudi B-Akshara, described above.
 - **Web search.** Searches for PDFs naming `Shree-Kan` fonts found only font shops and converters.
+- **Prajavani.** Its pages of 2003 to 2008 use SHREE_DECCAN and Shree_DecMod, which do not read in the Shree-Lipi table. See [other-layouts.md](other-layouts.md#newspaper-fonts-on-archived-pages).
 
 The maintainer decided on 17 November 2026 that the font Udayavani served with its pages may be rendered to build the table, with the pages to check it. The table below was built that way.
 
