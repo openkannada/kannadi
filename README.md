@@ -1,3 +1,5 @@
+<img src="https://raw.githubusercontent.com/openkannada/kannadi/main/docs/images/logo.svg" width="72" height="72" alt="The kannadi logo: the Kannada letter ಕ and its reflection in a mirror, on an indigo tile.">
+
 # kannadi
 
 Convert Kannada documents typed in the legacy Nudi, Baraha, Nudi B-Akshara, Kan-Eng, Akruti and Shree-Lipi fonts to Unicode, and back. kannadi is a Rust library, a command-line tool that converts whole folders of TXT, HTML, DOCX and PDF files, and an editor that runs in the browser.
