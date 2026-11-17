@@ -21,6 +21,7 @@ Library (`kannadi`):
 - The encoder writes a consonant whose subscript the layout cannot draw as a half form with a visible virama.
 - `chars::Class::is_mark`.
 - Sound-alike keys (`phonetic::key`, `keys`, `latin_key`) at 3 levels, for fuzzy search and for suggesting Kannada words from loosely typed Latin letters: "namaskara" and ನಮಸ್ಕಾರ share a medium key. `kannadi-wasm` exports `phoneticKey` and `latinKey`, so the editor page can use them.
+- Typo suggestions (`typos::find`): ರೃ at the start of a syllable suggests ಋ, as in ನೈರೃತ್ಯ for ನೈಋತ್ಯ. Sanskrit spells r + ṛ this way, so these are suggestions only. `kannadi-wasm` exports `typos`, with UTF-16 offsets, for editors that mark them.
 
 Command-line tool (`kannadi-cli`):
 

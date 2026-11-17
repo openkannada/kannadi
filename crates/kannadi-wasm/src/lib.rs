@@ -251,6 +251,49 @@ pub fn fixes(text: &str, start: u32, end: u32) -> Vec<Fix> {
         .collect()
 }
 
+/// A likely typing mistake in well-formed text: replace `start..end` with
+/// `replacement`. See [`kannadi::typos::find`].
+#[wasm_bindgen]
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct Typo {
+    /// First code unit to replace.
+    pub start: u32,
+    /// Code unit after the last one to replace.
+    pub end: u32,
+    replacement: &'static str,
+    rule: &'static str,
+}
+
+#[wasm_bindgen]
+impl Typo {
+    /// The likely intended spelling.
+    #[wasm_bindgen(getter)]
+    pub fn replacement(&self) -> String {
+        self.replacement.to_string()
+    }
+
+    /// The rule that found it, such as `ra-vocalic-r`.
+    #[wasm_bindgen(getter)]
+    pub fn rule(&self) -> String {
+        self.rule.to_string()
+    }
+}
+
+/// Likely typing mistakes in `text`, in text order, with UTF-16 offsets.
+#[wasm_bindgen]
+pub fn typos(text: &str) -> Vec<Typo> {
+    let mut cursor = Utf16Cursor::new(text);
+    kannadi::typos::find(text)
+        .into_iter()
+        .map(|t| Typo {
+            start: cursor.at(t.range.start),
+            end: cursor.at(t.range.end),
+            replacement: t.replacement,
+            rule: t.rule.name(),
+        })
+        .collect()
+}
+
 /// Counts vowel and consonant aksharas. See [`kannadi::count_aksharas`].
 #[wasm_bindgen(js_name = countAksharas)]
 pub fn count_aksharas(text: &str) -> u32 {
@@ -566,6 +609,19 @@ mod tests {
         assert_eq!(String::from_utf16(&units).unwrap(), "𝔸 ಮನೆ");
         assert!(fixes(text, 1, 2).is_empty(), "inside a surrogate pair");
         assert!(fixes(text, 99, 100).is_empty());
+    }
+
+    #[test]
+    fn typos_use_utf16_offsets() {
+        let text = "😀 ನೈರೃತ್ಯ";
+        let found = typos(text);
+        assert_eq!(found.len(), 1);
+        let units: Vec<u16> = text.encode_utf16().collect();
+        let span = &units[found[0].start as usize..found[0].end as usize];
+        assert_eq!(String::from_utf16(span).unwrap(), "ರೃ");
+        assert_eq!(found[0].replacement(), "ಋ");
+        assert_eq!(found[0].rule(), "ra-vocalic-r");
+        assert!(typos("ನೈಋತ್ಯ").is_empty());
     }
 
     #[test]
