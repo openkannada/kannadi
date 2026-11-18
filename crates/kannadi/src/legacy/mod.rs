@@ -183,6 +183,32 @@ fn unaspirated(c: char) -> Option<char> {
         .map(|&(plain, _)| plain)
 }
 
+/// True for text that is already Unicode Kannada: it holds a character from the
+/// Kannada block, and no character above ASCII that a legacy layout reads as a
+/// glyph, such as À or ß. Such text needs no conversion, and converting it would
+/// read its English letters as glyphs. Unicode punctuation such as – and the
+/// no-break space do not count against it.
+///
+/// ```
+/// use kannadi::legacy::is_unicode;
+///
+/// assert!(is_unicode("ಕನ್ನಡ ನಾಡು, 2026 – Bengaluru"));
+/// assert!(!is_unicode("PÀ£ÀßqÀ"));
+/// assert!(!is_unicode("Bengaluru"));
+/// ```
+pub fn is_unicode(text: &str) -> bool {
+    text.chars().any(crate::chars::is_kannada)
+        && !text
+            .chars()
+            .any(|c| windows_1252_byte(c).is_some_and(|b| b >= 0x80) && !is_passthrough(c))
+}
+
+/// Characters no legacy layout uses as a glyph code, which a legacy run passes
+/// on as they are: Unicode Kannada, the dandas, ZWNJ and ZWJ.
+fn is_unicode_kannada(c: char) -> bool {
+    crate::chars::is_kannada(c) || matches!(c, '\u{0964}' | '\u{0965}' | '\u{200C}' | '\u{200D}')
+}
+
 /// Characters a legacy-font run carries as themselves: spaces and punctuation.
 fn is_passthrough(c: char) -> bool {
     c.is_whitespace()
@@ -194,6 +220,21 @@ fn is_passthrough(c: char) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn unicode_text_is_told_from_legacy_text() {
+        for text in [
+            "ಕನ್ನಡ",
+            "ಕನ್ನಡ\u{A0}ನಾಡು “ಹೊಸ” – 2026",
+            "Office: ಕನ್ನಡ & English",
+        ] {
+            assert!(is_unicode(text), "{text:?}");
+        }
+        for text in ["PÀ£ÀßqÀ", "ಕನ್ನಡ PÀ£ÀßqÀ", "ಕನ್ನಡ café", "Bengaluru 2026", ""]
+        {
+            assert!(!is_unicode(text), "{text:?}");
+        }
+    }
 
     #[test]
     fn windows_1252_high_range() {

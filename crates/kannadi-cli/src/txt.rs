@@ -1,7 +1,7 @@
 //! Plain text files. The whole file is taken to be in the source encoding.
 
 use anyhow::{bail, Result};
-use kannadi::legacy::{decode_windows_1252, windows_1252_byte};
+use kannadi::legacy::{decode_windows_1252, is_unicode, windows_1252_byte};
 
 use crate::convert::{convert, Direction, Settings};
 use crate::report::{Report, Row};
@@ -11,6 +11,10 @@ use crate::report::{Report, Row};
 /// unencodable.
 pub fn convert_file(bytes: &[u8], settings: &Settings) -> Result<(Vec<u8>, Report)> {
     let text = read_text(bytes, settings.direction)?;
+    // A file converted before would have its English letters read as glyphs.
+    if matches!(settings.direction, Direction::ToUnicode(_)) && is_unicode(&text) {
+        return Ok((text.into_bytes(), Report::default()));
+    }
     let converted = convert(&text, settings.text_layout, settings);
     let rows = converted
         .issues
@@ -78,6 +82,35 @@ mod tests {
 
     fn to_nudi() -> Settings {
         Settings::new(Direction::ToNudi)
+    }
+
+    #[test]
+    fn unicode_files_are_kept_as_they_are() {
+        for text in [
+            "ಕನ್ನಡ ನಾಡು, Bengaluru 2026\r\nಎರಡನೇ ಸಾಲು\n",
+            "\u{FEFF}ಕನ್ನಡ Kannada",
+        ] {
+            let (out, report) = convert_file(text.as_bytes(), &to_unicode()).unwrap();
+            assert_eq!(
+                String::from_utf8(out).unwrap(),
+                text.trim_start_matches('\u{FEFF}')
+            );
+            assert!(report.is_empty(), "{:?}", report.rows);
+        }
+        let utf16: Vec<u8> = [0xFF, 0xFE]
+            .into_iter()
+            .chain("ಕನ್ನಡ".encode_utf16().flat_map(u16::to_le_bytes))
+            .collect();
+        let (out, report) = convert_file(&utf16, &to_unicode()).unwrap();
+        assert_eq!(String::from_utf8(out).unwrap(), "ಕನ್ನಡ");
+        assert!(report.is_empty());
+    }
+
+    #[test]
+    fn a_file_with_legacy_and_unicode_text_is_converted() {
+        let (out, report) = convert_file("PÀ£ÀßqÀ ನಾಡು".as_bytes(), &to_unicode()).unwrap();
+        assert_eq!(String::from_utf8(out).unwrap(), "ಕನ್ನಡ ನಾಡು");
+        assert!(report.is_empty(), "{:?}", report.rows);
     }
 
     #[test]

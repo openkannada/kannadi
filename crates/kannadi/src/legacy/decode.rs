@@ -8,7 +8,7 @@ use crate::lookup::Lookup;
 use crate::numerals::to_kannada_digit;
 
 use super::table::{rows, Entry};
-use super::{aspirated, is_passthrough, Layout};
+use super::{aspirated, is_passthrough, is_unicode_kannada, Layout};
 
 /// Settings for [`to_unicode`].
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -267,8 +267,8 @@ impl Writer {
         self.malformed.push(start..self.out.len());
     }
 
-    /// Writes a character the table does not cover: digits, spaces, punctuation or
-    /// an unknown glyph.
+    /// Writes a character the table does not cover: digits, spaces, punctuation,
+    /// Unicode Kannada already in the text, or an unknown glyph.
     fn plain(&mut self, (offset, c): (usize, char), options: &Options, starts_syllable: bool) {
         self.flush();
         if c.is_ascii_digit() {
@@ -283,7 +283,7 @@ impl Writer {
             }
             return;
         }
-        if !is_passthrough(c) {
+        if !is_passthrough(c) && !is_unicode_kannada(c) {
             self.unknown.push(Unknown { offset, glyph: c });
         }
         self.out.push(c);
@@ -564,6 +564,23 @@ mod tests {
                 glyph: '\u{F1}'
             }]
         );
+    }
+
+    #[test]
+    fn unicode_kannada_passes_through_unreported() {
+        for layout in Layout::ALL {
+            let text = "ಕನ್ನಡ ನಾಡು। ಆರ್\u{200C}ಎನ್\u{200D}ಎ ೧೨೩॥";
+            let c = to_unicode(text, layout, &Options::default());
+            assert_eq!(c.text, text, "{layout:?}");
+            assert!(c.is_clean(), "{layout:?}: {c:?}");
+        }
+    }
+
+    #[test]
+    fn unicode_kannada_beside_legacy_text_keeps_both() {
+        let c = nudi_to_unicode("PÀ£ÀßqÀ ನಾಡು PÀ", &Options::default());
+        assert_eq!(c.text, "ಕನ್ನಡ ನಾಡು ಕ");
+        assert!(c.is_clean(), "{c:?}");
     }
 
     #[test]

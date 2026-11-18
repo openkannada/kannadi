@@ -130,9 +130,27 @@ fn an_unreadable_file_fails_the_run_but_not_the_others() {
 }
 
 #[test]
+fn unicode_text_files_pass_strict_untouched() {
+    let tmp = tempfile::tempdir().unwrap();
+    let text = "ನಮಸ್ಕಾರ, ಕನ್ನಡ ನಾಡು ನುಡಿ.\nOffice hours 10 to 5\n";
+    std::fs::write(tmp.path().join("u.txt"), text).unwrap();
+    let run = kannadi(
+        &["to-unicode", "u.txt", "--out", "out", "--strict"],
+        tmp.path(),
+    );
+    assert_eq!(run.status.code(), Some(0), "{run:?}");
+    assert_eq!(
+        std::fs::read_to_string(tmp.path().join("out/u.txt")).unwrap(),
+        text
+    );
+    assert!(!tmp.path().join("out/u.txt.report.tsv").exists());
+}
+
+#[test]
 fn a_long_line_full_of_problems_gives_short_rows() {
     let tmp = tempfile::tempdir().unwrap();
-    std::fs::write(tmp.path().join("u.txt"), "ಕನ್ನಡ ".repeat(5_000)).unwrap();
+    // Nudi ಕ followed by F1, which no Nudi glyph uses.
+    std::fs::write(tmp.path().join("u.txt"), "P\u{C0}\u{F1} ".repeat(5_000)).unwrap();
     let run = kannadi(&["to-unicode", "u.txt", "--out", "out"], tmp.path());
     assert_eq!(run.status.code(), Some(0), "{run:?}");
     let report = std::fs::read_to_string(tmp.path().join("out/u.txt.report.tsv")).unwrap();
