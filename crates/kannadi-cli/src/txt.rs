@@ -3,7 +3,7 @@
 use anyhow::{bail, Result};
 use kannadi::legacy::{decode_windows_1252, is_unicode, windows_1252_byte};
 
-use crate::convert::{convert, Direction, Settings};
+use crate::convert::{convert, keep, Direction, Settings};
 use crate::report::{Report, Row};
 
 /// Converts a text file. Unicode output is UTF-8. Nudi output is Windows-1252,
@@ -12,10 +12,11 @@ use crate::report::{Report, Row};
 pub fn convert_file(bytes: &[u8], settings: &Settings) -> Result<(Vec<u8>, Report)> {
     let text = read_text(bytes, settings.direction)?;
     // A file converted before would have its English letters read as glyphs.
-    if matches!(settings.direction, Direction::ToUnicode(_)) && is_unicode(&text) {
-        return Ok((text.into_bytes(), Report::default()));
-    }
-    let converted = convert(&text, settings.text_layout, settings);
+    let converted = if matches!(settings.direction, Direction::ToUnicode(_)) && is_unicode(&text) {
+        keep(&text)
+    } else {
+        convert(&text, settings.text_layout, settings)
+    };
     let rows = converted
         .issues
         .iter()
@@ -104,6 +105,19 @@ mod tests {
         let (out, report) = convert_file(&utf16, &to_unicode()).unwrap();
         assert_eq!(String::from_utf8(out).unwrap(), "ಕನ್ನಡ");
         assert!(report.is_empty());
+    }
+
+    #[test]
+    fn kept_unicode_files_still_get_typo_suggestions() {
+        let text = "ಮಳೆ 30°C ಇದೆ\nನೈರೃತ್ಯ ದಿಕ್ಕು\n";
+        let (out, report) = convert_file(text.as_bytes(), &to_unicode()).unwrap();
+        assert_eq!(String::from_utf8(out).unwrap(), text);
+        let rows: Vec<(&str, Kind)> = report
+            .rows
+            .iter()
+            .map(|r| (r.location.as_str(), r.kind))
+            .collect();
+        assert_eq!(rows, [("line 2", Kind::LikelyTypo)]);
     }
 
     #[test]

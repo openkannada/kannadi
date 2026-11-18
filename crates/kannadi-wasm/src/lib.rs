@@ -532,6 +532,7 @@ mod tests {
     fn unicode_text_needs_no_conversion() {
         assert!(is_unicode("ಕನ್ನಡ ನಾಡು"));
         assert!(!is_unicode("PÀ£ÀßqÀ"));
+        assert!(!is_unicode("ಕ PÀ£ÀßqÀ"));
     }
 
     #[test]

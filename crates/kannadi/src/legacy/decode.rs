@@ -90,7 +90,7 @@ pub fn to_unicode(text: &str, layout: Layout, options: &Options) -> Conversion {
             let starts_syllable = matches!(
                 table.longest_match(chars[i + 1..].iter().map(|&(_, c)| c)),
                 Some((Entry::Letter(_) | Entry::Base(_), _))
-            );
+            ) || chars.get(i + 1).is_some_and(|&(_, c)| is_letter(c));
             writer.plain(chars[i], options, starts_syllable);
             i += 1;
             continue;
@@ -574,6 +574,12 @@ mod tests {
             assert_eq!(c.text, text, "{layout:?}");
             assert!(c.is_clean(), "{layout:?}: {c:?}");
         }
+    }
+
+    #[test]
+    fn a_zero_before_a_unicode_letter_is_an_anusvara() {
+        let c = nudi_to_unicode("PÀ0ಕ", &Options::default());
+        assert_eq!(c.text, "ಕಂಕ");
     }
 
     #[test]

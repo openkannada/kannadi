@@ -69,7 +69,7 @@ Project:
 
 ### Fixed
 
-- Unicode Kannada in legacy text is no longer reported as unknown glyphs (#43). Kannada characters, the dandas, ZWNJ and ZWJ pass through `legacy::to_unicode` as they are, and `to-unicode` copies text files that are already Unicode, which `legacy::is_unicode` tells. `kannadi-wasm` exports it as `isUnicode`.
+- Unicode Kannada in legacy text is no longer reported as unknown glyphs (#43). Kannada characters, the dandas, ZWNJ and ZWJ pass through `legacy::to_unicode` as they are, and `to-unicode` keeps the text of files that are already Unicode, which `legacy::is_unicode` tells by comparing Kannada characters with legacy glyph codes, and still suggests likely typos in them. `kannadi-wasm` exports it as `isUnicode`.
 - fontqa outline flattening: a TrueType quadratic with several off-curve points is split at its implied on-curve points, and a closed contour with no on-curve point is read. Stroke measurements on TrueType fonts were slightly off before.
 - fontqa manifest: Navilu is OFL-1.1 with Reserved Font Name Navilu, not GPL.
 - glyphdraft: side bearings come from the median of the font's consonants, not from KA, whose bearings can be an outlier.

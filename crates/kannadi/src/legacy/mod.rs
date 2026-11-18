@@ -183,24 +183,29 @@ fn unaspirated(c: char) -> Option<char> {
         .map(|&(plain, _)| plain)
 }
 
-/// True for text that is already Unicode Kannada: it holds a character from the
-/// Kannada block, and no character above ASCII that a legacy layout reads as a
-/// glyph, such as À or ß. Such text needs no conversion, and converting it would
-/// read its English letters as glyphs. Unicode punctuation such as – and the
-/// no-break space do not count against it.
+/// True for text that is already Unicode Kannada: it has more characters from
+/// the Kannada block than characters above ASCII that a legacy layout may use as a
+/// glyph code, such as À, ß or –. Converted text keeps a few such characters, as
+/// in 30°C or ©; legacy text has 1 or more per syllable. Converting Unicode text
+/// would read its English letters as glyphs.
 ///
 /// ```
 /// use kannadi::legacy::is_unicode;
 ///
-/// assert!(is_unicode("ಕನ್ನಡ ನಾಡು, 2026 – Bengaluru"));
+/// assert!(is_unicode("ಕನ್ನಡ ನಾಡು, 2026 – Bengaluru, 30°C"));
 /// assert!(!is_unicode("PÀ£ÀßqÀ"));
 /// assert!(!is_unicode("Bengaluru"));
 /// ```
 pub fn is_unicode(text: &str) -> bool {
-    text.chars().any(crate::chars::is_kannada)
-        && !text
-            .chars()
-            .any(|c| windows_1252_byte(c).is_some_and(|b| b >= 0x80) && !is_passthrough(c))
+    let kannada = text
+        .chars()
+        .filter(|&c| crate::chars::is_kannada(c))
+        .count();
+    let glyphs = text
+        .chars()
+        .filter(|&c| windows_1252_byte(c).is_some_and(|b| b >= 0x80))
+        .count();
+    kannada > glyphs
 }
 
 /// Characters no legacy layout uses as a glyph code, which a legacy run passes
@@ -227,11 +232,12 @@ mod tests {
             "ಕನ್ನಡ",
             "ಕನ್ನಡ\u{A0}ನಾಡು “ಹೊಸ” – 2026",
             "Office: ಕನ್ನಡ & English",
+            "ಮಳೆ 30°C ಇದೆ",
+            "ಕನ್ನಡ café © 2026",
         ] {
             assert!(is_unicode(text), "{text:?}");
         }
-        for text in ["PÀ£ÀßqÀ", "ಕನ್ನಡ PÀ£ÀßqÀ", "ಕನ್ನಡ café", "Bengaluru 2026", ""]
-        {
+        for text in ["PÀ£ÀßqÀ", "ಕ PÀ£ÀßqÀ", "ಕ ‚„", "Bengaluru 2026", ""] {
             assert!(!is_unicode(text), "{text:?}");
         }
     }
