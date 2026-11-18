@@ -1,0 +1,193 @@
+#compdef kannadi
+
+autoload -U is-at-least
+
+_kannadi() {
+    typeset -A opt_args
+    typeset -a _arguments_options
+    local ret=1
+
+    if is-at-least 5.2; then
+        _arguments_options=(-s -S -C)
+    else
+        _arguments_options=(-s -C)
+    fi
+
+    local context curcontext="$curcontext" state line
+    _arguments "${_arguments_options[@]}" : \
+'-h[Print help (see more with '\''--help'\'')]' \
+'--help[Print help (see more with '\''--help'\'')]' \
+'-V[Print version]' \
+'--version[Print version]' \
+":: :_kannadi_commands" \
+"*::: :->kannadi" \
+&& ret=0
+    case $state in
+    (kannadi)
+        words=($line[1] "${words[@]}")
+        (( CURRENT += 1 ))
+        curcontext="${curcontext%:*:*}:kannadi-command-$line[1]:"
+        case $line[1] in
+            (to-unicode)
+_arguments "${_arguments_options[@]}" : \
+'-o+[Folder to write the converted files and reports to]:DIR:_files' \
+'--out=[Folder to write the converted files and reports to]:DIR:_files' \
+'--layout=[Layout of text files, and of fonts added with --legacy-font that name none. nudi covers the Nudi and Baraha ANSI fonts]:LAYOUT:(nudi akruti shree-lipi nudi-b kan-eng)' \
+'--font=[Font to set converted text in, in HTML and DOCX files]:NAME:_default' \
+'*--legacy-font=[Treat this font as a legacy font too, in the layout after \`=\` ("My Font=akruti") or else the --layout one. Repeat for more fonts]:NAME[=LAYOUT]:_default' \
+'--strict[Exit with status 1 if any file has unknown glyphs, malformed syllables or unencodable characters; likely typos do not count]' \
+'--kannada-digits[Write digits as Kannada digits, for text set in the k variants of the Nudi fonts]' \
+'--keep-zeros[Keep a zero typed between letters as a digit; by default it becomes ಂ]' \
+'-h[Print help (see more with '\''--help'\'')]' \
+'--help[Print help (see more with '\''--help'\'')]' \
+'-V[Print version]' \
+'--version[Print version]' \
+'*::inputs -- Files and folders to convert. Folders are searched for .txt, .htm, .html, .docx and .pdf files:_files' \
+&& ret=0
+;;
+(to-nudi)
+_arguments "${_arguments_options[@]}" : \
+'-o+[Folder to write the converted files and reports to]:DIR:_files' \
+'--out=[Folder to write the converted files and reports to]:DIR:_files' \
+'--font=[Font to set converted text in, in HTML and DOCX files]:NAME:_default' \
+'*--legacy-font=[Treat this font as a legacy font too, so text already set in it is left as it is. Repeat for more fonts]:NAME:_default' \
+'--strict[Exit with status 1 if any file has unknown glyphs, malformed syllables or unencodable characters; likely typos do not count]' \
+'-h[Print help (see more with '\''--help'\'')]' \
+'--help[Print help (see more with '\''--help'\'')]' \
+'-V[Print version]' \
+'--version[Print version]' \
+'*::inputs -- Files and folders to convert. Folders are searched for .txt, .htm, .html, .docx and .pdf files:_files' \
+&& ret=0
+;;
+(completions)
+_arguments "${_arguments_options[@]}" : \
+'-h[Print help]' \
+'--help[Print help]' \
+'-V[Print version]' \
+'--version[Print version]' \
+':shell:(bash elvish fish powershell zsh)' \
+&& ret=0
+;;
+(manpages)
+_arguments "${_arguments_options[@]}" : \
+'-h[Print help]' \
+'--help[Print help]' \
+'-V[Print version]' \
+'--version[Print version]' \
+':dir -- Folder to write kannadi.1 and a page per command to:_files' \
+&& ret=0
+;;
+(help)
+_arguments "${_arguments_options[@]}" : \
+":: :_kannadi__subcmd__help_commands" \
+"*::: :->help" \
+&& ret=0
+
+    case $state in
+    (help)
+        words=($line[1] "${words[@]}")
+        (( CURRENT += 1 ))
+        curcontext="${curcontext%:*:*}:kannadi-help-command-$line[1]:"
+        case $line[1] in
+            (to-unicode)
+_arguments "${_arguments_options[@]}" : \
+&& ret=0
+;;
+(to-nudi)
+_arguments "${_arguments_options[@]}" : \
+&& ret=0
+;;
+(completions)
+_arguments "${_arguments_options[@]}" : \
+&& ret=0
+;;
+(manpages)
+_arguments "${_arguments_options[@]}" : \
+&& ret=0
+;;
+(help)
+_arguments "${_arguments_options[@]}" : \
+&& ret=0
+;;
+        esac
+    ;;
+esac
+;;
+        esac
+    ;;
+esac
+}
+
+(( $+functions[_kannadi_commands] )) ||
+_kannadi_commands() {
+    local commands; commands=(
+'to-unicode:Convert documents in legacy Kannada fonts to Unicode' \
+'to-nudi:Convert Unicode Kannada documents to Nudi glyph codes' \
+'completions:Print a shell completion script to standard output' \
+'manpages:Write the man pages to a folder' \
+'help:Print this message or the help of the given subcommand(s)' \
+    )
+    _describe -t commands 'kannadi commands' commands "$@"
+}
+(( $+functions[_kannadi__subcmd__completions_commands] )) ||
+_kannadi__subcmd__completions_commands() {
+    local commands; commands=()
+    _describe -t commands 'kannadi completions commands' commands "$@"
+}
+(( $+functions[_kannadi__subcmd__help_commands] )) ||
+_kannadi__subcmd__help_commands() {
+    local commands; commands=(
+'to-unicode:Convert documents in legacy Kannada fonts to Unicode' \
+'to-nudi:Convert Unicode Kannada documents to Nudi glyph codes' \
+'completions:Print a shell completion script to standard output' \
+'manpages:Write the man pages to a folder' \
+'help:Print this message or the help of the given subcommand(s)' \
+    )
+    _describe -t commands 'kannadi help commands' commands "$@"
+}
+(( $+functions[_kannadi__subcmd__help__subcmd__completions_commands] )) ||
+_kannadi__subcmd__help__subcmd__completions_commands() {
+    local commands; commands=()
+    _describe -t commands 'kannadi help completions commands' commands "$@"
+}
+(( $+functions[_kannadi__subcmd__help__subcmd__help_commands] )) ||
+_kannadi__subcmd__help__subcmd__help_commands() {
+    local commands; commands=()
+    _describe -t commands 'kannadi help help commands' commands "$@"
+}
+(( $+functions[_kannadi__subcmd__help__subcmd__manpages_commands] )) ||
+_kannadi__subcmd__help__subcmd__manpages_commands() {
+    local commands; commands=()
+    _describe -t commands 'kannadi help manpages commands' commands "$@"
+}
+(( $+functions[_kannadi__subcmd__help__subcmd__to-nudi_commands] )) ||
+_kannadi__subcmd__help__subcmd__to-nudi_commands() {
+    local commands; commands=()
+    _describe -t commands 'kannadi help to-nudi commands' commands "$@"
+}
+(( $+functions[_kannadi__subcmd__help__subcmd__to-unicode_commands] )) ||
+_kannadi__subcmd__help__subcmd__to-unicode_commands() {
+    local commands; commands=()
+    _describe -t commands 'kannadi help to-unicode commands' commands "$@"
+}
+(( $+functions[_kannadi__subcmd__manpages_commands] )) ||
+_kannadi__subcmd__manpages_commands() {
+    local commands; commands=()
+    _describe -t commands 'kannadi manpages commands' commands "$@"
+}
+(( $+functions[_kannadi__subcmd__to-nudi_commands] )) ||
+_kannadi__subcmd__to-nudi_commands() {
+    local commands; commands=()
+    _describe -t commands 'kannadi to-nudi commands' commands "$@"
+}
+(( $+functions[_kannadi__subcmd__to-unicode_commands] )) ||
+_kannadi__subcmd__to-unicode_commands() {
+    local commands; commands=()
+    _describe -t commands 'kannadi to-unicode commands' commands "$@"
+}
+
+if [ "$funcstack[1]" = "_kannadi" ]; then
+    _kannadi "$@"
+else
+    compdef _kannadi kannadi
+fi

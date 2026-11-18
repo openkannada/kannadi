@@ -17,12 +17,34 @@ For years, Kannada text in Karnataka was typed with Nudi and Baraha fonts that s
 
 ## Install
 
+The command-line tool is `kannadi`. There is no release yet, so for now build it from source with Rust 1.89 or later:
+
 ```sh
-# Command-line tool (Rust 1.89 or later)
 cargo install --locked --git https://github.com/openkannada/kannadi kannadi-cli
 kannadi to-unicode old-orders/ --out converted/
+```
 
-# Library, in Cargo.toml (not on crates.io yet)
+From the first release, any of these installs it:
+
+```sh
+# macOS and Linux
+curl --proto '=https' --tlsv1.2 -LsSf https://github.com/openkannada/kannadi/releases/latest/download/kannadi-cli-installer.sh | sh
+
+# Windows, in PowerShell
+powershell -ExecutionPolicy Bypass -c "irm https://github.com/openkannada/kannadi/releases/latest/download/kannadi-cli-installer.ps1 | iex"
+
+# Homebrew, with man pages and shell completions
+brew install openkannada/tap/kannadi
+
+# Rust
+cargo install --locked kannadi-cli
+```
+
+Each release also has archives for macOS (Apple silicon and Intel), Linux (x86_64 and arm64, glibc and static musl) and Windows (x86_64), each with a SHA-256 checksum. Every archive holds the binary, the man pages and the shell completions.
+
+The library is the `kannadi` crate. Until it is on crates.io, add it from Git:
+
+```toml
 kannadi = { git = "https://github.com/openkannada/kannadi" }
 ```
 
@@ -179,7 +201,8 @@ kannadi to-nudi letter.txt --out for-printing/ --strict
 - A file goes to `OUT/<file name>`. A folder goes to `OUT/<folder name>/`, with its subfolders kept. Hidden files, files already under `OUT`, and symbolic links to folders are skipped. The tool stops before writing anything if an output would overwrite any input or 2 inputs would share an output; paths are compared with links and `..` resolved, ignoring case.
 - Text files with a UTF-16 or UTF-8 byte order mark, or valid UTF-8, are read as such. Other legacy text files are read as Windows-1252. Unicode output is UTF-8. Nudi output is Windows-1252, with `?` for each character that has no glyph; those characters are in the report.
 - When a file has unknown glyphs, malformed syllables, unencodable characters or likely typos, the tool writes `FILE.report.tsv` next to the output: the line, the problem, and up to 30 characters of Unicode text on each side. Rows are in line order. A run with none removes an old report. Likely typos come from `typos::find` on the text `to-unicode` writes, such as `ಋ for ರೃ (ra-vocalic-r)`. They are suggestions and do not count as problems. Nudi's ಋ with an arkavattu gets 2 rows: a malformed syllable, since an arkavattu cannot sit on a vowel letter, and the likely typo `ಋ for ರ್ಋ`.
-- `--strict` exits with status 1 if any file has a problem. Likely typos do not count. Errors, such as an unreadable file or folder, exit with status 2; the other files are still converted.
+- Exit status: 0 on success, even when reports list problems or likely typos; 1 with `--strict` when a file has a problem; 2 for bad arguments, or a file that could not be read, converted or written (a PDF given to `to-nudi` is one). 2 wins over 1. After a file fails, the other files are still converted. If an output would overwrite an input, nothing is written.
+- `kannadi --help` and `kannadi to-unicode --help` give every option, with examples. `kannadi completions bash` (or `zsh`, `fish`, `powershell`, `elvish`) prints a completion script, and `kannadi manpages DIR` writes the man pages. Copies of both are in [crates/kannadi-cli/assets](https://github.com/openkannada/kannadi/tree/main/crates/kannadi-cli/assets). Packagers install them as `share/man/man1/*.1`, `share/bash-completion/completions/kannadi`, `share/zsh/site-functions/_kannadi` and `share/fish/vendor_completions.d/kannadi.fish`.
 - `to-unicode` takes `--kannada-digits` and `--keep-zeros`, the same settings as `legacy::Options`.
 - **HTML.** Only text set in a legacy font is converted to Unicode, in that font's layout. The font of each piece of text comes from its `style` attribute, then `<style>` rules for tags and classes such as `td.xl24` or `.font12` (the most specific, then the last), then `<font face>`, inherited from enclosing elements. End tags HTML lets authors leave out, such as `</td>` and `</p>`, are closed where a browser would close them. Legacy font names are replaced with `--font` (Noto Sans Kannada by default). `to-nudi` converts Kannada text outside legacy fonts and wraps it in a span set in `--font` (Nudi 01 e by default); the rest of the text is copied as it was. A page that declares a Windows-1252 or ISO-8859-1 charset is read that way. Output is UTF-8, and the charset declaration says so. Text in `<title>`, `<textarea>` and attribute values is not converted, and a syllable split across tags is converted piece by piece, so it shows as malformed in the report. More complex selectors and the `font` shorthand are not read.
 - **DOCX.** A run's font comes from its own `w:rFonts`, its character style, its paragraph style (or the default paragraph style), or the document defaults, following `basedOn`. Only runs whose Latin font is a legacy font are converted to Unicode, in that font's layout. Their fonts are set to `--font`. Word often splits a word across runs; text is moved between neighboring runs so no syllable is split. `to-nudi` moves each Kannada run of text into a new run set in `--font`, with the rest of the run's formatting. The body, headers, footers, footnotes, endnotes and comments are converted; every other part of the package is copied unchanged. Report rows name the part and paragraph; the fallback copy of a text box is converted but not reported twice. Where a run sets `w:b`, `w:i` or `w:sz` but not their complex-script copies, these are added, since Word formats Kannada with `w:bCs`, `w:iCs` and `w:szCs`; `to-nudi` copies them the other way. Tracked deletions are converted too. Not done: bold, italic and sizes that come from styles, symbols inserted with `w:sym`, fonts of paragraph marks and styles, and parts written with a namespace prefix other than `w:`.

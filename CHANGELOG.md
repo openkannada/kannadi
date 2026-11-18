@@ -28,6 +28,9 @@ Command-line tool (`kannadi-cli`):
 
 - `kannadi to-unicode` and `kannadi to-nudi` for files and folders, with a per-file report of problems and `--strict`.
 - `to-unicode` reports likely typos in the converted text as suggestions. They do not make `--strict` fail.
+- Release builds with dist: archives for macOS (Apple silicon and Intel), Linux (x86_64 and arm64, glibc and musl) and Windows, with SHA-256 checksums, shell and PowerShell install scripts, and a Homebrew formula that installs the man pages and completions. Both crates have the metadata crates.io needs; the command-line tool installs with `cargo install kannadi-cli`.
+- `kannadi completions SHELL` prints a completion script for bash, zsh, fish, PowerShell or Elvish, and `kannadi manpages DIR` writes man pages. Copies are kept in `crates/kannadi-cli/assets`, and a test fails when they fall behind the command line.
+- Help lists the exit statuses and gives examples, and each command's help covers only its own options and default font. `--layout` takes `baraha` as another name for `nudi`, in any case, and completion scripts offer the layout names.
 - Plain text, including UTF-16 and Windows-1252 input.
 - HTML: converts only text set in a legacy font, found from `style`, `<style>` rules and `<font face>`.
 - DOCX: converts only runs in a legacy font, following run, character and paragraph styles.

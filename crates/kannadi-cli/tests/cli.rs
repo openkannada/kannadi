@@ -203,3 +203,121 @@ fn unicode_pdfs_from_chrome_read_whole() {
             .exists());
     }
 }
+
+const ASSETS: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/assets");
+const REGENERATE: &str = "run the tests with KANNADI_BLESS=1 to rewrite crates/kannadi-cli/assets";
+
+/// Compares a generated asset with the committed copy, or rewrites the copy
+/// when KANNADI_BLESS is set.
+fn check_asset(path: &str, fresh: &[u8]) {
+    let committed = format!("{ASSETS}/{path}");
+    if std::env::var_os("KANNADI_BLESS").is_some() {
+        std::fs::write(&committed, fresh).unwrap();
+        return;
+    }
+    let old = std::fs::read(&committed).unwrap_or_default();
+    assert!(old == fresh, "{path} is out of date; {REGENERATE}");
+}
+
+#[test]
+fn committed_man_pages_match_the_cli() {
+    let tmp = tempfile::tempdir().unwrap();
+    let run = kannadi(&["manpages", "man"], tmp.path());
+    assert_eq!(run.status.code(), Some(0), "{run:?}");
+    let mut made: Vec<String> = std::fs::read_dir(tmp.path().join("man"))
+        .unwrap()
+        .map(|e| e.unwrap().file_name().into_string().unwrap())
+        .collect();
+    made.sort();
+    assert_eq!(
+        made,
+        [
+            "kannadi-completions.1",
+            "kannadi-manpages.1",
+            "kannadi-to-nudi.1",
+            "kannadi-to-unicode.1",
+            "kannadi.1"
+        ]
+    );
+    for name in made {
+        let fresh = std::fs::read(tmp.path().join("man").join(&name)).unwrap();
+        check_asset(&format!("man/{name}"), &fresh);
+    }
+}
+
+#[test]
+fn committed_completions_match_the_cli() {
+    let tmp = tempfile::tempdir().unwrap();
+    for (shell, file) in [
+        ("bash", "kannadi.bash"),
+        ("zsh", "_kannadi"),
+        ("fish", "kannadi.fish"),
+        ("powershell", "_kannadi.ps1"),
+        ("elvish", "kannadi.elv"),
+    ] {
+        let run = kannadi(&["completions", shell], tmp.path());
+        assert_eq!(run.status.code(), Some(0), "{run:?}");
+        check_asset(&format!("completions/{file}"), &run.stdout);
+        let script = String::from_utf8_lossy(&run.stdout);
+        assert!(script.contains("to-unicode"), "{file}");
+        if ["bash", "zsh", "fish"].contains(&shell) {
+            assert!(script.contains("shree-lipi"), "{file} completes layouts");
+        }
+    }
+}
+
+#[test]
+fn help_names_the_exit_statuses_and_version_prints_the_package_version() {
+    let tmp = tempfile::tempdir().unwrap();
+    for args in [
+        &["--help"][..],
+        &["to-unicode", "-h"],
+        &["to-nudi", "--help"],
+        &["to-nudi", "-h"],
+        &["to-unicode", "--help"],
+    ] {
+        let run = kannadi(args, tmp.path());
+        assert_eq!(run.status.code(), Some(0));
+        let help = String::from_utf8_lossy(&run.stdout);
+        assert!(
+            help.contains("Exit status:\n  0  Success."),
+            "{args:?}: {help}"
+        );
+    }
+    let long = String::from_utf8_lossy(&kannadi(&["to-unicode", "--help"], tmp.path()).stdout)
+        .into_owned();
+    assert!(long.contains("Examples:\n  kannadi to-unicode"), "{long}");
+    assert!(long.contains("[default: \"Noto Sans Kannada\"]"), "{long}");
+    let nudi =
+        String::from_utf8_lossy(&kannadi(&["to-nudi", "--help"], tmp.path()).stdout).into_owned();
+    assert!(nudi.contains("[default: \"Nudi 01 e\"]"), "{nudi}");
+    assert!(!nudi.contains("--layout"), "{nudi}");
+    for (args, name) in [
+        (&["--version"][..], "kannadi"),
+        (&["-V"], "kannadi"),
+        (&["to-unicode", "--version"], "kannadi-to-unicode"),
+    ] {
+        let run = kannadi(args, tmp.path());
+        assert_eq!(
+            String::from_utf8_lossy(&run.stdout),
+            format!("{name} {}\n", env!("CARGO_PKG_VERSION"))
+        );
+    }
+}
+
+#[test]
+fn manpages_into_a_file_path_is_an_error() {
+    let tmp = tempfile::tempdir().unwrap();
+    std::fs::write(tmp.path().join("taken"), "x").unwrap();
+    let run = kannadi(&["manpages", "taken"], tmp.path());
+    assert_eq!(run.status.code(), Some(2), "{run:?}");
+    assert!(String::from_utf8_lossy(&run.stderr).starts_with("error: creating taken"));
+}
+
+#[test]
+fn no_command_shows_help_and_exits_with_2() {
+    let tmp = tempfile::tempdir().unwrap();
+    let run = kannadi(&[], tmp.path());
+    assert_eq!(run.status.code(), Some(2));
+    assert!(String::from_utf8_lossy(&run.stderr).contains("Usage: kannadi <COMMAND>"));
+}

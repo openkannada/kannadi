@@ -8,6 +8,7 @@ license.workspace = true
 repository.workspace = true
 authors.workspace = true
 readme = "../../README.md"
+documentation = "https://docs.rs/kannadi"
 keywords = ["kannada", "nudi", "unicode", "transliteration", "indic"]
 exclude = ["tests/", "examples/corpus.rs"]
 categories = ["text-processing", "internationalization"]
