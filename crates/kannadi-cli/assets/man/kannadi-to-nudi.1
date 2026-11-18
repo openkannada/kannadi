@@ -1,0 +1,39 @@
+.ie \n(.g .ds Aq \(aq
+.el .ds Aq '
+.TH kannadi-to-nudi 1  "to-nudi " 
+.SH NAME
+kannadi\-to\-nudi \- Convert Unicode Kannada documents to Nudi glyph codes
+.SH SYNOPSIS
+\fBkannadi to\-nudi\fR [\fB\-\-strict\fR] [\fB\-\-font\fR] [\fB\-\-legacy\-font\fR] [\fB\-h\fR|\fB\-\-help\fR] <\fB\-o\fR|\fB\-\-out\fR> <\fIINPUTS\fR> 
+.SH DESCRIPTION
+Convert Unicode Kannada documents to Nudi glyph codes
+.PP
+Writes TXT, HTML and DOCX files. Text files are written in Windows\-1252. A PDF cannot be written back, so each PDF counts as an error.
+.SH OPTIONS
+.TP
+\fB\-o\fR, \fB\-\-out\fR \fI<DIR>\fR
+Folder to write the converted files and reports to
+.TP
+\fB\-\-strict\fR
+Exit with status 1 if any file has unknown glyphs, malformed syllables or unencodable characters; likely typos do not count
+.TP
+\fB\-\-font\fR \fI<NAME>\fR [default: Nudi 01 e]
+Font to set converted text in, in HTML and DOCX files
+.TP
+\fB\-\-legacy\-font\fR \fI<NAME>\fR
+Treat this font as a legacy font too, so text already set in it is left as it is. Repeat for more fonts
+.TP
+\fB\-h\fR, \fB\-\-help\fR
+Print help (see a summary with \*(Aq\-h\*(Aq)
+.TP
+<\fIINPUTS\fR>
+Files and folders to convert. Folders are searched for .txt, .htm, .html, .docx and .pdf files
+.SH EXTRA
+Examples:
+  kannadi to\-nudi letter.txt \-\-out for\-printing/ \-\-strict
+  kannadi to\-nudi site/ \-\-font "Nudi 05 e" \-\-out nudi\-site/
+
+Exit status:
+  0  Success. Reports may still list problems and likely typos.
+  1  \-\-strict was given and a file has a problem.
+  2  Bad arguments, or a file or folder that could not be read or written.

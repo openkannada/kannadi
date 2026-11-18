@@ -1,0 +1,19 @@
+.ie \n(.g .ds Aq \(aq
+.el .ds Aq '
+.TH kannadi-manpages 1  "manpages " 
+.SH NAME
+kannadi\-manpages \- Write the man pages to a folder
+.SH SYNOPSIS
+\fBkannadi manpages\fR [\fB\-h\fR|\fB\-\-help\fR] <\fIDIR\fR> 
+.SH DESCRIPTION
+Write the man pages to a folder
+.SH OPTIONS
+.TP
+\fB\-h\fR, \fB\-\-help\fR
+Print help
+.TP
+<\fIDIR\fR>
+Folder to write kannadi.1 and a page per command to
+.SH EXTRA
+Example:
+  kannadi manpages /usr/local/share/man/man1

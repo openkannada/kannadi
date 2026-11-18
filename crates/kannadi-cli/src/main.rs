@@ -14,20 +14,44 @@ use std::path::PathBuf;
 use std::process::ExitCode;
 
 use anyhow::{Context, Result};
-use clap::{Args, Parser, Subcommand};
+use clap::{Args, CommandFactory, Parser, Subcommand};
+use clap_complete::Shell;
 use kannadi::legacy::{Layout, Options};
 
 use convert::{Direction, Settings};
 use files::{Format, Job};
 use report::Report;
 
+const EXIT_STATUS: &str = "\
+Exit status:
+  0  Success. Reports may still list problems and likely typos.
+  1  --strict was given and a file has a problem.
+  2  Bad arguments, or a file or folder that could not be read or written.";
+
+const TO_UNICODE_EXAMPLES: &str = "\
+Examples:
+  kannadi to-unicode old-orders/ --out converted/
+  kannadi to-unicode notes.txt --layout akruti --out converted/
+  kannadi to-unicode page.html --legacy-font \"My Font=akruti\" --out converted/";
+
+const TO_NUDI_EXAMPLES: &str = "\
+Examples:
+  kannadi to-nudi letter.txt --out for-printing/ --strict
+  kannadi to-nudi site/ --font \"Nudi 05 e\" --out nudi-site/";
+
+/// Convert Kannada documents between legacy fonts and Unicode
 #[derive(Parser)]
-#[command(name = "kannadi", version, about)]
-/// Converts Kannada documents typed in Nudi, Baraha, Nudi B-Akshara, Kan-Eng, Akruti or Shree-Lipi fonts to Unicode,
-/// and Unicode back to Nudi.
-///
-/// Each converted file gets a report next to it, FILE.report.tsv, when anything
-/// could not be converted cleanly or the result has likely typos.
+#[command(
+    name = "kannadi",
+    version,
+    long_about = "Convert Kannada documents between legacy fonts and Unicode.\n\n\
+        to-unicode reads text typed in Nudi, Baraha ANSI, Nudi B-Akshara, Kan-Eng, Akruti and \
+        Shree-Lipi fonts in TXT, HTML, DOCX and PDF files. to-nudi writes Unicode Kannada as \
+        Nudi glyph codes.\n\n\
+        Each converted file gets a report next to it, FILE.report.tsv, when anything could not \
+        be converted cleanly or the result has likely typos.",
+    after_help = EXIT_STATUS
+)]
 struct Cli {
     #[command(subcommand)]
     command: Command,
@@ -35,74 +59,128 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Command {
-    /// Convert Nudi, Baraha, Nudi B-Akshara, Kan-Eng, Akruti and Shree-Lipi text to Unicode.
+    /// Convert documents in legacy Kannada fonts to Unicode
+    ///
+    /// Reads TXT, HTML, DOCX and PDF files. Text in HTML, DOCX and PDF files is
+    /// converted only where it is set in a legacy font. The text of a PDF goes to
+    /// NAME.pdf.txt.
+    #[command(after_help = EXIT_STATUS, after_long_help = format!("{TO_UNICODE_EXAMPLES}\n\n{EXIT_STATUS}"))]
     ToUnicode {
         #[command(flatten)]
-        common: Common,
-        /// The layout of text files, and of fonts added with --legacy-font that
-        /// name none: nudi (Nudi and Baraha), nudi-b (Nudi B-Akshara), kan-eng
-        /// (Kan-Eng), akruti or shree-lipi.
+        files: Files,
+        /// Layout of text files, and of fonts added with --legacy-font that name
+        /// none: nudi (Nudi and Baraha ANSI), nudi-b (Nudi B-Akshara), kan-eng,
+        /// akruti or shree-lipi
         #[arg(long, value_name = "LAYOUT", default_value = "nudi", value_parser = parse_layout)]
         layout: Layout,
         /// Write digits as Kannada digits, for text set in the k variants of the
-        /// Nudi fonts.
+        /// Nudi fonts
         #[arg(long)]
         kannada_digits: bool,
-        /// Keep a zero typed between letters as a digit. By default it becomes ಂ.
+        /// Keep a zero typed between letters as a digit; by default it becomes ಂ
         #[arg(long)]
         keep_zeros: bool,
+        /// Font to set converted text in, in HTML and DOCX files
+        #[arg(long, value_name = "NAME", default_value = convert::UNICODE_FONT)]
+        font: String,
+        /// Treat this font as a legacy font too, in the layout after `=`
+        /// ("My Font=akruti") or else the --layout one. Repeat for more fonts
+        #[arg(long, value_name = "NAME[=LAYOUT]", value_parser = parse_legacy_font)]
+        legacy_font: Vec<(String, Option<Layout>)>,
     },
-    /// Convert Unicode Kannada to Nudi and Baraha glyph codes.
+    /// Convert Unicode Kannada documents to Nudi glyph codes
+    ///
+    /// Writes TXT, HTML and DOCX files. Text files are written in Windows-1252.
+    /// A PDF cannot be written back, so each PDF counts as an error.
+    #[command(after_help = EXIT_STATUS, after_long_help = format!("{TO_NUDI_EXAMPLES}\n\n{EXIT_STATUS}"))]
     ToNudi {
         #[command(flatten)]
-        common: Common,
+        files: Files,
+        /// Font to set converted text in, in HTML and DOCX files
+        #[arg(long, value_name = "NAME", default_value = convert::LEGACY_FONT)]
+        font: String,
+        /// Treat this font as a legacy font too, so text already set in it is
+        /// left as it is. Repeat for more fonts
+        #[arg(long, value_name = "NAME", value_parser = parse_legacy_font)]
+        legacy_font: Vec<(String, Option<Layout>)>,
+    },
+    /// Print a shell completion script to standard output
+    #[command(after_help = "Example:\n  kannadi completions zsh > ~/.zfunc/_kannadi")]
+    Completions {
+        #[arg(value_enum)]
+        shell: Shell,
+    },
+    /// Write the man pages to a folder
+    #[command(after_help = "Example:\n  kannadi manpages /usr/local/share/man/man1")]
+    Manpages {
+        /// Folder to write kannadi.1 and a page per command to
+        dir: PathBuf,
     },
 }
 
 #[derive(Args)]
-struct Common {
+struct Files {
     /// Files and folders to convert. Folders are searched for .txt, .htm, .html,
-    /// .docx and .pdf files. PDF text goes to NAME.pdf.txt, to Unicode only.
+    /// .docx and .pdf files
     #[arg(required = true)]
     inputs: Vec<PathBuf>,
-    /// Folder to write the converted files to.
-    #[arg(short, long)]
+    /// Folder to write the converted files and reports to
+    #[arg(short, long, value_name = "DIR")]
     out: PathBuf,
     /// Exit with status 1 if any file has unknown glyphs, malformed syllables or
-    /// unencodable characters. Likely typos do not count.
+    /// unencodable characters; likely typos do not count
     #[arg(long)]
     strict: bool,
-    /// Font for converted text in HTML and DOCX: Noto Sans Kannada by default for
-    /// to-unicode, Nudi 01 e for to-nudi.
-    #[arg(long, value_name = "NAME")]
-    font: Option<String>,
-    /// Also treat this font as a legacy font, in the layout after `=` if given
-    /// (`"My Font=akruti"`), or else the --layout one. Repeat for more.
-    #[arg(long, value_name = "NAME[=LAYOUT]", value_parser = parse_legacy_font)]
-    legacy_font: Vec<(String, Option<Layout>)>,
 }
 
 fn main() -> ExitCode {
     let cli = Cli::parse();
-    let (common, direction, layout) = match cli.command {
+    let (files, settings) = match cli.command {
         Command::ToUnicode {
-            common,
+            files,
             layout,
             kannada_digits,
             keep_zeros,
+            font,
+            legacy_font,
         } => {
             let options = Options {
                 kannada_digits,
                 zero_as_anusvara: !keep_zeros,
             };
-            (common, Direction::ToUnicode(options), layout)
+            let direction = Direction::ToUnicode(options);
+            (files, settings(direction, layout, font, &legacy_font))
         }
-        Command::ToNudi { common } => (common, Direction::ToNudi, Layout::Nudi),
+        Command::ToNudi {
+            files,
+            font,
+            legacy_font,
+        } => (
+            files,
+            settings(Direction::ToNudi, Layout::Nudi, font, &legacy_font),
+        ),
+        Command::Completions { shell } => {
+            clap_complete::generate(
+                shell,
+                &mut Cli::command(),
+                "kannadi",
+                &mut std::io::stdout(),
+            );
+            return ExitCode::SUCCESS;
+        }
+        Command::Manpages { dir } => {
+            return match write_manpages(&dir) {
+                Ok(()) => ExitCode::SUCCESS,
+                Err(e) => {
+                    eprintln!("error: {e:#}");
+                    ExitCode::from(2)
+                }
+            };
+        }
     };
-    let settings = settings(&common, direction, layout);
-    match run(&common, &settings) {
+    match run(&files, &settings) {
         Ok(Outcome { failed: true, .. }) => ExitCode::from(2),
-        Ok(Outcome { issues: true, .. }) if common.strict => ExitCode::from(1),
+        Ok(Outcome { issues: true, .. }) if files.strict => ExitCode::from(1),
         Ok(_) => ExitCode::SUCCESS,
         Err(e) => {
             eprintln!("error: {e:#}");
@@ -112,21 +190,30 @@ fn main() -> ExitCode {
 }
 
 /// The settings the command line asks for; `layout` is the --layout value.
-fn settings(common: &Common, direction: Direction, layout: Layout) -> Settings {
+fn settings(
+    direction: Direction,
+    layout: Layout,
+    font: String,
+    legacy_font: &[(String, Option<Layout>)],
+) -> Settings {
     let mut settings = Settings::new(direction);
     settings.text_layout = layout;
-    if let Some(font) = &common.font {
-        match direction {
-            Direction::ToUnicode(_) => settings.fonts.unicode.clone_from(font),
-            Direction::ToNudi => settings.fonts.legacy.clone_from(font),
-        }
+    match direction {
+        Direction::ToUnicode(_) => settings.fonts.unicode = font,
+        Direction::ToNudi => settings.fonts.legacy = font,
     }
-    settings.fonts.extra_legacy = common
-        .legacy_font
+    settings.fonts.extra_legacy = legacy_font
         .iter()
         .map(|(name, named)| (name.clone(), named.unwrap_or(layout)))
         .collect();
     settings
+}
+
+/// Writes kannadi.1 and a page for each command, such as kannadi-to-unicode.1.
+fn write_manpages(dir: &std::path::Path) -> Result<()> {
+    std::fs::create_dir_all(dir).with_context(|| format!("creating {}", dir.display()))?;
+    clap_mangen::generate_to(Cli::command(), dir)
+        .with_context(|| format!("writing man pages to {}", dir.display()))
 }
 
 fn parse_layout(name: &str) -> Result<Layout, String> {
@@ -147,8 +234,8 @@ struct Outcome {
     failed: bool,
 }
 
-fn run(common: &Common, settings: &Settings) -> Result<Outcome> {
-    let plan = files::plan(&common.inputs, &common.out)?;
+fn run(files: &Files, settings: &Settings) -> Result<Outcome> {
+    let plan = files::plan(&files.inputs, &files.out)?;
     for (path, e) in &plan.unreadable {
         eprintln!("error: {}: {e}", path.display());
     }
@@ -243,10 +330,21 @@ mod tests {
             "--legacy-font",
             "B=nudi",
         ]);
-        let Command::ToUnicode { common, layout, .. } = cli.command else {
+        let Command::ToUnicode {
+            layout,
+            font,
+            legacy_font,
+            ..
+        } = cli.command
+        else {
             panic!("to-unicode")
         };
-        let s = settings(&common, Direction::ToUnicode(Options::default()), layout);
+        let s = settings(
+            Direction::ToUnicode(Options::default()),
+            layout,
+            font,
+            &legacy_font,
+        );
         assert_eq!(s.text_layout, Layout::Akruti);
         assert_eq!(
             s.fonts.extra_legacy,

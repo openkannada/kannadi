@@ -1,0 +1,40 @@
+.ie \n(.g .ds Aq \(aq
+.el .ds Aq '
+.TH kannadi 1  "kannadi 0.1.0" 
+.SH NAME
+kannadi \- Convert Kannada documents between legacy fonts and Unicode
+.SH SYNOPSIS
+\fBkannadi\fR [\fB\-h\fR|\fB\-\-help\fR] [\fB\-V\fR|\fB\-\-version\fR] <\fIsubcommands\fR>
+.SH DESCRIPTION
+Convert Kannada documents between legacy fonts and Unicode.
+.PP
+to\-unicode reads text typed in Nudi, Baraha ANSI, Nudi B\-Akshara, Kan\-Eng, Akruti and Shree\-Lipi fonts in TXT, HTML, DOCX and PDF files. to\-nudi writes Unicode Kannada as Nudi glyph codes.
+.PP
+Each converted file gets a report next to it, FILE.report.tsv, when anything could not be converted cleanly or the result has likely typos.
+.SH OPTIONS
+.TP
+\fB\-h\fR, \fB\-\-help\fR
+Print help (see a summary with \*(Aq\-h\*(Aq)
+.TP
+\fB\-V\fR, \fB\-\-version\fR
+Print version
+.SH SUBCOMMANDS
+.TP
+kannadi\-to\-unicode(1)
+Convert documents in legacy Kannada fonts to Unicode
+.TP
+kannadi\-to\-nudi(1)
+Convert Unicode Kannada documents to Nudi glyph codes
+.TP
+kannadi\-completions(1)
+Print a shell completion script to standard output
+.TP
+kannadi\-manpages(1)
+Write the man pages to a folder
+.SH EXTRA
+Exit status:
+  0  Success. Reports may still list problems and likely typos.
+  1  \-\-strict was given and a file has a problem.
+  2  Bad arguments, or a file or folder that could not be read or written.
+.SH VERSION
+v0.1.0
