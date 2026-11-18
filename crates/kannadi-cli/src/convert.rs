@@ -204,7 +204,6 @@ pub fn convert(text: &str, layout: Layout, settings: &Settings) -> Converted {
     }
 }
 
-/// Sorts by line, then by the key: (0, input offset) or (1, output offset).
 /// Text that is already Unicode, kept as it is, with its likely typos.
 pub fn keep(text: &str) -> Converted {
     let lines = Lines::new(text);
@@ -231,6 +230,7 @@ fn likely_typos(text: &str) -> impl Iterator<Item = (usize, String)> + '_ {
     })
 }
 
+/// Sorts by line, then by the key: (0, input offset) or (1, output offset).
 fn in_order(issues: impl Iterator<Item = ((u8, usize), Issue)>) -> Vec<Issue> {
     let mut issues: Vec<((u8, usize), Issue)> = issues.collect();
     issues.sort_by_key(|(at, issue)| (issue.line, *at));

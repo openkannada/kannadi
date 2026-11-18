@@ -145,11 +145,11 @@ pub fn best_layout(text: &str) -> String {
     legacy::best_layout(text).name().to_string()
 }
 
-/// True if `text` is already Unicode Kannada and needs no conversion. See
-/// [`legacy::is_unicode`].
+/// True if `text` is already Unicode Kannada and needs no conversion from
+/// `layout`. See [`legacy::is_unicode`].
 #[wasm_bindgen(js_name = isUnicode)]
-pub fn is_unicode(text: &str) -> bool {
-    legacy::is_unicode(text)
+pub fn is_unicode(text: &str, layout: &str) -> Result<bool, JsError> {
+    Ok(legacy::is_unicode(text, layout.parse()?))
 }
 
 fn convert(text: &str, layout: legacy::Layout, options: &NudiOptions) -> Conversion {
@@ -530,9 +530,9 @@ mod tests {
 
     #[test]
     fn unicode_text_needs_no_conversion() {
-        assert!(is_unicode("ಕನ್ನಡ ನಾಡು"));
-        assert!(!is_unicode("PÀ£ÀßqÀ"));
-        assert!(!is_unicode("ಕ PÀ£ÀßqÀ"));
+        assert!(is_unicode("ಕನ್ನಡ ನಾಡು", "nudi").unwrap());
+        assert!(!is_unicode("PÀ£ÀßqÀ", "nudi").unwrap());
+        assert!(!is_unicode("ಕ PÀ£ÀßqÀ", "nudi").unwrap());
     }
 
     #[test]

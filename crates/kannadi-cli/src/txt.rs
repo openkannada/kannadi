@@ -3,7 +3,7 @@
 use anyhow::{bail, Result};
 use kannadi::legacy::{decode_windows_1252, is_unicode, windows_1252_byte};
 
-use crate::convert::{convert, keep, Direction, Settings};
+use crate::convert::{convert, keep, Converted, Direction, Settings};
 use crate::report::{Report, Row};
 
 /// Converts a text file. Unicode output is UTF-8. Nudi output is Windows-1252,
@@ -11,11 +11,9 @@ use crate::report::{Report, Row};
 /// unencodable.
 pub fn convert_file(bytes: &[u8], settings: &Settings) -> Result<(Vec<u8>, Report)> {
     let text = read_text(bytes, settings.direction)?;
-    // A file converted before would have its English letters read as glyphs.
-    let converted = if matches!(settings.direction, Direction::ToUnicode(_)) && is_unicode(&text) {
-        keep(&text)
-    } else {
-        convert(&text, settings.text_layout, settings)
+    let converted = match settings.direction {
+        Direction::ToUnicode(_) => to_unicode_by_line(&text, settings),
+        Direction::ToNudi => convert(&text, settings.text_layout, settings),
     };
     let rows = converted
         .issues
@@ -31,6 +29,55 @@ pub fn convert_file(bytes: &[u8], settings: &Settings) -> Result<(Vec<u8>, Repor
             .collect(),
     };
     Ok((out, Report { rows }))
+}
+
+/// Converts `text` to Unicode, keeping the lines that are Unicode already, whose
+/// English letters would otherwise be read as glyphs. Runs of lines of 1 kind
+/// are handled together; a line of ASCII alone goes with the whole file.
+fn to_unicode_by_line(text: &str, settings: &Settings) -> Converted {
+    let layout = settings.text_layout;
+    let whole = is_unicode(text, layout);
+    let mut runs: Vec<(bool, usize, usize)> = Vec::new();
+    let mut at = 0;
+    for line in text.split_inclusive('\n') {
+        // A line of ASCII alone, such as English or Nudi's own letters, follows the file.
+        let unicode = if line.is_ascii() {
+            whole
+        } else {
+            is_unicode(line, layout)
+        };
+        match runs.last_mut() {
+            Some((kind, _, end)) if *kind == unicode => *end += line.len(),
+            _ => runs.push((unicode, at, at + line.len())),
+        }
+        at += line.len();
+    }
+    if runs.len() <= 1 {
+        return match runs.first() {
+            Some((true, ..)) => keep(text),
+            _ => convert(text, layout, settings),
+        };
+    }
+    let mut out = Converted {
+        text: String::with_capacity(text.len() * 2),
+        issues: Vec::new(),
+    };
+    let mut lines_before = 0;
+    for (unicode, start, end) in runs {
+        let part = &text[start..end];
+        let done = if unicode {
+            keep(part)
+        } else {
+            convert(part, layout, settings)
+        };
+        out.text.push_str(&done.text);
+        out.issues.extend(done.issues.into_iter().map(|mut issue| {
+            issue.line += lines_before;
+            issue
+        }));
+        lines_before += part.matches('\n').count();
+    }
+    out
 }
 
 /// Reads text with a UTF-8 or UTF-16 byte order mark, or valid UTF-8. Legacy text
@@ -118,6 +165,36 @@ mod tests {
             .map(|r| (r.location.as_str(), r.kind))
             .collect();
         assert_eq!(rows, [("line 2", Kind::LikelyTypo)]);
+    }
+
+    #[test]
+    fn a_nudi_line_in_a_mostly_unicode_file_is_converted() {
+        let text = "ಕರ್ನಾಟಕ ಸರ್ಕಾರದ ಸುತ್ತೋಲೆ: ಎಲ್ಲಾ ಶಾಲೆಗಳಲ್ಲಿ ಕನ್ನಡ ಕಡ್ಡಾಯ, 2026\n\
+            PÀ£ÀßqÀ \u{F1}\nನೈರೃತ್ಯ, English\nOffice hours\n";
+        let (out, report) = convert_file(text.as_bytes(), &to_unicode()).unwrap();
+        assert_eq!(
+            String::from_utf8(out).unwrap(),
+            "ಕರ್ನಾಟಕ ಸರ್ಕಾರದ ಸುತ್ತೋಲೆ: ಎಲ್ಲಾ ಶಾಲೆಗಳಲ್ಲಿ ಕನ್ನಡ ಕಡ್ಡಾಯ, 2026\n\
+            ಕನ್ನಡ \u{F1}\nನೈರೃತ್ಯ, English\nOffice hours\n"
+        );
+        let rows: Vec<(&str, Kind)> = report
+            .rows
+            .iter()
+            .map(|r| (r.location.as_str(), r.kind))
+            .collect();
+        assert_eq!(
+            rows,
+            [("line 2", Kind::UnknownGlyph), ("line 3", Kind::LikelyTypo)]
+        );
+    }
+
+    #[test]
+    fn ascii_lines_in_a_nudi_file_are_converted() {
+        let (out, _) = convert_file("¸Á»vÀå\nPÀ£ÀßqÀ\n".as_bytes(), &to_unicode()).unwrap();
+        assert_eq!(String::from_utf8(out).unwrap(), "ಸಾಹಿತ್ಯ\nಕನ್ನಡ\n");
+        // Q is ಕಿ in Nudi: a line of ASCII alone.
+        let (out, _) = convert_file("PÀ£ÀßqÀ\nQ\n".as_bytes(), &to_unicode()).unwrap();
+        assert_eq!(String::from_utf8(out).unwrap(), "ಕನ್ನಡ\nಕಿ\n");
     }
 
     #[test]

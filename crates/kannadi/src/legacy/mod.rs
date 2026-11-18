@@ -184,26 +184,27 @@ fn unaspirated(c: char) -> Option<char> {
 }
 
 /// True for text that is already Unicode Kannada: it has more characters from
-/// the Kannada block than characters above ASCII that a legacy layout may use as a
-/// glyph code, such as À, ß or –. Converted text keeps a few such characters, as
-/// in 30°C or ©; legacy text has 1 or more per syllable. Converting Unicode text
-/// would read its English letters as glyphs.
+/// the Kannada block than characters above ASCII that `layout` uses as glyph
+/// codes, such as À or ß in Nudi. Converted text keeps few such characters, as in
+/// 30°C or ©; legacy text has 1 or more per syllable. Converting Unicode text
+/// would read its English letters as glyphs. Decide line by line where a file
+/// may mix both.
 ///
 /// ```
-/// use kannadi::legacy::is_unicode;
+/// use kannadi::legacy::{is_unicode, Layout};
 ///
-/// assert!(is_unicode("ಕನ್ನಡ ನಾಡು, 2026 – Bengaluru, 30°C"));
-/// assert!(!is_unicode("PÀ£ÀßqÀ"));
-/// assert!(!is_unicode("Bengaluru"));
+/// assert!(is_unicode("ಕನ್ನಡ ನಾಡು, 2026 – “Bengaluru”, 30°C", Layout::Nudi));
+/// assert!(!is_unicode("PÀ£ÀßqÀ", Layout::Nudi));
+/// assert!(!is_unicode("Bengaluru", Layout::Nudi));
 /// ```
-pub fn is_unicode(text: &str) -> bool {
+pub fn is_unicode(text: &str, layout: Layout) -> bool {
     let kannada = text
         .chars()
         .filter(|&c| crate::chars::is_kannada(c))
         .count();
     let glyphs = text
         .chars()
-        .filter(|&c| windows_1252_byte(c).is_some_and(|b| b >= 0x80))
+        .filter(|&c| !c.is_ascii() && decode::is_glyph_code(layout, c))
         .count();
     kannada > glyphs
 }
@@ -234,12 +235,16 @@ mod tests {
             "Office: ಕನ್ನಡ & English",
             "ಮಳೆ 30°C ಇದೆ",
             "ಕನ್ನಡ café © 2026",
+            "“Minutes” – the committee met on 3 March; Mr. ರಾಮ’s report was read.",
         ] {
-            assert!(is_unicode(text), "{text:?}");
+            assert!(is_unicode(text, Layout::Nudi), "{text:?}");
         }
-        for text in ["PÀ£ÀßqÀ", "ಕ PÀ£ÀßqÀ", "ಕ ‚„", "Bengaluru 2026", ""] {
-            assert!(!is_unicode(text), "{text:?}");
+        for text in ["PÀ£ÀßqÀ", "ಕ PÀ£ÀßqÀ", "Bengaluru 2026", ""] {
+            assert!(!is_unicode(text, Layout::Nudi), "{text:?}");
         }
+        // Akruti draws ೨ and ೪ at 82 and 84, which Windows-1252 shows as ‚ and „.
+        assert!(!is_unicode("ಕ ‚„", Layout::Akruti));
+        assert!(is_unicode("ಕ ‚„ ಕ", Layout::Nudi));
     }
 
     #[test]

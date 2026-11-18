@@ -179,6 +179,11 @@ pub fn nudi_syllable_starts(text: &str) -> Vec<usize> {
     syllable_starts(text, Layout::Nudi)
 }
 
+/// True if `layout` has an entry for `c` on its own.
+pub(super) fn is_glyph_code(layout: Layout, c: char) -> bool {
+    table(layout).longest_match(std::iter::once(c)).is_some()
+}
+
 fn table(layout: Layout) -> &'static Lookup<Entry> {
     static TABLES: OnceLock<Vec<Lookup<Entry>>> = OnceLock::new();
     let tables = TABLES.get_or_init(|| {
