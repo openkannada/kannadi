@@ -24,5 +24,5 @@ github-custom-job-permissions = { "publish-homebrew" = { contents = "read" } }
 # release.yml has 1 hand edit: dist 0.34.0 writes `uses: $/.github/...` for local
 # publish jobs, which GitHub rejects; the line must read `uses: ./.github/...`
 allow-dirty = ["ci"]
-# Build every artifact on pull requests too, as a dry run
-pr-run-mode = "upload"
+# Pull requests check the release plan; set "upload" to build every archive as a dry run
+pr-run-mode = "plan"
