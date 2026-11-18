@@ -10,7 +10,7 @@ rust-version = "1.89"
 readme = "README.md"
 keywords = ["kannada", "nudi", "unicode", "converter", "cli"]
 categories = ["command-line-utilities", "text-processing", "internationalization"]
-include = ["src/**/*.rs", "assets/**", "README.md"]
+include = ["src/**/*.rs", "assets/**", "README.md", "LICENSE-MIT", "LICENSE-APACHE"]
 
 [[bin]]
 name = "kannadi"

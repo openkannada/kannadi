@@ -26,7 +26,9 @@ Releases are built by `.github/workflows/release.yml`, which [dist](https://open
 1. Set the new version in the root `Cargo.toml`, and in the `kannadi` dependency of `crates/kannadi-cli/Cargo.toml`.
 2. Run `KANNADI_BLESS=1 cargo test -p kannadi-cli` to rewrite the man pages and completion scripts in `crates/kannadi-cli/assets`, which carry the version.
 3. Give the changes under `Unreleased` in `CHANGELOG.md` a heading with the version and date.
-4. Publish the crates: `cargo publish -p kannadi`, then `cargo publish -p kannadi-cli`.
-5. Push a tag such as `v0.1.0`. The workflow builds the archives for macOS, Linux and Windows with their checksums and the install scripts, creates the GitHub Release, and writes the Homebrew formula to `openkannada/homebrew-tap`. That last step needs a `HOMEBREW_TAP_TOKEN` secret that can push to the tap. A tag with a suffix, such as `v0.2.0-rc.1`, makes a prerelease and leaves the tap alone.
+4. Push a tag such as `v0.1.0`. The workflow builds the archives for macOS, Linux and Windows with their checksums and the install scripts, creates the GitHub Release, and writes the Homebrew formula to `openkannada/homebrew-tap`. That last step needs a `HOMEBREW_TAP_TOKEN` secret that can push to the tap, and the tap needs at least 1 commit. A tag with a suffix, such as `v0.2.0-rc.1`, makes a prerelease and leaves the tap alone.
+5. Once the release is out, publish the crates: `cargo publish -p kannadi`, then `cargo publish -p kannadi-cli`. A version on crates.io cannot be replaced, so it goes last.
 
-Pull requests that change the release workflow or `dist-workspace.toml` build every archive as a dry run when `pr-run-mode` is `upload`; it is `plan` otherwise.
+dist 0.34.0 writes `uses: $/.github/workflows/publish-homebrew.yml` in `release.yml`, which GitHub rejects. After running `dist generate`, change that line to `uses: ./.github/workflows/publish-homebrew.yml`. `allow-dirty = ["ci"]` in `dist-workspace.toml` lets dist accept the edit, and also stops `dist generate` from rewriting `release.yml`: remove it for the run, then put it back.
+
+`pr-run-mode` in `dist-workspace.toml` is `plan`, so pull requests only check the release plan. Set it to `upload` in a pull request to build every archive as a dry run.

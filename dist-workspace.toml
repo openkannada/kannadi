@@ -19,5 +19,10 @@ hosting = "github"
 install-updater = false
 # Writes the Homebrew formula, with man pages and completions, to openkannada/homebrew-tap
 publish-jobs = ["./publish-homebrew"]
+# The publish job reads the release's checksums
+github-custom-job-permissions = { "publish-homebrew" = { contents = "read" } }
+# release.yml has 1 hand edit: dist 0.34.0 writes `uses: $/.github/...` for local
+# publish jobs, which GitHub rejects; the line must read `uses: ./.github/...`
+allow-dirty = ["ci"]
 # Build every artifact on pull requests too, as a dry run
 pr-run-mode = "upload"

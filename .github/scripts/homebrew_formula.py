@@ -3,6 +3,8 @@
 # SPDX-License-Identifier: MIT OR Apache-2.0
 """Writes the Homebrew formula for a kannadi release to standard output.
 
+Linux gets the static musl builds, which run on any glibc.
+
     homebrew_formula.py VERSION SHA256_SUM [BASE_URL]
 
 SHA256_SUM is the release's sha256.sum ("HASH *FILE" per line). BASE_URL defaults
@@ -14,15 +16,14 @@ import sys
 TARGETS = {
     ("mac", "arm"): "aarch64-apple-darwin",
     ("mac", "intel"): "x86_64-apple-darwin",
-    ("linux", "arm"): "aarch64-unknown-linux-gnu",
-    ("linux", "intel"): "x86_64-unknown-linux-gnu",
+    ("linux", "arm"): "aarch64-unknown-linux-musl",
+    ("linux", "intel"): "x86_64-unknown-linux-musl",
 }
 
 TEMPLATE = """\
 class Kannadi < Formula
   desc "Convert Kannada documents in legacy fonts such as Nudi to Unicode, and back"
   homepage "https://github.com/openkannada/kannadi"
-  version "{version}"
   license any_of: ["MIT", "Apache-2.0"]
 
   on_macos do
@@ -71,7 +72,7 @@ def read_sums(path):
     return sums
 
 
-def render(version, sums, base_url):
+def render(sums, base_url):
     blocks = {}
     for (os_name, cpu), target in TARGETS.items():
         archive = f"kannadi-cli-{target}.tar.xz"
@@ -80,7 +81,7 @@ def render(version, sums, base_url):
         blocks[f"{os_name}_{cpu}"] = (
             f'      url "{base_url}/{archive}"\n      sha256 "{sums[archive]}"'
         )
-    return TEMPLATE.format(version=version, **blocks)
+    return TEMPLATE.format(**blocks)
 
 
 def main(argv):
@@ -90,7 +91,7 @@ def main(argv):
     base_url = argv[3] if len(argv) == 4 else (
         f"https://github.com/openkannada/kannadi/releases/download/v{version}"
     )
-    sys.stdout.write(render(version, read_sums(sums_path), base_url))
+    sys.stdout.write(render(read_sums(sums_path), base_url))
 
 
 if __name__ == "__main__":

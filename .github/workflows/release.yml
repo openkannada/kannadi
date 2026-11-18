@@ -287,14 +287,13 @@ jobs:
       - plan
       - host
     if: ${{ !fromJson(needs.plan.outputs.val).announcement_is_prerelease || fromJson(needs.plan.outputs.val).publish_prereleases }}
-    uses: $/.github/workflows/publish-homebrew.yml
+    uses: ./.github/workflows/publish-homebrew.yml
     with:
       plan: ${{ needs.plan.outputs.val }}
     secrets: inherit
     # publish jobs get escalated permissions
     permissions:
-      "id-token": "write"
-      "packages": "write"
+      "contents": "read"
 
   announce:
     needs:
