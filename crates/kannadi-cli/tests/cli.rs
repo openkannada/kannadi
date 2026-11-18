@@ -176,9 +176,19 @@ fn html_round_trips_through_nudi() {
 }
 
 const ASSETS: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/assets");
-const REGENERATE: &str =
-    "regenerate with: cargo run -p kannadi-cli -- manpages crates/kannadi-cli/assets/man, \
-    and kannadi completions SHELL > crates/kannadi-cli/assets/completions/FILE";
+const REGENERATE: &str = "run the tests with KANNADI_BLESS=1 to rewrite crates/kannadi-cli/assets";
+
+/// Compares a generated asset with the committed copy, or rewrites the copy
+/// when KANNADI_BLESS is set.
+fn check_asset(path: &str, fresh: &[u8]) {
+    let committed = format!("{ASSETS}/{path}");
+    if std::env::var_os("KANNADI_BLESS").is_some() {
+        std::fs::write(&committed, fresh).unwrap();
+        return;
+    }
+    let old = std::fs::read(&committed).unwrap_or_default();
+    assert!(old == fresh, "{path} is out of date; {REGENERATE}");
+}
 
 #[test]
 fn committed_man_pages_match_the_cli() {
@@ -201,9 +211,8 @@ fn committed_man_pages_match_the_cli() {
         ]
     );
     for name in made {
-        let fresh = std::fs::read_to_string(tmp.path().join("man").join(&name)).unwrap();
-        let committed = std::fs::read_to_string(format!("{ASSETS}/man/{name}")).unwrap();
-        assert!(fresh == committed, "{name} is out of date; {REGENERATE}");
+        let fresh = std::fs::read(tmp.path().join("man").join(&name)).unwrap();
+        check_asset(&format!("man/{name}"), &fresh);
     }
 }
 
@@ -219,12 +228,12 @@ fn committed_completions_match_the_cli() {
     ] {
         let run = kannadi(&["completions", shell], tmp.path());
         assert_eq!(run.status.code(), Some(0), "{run:?}");
-        let committed = std::fs::read(format!("{ASSETS}/completions/{file}")).unwrap();
-        assert!(
-            run.stdout == committed,
-            "{file} is out of date; {REGENERATE}"
-        );
-        assert!(String::from_utf8_lossy(&run.stdout).contains("to-unicode"));
+        check_asset(&format!("completions/{file}"), &run.stdout);
+        let script = String::from_utf8_lossy(&run.stdout);
+        assert!(script.contains("to-unicode"), "{file}");
+        if ["bash", "zsh", "fish"].contains(&shell) {
+            assert!(script.contains("shree-lipi"), "{file} completes layouts");
+        }
     }
 }
 
@@ -254,11 +263,15 @@ fn help_names_the_exit_statuses_and_version_prints_the_package_version() {
         String::from_utf8_lossy(&kannadi(&["to-nudi", "--help"], tmp.path()).stdout).into_owned();
     assert!(nudi.contains("[default: \"Nudi 01 e\"]"), "{nudi}");
     assert!(!nudi.contains("--layout"), "{nudi}");
-    for args in [&["--version"][..], &["-V"]] {
+    for (args, name) in [
+        (&["--version"][..], "kannadi"),
+        (&["-V"], "kannadi"),
+        (&["to-unicode", "--version"], "kannadi-to-unicode"),
+    ] {
         let run = kannadi(args, tmp.path());
         assert_eq!(
             String::from_utf8_lossy(&run.stdout),
-            format!("kannadi {}\n", env!("CARGO_PKG_VERSION"))
+            format!("{name} {}\n", env!("CARGO_PKG_VERSION"))
         );
     }
 }

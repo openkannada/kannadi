@@ -35,7 +35,7 @@ Register-ArgumentCompleter -Native -CommandName 'kannadi' -ScriptBlock {
         'kannadi;to-unicode' {
             [CompletionResult]::new('-o', '-o', [CompletionResultType]::ParameterName, 'Folder to write the converted files and reports to')
             [CompletionResult]::new('--out', '--out', [CompletionResultType]::ParameterName, 'Folder to write the converted files and reports to')
-            [CompletionResult]::new('--layout', '--layout', [CompletionResultType]::ParameterName, 'Layout of text files, and of fonts added with --legacy-font that name none: nudi (Nudi and Baraha ANSI), nudi-b (Nudi B-Akshara), kan-eng, akruti or shree-lipi')
+            [CompletionResult]::new('--layout', '--layout', [CompletionResultType]::ParameterName, 'Layout of text files, and of fonts added with --legacy-font that name none. nudi covers the Nudi and Baraha ANSI fonts')
             [CompletionResult]::new('--font', '--font', [CompletionResultType]::ParameterName, 'Font to set converted text in, in HTML and DOCX files')
             [CompletionResult]::new('--legacy-font', '--legacy-font', [CompletionResultType]::ParameterName, 'Treat this font as a legacy font too, in the layout after `=` ("My Font=akruti") or else the --layout one. Repeat for more fonts')
             [CompletionResult]::new('--strict', '--strict', [CompletionResultType]::ParameterName, 'Exit with status 1 if any file has unknown glyphs, malformed syllables or unencodable characters; likely typos do not count')
@@ -43,6 +43,8 @@ Register-ArgumentCompleter -Native -CommandName 'kannadi' -ScriptBlock {
             [CompletionResult]::new('--keep-zeros', '--keep-zeros', [CompletionResultType]::ParameterName, 'Keep a zero typed between letters as a digit; by default it becomes ಂ')
             [CompletionResult]::new('-h', '-h', [CompletionResultType]::ParameterName, 'Print help (see more with ''--help'')')
             [CompletionResult]::new('--help', '--help', [CompletionResultType]::ParameterName, 'Print help (see more with ''--help'')')
+            [CompletionResult]::new('-V', '-V ', [CompletionResultType]::ParameterName, 'Print version')
+            [CompletionResult]::new('--version', '--version', [CompletionResultType]::ParameterName, 'Print version')
             break
         }
         'kannadi;to-nudi' {
@@ -53,16 +55,22 @@ Register-ArgumentCompleter -Native -CommandName 'kannadi' -ScriptBlock {
             [CompletionResult]::new('--strict', '--strict', [CompletionResultType]::ParameterName, 'Exit with status 1 if any file has unknown glyphs, malformed syllables or unencodable characters; likely typos do not count')
             [CompletionResult]::new('-h', '-h', [CompletionResultType]::ParameterName, 'Print help (see more with ''--help'')')
             [CompletionResult]::new('--help', '--help', [CompletionResultType]::ParameterName, 'Print help (see more with ''--help'')')
+            [CompletionResult]::new('-V', '-V ', [CompletionResultType]::ParameterName, 'Print version')
+            [CompletionResult]::new('--version', '--version', [CompletionResultType]::ParameterName, 'Print version')
             break
         }
         'kannadi;completions' {
             [CompletionResult]::new('-h', '-h', [CompletionResultType]::ParameterName, 'Print help')
             [CompletionResult]::new('--help', '--help', [CompletionResultType]::ParameterName, 'Print help')
+            [CompletionResult]::new('-V', '-V ', [CompletionResultType]::ParameterName, 'Print version')
+            [CompletionResult]::new('--version', '--version', [CompletionResultType]::ParameterName, 'Print version')
             break
         }
         'kannadi;manpages' {
             [CompletionResult]::new('-h', '-h', [CompletionResultType]::ParameterName, 'Print help')
             [CompletionResult]::new('--help', '--help', [CompletionResultType]::ParameterName, 'Print help')
+            [CompletionResult]::new('-V', '-V ', [CompletionResultType]::ParameterName, 'Print version')
+            [CompletionResult]::new('--version', '--version', [CompletionResultType]::ParameterName, 'Print version')
             break
         }
         'kannadi;help' {

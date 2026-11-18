@@ -67,7 +67,7 @@ _kannadi() {
             return 0
             ;;
         kannadi__subcmd__completions)
-            opts="-h --help bash elvish fish powershell zsh"
+            opts="-h -V --help --version bash elvish fish powershell zsh"
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 2 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0
@@ -165,7 +165,7 @@ _kannadi() {
             return 0
             ;;
         kannadi__subcmd__manpages)
-            opts="-h --help"
+            opts="-h -V --help --version"
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 2 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0
@@ -179,7 +179,7 @@ _kannadi() {
             return 0
             ;;
         kannadi__subcmd__to__subcmd__nudi)
-            opts="-o -h --out --strict --font --legacy-font --help"
+            opts="-o -h -V --out --strict --font --legacy-font --help --version"
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 2 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0
@@ -209,7 +209,7 @@ _kannadi() {
             return 0
             ;;
         kannadi__subcmd__to__subcmd__unicode)
-            opts="-o -h --out --strict --layout --kannada-digits --keep-zeros --font --legacy-font --help"
+            opts="-o -h -V --out --strict --layout --kannada-digits --keep-zeros --font --legacy-font --help --version"
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 2 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0
@@ -224,7 +224,7 @@ _kannadi() {
                     return 0
                     ;;
                 --layout)
-                    COMPREPLY=($(compgen -f "${cur}"))
+                    COMPREPLY=($(compgen -W "nudi akruti shree-lipi nudi-b kan-eng" -- "${cur}"))
                     return 0
                     ;;
                 --font)

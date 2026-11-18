@@ -1,10 +1,10 @@
 .ie \n(.g .ds Aq \(aq
 .el .ds Aq '
-.TH kannadi-to-nudi 1  "to-nudi " 
+.TH kannadi-to-nudi 1  "to-nudi 0.1.0" 
 .SH NAME
 kannadi\-to\-nudi \- Convert Unicode Kannada documents to Nudi glyph codes
 .SH SYNOPSIS
-\fBkannadi to\-nudi\fR [\fB\-\-strict\fR] [\fB\-\-font\fR] [\fB\-\-legacy\-font\fR] [\fB\-h\fR|\fB\-\-help\fR] <\fB\-o\fR|\fB\-\-out\fR> <\fIINPUTS\fR> 
+\fBkannadi to\-nudi\fR [\fB\-\-strict\fR] [\fB\-\-font\fR] [\fB\-\-legacy\-font\fR] [\fB\-h\fR|\fB\-\-help\fR] [\fB\-V\fR|\fB\-\-version\fR] <\fB\-o\fR|\fB\-\-out\fR> <\fIINPUTS\fR> 
 .SH DESCRIPTION
 Convert Unicode Kannada documents to Nudi glyph codes
 .PP
@@ -26,6 +26,9 @@ Treat this font as a legacy font too, so text already set in it is left as it is
 \fB\-h\fR, \fB\-\-help\fR
 Print help (see a summary with \*(Aq\-h\*(Aq)
 .TP
+\fB\-V\fR, \fB\-\-version\fR
+Print version
+.TP
 <\fIINPUTS\fR>
 Files and folders to convert. Folders are searched for .txt, .htm, .html, .docx and .pdf files
 .SH EXTRA
@@ -36,4 +39,7 @@ Examples:
 Exit status:
   0  Success. Reports may still list problems and likely typos.
   1  \-\-strict was given and a file has a problem.
-  2  Bad arguments, or a file or folder that could not be read or written.
+  2  Bad arguments, or a file that could not be read, converted or written.
+     2 wins over 1 when both apply.
+.SH VERSION
+v0.1.0

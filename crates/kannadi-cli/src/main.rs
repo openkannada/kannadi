@@ -26,7 +26,8 @@ const EXIT_STATUS: &str = "\
 Exit status:
   0  Success. Reports may still list problems and likely typos.
   1  --strict was given and a file has a problem.
-  2  Bad arguments, or a file or folder that could not be read or written.";
+  2  Bad arguments, or a file that could not be read, converted or written.
+     2 wins over 1 when both apply.";
 
 const TO_UNICODE_EXAMPLES: &str = "\
 Examples:
@@ -44,6 +45,7 @@ Examples:
 #[command(
     name = "kannadi",
     version,
+    propagate_version = true,
     long_about = "Convert Kannada documents between legacy fonts and Unicode.\n\n\
         to-unicode reads text typed in Nudi, Baraha ANSI, Nudi B-Akshara, Kan-Eng, Akruti and \
         Shree-Lipi fonts in TXT, HTML, DOCX and PDF files. to-nudi writes Unicode Kannada as \
@@ -69,9 +71,8 @@ enum Command {
         #[command(flatten)]
         files: Files,
         /// Layout of text files, and of fonts added with --legacy-font that name
-        /// none: nudi (Nudi and Baraha ANSI), nudi-b (Nudi B-Akshara), kan-eng,
-        /// akruti or shree-lipi
-        #[arg(long, value_name = "LAYOUT", default_value = "nudi", value_parser = parse_layout)]
+        /// none. nudi covers the Nudi and Baraha ANSI fonts
+        #[arg(long, value_name = "LAYOUT", default_value = "nudi", ignore_case = true, value_parser = layout_parser())]
         layout: Layout,
         /// Write digits as Kannada digits, for text set in the k variants of the
         /// Nudi fonts
@@ -101,8 +102,8 @@ enum Command {
         font: String,
         /// Treat this font as a legacy font too, so text already set in it is
         /// left as it is. Repeat for more fonts
-        #[arg(long, value_name = "NAME", value_parser = parse_legacy_font)]
-        legacy_font: Vec<(String, Option<Layout>)>,
+        #[arg(long, value_name = "NAME")]
+        legacy_font: Vec<String>,
     },
     /// Print a shell completion script to standard output
     #[command(after_help = "Example:\n  kannadi completions zsh > ~/.zfunc/_kannadi")]
@@ -155,10 +156,13 @@ fn main() -> ExitCode {
             files,
             font,
             legacy_font,
-        } => (
-            files,
-            settings(Direction::ToNudi, Layout::Nudi, font, &legacy_font),
-        ),
+        } => {
+            let legacy_font: Vec<_> = legacy_font.into_iter().map(|name| (name, None)).collect();
+            (
+                files,
+                settings(Direction::ToNudi, Layout::Nudi, font, &legacy_font),
+            )
+        }
         Command::Completions { shell } => {
             clap_complete::generate(
                 shell,
@@ -214,6 +218,17 @@ fn write_manpages(dir: &std::path::Path) -> Result<()> {
     std::fs::create_dir_all(dir).with_context(|| format!("creating {}", dir.display()))?;
     clap_mangen::generate_to(Cli::command(), dir)
         .with_context(|| format!("writing man pages to {}", dir.display()))
+}
+
+/// Layout names for --layout, listed in help, man pages and completions. `baraha`
+/// is accepted as another name for nudi.
+fn layout_parser() -> impl clap::builder::TypedValueParser<Value = Layout> {
+    use clap::builder::{PossibleValue, PossibleValuesParser, TypedValueParser};
+    let names = Layout::ALL
+        .map(|l| PossibleValue::new(l.name()))
+        .into_iter()
+        .chain([PossibleValue::new("baraha").hide(true)]);
+    PossibleValuesParser::new(names).try_map(|name| parse_layout(&name))
 }
 
 fn parse_layout(name: &str) -> Result<Layout, String> {
@@ -313,6 +328,40 @@ mod tests {
             Ok(("My Font".to_string(), None))
         );
         assert!(parse_legacy_font("My Font=akrti").is_err());
+    }
+
+    #[test]
+    fn layouts_ignore_case_and_baraha_is_nudi() {
+        for (name, layout) in [("AKRUTI", Layout::Akruti), ("baraha", Layout::Nudi)] {
+            let cli =
+                Cli::try_parse_from(["kannadi", "to-unicode", "in", "-o", "out", "--layout", name])
+                    .unwrap();
+            let Command::ToUnicode { layout: got, .. } = cli.command else {
+                panic!("to-unicode")
+            };
+            assert_eq!(got, layout);
+        }
+        assert!(
+            Cli::try_parse_from(["kannadi", "to-unicode", "in", "-o", "out", "--layout", "x"])
+                .is_err()
+        );
+    }
+
+    #[test]
+    fn to_nudi_keeps_a_legacy_font_name_whole() {
+        let cli = Cli::parse_from([
+            "kannadi",
+            "to-nudi",
+            "in",
+            "-o",
+            "out",
+            "--legacy-font",
+            "Odd=Name",
+        ]);
+        let Command::ToNudi { legacy_font, .. } = cli.command else {
+            panic!("to-nudi")
+        };
+        assert_eq!(legacy_font, ["Odd=Name"]);
     }
 
     #[test]
