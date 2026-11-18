@@ -1,0 +1,71 @@
+.ie \n(.g .ds Aq \(aq
+.el .ds Aq '
+.TH kannadi-to-unicode 1  "to-unicode 0.1.0" 
+.SH NAME
+kannadi\-to\-unicode \- Convert documents in legacy Kannada fonts to Unicode
+.SH SYNOPSIS
+\fBkannadi to\-unicode\fR [\fB\-\-strict\fR] [\fB\-\-layout\fR] [\fB\-\-kannada\-digits\fR] [\fB\-\-keep\-zeros\fR] [\fB\-\-font\fR] [\fB\-\-legacy\-font\fR] [\fB\-h\fR|\fB\-\-help\fR] [\fB\-V\fR|\fB\-\-version\fR] <\fB\-o\fR|\fB\-\-out\fR> <\fIINPUTS\fR> 
+.SH DESCRIPTION
+Convert documents in legacy Kannada fonts to Unicode
+.PP
+Reads TXT, HTML, DOCX and PDF files. Text in HTML, DOCX and PDF files is converted only where it is set in a legacy font. The text of a PDF goes to NAME.pdf.txt.
+.SH OPTIONS
+.TP
+\fB\-o\fR, \fB\-\-out\fR \fI<DIR>\fR
+Folder to write the converted files and reports to
+.TP
+\fB\-\-strict\fR
+Exit with status 1 if any file has unknown glyphs, malformed syllables or unencodable characters; likely typos do not count
+.TP
+\fB\-\-layout\fR \fI<LAYOUT>\fR [default: nudi]
+Layout of text files, and of fonts added with \-\-legacy\-font that name none. nudi covers the Nudi and Baraha ANSI fonts
+.br
+
+.br
+\fIPossible values:\fR
+.RS 14
+.IP \(bu 2
+nudi
+.IP \(bu 2
+akruti
+.IP \(bu 2
+shree\-lipi
+.IP \(bu 2
+nudi\-b
+.IP \(bu 2
+kan\-eng
+.RE
+.TP
+\fB\-\-kannada\-digits\fR
+Write digits as Kannada digits, for text set in the k variants of the Nudi fonts
+.TP
+\fB\-\-keep\-zeros\fR
+Keep a zero typed between letters as a digit; by default it becomes ಂ
+.TP
+\fB\-\-font\fR \fI<NAME>\fR [default: Noto Sans Kannada]
+Font to set converted text in, in HTML and DOCX files
+.TP
+\fB\-\-legacy\-font\fR \fI<NAME[=LAYOUT]>\fR
+Treat this font as a legacy font too, in the layout after `=` ("My Font=akruti") or else the \-\-layout one. Repeat for more fonts
+.TP
+\fB\-h\fR, \fB\-\-help\fR
+Print help (see a summary with \*(Aq\-h\*(Aq)
+.TP
+\fB\-V\fR, \fB\-\-version\fR
+Print version
+.TP
+<\fIINPUTS\fR>
+Files and folders to convert. Folders are searched for .txt, .htm, .html, .docx and .pdf files
+.SH EXTRA
+Examples:
+  kannadi to\-unicode old\-orders/ \-\-out converted/
+  kannadi to\-unicode notes.txt \-\-layout akruti \-\-out converted/
+  kannadi to\-unicode page.html \-\-legacy\-font "My Font=akruti" \-\-out converted/
+
+Exit status:
+  0  Success. Reports may still list problems and likely typos.
+  1  \-\-strict was given and a file has a problem.
+  2  Bad arguments, or a file that could not be read, converted or written.
+     2 wins over 1 when both apply.
+.SH VERSION
+v0.1.0

@@ -39,11 +39,16 @@ pub struct Fonts {
     pub extra_legacy: Vec<(String, Layout)>,
 }
 
+/// The font `to-unicode` sets converted text in, unless told otherwise.
+pub const UNICODE_FONT: &str = "Noto Sans Kannada";
+/// The font `to-nudi` sets converted text in, unless told otherwise.
+pub const LEGACY_FONT: &str = "Nudi 01 e";
+
 impl Default for Fonts {
     fn default() -> Self {
         Fonts {
-            unicode: "Noto Sans Kannada".to_string(),
-            legacy: "Nudi 01 e".to_string(),
+            unicode: UNICODE_FONT.to_string(),
+            legacy: LEGACY_FONT.to_string(),
             extra_legacy: Vec::new(),
         }
     }
