@@ -72,7 +72,7 @@ fn government_pages_encode_as_typed() {
 }
 
 /// Akruti typists stored some letters in more than 1 way, such as the arkavattu
-/// before or after ೕ, so a few fixture words encode differently from how they were typed.
+/// before or after ೕ, so some fixture words encode differently from how they were typed.
 #[test]
 fn most_akruti_words_encode_as_typed() {
     let (same, total) = typed_back(Layout::Akruti);
