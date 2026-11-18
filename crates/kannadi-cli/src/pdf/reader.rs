@@ -88,6 +88,7 @@ pub fn read_page(
         operations_left: MAX_OPERATIONS,
         marked: Vec::new(),
         actual: None,
+        in_text: false,
     };
     let content = Content::decode(&content).context("reading the page's content")?;
     reader.walk(&content.operations, &resources, 0)?;
@@ -153,8 +154,9 @@ impl Matrix {
 enum UnicodeReading {
     /// A composite font and its ToUnicode map, if any. With no map, its text is lost.
     Composite(Option<Rc<CMap>>),
-    /// A 1-byte font's map. A code the map lacks is read by the encoding.
-    Simple(Rc<CMap>),
+    /// A 1-byte font and its ToUnicode map, if any. A code the map lacks is read
+    /// by the encoding.
+    Simple(Option<Rc<CMap>>),
 }
 
 struct PageFont<'d> {
@@ -200,7 +202,7 @@ impl PageFont<'_> {
                 let mut missing = 0;
                 for b in bytes {
                     let code = std::slice::from_ref(b);
-                    if let Some(mapped) = cmap.get(code) {
+                    if let Some(mapped) = cmap.as_ref().and_then(|m| m.get(code)) {
                         text.push_str(mapped);
                         continue;
                     }
@@ -337,9 +339,11 @@ struct PageReader<'d, 'f> {
     /// Open marked-content sequences, each true if it began an `/ActualText`
     /// span that is being collected.
     marked: Vec<bool>,
-    /// The open `/ActualText` span: its text, where its pieces start, and the
-    /// form depth it opened at.
-    actual: Option<(String, usize, usize, usize)>,
+    /// The open `/ActualText` span: its text, where its pieces start, the form
+    /// depth it opened at, and whether it opened inside a text object.
+    actual: Option<(String, usize, usize, usize, bool)>,
+    /// Whether a text object (`BT` to `ET`) is open.
+    in_text: bool,
 }
 
 impl<'d> PageReader<'d, '_> {
@@ -358,8 +362,17 @@ impl<'d> PageReader<'d, '_> {
             let number = |i: usize| op.operands.get(i).and_then(|o| o.as_float().ok());
             let name = || op.operands.first().and_then(|o| o.as_name().ok());
             match op.operator.as_str() {
-                "BT" => self.pen.begin(),
-                "ET" => self.drop_open_span(),
+                "BT" => {
+                    self.pen.begin();
+                    self.in_text = true;
+                }
+                "ET" => {
+                    self.in_text = false;
+                    // Only a span that opened inside this text object ends with it.
+                    if self.actual.as_ref().is_some_and(|a| a.4 && a.3 == depth) {
+                        self.drop_open_span();
+                    }
+                }
                 "Tf" => {
                     self.current = name().and_then(|n| self.resource(resources, b"Font", n));
                     self.pen.size = number(1).unwrap_or(self.pen.size);
@@ -446,7 +459,7 @@ impl<'d> PageReader<'d, '_> {
         if let (true, Some(text)) = (starts, text) {
             let line = self.lines.len() - 1;
             let at = self.lines[line].len();
-            self.actual = Some((text, line, at, depth));
+            self.actual = Some((text, line, at, depth, self.in_text));
         }
         self.marked.push(starts);
     }
@@ -457,7 +470,7 @@ impl<'d> PageReader<'d, '_> {
         if self.marked.pop() != Some(true) {
             return;
         }
-        let Some((text, line, at, _)) = self.actual.take() else {
+        let Some((text, line, at, ..)) = self.actual.take() else {
             return;
         };
         if line + 1 != self.lines.len() {
@@ -498,7 +511,7 @@ impl<'d> PageReader<'d, '_> {
             self.lines.push(Vec::new());
             // A span that opened before its first glyph moved to a new line
             // starts on that line.
-            if let Some((_, line, at, _)) = &mut self.actual {
+            if let Some((_, line, at, ..)) = &mut self.actual {
                 if *at == self.lines[*line].len() {
                     *line = self.lines.len() - 1;
                     *at = 0;
@@ -569,7 +582,7 @@ impl<'d> PageReader<'d, '_> {
                 unicode: if named {
                     None
                 } else if simple {
-                    fonts.cmap(doc, dict).map(UnicodeReading::Simple)
+                    Some(UnicodeReading::Simple(fonts.cmap(doc, dict)))
                 } else {
                     Some(UnicodeReading::Composite(fonts.cmap(doc, dict)))
                 },
@@ -669,7 +682,7 @@ fn text_string(bytes: &[u8]) -> String {
 }
 
 /// A PDFDocEncoding byte (PDF 1.7, Annex D): Latin-1, apart from 0x18 to 0x1F and
-/// 0x80 to 0xA0. Its 3 undefined codes read as U+FFFD.
+/// 0x80 to 0xA0. Its undefined codes, 0x7F, 0x9F and 0xAD, read as U+FFFD.
 fn pdf_doc_char(b: u8) -> char {
     const LOW: [char; 8] = ['˘', 'ˇ', 'ˆ', '˙', '˝', '˛', '˚', '˜'];
     const HIGH: [char; 33] = [
@@ -679,7 +692,7 @@ fn pdf_doc_char(b: u8) -> char {
     match b {
         0x18..=0x1F => LOW[usize::from(b - 0x18)],
         0x80..=0xA0 => HIGH[usize::from(b - 0x80)],
-        0xAD => '\u{FFFD}',
+        0x7F | 0xAD => '\u{FFFD}',
         _ => char::from(b),
     }
 }
@@ -736,5 +749,6 @@ mod tests {
         assert_eq!(text_string("\u{FEFF}ಕಾ".as_bytes()), "ಕಾ");
         assert_eq!(text_string(b"caf\xE9"), "café");
         assert_eq!(text_string(b"\x80 \x84 \x92 \xA0 \x18"), "• — ™ € ˘");
+        assert_eq!(text_string(b"\x7F\x9F\xAD"), "\u{FFFD}\u{FFFD}\u{FFFD}");
     }
 }

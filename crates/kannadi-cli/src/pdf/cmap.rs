@@ -139,16 +139,20 @@ impl CMap {
         (out, missing)
     }
 
-    /// The length of the code at the start of `bytes`, by the codespace ranges.
+    /// The length of the code at the start of `bytes`, by the codespace ranges,
+    /// where the map has codes of that length.
     fn code_length(&self, bytes: &[u8]) -> Option<usize> {
-        self.spaces.iter().find_map(|(lo, hi)| {
-            let code = bytes.get(..lo.len())?;
-            let inside = code
-                .iter()
-                .zip(lo.iter().zip(hi))
-                .all(|(c, (l, h))| (l..=h).contains(&c));
-            inside.then_some(lo.len())
-        })
+        self.spaces
+            .iter()
+            .filter(|(lo, _)| self.lengths[lo.len() - 1])
+            .find_map(|(lo, hi)| {
+                let code = bytes.get(..lo.len())?;
+                let inside = code
+                    .iter()
+                    .zip(lo.iter().zip(hi))
+                    .all(|(c, (l, h))| (l..=h).contains(&c));
+                inside.then_some(lo.len())
+            })
     }
 
     /// Adds an entry, and says whether the map has room for more.
@@ -254,6 +258,18 @@ fn utf16(bytes: &[u8]) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn a_codespace_with_no_codes_of_its_length_is_not_trusted() {
+        let map = CMap::parse(
+            b"1 begincodespacerange <00> <FF> endcodespacerange \
+            2 beginbfchar <0001> <0CA8> <0003> <0CAE> endbfchar",
+        );
+        assert_eq!(
+            map.read(&[0x00, 0x02, 0x00, 0x01]),
+            ("\u{FFFD}ನ".to_string(), 1)
+        );
+    }
 
     #[test]
     fn a_missing_code_is_as_long_as_its_codespace_says() {

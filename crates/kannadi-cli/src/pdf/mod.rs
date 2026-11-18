@@ -725,6 +725,32 @@ endcmap\nCMapName currentdict /CMap defineresource pop\nend\nend\n";
     }
 
     #[test]
+    fn a_span_around_whole_text_objects_reads_as_its_text() {
+        let (doc, font) = unicode_font(&["0CA8", "0CAE"]);
+        let content = b"/Span <</ActualText <FEFF0CB80CCD0C950CBE>>> BDC \
+            BT /F1 12 Tf 72 700 Td <0003> Tj ET BT /F1 12 Tf 84 700 Td <0004> Tj ET EMC \
+            BT /F1 12 Tf 96 700 Td <0001> Tj ET";
+        let (text, report) = run(&pdf_with_objects(doc, vec![font], content));
+        assert_eq!(text, "ಸ್ಕಾನ\n");
+        assert!(report.is_empty(), "{:?}", report.rows);
+    }
+
+    #[test]
+    fn a_font_with_no_map_and_glyph_names_with_no_text_is_reported() {
+        let mut font = simple_font("AAAAAA+SomeType3Font");
+        font.set(
+            "Encoding",
+            dictionary! { "Differences" => vec![1.into(), Object::Name(b"g101".to_vec())] },
+        );
+        let (text, report) = run(&pdf(
+            vec![("F1", font)],
+            b"BT /F1 12 Tf 72 700 Td (A\x01) Tj ET",
+        ));
+        assert_eq!(text, "A\u{FFFD}\n");
+        assert_eq!(report.count(Kind::NotConverted), 1, "{:?}", report.rows);
+    }
+
+    #[test]
     fn actual_text_around_legacy_text_is_ignored() {
         let mut content = b"BT /F1 12 Tf 72 700 Td /Span <</ActualText (xyz)>> BDC (".to_vec();
         content.extend_from_slice(KANNADA);
