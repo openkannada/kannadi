@@ -66,6 +66,11 @@ impl CMap {
         cmap
     }
 
+    /// The text of 1 code.
+    pub fn get(&self, code: &[u8]) -> Option<&str> {
+        self.map.get(code).map(String::as_str)
+    }
+
     pub fn is_empty(&self) -> bool {
         self.map.is_empty()
     }
@@ -92,6 +97,33 @@ impl CMap {
             }
         }
         out
+    }
+
+    /// The text of a shown string in a font whose text is Unicode, and how many
+    /// codes have no entry. Each of those becomes U+FFFD, so lost text shows.
+    pub fn read(&self, bytes: &[u8]) -> (String, usize) {
+        let longest = (1..=4).rev().find(|n| self.lengths[n - 1]).unwrap_or(1);
+        let mut out = String::new();
+        let mut missing = 0;
+        let mut i = 0;
+        while i < bytes.len() {
+            let hit = (1..=4).rev().filter(|n| self.lengths[n - 1]).find_map(|n| {
+                let code = bytes.get(i..i + n)?;
+                self.map.get(code).map(|s| (s, n))
+            });
+            match hit {
+                Some((s, n)) => {
+                    out.push_str(s);
+                    i += n;
+                }
+                None => {
+                    out.push('\u{FFFD}');
+                    missing += 1;
+                    i += longest;
+                }
+            }
+        }
+        (out, missing)
     }
 
     /// Adds an entry, and says whether the map has room for more.

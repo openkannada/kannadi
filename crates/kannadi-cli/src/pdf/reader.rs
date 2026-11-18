@@ -25,7 +25,7 @@ const MAX_FORM_DEPTH: usize = 8;
 const MAX_OPERATIONS: usize = 1_000_000;
 
 /// Text shown in 1 font, or a space the layout implies.
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub enum Piece {
     Text {
         font: usize,
@@ -33,8 +33,18 @@ pub enum Piece {
         raw: String,
         /// The font's ToUnicode reading, where the font has a map of its own.
         mapped: Option<String>,
+        /// For a font not named as legacy that has a ToUnicode map, and for
+        /// every composite one: its text through the map, and how many glyph
+        /// codes have no Unicode text.
+        unicode: Option<(String, usize)>,
     },
     Space,
+    /// A marked-content span with an `/ActualText` replacement, such as the
+    /// spans Chrome writes for each conjunct, and the pieces drawn inside it.
+    Actual {
+        text: String,
+        inner: Vec<Piece>,
+    },
 }
 
 pub type Line = Vec<Piece>;
@@ -76,6 +86,8 @@ pub fn read_page(
         saved: Vec::new(),
         lost: 0,
         operations_left: MAX_OPERATIONS,
+        marked: Vec::new(),
+        actual: None,
     };
     let content = Content::decode(&content).context("reading the page's content")?;
     reader.walk(&content.operations, &resources, 0)?;
@@ -137,6 +149,14 @@ impl Matrix {
 }
 
 /// How a font's strings become text.
+/// How a font not named as legacy gives Unicode text.
+enum UnicodeReading {
+    /// A composite font and its ToUnicode map, if any. With no map, its text is lost.
+    Composite(Option<Rc<CMap>>),
+    /// A 1-byte font's map. A code the map lacks is read by the encoding.
+    Simple(Rc<CMap>),
+}
+
 struct PageFont<'d> {
     index: usize,
     /// 1-byte fonts named as legacy: their bytes are the glyph codes.
@@ -146,6 +166,10 @@ struct PageFont<'d> {
     table: Option<Vec<char>>,
     encoding: Option<Encoding<'d>>,
     cmap: Option<Rc<CMap>>,
+    /// How a font not named as legacy gives Unicode text. lopdf drops ToUnicode
+    /// entries that give more than 1 character, which Kannada conjuncts and
+    /// vowel signs need, and reads Type 3 fonts by their glyph names.
+    unicode: Option<UnicodeReading>,
     widths: Rc<Widths>,
 }
 
@@ -161,6 +185,25 @@ impl PageFont<'_> {
             .as_ref()
             .and_then(|e| Document::decode_text(e, bytes).ok())
             .unwrap_or_else(|| decode_windows_1252(bytes))
+    }
+
+    /// The Unicode reading of a string, with how many codes have no text.
+    fn unicode(&self, bytes: &[u8]) -> Option<(String, usize)> {
+        Some(match self.unicode.as_ref()? {
+            UnicodeReading::Composite(Some(cmap)) => cmap.read(bytes),
+            UnicodeReading::Composite(None) => (String::new(), bytes.len().div_ceil(2)),
+            UnicodeReading::Simple(cmap) => {
+                let text = bytes
+                    .iter()
+                    .map(|b| {
+                        let code = std::slice::from_ref(b);
+                        cmap.get(code)
+                            .map_or_else(|| self.raw(code), str::to_string)
+                    })
+                    .collect();
+                (text, 0)
+            }
+        })
     }
 }
 
@@ -279,6 +322,11 @@ struct PageReader<'d, 'f> {
     saved: Vec<(Option<&'d Dictionary>, f32, f32, Matrix)>,
     lost: usize,
     operations_left: usize,
+    /// Open marked-content sequences, each true if it began an `/ActualText`
+    /// span that is being collected.
+    marked: Vec<bool>,
+    /// The open `/ActualText` span: its text, and where its pieces start.
+    actual: Option<(String, usize, usize)>,
 }
 
 impl<'d> PageReader<'d, '_> {
@@ -343,6 +391,9 @@ impl<'d> PageReader<'d, '_> {
                         walked?;
                     }
                 }
+                "BMC" => self.marked.push(false),
+                "BDC" => self.begin_marked(op),
+                "EMC" => self.end_marked(),
                 "Tj" | "TJ" => {}
                 _ => continue,
             }
@@ -365,9 +416,51 @@ impl<'d> PageReader<'d, '_> {
         self.pen.ctm = ctm;
     }
 
+    /// Starts collecting an `/ActualText` span, unless one is already open.
+    fn begin_marked(&mut self, op: &Operation) {
+        let text = op
+            .operands
+            .get(1)
+            .and_then(|o| o.as_dict().ok())
+            .and_then(|d| d.get(b"ActualText").ok())
+            .and_then(|o| o.as_str().ok())
+            .map(text_string);
+        let starts = text.is_some() && self.actual.is_none();
+        if let (true, Some(text)) = (starts, text) {
+            let line = self.lines.len() - 1;
+            let at = self.lines[line].len();
+            self.actual = Some((text, line, at));
+        }
+        self.marked.push(starts);
+    }
+
+    /// Ends a marked-content sequence. An `/ActualText` span that stayed on 1
+    /// line becomes 1 piece; one that broke the line keeps its pieces as drawn.
+    fn end_marked(&mut self) {
+        if self.marked.pop() != Some(true) {
+            return;
+        }
+        let Some((text, line, at)) = self.actual.take() else {
+            return;
+        };
+        if line + 1 != self.lines.len() {
+            return;
+        }
+        let inner: Vec<Piece> = self.lines[line].drain(at..).collect();
+        self.lines[line].push(Piece::Actual { text, inner });
+    }
+
     fn break_line(&mut self) {
         if self.lines.last().is_some_and(|l| !l.is_empty()) {
             self.lines.push(Vec::new());
+            // A span that opened before its first glyph moved to a new line
+            // starts on that line.
+            if let Some((_, line, at)) = &mut self.actual {
+                if *at == self.lines[*line].len() {
+                    *line = self.lines.len() - 1;
+                    *at = 0;
+                }
+            }
         }
         self.pen.end = None;
     }
@@ -430,6 +523,13 @@ impl<'d> PageReader<'d, '_> {
                 },
                 encoding,
                 cmap: if named { fonts.cmap(doc, dict) } else { None },
+                unicode: if named {
+                    None
+                } else if simple {
+                    fonts.cmap(doc, dict).map(UnicodeReading::Simple)
+                } else {
+                    Some(UnicodeReading::Composite(fonts.cmap(doc, dict)))
+                },
                 widths: fonts.widths(doc, dict),
             }
         })
@@ -466,12 +566,14 @@ impl<'d> PageReader<'d, '_> {
                     let font = self.page_font(dict);
                     let raw = font.raw(bytes);
                     let mapped = font.cmap.as_ref().map(|m| m.decode(bytes));
+                    let unicode = font.unicode(bytes);
                     self.fonts.add_text(index, &raw, mapped.as_deref());
                     self.push(
                         Piece::Text {
                             font: index,
                             raw,
                             mapped,
+                            unicode,
                         },
                         index,
                     );
@@ -502,6 +604,24 @@ impl<'d> PageReader<'d, '_> {
         if let Some(line) = self.lines.last_mut() {
             line.push(piece);
         }
+    }
+}
+
+/// A PDF text string: UTF-16BE or UTF-8 after a byte order mark, or else
+/// PDFDocEncoding, read here as Latin-1.
+fn text_string(bytes: &[u8]) -> String {
+    if let Some(rest) = bytes.strip_prefix(&[0xFE, 0xFF]) {
+        let units: Vec<u16> = rest
+            .as_chunks::<2>()
+            .0
+            .iter()
+            .map(|p| u16::from_be_bytes(*p))
+            .collect();
+        String::from_utf16_lossy(&units)
+    } else if let Some(rest) = bytes.strip_prefix(&[0xEF, 0xBB, 0xBF]) {
+        String::from_utf8_lossy(rest).into_owned()
+    } else {
+        bytes.iter().map(|&b| char::from(b)).collect()
     }
 }
 
@@ -545,4 +665,16 @@ fn shown(op: &Operation) -> Vec<Shown<'_>> {
         }
     }
     items
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn text_strings_read_in_each_encoding() {
+        assert_eq!(text_string(b"\xFE\xFF\x0C\x95\x0C\xBE"), "ಕಾ");
+        assert_eq!(text_string("\u{FEFF}ಕಾ".as_bytes()), "ಕಾ");
+        assert_eq!(text_string(b"caf\xE9"), "café");
+    }
 }
