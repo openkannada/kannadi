@@ -7,7 +7,6 @@ license.workspace = true
 repository.workspace = true
 authors.workspace = true
 rust-version = "1.89"
-homepage = "https://github.com/openkannada/kannadi"
 readme = "README.md"
 keywords = ["kannada", "nudi", "unicode", "converter", "cli"]
 categories = ["command-line-utilities", "text-processing", "internationalization"]
