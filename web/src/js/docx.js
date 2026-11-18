@@ -107,7 +107,7 @@ export async function readDocx(bytes, fontLayout) {
   let paragraphs = 0;
   // Text boxes nest paragraphs inside a run; the outer state comes back after them.
   const outer = [];
-  // Markup inside these elements is a copy or a past state, not the document.
+  // Markup inside these elements is a copy or a past state of the document, so it is skipped.
   let skipDepth = 0;
   const push = (text, legacy) => segments.push({ text, legacy });
   const runLegacy = () =>

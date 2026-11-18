@@ -88,7 +88,7 @@ def strokes(path: pathops.Path, lines: int = 21) -> Strokes:
 
 
 def _common_edge(values: list[float]) -> float:
-    """The median of the edges in the most common 10-unit band: the flat edge, not the curves."""
+    """The median of the edges in the most common 10-unit band, where the flat edge lies."""
     if not values:
         return 0.0
     band = Counter(round(v, -1) for v in values).most_common(1)[0][0]

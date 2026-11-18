@@ -101,23 +101,3 @@ def sheet(face: Face, results: list[Result], out: Path, reference: Face | None, 
     out.parent.mkdir(parents=True, exist_ok=True)
     canvas.save(out, optimize=True)
     return out
-
-
-def comparison(faces: list[tuple[str, Face]], texts: list[str], out: Path, px: int = 64) -> Path:
-    """1 row per face, 1 column per string: a before and after sheet for a fix."""
-    label_w, cell_w, cell_h = 260, max(px * 3, 160), px * 2 + 20
-    canvas = Image.new("RGB", (label_w + cell_w * len(texts), cell_h * len(faces) + 10), "white")
-    draw = ImageDraw.Draw(canvas)
-    small = ImageFont.load_default(size=16)
-    for row, (label, face) in enumerate(faces):
-        y = row * cell_h + 10
-        draw.text((10, y + cell_h // 2 - 10), label, fill=INK, font=small)
-        renderer = Renderer(face)
-        for col, text in enumerate(texts):
-            x = label_w + col * cell_w
-            draw.line([x, y, x, y + cell_h], fill=(220, 220, 220))
-            renderer.draw(canvas, text, (x + 16, y + int(px * 1.25)), px)
-        draw.line([0, y + cell_h - 1, canvas.width, y + cell_h - 1], fill=(220, 220, 220))
-    out.parent.mkdir(parents=True, exist_ok=True)
-    canvas.save(out, optimize=True)
-    return out

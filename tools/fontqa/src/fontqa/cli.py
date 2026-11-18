@@ -111,7 +111,7 @@ def _fetch_all(args, only=None) -> dict[str, tuple[fetching.Entry, list[Path]]]:
             continue
         try:
             out[entry.id] = (entry, fetching.fetch(entry, args.cache, lock))
-        except Exception as e:  # noqa: BLE001
+        except Exception as e:
             print(f"{entry.id}: fetch failed: {e}", file=sys.stderr)
     return out
 
@@ -143,7 +143,7 @@ def cmd_run(args) -> int:
         for path in paths:
             try:
                 faces = faces_in(path)
-            except Exception as e:  # noqa: BLE001
+            except Exception as e:
                 print(f"{entry.id}/{path.name}: not a readable font: {e}", file=sys.stderr)
                 continue
             for face in faces:

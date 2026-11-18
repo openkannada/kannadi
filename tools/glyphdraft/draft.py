@@ -19,7 +19,7 @@ from pathlib import Path
 import fontforge
 
 sys.path.insert(0, str(Path(__file__).parent))
-import skeletons  # noqa: E402
+import skeletons
 
 LETTER_A = 0x0C85
 CONSONANTS = [cp for cp in range(0x0C95, 0x0CBA) if cp not in (0x0CA9, 0x0CB4)]
