@@ -17,14 +17,7 @@ For years, Kannada text in Karnataka was typed with Nudi and Baraha fonts that s
 
 ## Install
 
-The command-line tool is `kannadi`. There is no release yet, so for now build it from source with Rust 1.89 or later:
-
-```sh
-cargo install --locked --git https://github.com/openkannada/kannadi kannadi-cli
-kannadi to-unicode old-orders/ --out converted/
-```
-
-From the first release, any of these installs it:
+The command-line tool is `kannadi`. Install it with any of these:
 
 ```sh
 # macOS and Linux
@@ -33,14 +26,20 @@ curl --proto '=https' --tlsv1.2 -LsSf https://github.com/openkannada/kannadi/rel
 # Windows, in PowerShell
 powershell -ExecutionPolicy Bypass -c "irm https://github.com/openkannada/kannadi/releases/latest/download/kannadi-cli-installer.ps1 | iex"
 
-# Homebrew, with man pages and shell completions
+# Homebrew on macOS and Linux, with man pages and shell completions
 brew install openkannada/tap/kannadi
 
-# Rust
-cargo install --locked kannadi-cli
+# From source, with Rust 1.89 or later
+cargo install --locked --git https://github.com/openkannada/kannadi kannadi-cli
 ```
 
-Each release also has archives for macOS (Apple silicon and Intel), Linux (x86_64 and arm64, glibc and static musl) and Windows (x86_64), each with a SHA-256 checksum. Every archive holds the binary, the man pages and the shell completions.
+Then convert a folder:
+
+```sh
+kannadi to-unicode old-orders/ --out converted/
+```
+
+Each [release](https://github.com/openkannada/kannadi/releases) has archives for macOS (Apple silicon and Intel), Linux (x86_64 and arm64, glibc and static musl) and Windows (x86_64), each with a SHA-256 checksum. Every archive holds the binary, the man pages and the shell completions.
 
 The library is the `kannadi` crate. Until it is on crates.io, add it from Git:
 
