@@ -175,6 +175,35 @@ fn html_round_trips_through_nudi() {
     );
 }
 
+#[test]
+fn unicode_pdfs_from_chrome_read_whole() {
+    let fixtures = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/fixtures");
+    let expected = "ನಮಸ್ಕಾರ, ಕನ್ನಡ ನಾಡು ನುಡಿ.\n\
+        ಶ್ರೀ ಕೃಷ್ಣ ಅರ್ಜುನ ಸ್ತ್ರೀ ಕ್ಷೇತ್ರ ಜ್ಞಾನ ಋಷಿ ೧೨೩\n\
+        English line 2026 & more\n\
+        ಕಾರ್ಯಕ್ರಮಗಳನ್ನು ಹಮ್ಮಿಕೊಳ್ಳಲಾಗುತ್ತಿದೆ.\n";
+    let tmp = tempfile::tempdir().unwrap();
+    for name in ["unicode-sans.pdf", "unicode-serif.pdf"] {
+        let run = kannadi(
+            &[
+                "to-unicode",
+                &format!("{fixtures}/{name}"),
+                "--out",
+                "out",
+                "--strict",
+            ],
+            tmp.path(),
+        );
+        assert_eq!(run.status.code(), Some(0), "{name}: {run:?}");
+        let text = std::fs::read_to_string(tmp.path().join(format!("out/{name}.txt"))).unwrap();
+        assert_eq!(text, expected, "{name}");
+        assert!(!tmp
+            .path()
+            .join(format!("out/{name}.txt.report.tsv"))
+            .exists());
+    }
+}
+
 const ASSETS: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/assets");
 const REGENERATE: &str = "run the tests with KANNADI_BLESS=1 to rewrite crates/kannadi-cli/assets";
 

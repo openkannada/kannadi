@@ -12,6 +12,8 @@ pub struct CMap {
     lengths: [bool; 4],
     /// How many more entries the map may take.
     room: usize,
+    /// The `codespacerange` entries: the lowest and highest code of each.
+    spaces: Vec<(Vec<u8>, Vec<u8>)>,
 }
 
 /// The most codes 1 `bfrange` may cover; codes are at most 2 bytes in practice.
@@ -32,6 +34,17 @@ impl CMap {
         let mut i = 0;
         while i < tokens.len() {
             match tokens[i] {
+                Token::Word("begincodespacerange") => {
+                    i += 1;
+                    while let (Some(Token::Hex(lo)), Some(Token::Hex(hi))) =
+                        (tokens.get(i), tokens.get(i + 1))
+                    {
+                        if lo.len() == hi.len() && (1..=4).contains(&lo.len()) {
+                            cmap.spaces.push((lo.clone(), hi.clone()));
+                        }
+                        i += 2;
+                    }
+                }
                 Token::Word("beginbfchar") => {
                     i += 1;
                     while let (Some(Token::Hex(src)), Some(Token::Hex(dst))) =
@@ -66,6 +79,11 @@ impl CMap {
         cmap
     }
 
+    /// The text of 1 code.
+    pub fn get(&self, code: &[u8]) -> Option<&str> {
+        self.map.get(code).map(String::as_str)
+    }
+
     pub fn is_empty(&self) -> bool {
         self.map.is_empty()
     }
@@ -92,6 +110,49 @@ impl CMap {
             }
         }
         out
+    }
+
+    /// The text of a shown string in a font whose text is Unicode, and how many
+    /// codes have no entry. Each of those becomes U+FFFD, so lost text shows.
+    pub fn read(&self, bytes: &[u8]) -> (String, usize) {
+        let longest = (1..=4).rev().find(|n| self.lengths[n - 1]).unwrap_or(1);
+        let mut out = String::new();
+        let mut missing = 0;
+        let mut i = 0;
+        while i < bytes.len() {
+            let hit = (1..=4).rev().filter(|n| self.lengths[n - 1]).find_map(|n| {
+                let code = bytes.get(i..i + n)?;
+                self.map.get(code).map(|s| (s, n))
+            });
+            match hit {
+                Some((s, n)) => {
+                    out.push_str(s);
+                    i += n;
+                }
+                None => {
+                    out.push('\u{FFFD}');
+                    missing += 1;
+                    i += self.code_length(&bytes[i..]).unwrap_or(longest);
+                }
+            }
+        }
+        (out, missing)
+    }
+
+    /// The length of the code at the start of `bytes`, by the codespace ranges,
+    /// where the map has codes of that length.
+    fn code_length(&self, bytes: &[u8]) -> Option<usize> {
+        self.spaces
+            .iter()
+            .filter(|(lo, _)| self.lengths[lo.len() - 1])
+            .find_map(|(lo, hi)| {
+                let code = bytes.get(..lo.len())?;
+                let inside = code
+                    .iter()
+                    .zip(lo.iter().zip(hi))
+                    .all(|(c, (l, h))| (l..=h).contains(&c));
+                inside.then_some(lo.len())
+            })
     }
 
     /// Adds an entry, and says whether the map has room for more.
@@ -197,6 +258,30 @@ fn utf16(bytes: &[u8]) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn a_codespace_with_no_codes_of_its_length_is_not_trusted() {
+        let map = CMap::parse(
+            b"1 begincodespacerange <00> <FF> endcodespacerange \
+            2 beginbfchar <0001> <0CA8> <0003> <0CAE> endbfchar",
+        );
+        assert_eq!(
+            map.read(&[0x00, 0x02, 0x00, 0x01]),
+            ("\u{FFFD}ನ".to_string(), 1)
+        );
+    }
+
+    #[test]
+    fn a_missing_code_is_as_long_as_its_codespace_says() {
+        let map = CMap::parse(
+            b"2 begincodespacerange <00> <7F> <8000> <FFFF> endcodespacerange \
+            2 beginbfchar <41> <0CA8> <8001> <0CAE> endbfchar",
+        );
+        assert_eq!(
+            map.read(&[0x10, 0x41, 0x80, 0x02, 0x80, 0x01]),
+            ("\u{FFFD}ನ\u{FFFD}ಮ".to_string(), 2)
+        );
+    }
 
     #[test]
     fn bfchar_and_bfrange_entries_are_read() {
