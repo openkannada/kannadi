@@ -533,7 +533,7 @@ dependencies = [
 
 [[package]]
 name = "kannadi"
-version = "0.1.0"
+version = "0.1.0-rc.1"
 dependencies = [
  "proptest",
  "unicode-normalization",
@@ -542,7 +542,7 @@ dependencies = [
 
 [[package]]
 name = "kannadi-cli"
-version = "0.1.0"
+version = "0.1.0-rc.1"
 dependencies = [
  "anyhow",
  "clap",
@@ -558,7 +558,7 @@ dependencies = [
 
 [[package]]
 name = "kannadi-wasm"
-version = "0.1.0"
+version = "0.1.0-rc.1"
 dependencies = [
  "kannadi",
  "wasm-bindgen",
