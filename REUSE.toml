@@ -49,3 +49,10 @@ path = [
 ]
 SPDX-FileCopyrightText = "Government of Karnataka"
 SPDX-License-Identifier = "LicenseRef-Excerpts"
+
+# PDFs printed by Chrome from text written for kannadi, set in the Noto fonts in
+# web/src/fonts, whose glyphs they embed.
+[[annotations]]
+path = "crates/kannadi-cli/tests/fixtures/unicode-*.pdf"
+SPDX-FileCopyrightText = ["2026 The Open Kannada Authors", "2022 The Noto Project Authors (https://github.com/notofonts/kannada)"]
+SPDX-License-Identifier = "(MIT OR Apache-2.0) AND OFL-1.1"

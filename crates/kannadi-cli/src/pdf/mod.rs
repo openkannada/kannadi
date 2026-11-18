@@ -124,6 +124,40 @@ impl<'a> LineWriter<'a> {
         }
     }
 
+    /// The line with each `/ActualText` span read: as its replacement text where
+    /// every font drawn in it is a Unicode font, or else as the pieces drawn.
+    fn expand(&self, line: &[Piece]) -> Vec<Piece> {
+        let mut out = Vec::with_capacity(line.len());
+        for piece in line {
+            let Piece::Actual { text, inner } = piece else {
+                out.push(piece.clone());
+                continue;
+            };
+            let fonts: Vec<usize> = inner
+                .iter()
+                .filter_map(|p| match p {
+                    Piece::Text { font, .. } => Some(*font),
+                    _ => None,
+                })
+                .collect();
+            let unicode = !fonts.is_empty()
+                && fonts
+                    .iter()
+                    .all(|&f| matches!(self.fonts.fonts[f].verdict, Verdict::Other));
+            if unicode {
+                out.push(Piece::Text {
+                    font: fonts[0],
+                    raw: text.clone(),
+                    mapped: None,
+                    unicode: Some((text.clone(), 0)),
+                });
+            } else {
+                out.extend(self.expand(inner));
+            }
+        }
+        out
+    }
+
     fn write(&self, line: &[Piece], location: &str, report: &mut Report) -> String {
         let mut out = String::new();
         let mut legacy = String::new();
@@ -146,6 +180,7 @@ impl<'a> LineWriter<'a> {
             legacy.clear();
         };
         let mut gap = false;
+        let mut unreadable = 0;
         let space = |gap: &mut bool, legacy: &mut String, out: &mut String| {
             if std::mem::take(gap) {
                 if legacy.is_empty() {
@@ -155,8 +190,14 @@ impl<'a> LineWriter<'a> {
                 }
             }
         };
-        for piece in line {
-            let Piece::Text { font, raw, mapped } = piece else {
+        for piece in &self.expand(line) {
+            let Piece::Text {
+                font,
+                raw,
+                mapped,
+                unicode,
+            } = piece
+            else {
                 gap = true;
                 continue;
             };
@@ -190,16 +231,31 @@ impl<'a> LineWriter<'a> {
                     space(&mut gap, &mut legacy, &mut out);
                     flush(&mut legacy, reading, &mut out, report);
                 }
-                Verdict::Other if raw.is_empty() => {}
                 Verdict::Other => {
+                    let text = match unicode {
+                        Some((text, missing)) => {
+                            unreadable += missing;
+                            text
+                        }
+                        None => raw,
+                    };
+                    if text.is_empty() {
+                        continue;
+                    }
                     space(&mut gap, &mut legacy, &mut out);
                     flush(&mut legacy, reading, &mut out, report);
-                    out.push_str(raw);
+                    out.push_str(text);
                 }
             }
         }
         space(&mut gap, &mut legacy, &mut out);
         flush(&mut legacy, reading, &mut out, report);
+        if unreadable > 0 {
+            report.rows.push(not_converted(
+                location.to_string(),
+                format!("{unreadable} glyphs with no Unicode text, shown as U+FFFD"),
+            ));
+        }
         out.trim_end().to_string()
     }
 }
@@ -536,6 +592,172 @@ endcmap\nCMapName currentdict /CMap defineresource pop\nend\nend\n";
             "Encoding" => "Identity-H", "DescendantFonts" => vec![descendant.into()], "ToUnicode" => map,
         };
         (doc, copy)
+    }
+
+    /// A Unicode font as Chrome writes it: Type0, with a ToUnicode map.
+    fn unicode_font(mapped: &[&str]) -> (Document, Dictionary) {
+        acrobat_copy("AAAAAA+NotoSansKannada-Regular", mapped)
+    }
+
+    const SKA: &str = "0CB80CCD0C950CBE";
+
+    #[test]
+    fn unicode_glyphs_that_map_to_several_characters_are_kept() {
+        let (doc, font) = unicode_font(&["0C95", SKA]);
+        let (text, report) = run(&pdf_with_objects(
+            doc,
+            vec![font],
+            b"BT /F1 12 Tf 72 700 Td <00010002> Tj ET",
+        ));
+        assert_eq!(text, "ಕಸ್ಕಾ\n");
+        assert!(report.is_empty(), "{:?}", report.rows);
+    }
+
+    #[test]
+    fn actual_text_replaces_the_glyphs_drawn_inside_it() {
+        // Glyphs 3 and 4 are parts of ಸ್ಕಾ with no ToUnicode entry, as in Chrome's PDFs.
+        let (doc, font) = unicode_font(&["0CA8", "0CAE"]);
+        let content = b"BT /F1 12 Tf 72 700 Td <00010002> Tj \
+            /Span <</ActualText <FEFF0CB80CCD0C950CBE>>> BDC <0003> Tj 6 0 Td <0004> Tj EMC \
+            <0002> Tj ET";
+        let (text, report) = run(&pdf_with_objects(doc, vec![font], content));
+        assert_eq!(text, "ನಮಸ್ಕಾಮ\n");
+        assert!(report.is_empty(), "{:?}", report.rows);
+    }
+
+    #[test]
+    fn a_span_opened_just_before_a_new_line_reads_on_that_line() {
+        let (doc, font) = unicode_font(&["0CA8"]);
+        let content = b"BT /F1 12 Tf 72 700 Td <0001> Tj \
+            /Span <</ActualText <FEFF0CB60CCD0CB00CC0>>> BDC 0 -20 Td <0003> Tj EMC \
+            <0001> Tj ET";
+        let (text, report) = run(&pdf_with_objects(doc, vec![font], content));
+        assert_eq!(text, "ನ\nಶ್ರೀನ\n");
+        assert!(report.is_empty(), "{:?}", report.rows);
+    }
+
+    #[test]
+    fn unicode_glyphs_with_no_text_are_marked_and_reported() {
+        let (doc, font) = unicode_font(&["0CA8"]);
+        let (text, report) = run(&pdf_with_objects(
+            doc,
+            vec![font],
+            b"BT /F1 12 Tf 72 700 Td <000100090009> Tj ET",
+        ));
+        assert_eq!(text, "ನ\u{FFFD}\u{FFFD}\n");
+        assert_eq!(report.rows.len(), 1, "{:?}", report.rows);
+        assert_eq!(report.rows[0].kind, Kind::NotConverted);
+        assert_eq!(report.rows[0].location, "page 1, line 1");
+        assert!(
+            report.rows[0].detail.starts_with("2 glyphs"),
+            "{:?}",
+            report.rows
+        );
+    }
+
+    #[test]
+    fn a_composite_font_with_no_map_is_reported() {
+        let (doc, mut font) = unicode_font(&["0CA8"]);
+        font.remove(b"ToUnicode");
+        let (text, report) = run(&pdf_with_objects(
+            doc,
+            vec![font],
+            b"BT /F1 12 Tf 72 700 Td <00010002> Tj ET",
+        ));
+        assert_eq!(text, "\u{FFFD}\u{FFFD}\n");
+        assert_eq!(report.count(Kind::NotConverted), 1, "{:?}", report.rows);
+        assert!(
+            report.rows[0].detail.starts_with("2 glyphs"),
+            "{:?}",
+            report.rows
+        );
+    }
+
+    #[test]
+    fn a_word_gap_drawn_inside_a_span_is_kept() {
+        let (doc, font) = unicode_font(&["0CA8", "0CAE"]);
+        let content = b"BT /F1 12 Tf 72 700 Td <00010002> Tj \
+            /Span <</ActualText <FEFF0CB80CCD0C950CBE>>> BDC [-400 <0003>] TJ <0004> Tj EMC ET";
+        let (text, report) = run(&pdf_with_objects(doc, vec![font], content));
+        assert_eq!(text, "ನಮ ಸ್ಕಾ\n");
+        assert!(report.is_empty(), "{:?}", report.rows);
+    }
+
+    #[test]
+    fn a_span_left_open_keeps_its_glyphs_and_the_rest_of_the_line() {
+        let (doc, font) = unicode_font(&["0CA8", "0CAE"]);
+        // The EMC at the end closes the outer sequence; it must not close the span.
+        let content =
+            b"/Art BMC BT /F1 12 Tf 72 700 Td /Span <</ActualText (x)>> BDC <0001> Tj ET \
+            BT /F1 12 Tf 84 700 Td <0002> Tj ET EMC";
+        let (text, report) = run(&pdf_with_objects(doc, vec![font], content));
+        assert_eq!(text, "ನಮ\n");
+        assert!(report.is_empty(), "{:?}", report.rows);
+    }
+
+    #[test]
+    fn an_empty_actual_text_does_not_replace_its_glyphs() {
+        let (doc, font) = unicode_font(&["0CA8"]);
+        let content = b"BT /F1 12 Tf 72 700 Td /Span <</ActualText ()>> BDC <0001> Tj EMC ET";
+        let (text, _) = run(&pdf_with_objects(doc, vec![font], content));
+        assert_eq!(text, "ನ\n");
+    }
+
+    #[test]
+    fn simple_font_codes_with_no_text_are_marked_and_reported() {
+        let cmap = b"begincmap\n1 beginbfchar\n<41> <0CA8>\nendbfchar\nendcmap\n";
+        let mut doc = Document::with_version("1.5");
+        let map = doc.add_object(Stream::new(dictionary! {}, cmap.to_vec()));
+        let mut font = simple_font("AAAAAA+NotoSansKannada-Regular");
+        font.set("ToUnicode", map);
+        // A glyph name with no character, as in Chrome's Type 3 fonts.
+        font.set(
+            "Encoding",
+            dictionary! { "Differences" => vec![1.into(), Object::Name(b"g101".to_vec())] },
+        );
+        let (text, report) = run(&pdf_with_objects(
+            doc,
+            vec![font],
+            b"BT /F1 12 Tf 72 700 Td (A\x01B) Tj ET",
+        ));
+        assert_eq!(text, "ನ\u{FFFD}B\n");
+        assert_eq!(report.count(Kind::NotConverted), 1, "{:?}", report.rows);
+    }
+
+    #[test]
+    fn a_span_around_whole_text_objects_reads_as_its_text() {
+        let (doc, font) = unicode_font(&["0CA8", "0CAE"]);
+        let content = b"/Span <</ActualText <FEFF0CB80CCD0C950CBE>>> BDC \
+            BT /F1 12 Tf 72 700 Td <0003> Tj ET BT /F1 12 Tf 84 700 Td <0004> Tj ET EMC \
+            BT /F1 12 Tf 96 700 Td <0001> Tj ET";
+        let (text, report) = run(&pdf_with_objects(doc, vec![font], content));
+        assert_eq!(text, "ಸ್ಕಾನ\n");
+        assert!(report.is_empty(), "{:?}", report.rows);
+    }
+
+    #[test]
+    fn a_font_with_no_map_and_glyph_names_with_no_text_is_reported() {
+        let mut font = simple_font("AAAAAA+SomeType3Font");
+        font.set(
+            "Encoding",
+            dictionary! { "Differences" => vec![1.into(), Object::Name(b"g101".to_vec())] },
+        );
+        let (text, report) = run(&pdf(
+            vec![("F1", font)],
+            b"BT /F1 12 Tf 72 700 Td (A\x01) Tj ET",
+        ));
+        assert_eq!(text, "A\u{FFFD}\n");
+        assert_eq!(report.count(Kind::NotConverted), 1, "{:?}", report.rows);
+    }
+
+    #[test]
+    fn actual_text_around_legacy_text_is_ignored() {
+        let mut content = b"BT /F1 12 Tf 72 700 Td /Span <</ActualText (xyz)>> BDC (".to_vec();
+        content.extend_from_slice(KANNADA);
+        content.extend_from_slice(b") Tj EMC ET");
+        let (text, report) = run(&pdf(vec![("F1", simple_font("Nudi 01 e"))], &content));
+        assert_eq!(text, "ಕನ್ನಡ\n");
+        assert!(report.is_empty(), "{:?}", report.rows);
     }
 
     #[test]

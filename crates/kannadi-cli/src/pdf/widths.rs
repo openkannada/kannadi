@@ -26,9 +26,16 @@ impl Widths {
         let subtype = font.get(b"Subtype").and_then(Object::as_name).ok();
         if subtype != Some(b"Type0".as_slice()) {
             let first = font.get(b"FirstChar").ok().and_then(number).unwrap_or(0.0);
+            // Type 3 widths are in glyph space, which FontMatrix maps to text space.
+            let scale = entry(font, b"FontMatrix")
+                .filter(|_| subtype == Some(b"Type3".as_slice()))
+                .and_then(|o| o.as_array().ok()?.first().and_then(number))
+                .map(|a| a.abs() * 1000.0)
+                .filter(|s| s.is_normal())
+                .unwrap_or(1.0);
             let widths = entry(font, b"Widths")
                 .and_then(|o| o.as_array().ok())
-                .map(|a| a.iter().filter_map(number).collect())
+                .map(|a| a.iter().filter_map(number).map(|w| w * scale).collect())
                 .unwrap_or_default();
             return Widths::Simple {
                 first: first.clamp(0.0, 255.0) as u32,
@@ -126,6 +133,41 @@ fn number(o: &Object) -> Option<f32> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use lopdf::dictionary;
+
+    #[test]
+    fn type_3_widths_follow_the_font_matrix() {
+        let doc = Document::with_version("1.5");
+        let font = |subtype: &str| {
+            dictionary! {
+                "Subtype" => subtype,
+                "FirstChar" => 32,
+                "Widths" => vec![Object::Integer(25)],
+                "FontMatrix" => vec![0.01.into(), 0.into(), 0.into(), 0.01.into(), 0.into(), 0.into()],
+            }
+        };
+        assert_eq!(Widths::of(&doc, &font("Type3")).advance(b" "), 250.0);
+        assert_eq!(Widths::of(&doc, &font("TrueType")).advance(b" "), 25.0);
+        let mut flipped = font("Type3");
+        flipped.set(
+            "FontMatrix",
+            vec![
+                (-0.01).into(),
+                0.into(),
+                0.into(),
+                0.01.into(),
+                0.into(),
+                0.into(),
+            ],
+        );
+        assert_eq!(Widths::of(&doc, &flipped).advance(b" "), 250.0);
+        let mut flat = font("Type3");
+        flat.set(
+            "FontMatrix",
+            vec![0.into(), 0.into(), 0.into(), 0.into(), 0.into(), 0.into()],
+        );
+        assert_eq!(Widths::of(&doc, &flat).advance(b" "), 25.0);
+    }
 
     #[test]
     fn cid_ranges_cover_runs_and_spans() {
