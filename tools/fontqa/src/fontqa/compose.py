@@ -85,7 +85,7 @@ def tail(font: TTFont, short: str, long: str) -> pathops.Path:
 
 
 def _closed(font: TTFont, long: str, apart: list[tuple]) -> bool:
-    """True when the apart contours hold ink of their own, not just counters of the rest."""
+    """True when over half the apart area lies outside the rest, so it is ink of its own."""
     rest = to_path([c for c in contours(font, long) if c not in apart])
     rest.simplify(fix_winding=True)
     piece = to_path(apart)

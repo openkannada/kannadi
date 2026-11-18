@@ -39,7 +39,7 @@ def shaperglot_checks(cases: list[Case], language: str = "kn_Knda") -> str:
     """Shaperglot manual checks (TOML): each cluster must shape differently with its conjunct
     features on and off. Shaperglot compares the whole output, so a joiner would always differ."""
     clusters = [c.text for c in cases if c.unjoined]
-    # ರ್ರ forms a subscript ra in many fonts, not a reph, so it is a conjunct case only.
+    # Many fonts draw ರ್ರ with a subscript ra in place of a reph, so it is a conjunct case only.
     arkavattu = [t for t in clusters if t.startswith(RA + VIRAMA) and t != RA + VIRAMA + RA]
     checks = [
         (
