@@ -44,6 +44,7 @@ Examples:
 #[derive(Parser)]
 #[command(
     name = "kannadi",
+    bin_name = "kannadi",
     version,
     propagate_version = true,
     long_about = "Convert Kannada documents between legacy fonts and Unicode.\n\n\
