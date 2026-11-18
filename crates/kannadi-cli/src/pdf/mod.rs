@@ -253,7 +253,7 @@ impl<'a> LineWriter<'a> {
         if unreadable > 0 {
             report.rows.push(not_converted(
                 location.to_string(),
-                format!("{unreadable} glyphs with no Unicode text in the font's ToUnicode map"),
+                format!("{unreadable} glyphs with no Unicode text, shown as U+FFFD"),
             ));
         }
         out.trim_end().to_string()
@@ -659,17 +659,69 @@ endcmap\nCMapName currentdict /CMap defineresource pop\nend\nend\n";
     fn a_composite_font_with_no_map_is_reported() {
         let (doc, mut font) = unicode_font(&["0CA8"]);
         font.remove(b"ToUnicode");
-        let (_, report) = run(&pdf_with_objects(
+        let (text, report) = run(&pdf_with_objects(
             doc,
             vec![font],
             b"BT /F1 12 Tf 72 700 Td <00010002> Tj ET",
         ));
+        assert_eq!(text, "\u{FFFD}\u{FFFD}\n");
         assert_eq!(report.count(Kind::NotConverted), 1, "{:?}", report.rows);
         assert!(
             report.rows[0].detail.starts_with("2 glyphs"),
             "{:?}",
             report.rows
         );
+    }
+
+    #[test]
+    fn a_word_gap_drawn_inside_a_span_is_kept() {
+        let (doc, font) = unicode_font(&["0CA8", "0CAE"]);
+        let content = b"BT /F1 12 Tf 72 700 Td <00010002> Tj \
+            /Span <</ActualText <FEFF0CB80CCD0C950CBE>>> BDC [-400 <0003>] TJ <0004> Tj EMC ET";
+        let (text, report) = run(&pdf_with_objects(doc, vec![font], content));
+        assert_eq!(text, "ನಮ ಸ್ಕಾ\n");
+        assert!(report.is_empty(), "{:?}", report.rows);
+    }
+
+    #[test]
+    fn a_span_left_open_keeps_its_glyphs_and_the_rest_of_the_line() {
+        let (doc, font) = unicode_font(&["0CA8", "0CAE"]);
+        // The EMC at the end closes the outer sequence; it must not close the span.
+        let content =
+            b"/Art BMC BT /F1 12 Tf 72 700 Td /Span <</ActualText (x)>> BDC <0001> Tj ET \
+            BT /F1 12 Tf 84 700 Td <0002> Tj ET EMC";
+        let (text, report) = run(&pdf_with_objects(doc, vec![font], content));
+        assert_eq!(text, "ನಮ\n");
+        assert!(report.is_empty(), "{:?}", report.rows);
+    }
+
+    #[test]
+    fn an_empty_actual_text_does_not_replace_its_glyphs() {
+        let (doc, font) = unicode_font(&["0CA8"]);
+        let content = b"BT /F1 12 Tf 72 700 Td /Span <</ActualText ()>> BDC <0001> Tj EMC ET";
+        let (text, _) = run(&pdf_with_objects(doc, vec![font], content));
+        assert_eq!(text, "ನ\n");
+    }
+
+    #[test]
+    fn simple_font_codes_with_no_text_are_marked_and_reported() {
+        let cmap = b"begincmap\n1 beginbfchar\n<41> <0CA8>\nendbfchar\nendcmap\n";
+        let mut doc = Document::with_version("1.5");
+        let map = doc.add_object(Stream::new(dictionary! {}, cmap.to_vec()));
+        let mut font = simple_font("AAAAAA+NotoSansKannada-Regular");
+        font.set("ToUnicode", map);
+        // A glyph name with no character, as in Chrome's Type 3 fonts.
+        font.set(
+            "Encoding",
+            dictionary! { "Differences" => vec![1.into(), Object::Name(b"g101".to_vec())] },
+        );
+        let (text, report) = run(&pdf_with_objects(
+            doc,
+            vec![font],
+            b"BT /F1 12 Tf 72 700 Td (A\x01B) Tj ET",
+        ));
+        assert_eq!(text, "ನ\u{FFFD}B\n");
+        assert_eq!(report.count(Kind::NotConverted), 1, "{:?}", report.rows);
     }
 
     #[test]

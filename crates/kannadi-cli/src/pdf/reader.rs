@@ -191,17 +191,29 @@ impl PageFont<'_> {
     fn unicode(&self, bytes: &[u8]) -> Option<(String, usize)> {
         Some(match self.unicode.as_ref()? {
             UnicodeReading::Composite(Some(cmap)) => cmap.read(bytes),
-            UnicodeReading::Composite(None) => (String::new(), bytes.len().div_ceil(2)),
+            UnicodeReading::Composite(None) => {
+                let codes = bytes.len().div_ceil(2);
+                ("\u{FFFD}".repeat(codes), codes)
+            }
             UnicodeReading::Simple(cmap) => {
-                let text = bytes
-                    .iter()
-                    .map(|b| {
-                        let code = std::slice::from_ref(b);
-                        cmap.get(code)
-                            .map_or_else(|| self.raw(code), str::to_string)
-                    })
-                    .collect();
-                (text, 0)
+                let mut text = String::new();
+                let mut missing = 0;
+                for b in bytes {
+                    let code = std::slice::from_ref(b);
+                    if let Some(mapped) = cmap.get(code) {
+                        text.push_str(mapped);
+                        continue;
+                    }
+                    // Chrome's Type 3 glyph names, such as /g101, read as NUL.
+                    let read = self.raw(code);
+                    if read.is_empty() || read.chars().all(char::is_control) {
+                        text.push('\u{FFFD}');
+                        missing += 1;
+                    } else {
+                        text.push_str(&read);
+                    }
+                }
+                (text, missing)
             }
         })
     }
@@ -325,8 +337,9 @@ struct PageReader<'d, 'f> {
     /// Open marked-content sequences, each true if it began an `/ActualText`
     /// span that is being collected.
     marked: Vec<bool>,
-    /// The open `/ActualText` span: its text, and where its pieces start.
-    actual: Option<(String, usize, usize)>,
+    /// The open `/ActualText` span: its text, where its pieces start, and the
+    /// form depth it opened at.
+    actual: Option<(String, usize, usize, usize)>,
 }
 
 impl<'d> PageReader<'d, '_> {
@@ -346,6 +359,7 @@ impl<'d> PageReader<'d, '_> {
             let name = || op.operands.first().and_then(|o| o.as_name().ok());
             match op.operator.as_str() {
                 "BT" => self.pen.begin(),
+                "ET" => self.drop_open_span(),
                 "Tf" => {
                     self.current = name().and_then(|n| self.resource(resources, b"Font", n));
                     self.pen.size = number(1).unwrap_or(self.pen.size);
@@ -392,7 +406,7 @@ impl<'d> PageReader<'d, '_> {
                     }
                 }
                 "BMC" => self.marked.push(false),
-                "BDC" => self.begin_marked(op),
+                "BDC" => self.begin_marked(op, depth),
                 "EMC" => self.end_marked(),
                 "Tj" | "TJ" => {}
                 _ => continue,
@@ -400,6 +414,9 @@ impl<'d> PageReader<'d, '_> {
             if matches!(op.operator.as_str(), "Tj" | "TJ" | "'" | "\"") {
                 self.show(op);
             }
+        }
+        if self.actual.as_ref().is_some_and(|a| a.3 == depth) {
+            self.drop_open_span();
         }
         Ok(())
     }
@@ -417,7 +434,7 @@ impl<'d> PageReader<'d, '_> {
     }
 
     /// Starts collecting an `/ActualText` span, unless one is already open.
-    fn begin_marked(&mut self, op: &Operation) {
+    fn begin_marked(&mut self, op: &Operation, depth: usize) {
         let text = op
             .operands
             .get(1)
@@ -425,11 +442,11 @@ impl<'d> PageReader<'d, '_> {
             .and_then(|d| d.get(b"ActualText").ok())
             .and_then(|o| o.as_str().ok())
             .map(text_string);
-        let starts = text.is_some() && self.actual.is_none();
+        let starts = text.as_ref().is_some_and(|t| !t.is_empty()) && self.actual.is_none();
         if let (true, Some(text)) = (starts, text) {
             let line = self.lines.len() - 1;
             let at = self.lines[line].len();
-            self.actual = Some((text, line, at));
+            self.actual = Some((text, line, at, depth));
         }
         self.marked.push(starts);
     }
@@ -440,14 +457,40 @@ impl<'d> PageReader<'d, '_> {
         if self.marked.pop() != Some(true) {
             return;
         }
-        let Some((text, line, at)) = self.actual.take() else {
+        let Some((text, line, at, _)) = self.actual.take() else {
             return;
         };
         if line + 1 != self.lines.len() {
             return;
         }
-        let inner: Vec<Piece> = self.lines[line].drain(at..).collect();
-        self.lines[line].push(Piece::Actual { text, inner });
+        // Word gaps around the span's glyphs stay as they were drawn.
+        let mut inner: Vec<Piece> = self.lines[line].drain(at..).collect();
+        let lead = inner
+            .iter()
+            .take_while(|p| matches!(p, Piece::Space))
+            .count();
+        let trail = inner[lead..]
+            .iter()
+            .rev()
+            .take_while(|p| matches!(p, Piece::Space))
+            .count();
+        let after = inner.split_off(inner.len() - trail);
+        let middle = inner.split_off(lead);
+        let line = &mut self.lines[line];
+        line.extend(inner);
+        line.push(Piece::Actual {
+            text,
+            inner: middle,
+        });
+        line.extend(after);
+    }
+
+    /// Gives up on an `/ActualText` span left open at the end of a text object
+    /// or of the stream it opened in. Its glyphs stay as drawn.
+    fn drop_open_span(&mut self) {
+        if self.actual.take().is_some() {
+            self.marked.iter_mut().for_each(|m| *m = false);
+        }
     }
 
     fn break_line(&mut self) {
@@ -455,7 +498,7 @@ impl<'d> PageReader<'d, '_> {
             self.lines.push(Vec::new());
             // A span that opened before its first glyph moved to a new line
             // starts on that line.
-            if let Some((_, line, at)) = &mut self.actual {
+            if let Some((_, line, at, _)) = &mut self.actual {
                 if *at == self.lines[*line].len() {
                     *line = self.lines.len() - 1;
                     *at = 0;
@@ -621,7 +664,23 @@ fn text_string(bytes: &[u8]) -> String {
     } else if let Some(rest) = bytes.strip_prefix(&[0xEF, 0xBB, 0xBF]) {
         String::from_utf8_lossy(rest).into_owned()
     } else {
-        bytes.iter().map(|&b| char::from(b)).collect()
+        bytes.iter().map(|&b| pdf_doc_char(b)).collect()
+    }
+}
+
+/// A PDFDocEncoding byte (PDF 1.7, Annex D): Latin-1, apart from 0x18 to 0x1F and
+/// 0x80 to 0xA0. Its 3 undefined codes read as U+FFFD.
+fn pdf_doc_char(b: u8) -> char {
+    const LOW: [char; 8] = ['˘', 'ˇ', 'ˆ', '˙', '˝', '˛', '˚', '˜'];
+    const HIGH: [char; 33] = [
+        '•', '†', '‡', '…', '—', '–', 'ƒ', '⁄', '‹', '›', '−', '‰', '„', '“', '”', '‘', '’', '‚',
+        '™', 'ﬁ', 'ﬂ', 'Ł', 'Œ', 'Š', 'Ÿ', 'Ž', 'ı', 'ł', 'œ', 'š', 'ž', '\u{FFFD}', '€',
+    ];
+    match b {
+        0x18..=0x1F => LOW[usize::from(b - 0x18)],
+        0x80..=0xA0 => HIGH[usize::from(b - 0x80)],
+        0xAD => '\u{FFFD}',
+        _ => char::from(b),
     }
 }
 
@@ -676,5 +735,6 @@ mod tests {
         assert_eq!(text_string(b"\xFE\xFF\x0C\x95\x0C\xBE"), "ಕಾ");
         assert_eq!(text_string("\u{FEFF}ಕಾ".as_bytes()), "ಕಾ");
         assert_eq!(text_string(b"caf\xE9"), "café");
+        assert_eq!(text_string(b"\x80 \x84 \x92 \xA0 \x18"), "• — ™ € ˘");
     }
 }

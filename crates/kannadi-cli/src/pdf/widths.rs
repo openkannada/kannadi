@@ -30,7 +30,9 @@ impl Widths {
             let scale = entry(font, b"FontMatrix")
                 .filter(|_| subtype == Some(b"Type3".as_slice()))
                 .and_then(|o| o.as_array().ok()?.first().and_then(number))
-                .map_or(1.0, |a| a * 1000.0);
+                .map(|a| a.abs() * 1000.0)
+                .filter(|s| s.is_normal())
+                .unwrap_or(1.0);
             let widths = entry(font, b"Widths")
                 .and_then(|o| o.as_array().ok())
                 .map(|a| a.iter().filter_map(number).map(|w| w * scale).collect())
@@ -146,6 +148,25 @@ mod tests {
         };
         assert_eq!(Widths::of(&doc, &font("Type3")).advance(b" "), 250.0);
         assert_eq!(Widths::of(&doc, &font("TrueType")).advance(b" "), 25.0);
+        let mut flipped = font("Type3");
+        flipped.set(
+            "FontMatrix",
+            vec![
+                (-0.01).into(),
+                0.into(),
+                0.into(),
+                0.01.into(),
+                0.into(),
+                0.into(),
+            ],
+        );
+        assert_eq!(Widths::of(&doc, &flipped).advance(b" "), 250.0);
+        let mut flat = font("Type3");
+        flat.set(
+            "FontMatrix",
+            vec![0.into(), 0.into(), 0.into(), 0.into(), 0.into(), 0.into()],
+        );
+        assert_eq!(Widths::of(&doc, &flat).advance(b" "), 25.0);
     }
 
     #[test]
