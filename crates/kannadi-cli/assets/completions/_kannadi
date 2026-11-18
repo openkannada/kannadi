@@ -32,7 +32,7 @@ _kannadi() {
 _arguments "${_arguments_options[@]}" : \
 '-o+[Folder to write the converted files and reports to]:DIR:_files' \
 '--out=[Folder to write the converted files and reports to]:DIR:_files' \
-'--layout=[Layout of text files, and of fonts added with --legacy-font that name none\: nudi (Nudi and Baraha ANSI), nudi-b (Nudi B-Akshara), kan-eng, akruti or shree-lipi]:LAYOUT:_default' \
+'--layout=[Layout of text files, and of fonts added with --legacy-font that name none. nudi covers the Nudi and Baraha ANSI fonts]:LAYOUT:(nudi akruti shree-lipi nudi-b kan-eng)' \
 '--font=[Font to set converted text in, in HTML and DOCX files]:NAME:_default' \
 '*--legacy-font=[Treat this font as a legacy font too, in the layout after \`=\` ("My Font=akruti") or else the --layout one. Repeat for more fonts]:NAME[=LAYOUT]:_default' \
 '--strict[Exit with status 1 if any file has unknown glyphs, malformed syllables or unencodable characters; likely typos do not count]' \
@@ -40,6 +40,8 @@ _arguments "${_arguments_options[@]}" : \
 '--keep-zeros[Keep a zero typed between letters as a digit; by default it becomes ಂ]' \
 '-h[Print help (see more with '\''--help'\'')]' \
 '--help[Print help (see more with '\''--help'\'')]' \
+'-V[Print version]' \
+'--version[Print version]' \
 '*::inputs -- Files and folders to convert. Folders are searched for .txt, .htm, .html, .docx and .pdf files:_files' \
 && ret=0
 ;;
@@ -52,6 +54,8 @@ _arguments "${_arguments_options[@]}" : \
 '--strict[Exit with status 1 if any file has unknown glyphs, malformed syllables or unencodable characters; likely typos do not count]' \
 '-h[Print help (see more with '\''--help'\'')]' \
 '--help[Print help (see more with '\''--help'\'')]' \
+'-V[Print version]' \
+'--version[Print version]' \
 '*::inputs -- Files and folders to convert. Folders are searched for .txt, .htm, .html, .docx and .pdf files:_files' \
 && ret=0
 ;;
@@ -59,6 +63,8 @@ _arguments "${_arguments_options[@]}" : \
 _arguments "${_arguments_options[@]}" : \
 '-h[Print help]' \
 '--help[Print help]' \
+'-V[Print version]' \
+'--version[Print version]' \
 ':shell:(bash elvish fish powershell zsh)' \
 && ret=0
 ;;
@@ -66,6 +72,8 @@ _arguments "${_arguments_options[@]}" : \
 _arguments "${_arguments_options[@]}" : \
 '-h[Print help]' \
 '--help[Print help]' \
+'-V[Print version]' \
+'--version[Print version]' \
 ':dir -- Folder to write kannadi.1 and a page per command to:_files' \
 && ret=0
 ;;

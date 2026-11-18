@@ -31,7 +31,7 @@ set edit:completion:arg-completer[kannadi] = {|@words|
         &'kannadi;to-unicode'= {
             cand -o 'Folder to write the converted files and reports to'
             cand --out 'Folder to write the converted files and reports to'
-            cand --layout 'Layout of text files, and of fonts added with --legacy-font that name none: nudi (Nudi and Baraha ANSI), nudi-b (Nudi B-Akshara), kan-eng, akruti or shree-lipi'
+            cand --layout 'Layout of text files, and of fonts added with --legacy-font that name none. nudi covers the Nudi and Baraha ANSI fonts'
             cand --font 'Font to set converted text in, in HTML and DOCX files'
             cand --legacy-font 'Treat this font as a legacy font too, in the layout after `=` ("My Font=akruti") or else the --layout one. Repeat for more fonts'
             cand --strict 'Exit with status 1 if any file has unknown glyphs, malformed syllables or unencodable characters; likely typos do not count'
@@ -39,6 +39,8 @@ set edit:completion:arg-completer[kannadi] = {|@words|
             cand --keep-zeros 'Keep a zero typed between letters as a digit; by default it becomes ಂ'
             cand -h 'Print help (see more with ''--help'')'
             cand --help 'Print help (see more with ''--help'')'
+            cand -V 'Print version'
+            cand --version 'Print version'
         }
         &'kannadi;to-nudi'= {
             cand -o 'Folder to write the converted files and reports to'
@@ -48,14 +50,20 @@ set edit:completion:arg-completer[kannadi] = {|@words|
             cand --strict 'Exit with status 1 if any file has unknown glyphs, malformed syllables or unencodable characters; likely typos do not count'
             cand -h 'Print help (see more with ''--help'')'
             cand --help 'Print help (see more with ''--help'')'
+            cand -V 'Print version'
+            cand --version 'Print version'
         }
         &'kannadi;completions'= {
             cand -h 'Print help'
             cand --help 'Print help'
+            cand -V 'Print version'
+            cand --version 'Print version'
         }
         &'kannadi;manpages'= {
             cand -h 'Print help'
             cand --help 'Print help'
+            cand -V 'Print version'
+            cand --version 'Print version'
         }
         &'kannadi;help'= {
             cand to-unicode 'Convert documents in legacy Kannada fonts to Unicode'
