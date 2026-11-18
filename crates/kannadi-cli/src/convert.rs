@@ -165,11 +165,8 @@ pub fn convert(text: &str, layout: Layout, settings: &Settings) -> Converted {
                 .malformed
                 .iter()
                 .map(|r| found(Kind::Malformed, r.start, c.text[r.clone()].to_string()));
-            let typos = typos::find(&c.text).into_iter().map(|t| {
-                let spelled = &c.text[t.range.clone()];
-                let detail = format!("{} for {spelled} ({})", t.replacement, t.rule.name());
-                found(Kind::LikelyTypo, t.range.start, detail)
-            });
+            let typos =
+                likely_typos(&c.text).map(|(at, detail)| found(Kind::LikelyTypo, at, detail));
             let issues = in_order(unknown.chain(malformed).chain(typos));
             Converted {
                 issues,
@@ -205,6 +202,32 @@ pub fn convert(text: &str, layout: Layout, settings: &Settings) -> Converted {
             }
         }
     }
+}
+
+/// Text that is already Unicode, kept as it is, with its likely typos.
+pub fn keep(text: &str) -> Converted {
+    let lines = Lines::new(text);
+    let issues = likely_typos(text)
+        .map(|(at, detail)| Issue {
+            kind: Kind::LikelyTypo,
+            line: lines.line(at),
+            detail,
+            context: window(text, &lines, at).to_string(),
+        })
+        .collect();
+    Converted {
+        text: text.to_string(),
+        issues,
+    }
+}
+
+/// Where each likely typo starts, and its report detail.
+fn likely_typos(text: &str) -> impl Iterator<Item = (usize, String)> + '_ {
+    typos::find(text).into_iter().map(|t| {
+        let spelled = &text[t.range.clone()];
+        let detail = format!("{} for {spelled} ({})", t.replacement, t.rule.name());
+        (t.range.start, detail)
+    })
 }
 
 /// Sorts by line, then by the key: (0, input offset) or (1, output offset).

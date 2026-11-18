@@ -71,6 +71,7 @@ Project:
 ### Fixed
 
 - `to-unicode` reads Unicode PDFs whole (#42). Conjuncts and vowel signs were lost from PDFs Chrome makes: fonts that are not legacy are now read through their own ToUnicode map, which may give several characters per glyph, and `/ActualText` spans replace the glyphs drawn in them. Glyphs with no Unicode text come out as U+FFFD and are reported as not converted.
+- Unicode Kannada in legacy text is no longer reported as unknown glyphs (#43). Kannada characters, the dandas, ZWNJ and ZWJ pass through `legacy::to_unicode` as they are, and `to-unicode` keeps the lines of a text file that are already Unicode, which `legacy::is_unicode` tells by comparing Kannada characters with the layout's glyph codes, converts the other lines, and still suggests likely typos in kept lines. `kannadi-wasm` exports it as `isUnicode(text, layout)`.
 - fontqa outline flattening: a TrueType quadratic with several off-curve points is split at its implied on-curve points, and a closed contour with no on-curve point is read. Stroke measurements on TrueType fonts were slightly off before.
 - fontqa manifest: Navilu is OFL-1.1 with Reserved Font Name Navilu, not GPL.
 - glyphdraft: side bearings come from the median of the font's consonants, not from KA, whose bearings can be an outlier.
