@@ -18,5 +18,4 @@ unicode-normalization = "0.1.26"
 
 [dev-dependencies]
 proptest = "1.12"
-unicode-normalization = "0.1.26"
 vidyut-lipi = "0.2.0"

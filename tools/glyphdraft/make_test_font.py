@@ -8,7 +8,7 @@ from pathlib import Path
 import fontforge
 
 sys.path.insert(0, str(Path(__file__).parent))
-from draft import CONSONANTS  # noqa: E402
+from draft import CONSONANTS
 
 
 def ring(glyph, width, height, stroke):

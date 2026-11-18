@@ -86,7 +86,7 @@ export class Composer {
     else this.word = { start: at, latin: letters, rendered: "" };
   }
 
-  /** Backspace inside the word removes the last Latin letter, not a Kannada sign. */
+  /** Backspace inside the word removes its last Latin letter and renders the word again. */
   beforeInput(e) {
     if (!this.word || e.inputType !== "deleteContentBackward" || !e.cancelable) return;
     const sel = this.editor.selection();

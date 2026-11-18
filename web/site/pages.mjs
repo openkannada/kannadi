@@ -1,6 +1,7 @@
 // Content of each page the site build writes. FAQ entries marked `shared`
-// appear on several pages; their JSON-LD is written on the home page only. Strings are trusted HTML from
-// this file; FAQ answers are also sent as plain text in the FAQPage JSON-LD.
+// appear on several pages; their JSON-LD is written on the home page only.
+// Strings are trusted HTML from this file; FAQ answers are also sent as plain
+// text in the FAQPage JSON-LD.
 
 const UNICODE_TO_NUDI = {
   shared: true,
