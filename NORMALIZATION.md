@@ -57,7 +57,7 @@ The joiner rules rewrite text into a spelling that renders the same. [normalizat
 | C8 | joiner after a word-final virama, after a vowel sign, between consonants, at a word start | nothing | 6 of 6 |
 | kept | ಮ ZWNJ ೂ | ಮ ೂ | 4 of 6, so C8 leaves it |
 
-The fonts are Noto Sans Kannada, Noto Serif Kannada, Tiro Kannada, Anek Kannada, Gari and Kannada Sangam MN. HarfBuzz treats ರ + virama + ZWJ like ರ + ZWJ + virama for Kannada, which C6 follows, picking the order the Unicode Standard gives. In the 2 exceptions, the font itself handles the sequence differently.
+The fonts are Noto Sans Kannada, Noto Serif Kannada, Tiro Kannada, Anek Kannada, Gari and Kannada Sangam MN. A font draws these sequences with its OpenType features: `rphf` for the arkavattu, `blwf` for subscript consonants and `haln` for a visible virama. Sanchaya's [Karnata type script](https://github.com/sanchaya/karnata-type-script) collects glyph naming and feature conventions for Kannada fonts; the profile works on text, so it depends on no glyph names. HarfBuzz treats ರ + virama + ZWJ like ರ + ZWJ + virama for Kannada, which C6 follows, picking the order the Unicode Standard gives. In the 2 exceptions, the font itself handles the sequence differently.
 
 ## Legacy form
 
@@ -92,14 +92,14 @@ These were counted and left alone, because a rule would change text that is corr
 
 ## Evidence
 
-Counts are over the Kannada Wikipedia dump of 1 November 2026 (`knwiki` pages-articles, 781 MB of XML, 166,947,879 Kannada characters, newest revision 2026-11-01T14:00:28Z) and the Kannada Wikisource dump of 1 December 2023 (`wikimedia/wikisource`, 20231201.kn, 195 MB of text). They count changes made by `kannadi normalize --stats`. For C5 to C8 a run of several joiners counts once; S2 counts each character it removes.
+Counts are over the Kannada Wikipedia dump of 1 November 2026 (`knwiki` pages-articles, 781 MB of XML, 166,947,879 Kannada characters, newest revision 2026-11-01T14:00:28Z) and the Kannada Wikisource dump of 1 December 2023 (`wikimedia/wikisource`, 20231201.kn, 195 MB of text). They count changes made by `kannadi normalize --stats`, each form run on its own; a legacy rule can expose a repeated mark, so C4 counts 1,708 in the legacy and search forms. For C5 to C8 a run of several joiners counts once; S2 counts each character it removes.
 
 | Rule | Wikipedia | Wikisource |
 |---|---:|---:|
 | C1 nfc | 2 | 12 |
 | C2 vowel-letter | 0 | 0 |
 | C3 nukta-order | 501 | 429 |
-| C4 repeated-mark | 1,711 | 906 |
+| C4 repeated-mark | 1,706 | 906 |
 | C5 joiner-before-virama | 744 | 4 |
 | C6 non-reph-ra | 4,190 | 7,725 |
 | C7 explicit-virama | 50,714 | 51,835 |
@@ -108,7 +108,7 @@ Counts are over the Kannada Wikipedia dump of 1 November 2026 (`knwiki` pages-ar
 | L2 latin-as-anusvara | 168 | 322 |
 | L3 misplaced-reph | 117 | 9 |
 | S1 old-letter | 935 | 8,330 |
-| S2 invisible | 388,109 | 61,649 |
+| S2 invisible | 388,485 | 61,650 |
 | S3 nukta | 8,657 | 855 |
 
 Some context for these counts:
