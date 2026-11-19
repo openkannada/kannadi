@@ -4,7 +4,7 @@
 
 ### Added
 
-- The Kannada text normalization profile, [NORMALIZATION.md](NORMALIZATION.md): 3 forms (canonical, legacy, search) and 14 rules, each with counts from Kannada Wikipedia and Wikisource, and HarfBuzz rendering checks for the joiner rules. 71 test vectors in `normalization/vectors.tsv` and `vectors.json`.
+- The Kannada text normalization profile, [NORMALIZATION.md](NORMALIZATION.md): 3 forms (canonical, legacy, search) and 14 rules, each with counts from Kannada Wikipedia and Wikisource, and HarfBuzz rendering checks for the joiner rules. 75 test vectors in `normalization/vectors.tsv` and `vectors.json`.
 - `normalize::normalize_as`, `normalize_counted`, `is_normalized`, `Form`, `Rule` and `Counts`.
 - `kannadi normalize`: normalize text files or standard input to a form, with `--stats` (changes per rule) and `--check` (exit 1 if not normalized).
 - Tests that clean converter output is canonical, on every fixture line and on random glyph sequences.
