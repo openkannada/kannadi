@@ -59,6 +59,18 @@ _arguments "${_arguments_options[@]}" : \
 '*::inputs -- Files and folders to convert. Folders are searched for .txt, .htm, .html, .docx and .pdf files:_files' \
 && ret=0
 ;;
+(normalize)
+_arguments "${_arguments_options[@]}" : \
+'--form=[How far to go]:FORM:(canonical legacy search)' \
+'--stats[Print how many times each rule changed the text to standard error, as TSV]' \
+'--check[Write nothing; exit with status 1 if any input is not already in the form]' \
+'-h[Print help (see more with '\''--help'\'')]' \
+'--help[Print help (see more with '\''--help'\'')]' \
+'-V[Print version]' \
+'--version[Print version]' \
+'*::inputs -- UTF-8 text files; standard input when none is given or for -:_files' \
+&& ret=0
+;;
 (completions)
 _arguments "${_arguments_options[@]}" : \
 '-h[Print help]' \
@@ -97,6 +109,10 @@ _arguments "${_arguments_options[@]}" : \
 _arguments "${_arguments_options[@]}" : \
 && ret=0
 ;;
+(normalize)
+_arguments "${_arguments_options[@]}" : \
+&& ret=0
+;;
 (completions)
 _arguments "${_arguments_options[@]}" : \
 && ret=0
@@ -123,6 +139,7 @@ _kannadi_commands() {
     local commands; commands=(
 'to-unicode:Convert documents in legacy Kannada fonts to Unicode' \
 'to-nudi:Convert Unicode Kannada documents to Nudi glyph codes' \
+'normalize:Normalize Unicode Kannada text, following the Kannada text normalization profile' \
 'completions:Print a shell completion script to standard output' \
 'manpages:Write the man pages to a folder' \
 'help:Print this message or the help of the given subcommand(s)' \
@@ -139,6 +156,7 @@ _kannadi__subcmd__help_commands() {
     local commands; commands=(
 'to-unicode:Convert documents in legacy Kannada fonts to Unicode' \
 'to-nudi:Convert Unicode Kannada documents to Nudi glyph codes' \
+'normalize:Normalize Unicode Kannada text, following the Kannada text normalization profile' \
 'completions:Print a shell completion script to standard output' \
 'manpages:Write the man pages to a folder' \
 'help:Print this message or the help of the given subcommand(s)' \
@@ -160,6 +178,11 @@ _kannadi__subcmd__help__subcmd__manpages_commands() {
     local commands; commands=()
     _describe -t commands 'kannadi help manpages commands' commands "$@"
 }
+(( $+functions[_kannadi__subcmd__help__subcmd__normalize_commands] )) ||
+_kannadi__subcmd__help__subcmd__normalize_commands() {
+    local commands; commands=()
+    _describe -t commands 'kannadi help normalize commands' commands "$@"
+}
 (( $+functions[_kannadi__subcmd__help__subcmd__to-nudi_commands] )) ||
 _kannadi__subcmd__help__subcmd__to-nudi_commands() {
     local commands; commands=()
@@ -174,6 +197,11 @@ _kannadi__subcmd__help__subcmd__to-unicode_commands() {
 _kannadi__subcmd__manpages_commands() {
     local commands; commands=()
     _describe -t commands 'kannadi manpages commands' commands "$@"
+}
+(( $+functions[_kannadi__subcmd__normalize_commands] )) ||
+_kannadi__subcmd__normalize_commands() {
+    local commands; commands=()
+    _describe -t commands 'kannadi normalize commands' commands "$@"
 }
 (( $+functions[_kannadi__subcmd__to-nudi_commands] )) ||
 _kannadi__subcmd__to-nudi_commands() {

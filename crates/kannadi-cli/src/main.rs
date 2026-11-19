@@ -6,6 +6,7 @@ mod edits;
 mod files;
 mod fonts;
 mod html;
+mod normalize;
 mod pdf;
 mod report;
 mod txt;
@@ -34,6 +35,17 @@ Examples:
   kannadi to-unicode old-orders/ --out converted/
   kannadi to-unicode notes.txt --layout akruti --out converted/
   kannadi to-unicode page.html --legacy-font \"My Font=akruti\" --out converted/";
+
+const NORMALIZE_EXAMPLES: &str = "\
+Examples:
+  kannadi normalize page.txt > page.normalized.txt
+  kannadi normalize --form legacy --stats converted.txt > clean.txt
+  kannadi normalize --check corpus/*.txt
+
+Exit status:
+  0  Success.
+  1  --check was given and an input is not in the form.
+  2  A file could not be read or is not UTF-8.";
 
 const TO_NUDI_EXAMPLES: &str = "\
 Examples:
@@ -106,6 +118,27 @@ enum Command {
         #[arg(long, value_name = "NAME")]
         legacy_font: Vec<String>,
     },
+    /// Normalize Unicode Kannada text, following the Kannada text normalization profile
+    ///
+    /// Reads UTF-8 text files, or standard input, and writes the normalized text to
+    /// standard output. canonical gives 1 spelling to text that renders the same;
+    /// legacy also repairs mistakes of legacy font converters and OCR, such as a zero
+    /// typed for anusvara; search also folds Old Kannada letters, joiners and the nukta,
+    /// for search keys. NORMALIZATION.md in the kannadi repository lists every rule.
+    #[command(after_long_help = NORMALIZE_EXAMPLES)]
+    Normalize {
+        /// UTF-8 text files; standard input when none is given or for -
+        inputs: Vec<PathBuf>,
+        /// How far to go
+        #[arg(long, default_value = "canonical", value_parser = form_parser())]
+        form: kannadi::normalize::Form,
+        /// Print how many times each rule changed the text to standard error, as TSV
+        #[arg(long)]
+        stats: bool,
+        /// Write nothing; exit with status 1 if any input is not already in the form
+        #[arg(long)]
+        check: bool,
+    },
     /// Print a shell completion script to standard output
     #[command(after_help = "Example:\n  kannadi completions zsh > ~/.zfunc/_kannadi")]
     Completions {
@@ -164,6 +197,12 @@ fn main() -> ExitCode {
                 settings(Direction::ToNudi, Layout::Nudi, font, &legacy_font),
             )
         }
+        Command::Normalize {
+            inputs,
+            form,
+            stats,
+            check,
+        } => return run_normalize(&inputs, form, stats, check),
         Command::Completions { shell } => {
             clap_complete::generate(
                 shell,
@@ -192,6 +231,40 @@ fn main() -> ExitCode {
             ExitCode::from(2)
         }
     }
+}
+
+fn run_normalize(
+    inputs: &[PathBuf],
+    form: kannadi::normalize::Form,
+    stats: bool,
+    check: bool,
+) -> ExitCode {
+    let outcome = match normalize::run(inputs, form, check, &mut std::io::stdout().lock()) {
+        Ok(outcome) => outcome,
+        Err(e) if normalize::is_broken_pipe(&e) => return ExitCode::SUCCESS,
+        Err(e) => {
+            eprintln!("error: {e:#}");
+            return ExitCode::from(2);
+        }
+    };
+    if stats {
+        eprint!("{}", normalize::stats_tsv(&outcome.counts, form));
+    }
+    if check && !outcome.changed.is_empty() {
+        for name in &outcome.changed {
+            eprintln!("{name}: not in the {} form", form.name());
+        }
+        return ExitCode::from(1);
+    }
+    ExitCode::SUCCESS
+}
+
+/// Form names for --form, listed in help, man pages and completions.
+fn form_parser() -> impl clap::builder::TypedValueParser<Value = kannadi::normalize::Form> {
+    use clap::builder::{PossibleValuesParser, TypedValueParser};
+    use kannadi::normalize::Form;
+    PossibleValuesParser::new(Form::ALL.map(Form::name))
+        .map(|name| Form::from_name(&name).expect("a listed form"))
 }
 
 /// The settings the command line asks for; `layout` is the --layout value.

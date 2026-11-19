@@ -3,6 +3,7 @@ use kannadi::legacy::{
     from_unicode, nudi_syllable_starts, nudi_to_unicode, syllable_starts, to_unicode,
     unicode_to_nudi, Layout, Options,
 };
+use kannadi::normalize::{is_normalized, normalize_as, Form};
 use kannadi::{
     aksharas, from_latin, modernize, normalize, numerals, split, to_latin, typos, Scheme,
 };
@@ -36,6 +37,17 @@ fn kannada_text() -> impl Strategy<Value = String> {
     // Characters that schemes use in tokens, separators or escapes.
     pool.extend([
         ':', '\'', '\u{2019}', '_', '^', '~', '@', '\\', '\u{0951}', '\u{0952}', '\u{1CD4}',
+    ]);
+    prop::collection::vec(prop::sample::select(pool), 0..40).prop_map(|v| v.into_iter().collect())
+}
+
+/// Kannada text plus what the normalization rules look at: Kannada digits, Latin o,
+/// format characters, U+0CDC, and a Devanagari composition exclusion.
+fn normalization_text() -> impl Strategy<Value = String> {
+    let mut pool = kannada_chars();
+    pool.extend([
+        ' ', '\u{200C}', '\u{200C}', '\u{200D}', '\u{200D}', '೦', '೧', 'o', 'O', '0', '\n',
+        '\u{200B}', '\u{00AD}', '\u{2060}', '\u{FEFF}', '\u{0CDC}', '\u{0958}', 'a',
     ]);
     prop::collection::vec(prop::sample::select(pool), 0..40).prop_map(|v| v.into_iter().collect())
 }
@@ -200,6 +212,20 @@ proptest! {
     }
 
     #[test]
+    fn every_form_is_idempotent_and_includes_the_one_before(s in normalization_text()) {
+        let mut before: Option<String> = None;
+        for form in Form::ALL {
+            let once = normalize_as(&s, form);
+            prop_assert_eq!(normalize_as(&once, form), once.clone(), "{:?}", form);
+            prop_assert!(is_normalized(&once, form), "{:?}", form);
+            if let Some(prev) = before {
+                prop_assert_eq!(normalize_as(&prev, form), once.clone(), "{:?}", form);
+            }
+            before = Some(once);
+        }
+    }
+
+    #[test]
     fn modernize_removes_old_letters(s in kannada_text()) {
         let m = modernize(&s);
         prop_assert!(!kannadi::has_old_kannada(&m));
@@ -234,6 +260,19 @@ proptest! {
         let back = to_unicode(&encoded.text, Layout::Akruti, &Options::default());
         prop_assert!(back.is_clean(), "{:?} from {:?}", back, encoded.text);
         prop_assert_eq!(back.text, text);
+    }
+
+    /// Clean conversions are canonical; malformed ones are reported as they are.
+    #[test]
+    fn glyph_codes_convert_to_canonical_text(bytes in prop::collection::vec(any::<u8>(), 0..60)) {
+        let legacy = kannadi::legacy::decode_windows_1252(&bytes);
+        for layout in Layout::ALL {
+            let converted = to_unicode(&legacy, layout, &Options::default());
+            if converted.is_clean() {
+                let text = converted.text;
+                prop_assert!(is_normalized(&text, Form::Canonical), "{}: {:?}", layout, text);
+            }
+        }
     }
 
     #[test]

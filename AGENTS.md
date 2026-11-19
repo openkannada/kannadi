@@ -33,7 +33,8 @@ crates/kannadi/
   src/chars.rs        character classes for the Kannada block
   src/lookup.rs       longest-prefix lookup shared by the scheme and glyph tables
   src/akshara.rs      segmentation into aksharas (uses chars)
-  src/normalize.rs    NFC plus Kannada fixes; Old Kannada modernization
+  src/normalize.rs    the normalization profile (NORMALIZATION.md): canonical, legacy
+                      and search forms, counts per rule; Old Kannada modernization
   src/numerals.rs     Kannada digits: conversion, formatting, parsing
   src/phonetic.rs     sound-alike keys for Kannada words and loose Latin spellings
   src/typos.rs        well-formed spellings that are often typing mistakes
@@ -58,6 +59,7 @@ crates/kannadi-cli/   the `kannadi` binary: batch conversion of files and folder
   src/files.rs        which files to convert and where each one goes
   src/convert.rs      1 piece of text in either direction, with its issues
   src/report.rs       the per-file report
+  src/normalize.rs    `kannadi normalize`: text files or standard input, line by line
   src/fonts.rs        names added with --legacy-font, and font-family lists
   src/edits.rs        rewriting a document by byte ranges
   src/txt.rs          plain text files
@@ -89,6 +91,8 @@ tools/fontqa/         Python: HarfBuzz shaping tests for Kannada fonts, results,
                       and fixes for font tables; see its README
 tools/glyphdraft/     FontForge Python: drafts U+0CDC, U+0CDD, U+0CF3 into an .sfd
 corpus/               benchmark lines from real documents, with a data card
+normalization/        test vectors for NORMALIZATION.md (TSV, and JSON written from it
+                      by tests/normalization.rs), and the HarfBuzz rendering check
 docs/                 design notes, corpus plan, prior art
 ```
 

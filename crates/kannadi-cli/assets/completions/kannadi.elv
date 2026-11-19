@@ -24,6 +24,7 @@ set edit:completion:arg-completer[kannadi] = {|@words|
             cand --version 'Print version'
             cand to-unicode 'Convert documents in legacy Kannada fonts to Unicode'
             cand to-nudi 'Convert Unicode Kannada documents to Nudi glyph codes'
+            cand normalize 'Normalize Unicode Kannada text, following the Kannada text normalization profile'
             cand completions 'Print a shell completion script to standard output'
             cand manpages 'Write the man pages to a folder'
             cand help 'Print this message or the help of the given subcommand(s)'
@@ -53,6 +54,15 @@ set edit:completion:arg-completer[kannadi] = {|@words|
             cand -V 'Print version'
             cand --version 'Print version'
         }
+        &'kannadi;normalize'= {
+            cand --form 'How far to go'
+            cand --stats 'Print how many times each rule changed the text to standard error, as TSV'
+            cand --check 'Write nothing; exit with status 1 if any input is not already in the form'
+            cand -h 'Print help (see more with ''--help'')'
+            cand --help 'Print help (see more with ''--help'')'
+            cand -V 'Print version'
+            cand --version 'Print version'
+        }
         &'kannadi;completions'= {
             cand -h 'Print help'
             cand --help 'Print help'
@@ -68,6 +78,7 @@ set edit:completion:arg-completer[kannadi] = {|@words|
         &'kannadi;help'= {
             cand to-unicode 'Convert documents in legacy Kannada fonts to Unicode'
             cand to-nudi 'Convert Unicode Kannada documents to Nudi glyph codes'
+            cand normalize 'Normalize Unicode Kannada text, following the Kannada text normalization profile'
             cand completions 'Print a shell completion script to standard output'
             cand manpages 'Write the man pages to a folder'
             cand help 'Print this message or the help of the given subcommand(s)'
@@ -75,6 +86,8 @@ set edit:completion:arg-completer[kannadi] = {|@words|
         &'kannadi;help;to-unicode'= {
         }
         &'kannadi;help;to-nudi'= {
+        }
+        &'kannadi;help;normalize'= {
         }
         &'kannadi;help;completions'= {
         }

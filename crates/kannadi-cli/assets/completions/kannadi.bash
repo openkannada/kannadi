@@ -25,6 +25,9 @@ _kannadi() {
             kannadi,manpages)
                 cmd="kannadi__subcmd__manpages"
                 ;;
+            kannadi,normalize)
+                cmd="kannadi__subcmd__normalize"
+                ;;
             kannadi,to-nudi)
                 cmd="kannadi__subcmd__to__subcmd__nudi"
                 ;;
@@ -40,6 +43,9 @@ _kannadi() {
             kannadi__subcmd__help,manpages)
                 cmd="kannadi__subcmd__help__subcmd__manpages"
                 ;;
+            kannadi__subcmd__help,normalize)
+                cmd="kannadi__subcmd__help__subcmd__normalize"
+                ;;
             kannadi__subcmd__help,to-nudi)
                 cmd="kannadi__subcmd__help__subcmd__to__subcmd__nudi"
                 ;;
@@ -53,7 +59,7 @@ _kannadi() {
 
     case "${cmd}" in
         kannadi)
-            opts="-h -V --help --version to-unicode to-nudi completions manpages help"
+            opts="-h -V --help --version to-unicode to-nudi normalize completions manpages help"
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 1 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0
@@ -81,7 +87,7 @@ _kannadi() {
             return 0
             ;;
         kannadi__subcmd__help)
-            opts="to-unicode to-nudi completions manpages help"
+            opts="to-unicode to-nudi normalize completions manpages help"
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 2 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0
@@ -136,6 +142,20 @@ _kannadi() {
             COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
             return 0
             ;;
+        kannadi__subcmd__help__subcmd__normalize)
+            opts=""
+            if [[ ${cur} == -* || ${COMP_CWORD} -eq 3 ]] ; then
+                COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+                return 0
+            fi
+            case "${prev}" in
+                *)
+                    COMPREPLY=()
+                    ;;
+            esac
+            COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+            return 0
+            ;;
         kannadi__subcmd__help__subcmd__to__subcmd__nudi)
             opts=""
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 3 ]] ; then
@@ -171,6 +191,24 @@ _kannadi() {
                 return 0
             fi
             case "${prev}" in
+                *)
+                    COMPREPLY=()
+                    ;;
+            esac
+            COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+            return 0
+            ;;
+        kannadi__subcmd__normalize)
+            opts="-h -V --form --stats --check --help --version"
+            if [[ ${cur} == -* || ${COMP_CWORD} -eq 2 ]] ; then
+                COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+                return 0
+            fi
+            case "${prev}" in
+                --form)
+                    COMPREPLY=($(compgen -W "canonical legacy search" -- "${cur}"))
+                    return 0
+                    ;;
                 *)
                     COMPREPLY=()
                     ;;

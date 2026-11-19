@@ -42,6 +42,19 @@ fn documents_convert_cleanly() {
     }
 }
 
+/// The converter writes text in the canonical form of the normalization profile, so
+/// converted text compares equal to the same text typed in Unicode.
+#[test]
+fn converted_text_is_canonical() {
+    for (layout, fixture, _) in FIXTURES {
+        for (legacy, _, source) in rows(fixture) {
+            let converted = to_unicode(&legacy, layout, &Options::default());
+            let canonical = kannadi::normalize(&converted.text);
+            assert_eq!(converted.text, canonical, "{layout}: source {source}");
+        }
+    }
+}
+
 /// Text written in a layout reads back as the same Unicode, for every word of the
 /// fixtures that converts cleanly.
 #[test]

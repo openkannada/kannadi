@@ -252,6 +252,7 @@ fn committed_man_pages_match_the_cli() {
         [
             "kannadi-completions.1",
             "kannadi-manpages.1",
+            "kannadi-normalize.1",
             "kannadi-to-nudi.1",
             "kannadi-to-unicode.1",
             "kannadi.1"
@@ -338,4 +339,29 @@ fn no_command_shows_help_and_exits_with_2() {
     let run = kannadi(&[], tmp.path());
     assert_eq!(run.status.code(), Some(2));
     assert!(String::from_utf8_lossy(&run.stderr).contains("Usage: kannadi <COMMAND>"));
+}
+
+#[test]
+fn normalize_writes_text_counts_rules_and_checks() {
+    let tmp = tempfile::tempdir().unwrap();
+    std::fs::write(tmp.path().join("in.txt"), "ಆಫ್\u{200C} ಬೆ೦ಗಳೂರು\n").unwrap();
+    let run = kannadi(
+        &["normalize", "--form", "legacy", "--stats", "in.txt"],
+        tmp.path(),
+    );
+    assert_eq!(run.status.code(), Some(0), "{run:?}");
+    assert_eq!(String::from_utf8(run.stdout).unwrap(), "ಆಫ್ ಬೆಂಗಳೂರು\n");
+    let stats = String::from_utf8(run.stderr).unwrap();
+    assert!(stats.contains("C8\tstray-joiner\t1\n"), "{stats}");
+    assert!(stats.contains("L1\tzero-as-anusvara\t1\n"), "{stats}");
+
+    let check = kannadi(&["normalize", "--check", "in.txt"], tmp.path());
+    assert_eq!(check.status.code(), Some(1), "{check:?}");
+    assert!(check.stdout.is_empty());
+    std::fs::write(tmp.path().join("ok.txt"), "ಕನ್ನಡ\n").unwrap();
+    let clean = kannadi(&["normalize", "--check", "ok.txt"], tmp.path());
+    assert_eq!(clean.status.code(), Some(0), "{clean:?}");
+
+    let missing = kannadi(&["normalize", "nope.txt"], tmp.path());
+    assert_eq!(missing.status.code(), Some(2), "{missing:?}");
 }
