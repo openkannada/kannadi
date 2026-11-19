@@ -307,6 +307,6 @@ Not covered by these licenses:
 
 The Shree-Lipi test lines were written for kannadi; no newspaper text is included. The names Open Kannada and kannadi, and the logo, are covered by [TRADEMARKS.md](https://github.com/openkannada/kannadi/blob/main/TRADEMARKS.md).
 
-If kannadi helps your project, a mention or a link to [prasad.tech](https://prasad.tech) is appreciated.
+If kannadi helps your project, a mention or a link to [openkannada.org](https://openkannada.org) is appreciated.
 
 Part of [Open Kannada](https://github.com/openkannada), free and open-source tools that make Kannada work properly on computers.
