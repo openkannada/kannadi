@@ -1,0 +1,54 @@
+.ie \n(.g .ds Aq \(aq
+.el .ds Aq '
+.TH kannadi-normalize 1  "normalize 0.1.0" 
+.SH NAME
+kannadi\-normalize \- Normalize Unicode Kannada text, following the Kannada text normalization profile
+.SH SYNOPSIS
+\fBkannadi normalize\fR [\fB\-\-form\fR] [\fB\-\-stats\fR] [\fB\-\-check\fR] [\fB\-h\fR|\fB\-\-help\fR] [\fB\-V\fR|\fB\-\-version\fR] [\fIINPUTS\fR] 
+.SH DESCRIPTION
+Normalize Unicode Kannada text, following the Kannada text normalization profile
+.PP
+Reads UTF\-8 text files, or standard input, and writes the normalized text to standard output. canonical gives 1 spelling to text that renders the same; legacy also repairs mistakes of legacy font converters and OCR, such as a zero typed for anusvara; search also folds Old Kannada letters, joiners and the nukta, for search keys. NORMALIZATION.md in the kannadi repository lists every rule.
+.SH OPTIONS
+.TP
+\fB\-\-form\fR \fI<FORM>\fR [default: canonical]
+How far to go
+.br
+
+.br
+\fIPossible values:\fR
+.RS 14
+.IP \(bu 2
+canonical
+.IP \(bu 2
+legacy
+.IP \(bu 2
+search
+.RE
+.TP
+\fB\-\-stats\fR
+Print how many times each rule changed the text to standard error, as TSV
+.TP
+\fB\-\-check\fR
+Write nothing; exit with status 1 if any input is not already in the form
+.TP
+\fB\-h\fR, \fB\-\-help\fR
+Print help (see a summary with \*(Aq\-h\*(Aq)
+.TP
+\fB\-V\fR, \fB\-\-version\fR
+Print version
+.TP
+[\fIINPUTS\fR]
+UTF\-8 text files; standard input when none is given or for \-
+.SH EXTRA
+Examples:
+  kannadi normalize page.txt > page.normalized.txt
+  kannadi normalize \-\-form legacy \-\-stats converted.txt > clean.txt
+  kannadi normalize \-\-check corpus/*.txt
+
+Exit status:
+  0  Success.
+  1  \-\-check was given and an input is not in the form.
+  2  A file could not be read or is not UTF\-8.
+.SH VERSION
+v0.1.0

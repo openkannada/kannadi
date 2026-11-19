@@ -1,0 +1,80 @@
+# Test vectors for the Kannada text normalization profile (NORMALIZATION.md).
+# Columns: id, form, rules, input, expected, note.
+# form: canonical, legacy or search. Normalizing input to that form gives expected.
+# rules: the rule ids that change the input, comma-separated, or - for none. A
+#   conforming implementation need not count rules; kannadi checks that these rules,
+#   and no others, report changes.
+# input and expected spell {ZWNJ} for U+200C, {ZWJ} for U+200D and {U+XXXX} for any
+#   other code point. vectors.json has the same vectors as plain strings.
+id	form	rules	input	expected	note
+c-nfc-ii	canonical	C1	ಕಿ{U+0CD5}	ಕೀ	2-part vowel sign
+c-nfc-ee	canonical	C1	ಕೆ{U+0CD5}	ಕೇ	2-part vowel sign
+c-nfc-o	canonical	C1	ಕೆ{U+0CC2}	ಕೊ	2-part vowel sign
+c-nfc-oo	canonical	C1	ಕೆ{U+0CC2}{U+0CD5}	ಕೋ	3-part vowel sign
+c-nfc-ai	canonical	C1	ಕೆ{U+0CD6}	ಕೈ	2-part vowel sign
+c-nfc-nukta-virama	canonical	C1	ಜ{U+0CCD}{U+0CBC}	ಜ{U+0CBC}{U+0CCD}	the nukta comes before the virama
+c-vowel-uu	canonical	C2	ಉಾರು	ಊರು	Unicode Table 12-32
+c-vowel-au	canonical	C2	ಒೌ	ಔ	Unicode Table 12-32
+c-vowel-rr	canonical	C2	ಋಾ	ೠ	Unicode Table 12-32
+c-nukta-after-sign	canonical	C3	ಜೀ{U+0CBC}ರೋ	ಜ{U+0CBC}ೀರೋ	the nukta follows its consonant
+c-nukta-after-parts	canonical	C1,C3	ಜೆ{U+0CD5}{U+0CBC}	ಜ{U+0CBC}ೇ	NFC first, then the nukta moves
+c-nukta-twice	canonical	C4	ಜ{U+0CBC}ೀ{U+0CBC}	ಜ{U+0CBC}ೀ	the second nukta repeats the first
+c-repeated-virama	canonical	C4	ಕ್್ಕ	ಕ್ಕ	
+c-repeated-aa	canonical	C4	ಅಥವಾಾ	ಅಥವಾ	
+c-repeated-anusvara	canonical	C4	ಕಂಂ	ಕಂ	
+c-different-signs-kept	canonical	-	ಕಕ	ಕಕ	2 letters, not marks
+c-zwnj-before-virama	canonical	C5	ಮ{ZWNJ}್ಯೂಸಿಯಂ	ಮ್ಯೂಸಿಯಂ	renders as the conjunct
+c-zwj-before-virama	canonical	C5	ಕೆಪ{ZWJ}್ಲರ್	ಕೆಪ್ಲರ್	renders as the conjunct
+c-ra-zwnj-before-virama	canonical	C5	ರ{ZWNJ}್ಯಾಲಿ	ರ{ZWJ}್ಯಾಲಿ	renders as ರ with a subscript, no arkavattu
+c-ra-zwj-virama-kept	canonical	-	ರ{ZWJ}್ಯಾಲಿ	ರ{ZWJ}್ಯಾಲಿ	Unicode's spelling of the non-arkavattu ರ
+c-ra-in-cluster	canonical	C5	ಕ್ರ{ZWNJ}್ಯ	ಕ್ರ್ಯ	a ರ inside a cluster forms no arkavattu
+c-non-reph	canonical	C6	ನೆದರ್{ZWJ}ಲ್ಯಾಂಡ್ಸ್	ನೆದರ{ZWJ}್ಲ್ಯಾಂಡ್ಸ್	HarfBuzz renders both orders alike
+c-non-reph-month	canonical	C6	ಡಿಸೆಂಬರ್{ZWJ}ನ	ಡಿಸೆಂಬರ{ZWJ}್ನ	
+c-ra-explicit-virama-kept	canonical	-	ಡಿಸೆಂಬರ್{ZWNJ}ನ	ಡಿಸೆಂಬರ್{ZWNJ}ನ	visible virama on ರ
+c-explicit-zwj	canonical	C7	ರಾಜ್{ZWJ}ಕುಮಾರ್	ರಾಜ್{ZWNJ}ಕುಮಾರ್	ZWJ after a virama renders as ZWNJ
+c-explicit-double	canonical	C7	ಡೇವಿಡ್{ZWNJ}{ZWNJ}ಸನ್	ಡೇವಿಡ್{ZWNJ}ಸನ್	
+c-explicit-mixed	canonical	C7	ನ್{ZWJ}{ZWNJ}ನ	ನ್{ZWNJ}ನ	
+c-explicit-kept	canonical	-	ಕನ್{ZWNJ}ನಡ	ಕನ್{ZWNJ}ನಡ	
+c-stray-word-end	canonical	C8	ಆಫ್{ZWNJ} ಇಂಡಿಯಾ	ಆಫ್ ಇಂಡಿಯಾ	no consonant follows
+c-stray-zwj-end	canonical	C8	ಆಫ್{ZWJ}.	ಆಫ್.	
+c-stray-after-sign	canonical	C8	ಪ್ರಶಸ್ತಿ{ZWNJ}	ಪ್ರಶಸ್ತಿ	
+c-stray-between-vowels	canonical	C8	ಸಿ{ZWNJ}ಇಒ	ಸಿಇಒ	
+c-stray-between-consonants	canonical	C8	ಜವಾಹರ{ZWNJ}ಲಾಲ್	ಜವಾಹರಲಾಲ್	no virama, so nothing to join
+c-stray-word-start	canonical	C8	 {ZWNJ}ಕನ್ನಡ	 ಕನ್ನಡ	
+c-stray-before-vowel	canonical	C8	ಕ್{ZWNJ}ಅ	ಕ್ಅ	a vowel letter cannot join
+c-stray-then-nfc	canonical	C1,C8	ಕಿ{ZWNJ}{U+0CD5}	ಕೀ	removing the joiner lets NFC compose
+c-kept-before-sign	canonical	-	ಮ{ZWNJ}ೂಲಕ	ಮ{ZWNJ}ೂಲಕ	some fonts draw a different shape
+c-old-letters-kept	canonical	-	ಅಱಿವು ಬಾೞ್ ಅವೝ	ಅಱಿವು ಬಾೞ್ ಅವೝ	distinct letters
+c-archaic-shrii-kept	canonical	-	{U+0CDC} ಕನ್ನಡ	{U+0CDC} ಕನ್ನಡ	U+0CDC, Unicode 17.0
+c-persian-joiner-kept	canonical	-	می{ZWNJ}خواهم	می{ZWNJ}خواهم	not Kannada
+c-latin-joiner-kept	canonical	-	a{ZWNJ}b	a{ZWNJ}b	not Kannada
+c-zero-kept	canonical	-	ಬೆ೦ಗಳೂರು	ಬೆ೦ಗಳೂರು	a legacy rule
+l-zero-inside	legacy	L1	ಬೆ೦ಗಳೂರು	ಬೆಂಗಳೂರು	
+l-zero-word-end	legacy	L1	ಸ್ವಯ೦ ಸೇವಕ	ಸ್ವಯಂ ಸೇವಕ	
+l-zero-before-digit	legacy	-	ಕೊಠಡಿ೦೧	ಕೊಠಡಿ೦೧	a number after a word
+l-zero-number	legacy	-	೧೦೦	೧೦೦	
+l-zero-alone	legacy	-	ಕ ೦	ಕ ೦	
+l-latin-o	legacy	L2	ಹೊoದಿದೆ	ಹೊಂದಿದೆ	
+l-latin-zero	legacy	L2	ಡಿ0ಟಿ	ಡಿಂಟಿ	
+l-latin-o-word-end	legacy	-	ಮಾo	ಮಾo	no Kannada letter follows
+l-reph-i	legacy	L3	ಆಥರ್ಿಕ	ಆರ್ಥಿಕ	
+l-reph-aa	legacy	L3	ಸಕರ್ಾರ	ಸರ್ಕಾರ	
+l-reph-cluster	legacy	L3	ಕ್ಷರ್ಿ	ರ್ಕ್ಷಿ	the arkavattu goes before the whole cluster
+l-reph-no-consonant	legacy	-	ರ್ಿ	ರ್ಿ	nothing to move over
+l-reph-correct	legacy	-	ಸರ್ಕಾರ	ಸರ್ಕಾರ	
+l-includes-canonical	legacy	C8,L1	ಬೆ೦ಗಳೂರು{ZWNJ}	ಬೆಂಗಳೂರು	
+l-old-letters-kept	legacy	-	ಅಱಿವು	ಅಱಿವು	
+s-llla	search	S1	ಬಾೞ್	ಬಾಳ್	
+s-rra	search	S1	ಅಱಿವು	ಅರಿವು	
+s-nakaara-pollu	search	S1	ಅವೝ	ಅವನ್	
+s-nakaara-pollu-before-consonant	search	S1	ಅವೝಕಂಡ	ಅವನ್ಕಂಡ	the joiner modernize() adds is folded too
+s-anusvara-above-right	search	S1	ಕ{U+0CF3}	ಕಂ	
+s-archaic-shrii	search	S1	{U+0CDC}	ಶ್ರೀ	
+s-explicit-virama	search	S2	ಕನ್{ZWNJ}ನಡ	ಕನ್ನಡ	
+s-non-reph	search	S2	ರ{ZWJ}್ಯಾಲಿ	ರ್ಯಾಲಿ	
+s-before-sign	search	S2	ಮ{ZWNJ}ೂಲಕ	ಮೂಲಕ	
+s-zwsp	search	S2	ಕಾಂಗ್ರೆಸ್{U+200B}ನಿಂದ	ಕಾಂಗ್ರೆಸ್ನಿಂದ	
+s-shy	search	S2	ಕನ್ನ{U+00AD}ಡ	ಕನ್ನಡ	
+s-shy-latin-kept	search	-	co{U+00AD}operate	co{U+00AD}operate	not Kannada
+s-nukta	search	S3	ಜ{U+0CBC}ೀರೋ	ಜೀರೋ	
+s-includes-legacy	search	L1	ಬೆ೦ಗಳೂರು	ಬೆಂಗಳೂರು	

@@ -62,7 +62,7 @@ Tokens are grouped 1 visual syllable at a time: a base, then the vowel sign part
 
 ### Join, normalize, check
 
-Vowel sign parts are joined into 1 sign. Then `kannadi::normalize` runs, which already fixes Unicode pairs and the digit zero typed for an anusvara. Finally `kannadi::aksharas` splits the result, and any segment that is not a well-formed akshara is flagged.
+Vowel sign parts are joined into 1 sign and the text is put in NFC; the digit zero typed for an anusvara becomes ಂ unless `keep_zeros` is set. Text that converts cleanly is in the canonical form of the [normalization profile](../NORMALIZATION.md), which the tests check on every fixture line and on random glyph sequences. Finally `kannadi::aksharas` splits the result, and any segment that is not a well-formed akshara is flagged.
 
 ### Report
 

@@ -27,6 +27,7 @@ Register-ArgumentCompleter -Native -CommandName 'kannadi' -ScriptBlock {
             [CompletionResult]::new('--version', '--version', [CompletionResultType]::ParameterName, 'Print version')
             [CompletionResult]::new('to-unicode', 'to-unicode', [CompletionResultType]::ParameterValue, 'Convert documents in legacy Kannada fonts to Unicode')
             [CompletionResult]::new('to-nudi', 'to-nudi', [CompletionResultType]::ParameterValue, 'Convert Unicode Kannada documents to Nudi glyph codes')
+            [CompletionResult]::new('normalize', 'normalize', [CompletionResultType]::ParameterValue, 'Normalize Unicode Kannada text, following the Kannada text normalization profile')
             [CompletionResult]::new('completions', 'completions', [CompletionResultType]::ParameterValue, 'Print a shell completion script to standard output')
             [CompletionResult]::new('manpages', 'manpages', [CompletionResultType]::ParameterValue, 'Write the man pages to a folder')
             [CompletionResult]::new('help', 'help', [CompletionResultType]::ParameterValue, 'Print this message or the help of the given subcommand(s)')
@@ -59,6 +60,16 @@ Register-ArgumentCompleter -Native -CommandName 'kannadi' -ScriptBlock {
             [CompletionResult]::new('--version', '--version', [CompletionResultType]::ParameterName, 'Print version')
             break
         }
+        'kannadi;normalize' {
+            [CompletionResult]::new('--form', '--form', [CompletionResultType]::ParameterName, 'How far to go')
+            [CompletionResult]::new('--stats', '--stats', [CompletionResultType]::ParameterName, 'Print how many times each rule changed the text to standard error, as TSV')
+            [CompletionResult]::new('--check', '--check', [CompletionResultType]::ParameterName, 'Write nothing; exit with status 1 if any input is not already in the form')
+            [CompletionResult]::new('-h', '-h', [CompletionResultType]::ParameterName, 'Print help (see more with ''--help'')')
+            [CompletionResult]::new('--help', '--help', [CompletionResultType]::ParameterName, 'Print help (see more with ''--help'')')
+            [CompletionResult]::new('-V', '-V ', [CompletionResultType]::ParameterName, 'Print version')
+            [CompletionResult]::new('--version', '--version', [CompletionResultType]::ParameterName, 'Print version')
+            break
+        }
         'kannadi;completions' {
             [CompletionResult]::new('-h', '-h', [CompletionResultType]::ParameterName, 'Print help')
             [CompletionResult]::new('--help', '--help', [CompletionResultType]::ParameterName, 'Print help')
@@ -76,6 +87,7 @@ Register-ArgumentCompleter -Native -CommandName 'kannadi' -ScriptBlock {
         'kannadi;help' {
             [CompletionResult]::new('to-unicode', 'to-unicode', [CompletionResultType]::ParameterValue, 'Convert documents in legacy Kannada fonts to Unicode')
             [CompletionResult]::new('to-nudi', 'to-nudi', [CompletionResultType]::ParameterValue, 'Convert Unicode Kannada documents to Nudi glyph codes')
+            [CompletionResult]::new('normalize', 'normalize', [CompletionResultType]::ParameterValue, 'Normalize Unicode Kannada text, following the Kannada text normalization profile')
             [CompletionResult]::new('completions', 'completions', [CompletionResultType]::ParameterValue, 'Print a shell completion script to standard output')
             [CompletionResult]::new('manpages', 'manpages', [CompletionResultType]::ParameterValue, 'Write the man pages to a folder')
             [CompletionResult]::new('help', 'help', [CompletionResultType]::ParameterValue, 'Print this message or the help of the given subcommand(s)')
@@ -85,6 +97,9 @@ Register-ArgumentCompleter -Native -CommandName 'kannadi' -ScriptBlock {
             break
         }
         'kannadi;help;to-nudi' {
+            break
+        }
+        'kannadi;help;normalize' {
             break
         }
         'kannadi;help;completions' {

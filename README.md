@@ -190,7 +190,7 @@ python3 web/serve.py 8000
 
 ## Command-line tool
 
-The `kannadi` binary in `crates/kannadi-cli` converts files and folders in both directions:
+The `kannadi` binary in `crates/kannadi-cli` converts files and folders in both directions, and normalizes Unicode text (see [Normalization](#normalization)):
 
 ```sh
 cargo install --path crates/kannadi-cli
@@ -217,12 +217,17 @@ The legacy converter uses segmentation to check its own output.
 
 ## Normalization
 
-`normalize(text)` applies Unicode NFC, then 2 Kannada fixes:
+`normalize(text)` gives the canonical form of the [Kannada text normalization profile](NORMALIZATION.md): 1 spelling for text that renders the same. It applies Unicode NFC, builds ಊ, ಔ and ೠ from their parts, puts the nukta after its consonant, keeps a repeated mark once, and settles the joiners: ZWNJ after a virama shows the virama (ಕನ್‌ನಡ), ZWJ between ರ and its virama prevents the arkavattu (ರ‍್ಯ), other spellings of the same rendering become these, and joiners that change nothing are removed. In Kannada Wikipedia it changes 388,742 joiners that do nothing, such as the ZWNJ in ಆಫ್‌, and 50,714 that show a virama with ZWJ.
 
-1. ಉ + ಾ becomes ಊ, and ಋ + ಾ becomes ೠ. They look the same, and Unicode says to use the single letter.
-2. A mark typed twice in a row (್್, ಂಂ) is kept once.
+`normalize::normalize_as(text, Form::Legacy)` also repairs converter and OCR mistakes: a zero or a Latin o typed for ಂ, and an arkavattu stored after its consonant (ಸಕರ್ಾರ for ಸರ್ಕಾರ). `Form::Search` also folds Old Kannada letters, joiners and the nukta, for search keys. `normalize_counted` counts the changes of each rule. [NORMALIZATION.md](NORMALIZATION.md) lists every rule with its evidence, and [normalization/vectors.tsv](normalization/vectors.tsv) has the test vectors.
 
-`fix_zero_as_anusvara(text)` turns a Kannada zero (೦) written right after a letter into an anusvara (ಂ). Legacy fonts and OCR often mix the 2 up. It is a separate step because it also changes a number written straight after a word, such as ಕೊಠಡಿ೦೧.
+```sh
+kannadi normalize page.txt > page.normalized.txt
+kannadi normalize --form legacy --stats converted.txt > clean.txt
+kannadi normalize --check corpus/*.txt
+```
+
+`fix_zero_as_anusvara(text)` turns a Kannada zero (೦) written right after a letter into an anusvara (ಂ), even before a digit, as in ಕೊಠಡಿ೦೧. The legacy form keeps that zero.
 
 `modernize(text)` maps ೞ to ಳ, ಱ to ರ and ೝ to ನ್. When a consonant follows ೝ, a ZWNJ keeps the ನ್ from joining it.
 
@@ -276,7 +281,7 @@ The crate is split into small modules, each with 1 job:
 |---|---|
 | `chars` | Classifies characters in the Kannada block |
 | `akshara` | Splits text into aksharas |
-| `normalize` | Unicode NFC plus Kannada fixes; Old Kannada modernization |
+| `normalize` | The normalization profile's 3 forms, with counts per rule; Old Kannada modernization |
 | `numerals` | Kannada digits: conversion, formatting, parsing |
 | `phonetic` | Sound-alike keys for Kannada words and loose Latin spellings |
 | `typos` | Well-formed spellings that are often typing mistakes, with suggested fixes |

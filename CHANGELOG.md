@@ -1,5 +1,18 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- The Kannada text normalization profile, [NORMALIZATION.md](NORMALIZATION.md): 3 forms (canonical, legacy, search) and 14 rules, each with counts from Kannada Wikipedia and Wikisource, and HarfBuzz rendering checks for the joiner rules. 71 test vectors in `normalization/vectors.tsv` and `vectors.json`.
+- `normalize::normalize_as`, `normalize_counted`, `is_normalized`, `Form`, `Rule` and `Counts`.
+- `kannadi normalize`: normalize text files or standard input to a form, with `--stats` (changes per rule) and `--check` (exit 1 if not normalized).
+- Tests that clean converter output is canonical, on every fixture line and on random glyph sequences.
+
+### Changed
+
+- `normalize` now gives the profile's canonical form. Besides NFC, look-alike vowel letters and repeated marks, it builds ಔ from ಒ + ೌ, moves a nukta to its consonant, and settles joiners: ZWJ after a virama becomes ZWNJ, ರ + virama + ZWJ becomes ರ + ZWJ + virama, a joiner between a consonant and its virama goes, and joiners that change nothing are removed.
+
 ## 0.1.0 - 2026-11-18
 
 ### Added

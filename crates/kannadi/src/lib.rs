@@ -1,7 +1,9 @@
 //! Kannada text tools.
 //!
 //! - [`aksharas()`]: split text into aksharas (orthographic syllables).
-//! - [`normalize()`]: make equal-looking Kannada text compare equal.
+//! - [`normalize()`]: the canonical form of the Kannada text normalization profile, so
+//!   text that renders the same compares equal; [`normalize::normalize_as`] for the
+//!   legacy and search forms.
 //! - [`modernize()`]: map Old Kannada letters (ೞ, ಱ, ೝ) to modern ones.
 //! - [`transliterate()`]: Kannada to and from ISO 15919, IAST and Baraha phonetic.
 //! - [`numerals`]: Kannada digits.
