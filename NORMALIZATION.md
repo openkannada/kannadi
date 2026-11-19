@@ -4,7 +4,7 @@ Version 1.0.0, draft of 19 November 2026.
 
 Kannada text can be spelled in several ways that look the same on screen. A word typed with a joiner after its last letter, or with a vowel sign typed in 2 parts, does not match the same word typed plainly. Search misses it, a spell checker flags it, a dictionary cannot find it, and OCR scoring counts an error a reader cannot see.
 
-This profile fixes 1 spelling for each case. Every rule is backed by counts from Kannada Wikipedia and Wikisource and, for joiners, by how HarfBuzz renders the text. [kannadi](https://github.com/openkannada/kannadi) is the reference implementation, and [normalization/vectors.tsv](normalization/vectors.tsv) holds the test vectors.
+This profile fixes 1 spelling for each case. Every rule comes from the Unicode Standard or from counts in Kannada Wikipedia and Wikisource, and every joiner rule from how HarfBuzz renders the text. [kannadi](https://github.com/openkannada/kannadi) is the reference implementation, and [normalization/vectors.tsv](normalization/vectors.tsv) holds the test vectors.
 
 ## Forms
 
@@ -12,13 +12,13 @@ The profile has 3 forms. Each one applies the rules of the forms before it.
 
 | Form | What it does | Use it for |
 |---|---|---|
-| canonical | 1 spelling for text that renders the same, or that Unicode allows only 1 way | Storing and exchanging text. Safe to apply to anything. |
+| canonical | 1 spelling for text that renders the same, or that Unicode allows only 1 way; a mark typed twice is kept once | Storing and exchanging text. Safe to apply to anything. |
 | legacy | Also repairs mistakes that legacy font converters and OCR make | Text converted from Nudi, Baraha and other legacy fonts, and OCR output |
 | search | Also folds differences a reader ignores when searching | Search keys, dictionary lookup, deduplication. Never for stored text: it changes letters. |
 
 To compare 2 texts that a reader would call equal, such as OCR output and its reference, normalize both to the canonical form. If the references do not record joiners consistently, also apply rule S2.
 
-The rules apply to Kannada text: characters in U+0C80 to U+0CFF, and joiners and format characters next to them. Text in other scripts is changed by NFC only.
+The rules apply to Kannada text: characters in U+0C80 to U+0CFF, joiners and format characters next to them, and, in the legacy form, a Latin o or 0 between Kannada signs and letters. Text in other scripts is changed by NFC only.
 
 ## Canonical form
 
@@ -27,7 +27,7 @@ The rules apply to Kannada text: characters in U+0C80 to U+0CFF, and joiners and
 | C1 | Unicode Normalization Form C. 2-part vowel signs join, and a nukta goes before a virama. | ಕಿ + ೕ becomes ಕೀ |
 | C2 | The vowel letters in Unicode's Table 12-32 that must not be built from parts: ಉ + ಾ is ಊ, ಒ + ೌ is ಔ, ಋ + ಾ is ೠ. | ಉಾರು becomes ಊರು |
 | C3 | A nukta moves to directly after its consonant, over any vowel signs. | ಜೀ಼ becomes ಜ಼ೀ |
-| C4 | A mark repeated directly after itself (vowel sign, virama, nukta, anusvara, visarga) is kept once. | ಅಥವಾಾ becomes ಅಥವಾ |
+| C4 | A Kannada mark repeated directly after itself (a vowel sign, the virama, the nukta, or a sign such as the anusvara or visarga) is kept once. A second copy can only be a typing slip; fonts draw it on a dotted circle. | ಅಥವಾಾ becomes ಅಥವಾ |
 | C5 | A ZWNJ or ZWJ between a consonant and its virama is removed. After a ರ that starts its syllable, it becomes ZWJ. | ಮ‌್ಯೂಸಿಯಂ becomes ಮ್ಯೂಸಿಯಂ; ರ‌್ಯಾ becomes ರ‍್ಯಾ |
 | C6 | ರ + virama + ZWJ before a consonant becomes ರ + ZWJ + virama, when the ರ starts its syllable. | ನೆದರ್‍ಲ್ಯಾಂಡ್ಸ್ becomes ನೆದರ‍್ಲ್ಯಾಂಡ್ಸ್ |
 | C7 | Any run of joiners between a virama and a consonant becomes 1 ZWNJ, except the case of C6. | ರಾಜ್‍ಕುಮಾರ್ (ZWJ) becomes ರಾಜ್‌ಕುಮಾರ್ (ZWNJ) |
@@ -92,7 +92,7 @@ These were counted and left alone, because a rule would change text that is corr
 
 ## Evidence
 
-Counts are over the Kannada Wikipedia dump of 1 November 2026 (`knwiki` pages-articles, 781 MB of XML, 166,947,879 Kannada characters, newest revision 2026-11-01T14:00:28Z) and the Kannada Wikisource dump of 1 December 2023 (`wikimedia/wikisource`, 20231201.kn, 195 MB of text). They count changes made by `kannadi normalize --stats`; a run of several joiners counts once.
+Counts are over the Kannada Wikipedia dump of 1 November 2026 (`knwiki` pages-articles, 781 MB of XML, 166,947,879 Kannada characters, newest revision 2026-11-01T14:00:28Z) and the Kannada Wikisource dump of 1 December 2023 (`wikimedia/wikisource`, 20231201.kn, 195 MB of text). They count changes made by `kannadi normalize --stats`. For C5 to C8 a run of several joiners counts once; S2 counts each character it removes.
 
 | Rule | Wikipedia | Wikisource |
 |---|---:|---:|

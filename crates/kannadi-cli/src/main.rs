@@ -241,6 +241,7 @@ fn run_normalize(
 ) -> ExitCode {
     let outcome = match normalize::run(inputs, form, check, &mut std::io::stdout().lock()) {
         Ok(outcome) => outcome,
+        Err(e) if normalize::is_broken_pipe(&e) => return ExitCode::SUCCESS,
         Err(e) => {
             eprintln!("error: {e:#}");
             return ExitCode::from(2);

@@ -41,6 +41,17 @@ fn kannada_text() -> impl Strategy<Value = String> {
     prop::collection::vec(prop::sample::select(pool), 0..40).prop_map(|v| v.into_iter().collect())
 }
 
+/// Kannada text plus what the normalization rules look at: Kannada digits, Latin o,
+/// format characters, U+0CDC, and a Devanagari composition exclusion.
+fn normalization_text() -> impl Strategy<Value = String> {
+    let mut pool = kannada_chars();
+    pool.extend([
+        ' ', '\u{200C}', '\u{200C}', '\u{200D}', '\u{200D}', '೦', '೧', 'o', 'O', '0', '\n',
+        '\u{200B}', '\u{00AD}', '\u{2060}', '\u{FEFF}', '\u{0CDC}', '\u{0958}', 'a',
+    ]);
+    prop::collection::vec(prop::sample::select(pool), 0..40).prop_map(|v| v.into_iter().collect())
+}
+
 /// Well-formed words: consonant clusters and vowels with signs and modifiers.
 fn kannada_word() -> impl Strategy<Value = String> {
     let vowels = ('\u{0C85}'..='\u{0CE1}')
@@ -201,7 +212,7 @@ proptest! {
     }
 
     #[test]
-    fn every_form_is_idempotent_and_includes_the_one_before(s in kannada_text()) {
+    fn every_form_is_idempotent_and_includes_the_one_before(s in normalization_text()) {
         let mut before: Option<String> = None;
         for form in Form::ALL {
             let once = normalize_as(&s, form);

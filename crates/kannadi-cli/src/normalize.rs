@@ -6,6 +6,15 @@ use std::path::{Path, PathBuf};
 use anyhow::{Context, Result};
 use kannadi::normalize::{normalize_counted, Counts, Form};
 
+const WRITING: &str = "writing the normalized text";
+
+/// True if `e` comes from writing to a pipe whose reader has gone, as with `| head`.
+pub fn is_broken_pipe(e: &anyhow::Error) -> bool {
+    e.root_cause()
+        .downcast_ref::<std::io::Error>()
+        .is_some_and(|io| io.kind() == std::io::ErrorKind::BrokenPipe)
+}
+
 /// What a run found.
 pub struct Outcome {
     /// How many times each rule changed the text, over all inputs.
@@ -34,14 +43,13 @@ pub fn run(inputs: &[PathBuf], form: Form, check: bool, out: &mut dyn Write) -> 
         } else {
             Box::new(std::fs::File::open(input).with_context(|| format!("opening {name}"))?)
         };
-        let counts = normalize_stream(reader, form, (!check).then_some(&mut *out))
-            .with_context(|| format!("reading {name}"))?;
+        let counts = normalize_stream(reader, &name, form, (!check).then_some(&mut *out))?;
         if counts.total() > 0 {
             outcome.changed.push(name);
         }
         outcome.counts.add(&counts);
     }
-    out.flush()?;
+    out.flush().context(WRITING)?;
     Ok(outcome)
 }
 
@@ -49,6 +57,7 @@ pub fn run(inputs: &[PathBuf], form: Form, check: bool, out: &mut dyn Write) -> 
 /// past a line break, so this gives the same text as normalizing the whole input.
 fn normalize_stream(
     reader: impl Read,
+    name: &str,
     form: Form,
     mut out: Option<&mut dyn Write>,
 ) -> Result<Counts> {
@@ -57,13 +66,14 @@ fn normalize_stream(
     let mut total = Counts::default();
     loop {
         line.clear();
-        if reader.read_line(&mut line).context("not UTF-8 text")? == 0 {
+        let read = reader.read_line(&mut line);
+        if read.with_context(|| format!("reading {name}: not UTF-8 text, or unreadable"))? == 0 {
             return Ok(total);
         }
         let (text, counts) = normalize_counted(&line, form);
         total.add(&counts);
         if let Some(out) = out.as_deref_mut() {
-            out.write_all(text.as_bytes())?;
+            out.write_all(text.as_bytes()).context(WRITING)?;
         }
     }
 }
@@ -87,6 +97,7 @@ mod tests {
         let mut out = Vec::new();
         let counts = normalize_stream(
             "ಆಫ್\u{200C}\r\nಬೆ೦ಗಳೂರು\n".as_bytes(),
+            "in",
             Form::Legacy,
             Some(&mut out),
         )
@@ -98,13 +109,41 @@ mod tests {
 
     #[test]
     fn a_joiner_before_a_line_break_is_stray() {
-        let counts = normalize_stream("ಆಫ್\u{200C}\nಕ".as_bytes(), Form::Canonical, None).unwrap();
+        let counts =
+            normalize_stream("ಆಫ್\u{200C}\nಕ".as_bytes(), "in", Form::Canonical, None).unwrap();
         assert_eq!(counts.get(Rule::StrayJoiner), 1);
     }
 
     #[test]
     fn invalid_utf8_is_an_error() {
-        assert!(normalize_stream(&b"\xff\n"[..], Form::Canonical, None).is_err());
+        assert!(normalize_stream(&b"\xff\n"[..], "in", Form::Canonical, None).is_err());
+    }
+
+    struct ClosedPipe;
+
+    impl Write for ClosedPipe {
+        fn write(&mut self, _: &[u8]) -> std::io::Result<usize> {
+            Err(std::io::ErrorKind::BrokenPipe.into())
+        }
+        fn flush(&mut self) -> std::io::Result<()> {
+            Ok(())
+        }
+    }
+
+    #[test]
+    fn a_closed_pipe_is_a_write_error_the_command_can_ignore() {
+        let e = normalize_stream(
+            "ಕ\n".as_bytes(),
+            "in",
+            Form::Canonical,
+            Some(&mut ClosedPipe),
+        )
+        .unwrap_err();
+        assert!(format!("{e:#}").starts_with("writing"), "{e:#}");
+        assert!(is_broken_pipe(&e));
+        let bad = normalize_stream(&b"\xff\n"[..], "in", Form::Canonical, None).unwrap_err();
+        assert!(format!("{bad:#}").starts_with("reading in"), "{bad:#}");
+        assert!(!is_broken_pipe(&bad));
     }
 
     #[test]

@@ -288,6 +288,7 @@ fn canonical_chars(chars: &[char], counts: &mut Counts) -> Vec<char> {
         }
         text = out;
     }
+    debug_assert_eq!(marks_and_joiners(&text, &mut Counts::default()), text);
     text
 }
 
@@ -305,7 +306,8 @@ fn nfc(chars: &[char], counts: &mut Counts) -> Vec<char> {
                 a > b && b != 0
             })
             .count();
-        let changes = (chars.len() - composed.len()) + reordered;
+        // Composition exclusions such as U+0958 make the text longer, so count the size change.
+        let changes = chars.len().abs_diff(composed.len()) + reordered;
         counts.0[Rule::Nfc.index()] += changes.max(1);
     }
     composed
@@ -348,7 +350,9 @@ fn marks_and_joiners(chars: &[char], counts: &mut Counts) -> Vec<char> {
             (Some('ಉ'), 'ಾ') => replace_last(&mut out, 'ಊ', Rule::VowelLetter, counts),
             (Some('ಒ'), 'ೌ') => replace_last(&mut out, 'ಔ', Rule::VowelLetter, counts),
             (Some('ಋ'), 'ಾ') => replace_last(&mut out, 'ೠ', Rule::VowelLetter, counts),
-            (Some(p), c) if p == c && class(c).is_mark() => counts.bump(Rule::RepeatedMark),
+            (Some(p), c) if p == c && is_kannada(c) && class(c).is_mark() => {
+                counts.bump(Rule::RepeatedMark)
+            }
             (_, NUKTA) => place_nukta(&mut out, counts),
             _ => out.push(c),
         }
@@ -475,8 +479,8 @@ fn move_reph(out: &mut Vec<char>) -> bool {
         return false;
     }
     start -= 1;
-    while start >= 2 && out[start - 1] == VIRAMA && is_consonant(out[start - 2]) {
-        start -= 2;
+    while start >= 2 && out[start - 1] == VIRAMA && ends_with_consonant(&out[..start - 1]) {
+        start -= if out[start - 2] == NUKTA { 3 } else { 2 };
     }
     if start > 0 && out[start - 1] == VIRAMA {
         return false;
@@ -486,10 +490,29 @@ fn move_reph(out: &mut Vec<char>) -> bool {
     true
 }
 
+fn is_invisible(c: char) -> bool {
+    is_joiner(c) || FORMAT.contains(&c)
+}
+
 fn search(chars: &[char], counts: &mut Counts) -> Vec<char> {
     let mut out: Vec<char> = Vec::with_capacity(chars.len());
-    for (i, &c) in chars.iter().enumerate() {
-        let next = chars.get(i + 1).copied();
+    let mut i = 0;
+    while i < chars.len() {
+        let c = chars[i];
+        if is_invisible(c) {
+            let start = i;
+            while i < chars.len() && is_invisible(chars[i]) {
+                i += 1;
+            }
+            let next = chars.get(i).copied();
+            if out.last().is_some_and(|&p| is_kannada(p)) || next.is_some_and(is_kannada) {
+                counts.0[Rule::Invisible.index()] += i - start;
+            } else {
+                out.extend_from_slice(&chars[start..i]);
+            }
+            continue;
+        }
+        i += 1;
         match c {
             LLLA => fold(&mut out, &['ಳ'], counts),
             RRA => fold(&mut out, &['ರ'], counts),
@@ -497,11 +520,6 @@ fn search(chars: &[char], counts: &mut Counts) -> Vec<char> {
             ANUSVARA_ABOVE_RIGHT => fold(&mut out, &[ANUSVARA], counts),
             ARCHAIC_SHRII => fold(&mut out, &['ಶ', VIRAMA, 'ರ', 'ೀ'], counts),
             NUKTA => counts.bump(Rule::Nukta),
-            c if (is_joiner(c) || FORMAT.contains(&c))
-                && (out.last().is_some_and(|&p| is_kannada(p)) || next.is_some_and(is_kannada)) =>
-            {
-                counts.bump(Rule::Invisible)
-            }
             _ => out.push(c),
         }
     }
@@ -522,8 +540,8 @@ fn is_letter_or_mark(c: char) -> bool {
 /// anusvara (ಂ). Legacy fonts and OCR often confuse the two.
 ///
 /// Use this on converted or scanned text only: a number written directly after a
-/// word, such as ಕೊಠಡಿ೦೧, is changed too. [`Form::Legacy`] leaves a zero before a
-/// digit alone.
+/// word, such as ಕೊಠಡಿ೦೧, is changed too. Rule L1 of [`Form::Legacy`] is narrower: it
+/// leaves a zero before a digit, or after a virama or visarga, alone.
 ///
 /// ```
 /// assert_eq!(kannadi::fix_zero_as_anusvara("ಬೆ೦ಗಳೂರು"), "ಬೆಂಗಳೂರು");
@@ -543,6 +561,7 @@ pub fn fix_zero_as_anusvara(text: &str) -> String {
 }
 
 /// Maps Old Kannada letters to their modern equivalents, for search and indexing.
+/// [`Form::Search`] folds these and also ೳ and U+0CDC, and removes the joiner this adds.
 ///
 /// - ೞ (LLLA) becomes ಳ
 /// - ಱ (RRA) becomes ರ
@@ -754,6 +773,24 @@ mod tests {
         assert_eq!(s("ಬೆ೦ಗಳೂರು"), "ಬೆಂಗಳೂರು");
         assert_eq!(s("a\u{00AD}b"), "a\u{00AD}b");
         assert_eq!(normalize_as("ಅಱಿ", Form::Legacy), "ಅಱಿ");
+    }
+
+    #[test]
+    fn review_cases() {
+        // Composition exclusions get longer under NFC.
+        assert_eq!(canon("\u{0958}"), "\u{0915}\u{093C}");
+        assert_eq!(count("\u{0958}", Form::Canonical, Rule::Nfc), 1);
+        // Marks outside Kannada are left to NFC.
+        assert_eq!(canon("क\u{0951}\u{0951}"), "क\u{0951}\u{0951}");
+        // A run of invisible characters next to Kannada goes in 1 pass.
+        let s = |t: &str| normalize_as(t, Form::Search);
+        assert_eq!(s("\u{200B}\u{200B}ಕ"), "ಕ");
+        assert_eq!(s("a\u{200C}\u{200B}ಕ"), "aಕ");
+        assert_eq!(s("a\u{200B}\u{00AD}b"), "a\u{200B}\u{00AD}b");
+        assert_eq!(count("\u{200B}\u{200B}ಕ", Form::Search, Rule::Invisible), 2);
+        // The arkavattu moves over a cluster with a nukta, in legacy and search alike.
+        assert_eq!(normalize_as("ಜ಼್ಕರ್ಿ", Form::Legacy), "ರ್ಜ಼್ಕಿ");
+        assert_eq!(s("ಜ಼್ಕರ್ಿ"), "ರ್ಜ್ಕಿ");
     }
 
     #[test]

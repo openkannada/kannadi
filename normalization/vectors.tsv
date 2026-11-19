@@ -49,6 +49,8 @@ c-archaic-shrii-kept	canonical	-	{U+0CDC} ಕನ್ನಡ	{U+0CDC} ಕನ್ನ�
 c-persian-joiner-kept	canonical	-	می{ZWNJ}خواهم	می{ZWNJ}خواهم	not Kannada
 c-latin-joiner-kept	canonical	-	a{ZWNJ}b	a{ZWNJ}b	not Kannada
 c-zero-kept	canonical	-	ಬೆ೦ಗಳೂರು	ಬೆ೦ಗಳೂರು	a legacy rule
+c-nfc-exclusion	canonical	C1	{U+0958}	{U+0915}{U+093C}	Devanagari QA: NFC decomposes it
+c-other-script-marks-kept	canonical	-	क{U+0951}{U+0951}	क{U+0951}{U+0951}	not Kannada
 l-zero-inside	legacy	L1	ಬೆ೦ಗಳೂರು	ಬೆಂಗಳೂರು	
 l-zero-word-end	legacy	L1	ಸ್ವಯ೦ ಸೇವಕ	ಸ್ವಯಂ ಸೇವಕ	
 l-zero-before-digit	legacy	-	ಕೊಠಡಿ೦೧	ಕೊಠಡಿ೦೧	a number after a word
@@ -64,6 +66,7 @@ l-reph-no-consonant	legacy	-	ರ್ಿ	ರ್ಿ	nothing to move over
 l-reph-correct	legacy	-	ಸರ್ಕಾರ	ಸರ್ಕಾರ	
 l-includes-canonical	legacy	C8,L1	ಬೆ೦ಗಳೂರು{ZWNJ}	ಬೆಂಗಳೂರು	
 l-old-letters-kept	legacy	-	ಅಱಿವು	ಅಱಿವು	
+l-reph-nukta-cluster	legacy	L3	ಜ{U+0CBC}್ಕರ್ಿ	ರ್ಜ{U+0CBC}್ಕಿ	a nukta inside the cluster
 s-llla	search	S1	ಬಾೞ್	ಬಾಳ್	
 s-rra	search	S1	ಅಱಿವು	ಅರಿವು	
 s-nakaara-pollu	search	S1	ಅವೝ	ಅವನ್	
@@ -76,5 +79,6 @@ s-before-sign	search	S2	ಮ{ZWNJ}ೂಲಕ	ಮೂಲಕ
 s-zwsp	search	S2	ಕಾಂಗ್ರೆಸ್{U+200B}ನಿಂದ	ಕಾಂಗ್ರೆಸ್ನಿಂದ	
 s-shy	search	S2	ಕನ್ನ{U+00AD}ಡ	ಕನ್ನಡ	
 s-shy-latin-kept	search	-	co{U+00AD}operate	co{U+00AD}operate	not Kannada
+s-invisible-run	search	S2	{U+200B}{U+200B}ಕ	ಕ	the whole run next to Kannada goes
 s-nukta	search	S3	ಜ{U+0CBC}ೀರೋ	ಜೀರೋ	
 s-includes-legacy	search	L1	ಬೆ೦ಗಳೂರು	ಬೆಂಗಳೂರು	

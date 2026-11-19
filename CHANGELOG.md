@@ -11,7 +11,7 @@
 
 ### Changed
 
-- `normalize` now gives the profile's canonical form. Besides NFC, look-alike vowel letters and repeated marks, it builds ಔ from ಒ + ೌ, moves a nukta to its consonant, and settles joiners: ZWJ after a virama becomes ZWNJ, ರ + virama + ZWJ becomes ರ + ZWJ + virama, a joiner between a consonant and its virama goes, and joiners that change nothing are removed.
+- Breaking: `normalize` now gives the profile's canonical form, so it changes text the 0.1.0 version left alone. Besides NFC, look-alike vowel letters and repeated marks, it builds ಔ from ಒ + ೌ, moves a nukta to its consonant, and settles joiners: ZWJ after a virama becomes ZWNJ, ರ + virama + ZWJ becomes ರ + ZWJ + virama, a joiner between a consonant and its virama goes, and joiners that change nothing are removed.
 
 ## 0.1.0 - 2026-11-18
 
