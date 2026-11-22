@@ -41,6 +41,45 @@ fn til_offers_tili() {
 }
 
 #[test]
+fn word_starts_show_what_the_letters_spell() {
+    for (input, first) in [
+        ("ka", "ಕ"),
+        ("ga", "ಗ"),
+        ("ba", "ಬ"),
+        ("ti", "ತಿ"),
+        ("be", "ಬೆ"),
+        ("a", "ಅ"),
+    ] {
+        assert_eq!(top(input, 1), [first], "{input}");
+    }
+    // The commonest whole word stays next to it.
+    assert_eq!(top("a", 2), ["ಅ", "ಆ"]);
+    assert!(top("ka", 5).contains(&"ಕೆ".to_string()));
+    // x counts as 1 typed letter.
+    assert_eq!(top("xa", 1), ["ಕ್ಸ"]);
+    // 5 letters that start ನಮಸ್ಕಾರ: the letters as typed, then the word they start.
+    let namas = top("namas", 5);
+    assert_eq!(namas[0], "ನಮಸ್");
+    assert!(namas.contains(&"ನಮಸ್ಕಾರ".to_string()));
+}
+
+#[test]
+fn the_strict_reading_is_always_offered() {
+    for (input, strict) in [
+        ("til", "ತಿಲ್"),
+        ("a", "ಅ"),
+        ("kann", "ಕನ್ನ್"),
+        ("kannada", "ಕನ್ನದ"),
+    ] {
+        assert!(
+            top(input, 5).contains(&strict.to_string()),
+            "{input}: {:?}",
+            top(input, 5)
+        );
+    }
+}
+
+#[test]
 fn a_completion_never_comes_first() {
     for input in ["til", "namask", "sark", "t", "bengal"] {
         let c = engine().candidates(input, None);
