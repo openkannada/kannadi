@@ -22,7 +22,7 @@ use tables::{ParagraphProps, Piece, Spans, Styles};
 
 /// The most text a document may hold, in characters, and the most a stream may hold.
 const MAX_CHARS: u64 = 1 << 26;
-const MAX_STREAM: u64 = 1 << 28;
+const MAX_STREAM: u64 = 1 << 26;
 
 /// Reads the stories of a `.doc` file. Fails on files that are not Word 97 or
 /// later, or are password-protected.
@@ -70,12 +70,19 @@ pub fn read(bytes: &[u8]) -> Result<Document> {
 }
 
 fn stream(file: &mut cfb::CompoundFile<Cursor<&[u8]>>, name: &str) -> Result<Vec<u8>> {
+    let name = name.trim_start_matches('/');
     let mut out = Vec::new();
-    file.open_stream(name)
-        .with_context(|| format!("no {} stream", name.trim_start_matches('/')))?
-        .take(MAX_STREAM)
+    file.open_stream(format!("/{name}"))
+        .with_context(|| format!("no {name} stream"))?
+        .take(MAX_STREAM + 1)
         .read_to_end(&mut out)
-        .with_context(|| format!("reading the {} stream", name.trim_start_matches('/')))?;
+        .with_context(|| format!("reading the {name} stream"))?;
+    if out.len() as u64 > MAX_STREAM {
+        bail!(
+            "the {name} stream is larger than this tool reads ({} MB)",
+            MAX_STREAM >> 20
+        );
+    }
     Ok(out)
 }
 
@@ -123,13 +130,16 @@ impl Reader<'_> {
                     fields.retain(|&f| f == Field::Result);
                     let paragraph = self.paragraphs.at(fc);
                     self.close(&mut story, &mut pending, paragraph.style);
-                    if !paragraph.row_end {
+                    // A deleted mark joins its paragraph to the next.
+                    if !paragraph.row_end && props.deleted != Some(true) {
                         story.end_paragraph();
                     }
                 }
                 _ if fields.contains(&Field::Code) => {}
                 // Line, page and column breaks.
-                '\u{0B}' | '\u{0C}' | '\u{0E}' => pending.push(Item::Break),
+                '\u{0B}' | '\u{0C}' | '\u{0E}' if props.deleted != Some(true) => {
+                    pending.push(Item::Break)
+                }
                 // A non-breaking hyphen.
                 '\u{1E}' => pending.push(Item::Char('-', props)),
                 '\t' => pending.push(Item::Char(c, props)),

@@ -303,6 +303,27 @@ fn more_characters_than_the_text_stream_holds_are_refused() {
 }
 
 #[test]
+fn a_deleted_paragraph_mark_or_break_joins_the_lines() {
+    let deleted = vec![0x00, 0x08, 0x01];
+    let doc = Doc {
+        fonts: fonts(),
+        styles: vec![normal(font(0))],
+        pieces: vec![Piece::new(
+            true,
+            vec![
+                (Vec::new(), "a"),
+                (deleted.clone(), "\r"),
+                (Vec::new(), "b"),
+                (deleted, "\u{0B}"),
+                (Vec::new(), "c\rd\r"),
+            ],
+        )],
+        ..Doc::default()
+    };
+    assert_eq!(texts(&read(&doc.bytes()).unwrap(), 0), ["abc", "d"]);
+}
+
+#[test]
 fn breaks_start_lines_and_marks_and_pictures_are_dropped() {
     let doc = Doc {
         fonts: fonts(),
@@ -362,6 +383,15 @@ fn files_that_are_not_word_97_are_refused_with_a_reason() {
     assert!(err(&doc(Some(0x0065), false).bytes()).contains("Word 6 or Word 95"));
     assert!(err(&doc(None, true).bytes()).contains("password"));
     assert!(err(&compound(&[("/WordDocument", &[0xEC, 0xA5])])).contains("too short"));
+}
+
+#[test]
+fn a_stream_over_the_limit_is_refused() {
+    let big = vec![0u8; (MAX_STREAM + 1) as usize];
+    let err = read(&compound(&[("/WordDocument", &big)]))
+        .unwrap_err()
+        .to_string();
+    assert!(err.contains("larger than this tool reads (64 MB)"), "{err}");
 }
 
 #[test]

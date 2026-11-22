@@ -217,6 +217,7 @@ pub fn read(bytes: &[u8]) -> Result<Document> {
     for token in (Lexer { bytes, at: 0 }) {
         p.token(token);
     }
+    p.lone_surrogate();
     let mut stories = std::mem::take(&mut p.stories);
     for story in &mut stories {
         story.finish();
@@ -357,11 +358,12 @@ impl Parser {
             }
             (Dest::Text(_), "deleted") => self.state.deleted = param != Some(0),
             (_, "u") => {
-                // A negative N is a UTF-16 unit written as a signed 16-bit number.
-                if let Some(unit) =
-                    param.and_then(|n| u16::try_from(if n < 0 { n + 65536 } else { n }).ok())
-                {
-                    self.unit(unit);
+                // N is a signed 16-bit UTF-16 unit; some writers give the code point.
+                match param {
+                    Some(n @ -32768..=-1) => self.unit((n + 65536) as u16),
+                    Some(n @ 0..=0xFFFF) => self.unit(n as u16),
+                    Some(n) => self.char(char::from_u32(n as u32).unwrap_or('\u{FFFD}')),
+                    None => {}
                 }
                 if param.is_some() {
                     self.skip = self.state.uc;
@@ -463,6 +465,7 @@ impl Parser {
     }
 
     fn end_paragraph(&mut self) {
+        self.lone_surrogate();
         if let Dest::Text(story) = self.state.dest {
             self.stories[story].end_paragraph();
         }
@@ -618,6 +621,13 @@ mod tests {
     fn surrogate_pairs_join_and_lone_halves_become_replacement_characters() {
         let doc = rtf("\\u-10179?\\u-8704?x\\u-10179?y\\u-8704?\\u x\\par");
         assert_eq!(texts(&doc, 0), ["\u{1F600}x\u{FFFD}y\u{FFFD}x"]);
+        let doc = rtf("A\\u128512?B\\u-99999?C\\u1114112?D x\\u-10179?\\par\\u-8704?E\\par");
+        assert_eq!(
+            texts(&doc, 0),
+            ["A\u{1F600}B\u{FFFD}C\u{FFFD}D x\u{FFFD}", "\u{FFFD}E"]
+        );
+        let doc = read(b"{\\rtf1 a\\u-10179?").unwrap();
+        assert_eq!(texts(&doc, 0), ["a\u{FFFD}"]);
     }
 
     #[test]

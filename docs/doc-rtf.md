@@ -15,7 +15,7 @@ So the legacy text of a run is its characters as Windows-1252 codes, and the run
 - **Stories.** Footnotes, headers and footers, comments, endnotes and text boxes follow the body, each after a blank line. Headers and footers are split by PlcfHdd, and one that several sections repeat is written once.
 - **RTF.** The font table names each `\fN`. `\plain` returns to the `\deff` font. `\uN` is read as Unicode and its `\ucN` fallback skipped; `\'hh` and 8-bit text are read as Windows-1252. Destinations with no document text are skipped (the stylesheet, pictures, `\bin` data, field instructions, unknown `\*` destinations), and of a `\upr` group only the Unicode copy in `\*\ud` is read. Tracked deletions (`\deleted`) and list numbers (`\listtext`, `\pntext`) are left out, as a `.doc` file holds no list numbers as text. A surrogate pair written as 2 `\uN` values gives 1 character. Footnotes, headers and footers, comments and `\shptxt` text boxes become their own parts of the output.
 - **Conversion.** Runs in the same layout are joined, so a word Word split across runs converts whole. A character with no Windows-1252 code inside a legacy run, such as Unicode Kannada typed while a Nudi font was chosen, is kept as it is. Fonts named as legacy with no table, such as Shree-Kan-0851, are reported as `not converted` and their text left out.
-- **Limits.** Streams are read up to 256 MB, and a document may hold at most 2^26 characters and no more characters than its text stream has bytes; style chains stop after 11 levels and RTF groups after 512, so a hostile file cannot hang the tool or fill memory. Word 6 and Word 95 files and password-protected files are refused with a reason.
+- **Limits.** Streams are read up to 64 MB, and a document may hold at most 2^26 characters and no more characters than its text stream has bytes. Style chains stop after 11 levels and RTF groups after 512. Work grows in step with the file, so a hostile file cannot hang the tool; memory does too, at up to about 100 times the text for a file made of very short paragraphs. Word 6 and Word 95 files and password-protected files are refused with a reason.
 
 ## What was measured
 
@@ -36,4 +36,5 @@ The downloaded files are not kept in the repository.
 - `\'hh` text in non-legacy RTF fonts in a code page other than Windows-1252 is read as Windows-1252.
 - Word 6 and Word 95 files, whose FIB and text layout differ.
 - List numbers and bullets, which Word draws and does not store as text.
+- Paragraph properties stored outside the property page (sprmPHugePapx), as in very wide tables: their row ends are not seen, so each such row adds a blank line.
 - Output is text. A DOCX written from a `.doc` would keep paragraphs and runs, but needs its own change.
