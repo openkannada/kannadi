@@ -89,23 +89,65 @@ impl Candidate {
     }
 }
 
-/// Sorts candidates best first under `w`. Words picked before for the same
-/// letters come first, the newest pick first. A completion never comes first
-/// while a whole-word reading of the letters exists: the first word is what
-/// the letters spell, and completions follow as suggestions.
-pub fn rank(candidates: &mut [Candidate], w: &Weights) {
+/// Up to this many letters, the strict reading comes first: the input is most
+/// likely the start of a longer word, and the first word is shown as it is typed.
+const SHORT: usize = 2;
+/// The strict reading is never further down than this place (0-based).
+const STRICT_BY: usize = 4;
+
+/// Sorts the candidates for an input of `typed` letters best first under `w`.
+///
+/// Words picked before for the same letters come first, the newest pick first.
+/// Otherwise the first word is a reading of the letters as a whole word, never
+/// a completion:
+///
+/// - for 1 or 2 typed letters, the strict reading, with the best whole word second;
+/// - when a completion outscores every whole word, the letters are likely the
+///   start of a longer word, so the whole word that best fits the letters and
+///   the corpus, without the bonus for being in the lexicon;
+/// - otherwise the best-scoring whole word.
+///
+/// The strict reading always stays in the first 5, after any picks.
+pub fn rank(candidates: &mut [Candidate], w: &Weights, typed: usize) {
     candidates.sort_by(|a, b| {
         b.picked
             .cmp(&a.picked)
             .then_with(|| b.score(w).total_cmp(&a.score(w)))
             .then_with(|| a.word.cmp(&b.word))
     });
-    if candidates
-        .first()
-        .is_some_and(|c| c.extra > 0 && c.picked.is_none())
-    {
-        if let Some(i) = candidates.iter().position(|c| c.extra == 0) {
-            candidates[..=i].rotate_right(1);
+    let whole = |c: &Candidate| c.extra == 0;
+    let strict = |c: &Candidate| c.rule && c.extra == 0;
+    let picks = candidates.iter().take_while(|c| c.picked.is_some()).count();
+    let first_is_completion = candidates.first().is_some_and(|c| c.extra > 0);
+    let short = typed <= SHORT && candidates.iter().any(strict);
+    let lead = if picks > 0 {
+        None
+    } else if short {
+        candidates.iter().position(strict)
+    } else if first_is_completion {
+        let fit = |c: &Candidate| c.score(w) - if c.known { w.known } else { 0.0 };
+        let mut best: Option<(usize, f32)> = None;
+        for (i, c) in candidates.iter().enumerate().filter(|(_, c)| whole(c)) {
+            if best.is_none_or(|(_, f)| fit(c) > f) {
+                best = Some((i, fit(c)));
+            }
+        }
+        best.map(|(i, _)| i)
+    } else {
+        None
+    };
+    if let Some(i) = lead {
+        candidates[..=i].rotate_right(1);
+        if short {
+            if let Some(j) = candidates.iter().skip(1).position(whole).map(|j| j + 1) {
+                candidates[1..=j].rotate_right(1);
+            }
+        }
+    }
+    let by = STRICT_BY.max(picks);
+    if let Some(i) = candidates.iter().position(strict) {
+        if i > by {
+            candidates[by..=i].rotate_right(1);
         }
     }
 }
@@ -235,7 +277,7 @@ impl Engine {
                 }
             })
             .collect();
-        rank(&mut out, w);
+        rank(&mut out, w, roman::typed_letters(input));
         out
     }
 
@@ -284,5 +326,97 @@ impl Engine {
             }
             None => false,
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn cand(word: &str, lm: f32, known: bool, rule: bool, extra: usize) -> Candidate {
+        Candidate {
+            word: word.into(),
+            lm,
+            freq: 0.0,
+            known,
+            lift: 0.0,
+            rule,
+            precise: false,
+            user: 0.0,
+            picked: None,
+            extra,
+        }
+    }
+
+    fn order(mut c: Vec<Candidate>, letters: usize) -> Vec<String> {
+        let w = Weights {
+            known: 10.0,
+            ..Weights::default()
+        };
+        rank(&mut c, &w, letters);
+        c.into_iter().map(|c| c.word).collect()
+    }
+
+    #[test]
+    fn short_input_leads_with_the_strict_reading_then_the_best_word() {
+        let c = vec![
+            cand("done+", 0.0, true, false, 2),
+            cand("best", -1.0, true, false, 0),
+            cand("strict", -5.0, false, true, 0),
+        ];
+        assert_eq!(order(c.clone(), 2), ["strict", "best", "done+"]);
+        assert_eq!(order(c, 3)[0], "best");
+    }
+
+    #[test]
+    fn a_likely_prefix_leads_with_the_best_fit_without_the_lexicon_bonus() {
+        let c = vec![
+            cand("word+", 5.0, true, false, 3),
+            cand("known", -12.0, true, false, 0),
+            cand("letters", -8.0, false, true, 0),
+        ];
+        assert_eq!(order(c, 5)[0], "letters");
+        // With no completion ahead, the score decides.
+        let c = vec![
+            cand("known", -12.0, true, false, 0),
+            cand("letters", -8.0, false, true, 0),
+        ];
+        assert_eq!(order(c, 5)[0], "known");
+    }
+
+    #[test]
+    fn picks_stay_first_newest_first_and_the_strict_reading_follows_them() {
+        let mut c: Vec<Candidate> = (0..6)
+            .map(|i| Candidate {
+                picked: Some(i),
+                ..cand(&format!("p{i}"), -(i as f32), true, false, 0)
+            })
+            .collect();
+        c.push(cand("best", 10.0, true, false, 0));
+        c.push(cand("strict", -50.0, false, true, 0));
+        let got = order(c, 2);
+        assert_eq!(got[..6], ["p5", "p4", "p3", "p2", "p1", "p0"]);
+        assert_eq!(got[6], "strict");
+    }
+
+    #[test]
+    fn equal_fits_keep_the_score_order() {
+        let c = vec![
+            cand("word+", 5.0, true, false, 3),
+            cand("a", -8.0, false, false, 0),
+            cand("b", -8.0, false, false, 0),
+        ];
+        assert_eq!(order(c, 5)[0], "a");
+    }
+
+    #[test]
+    fn the_strict_reading_moves_up_to_the_fifth_place() {
+        let mut c: Vec<Candidate> = (0..8)
+            .map(|i| cand(&format!("w{i}"), -(i as f32), true, false, 0))
+            .collect();
+        c.push(cand("strict", -50.0, false, true, 0));
+        let got = order(c, 5);
+        assert_eq!(got[4], "strict");
+        assert_eq!(got[..4], ["w0", "w1", "w2", "w3"]);
     }
 }

@@ -123,7 +123,7 @@ pub fn score(engine: &Engine, items: &[Item], lists: &[Vec<Candidate>], w: &Weig
     };
     for (it, list) in items.iter().zip(lists) {
         let mut ranked = list.clone();
-        crate::rank(&mut ranked, w);
+        crate::rank(&mut ranked, w, crate::roman::typed_letters(&it.input));
         let rank = ranked.iter().position(|c| it.refs.contains(&c.word));
         r.top1 += usize::from(rank == Some(0));
         r.top5 += usize::from(rank.is_some_and(|k| k < 5));
