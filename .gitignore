@@ -3,3 +3,5 @@
 .DS_Store
 /web/dist
 node_modules/
+/crates/kannadi-py/target
+/crates/kannadi-py/dist

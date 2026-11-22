@@ -1,0 +1,29 @@
+[build-system]
+requires = ["maturin>=1.16,<2"]
+build-backend = "maturin"
+
+[project]
+name = "kannadi"
+description = "Convert Kannada text typed in legacy Nudi, Baraha, Akruti, Shree-Lipi, Nudi B-Akshara and Kan-Eng fonts to Unicode and back, and segment, normalize and transliterate Kannada"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT OR Apache-2.0"
+license-files = ["LICENSE-MIT", "LICENSE-APACHE"]
+authors = [{ name = "The Open Kannada Authors" }]
+keywords = ["kannada", "unicode", "nudi", "baraha", "transliteration"]
+classifiers = [
+  "Programming Language :: Rust",
+  "Programming Language :: Python :: 3",
+  "Natural Language :: Kannada",
+  "Topic :: Text Processing :: Linguistic",
+]
+dynamic = ["version"]
+
+[project.urls]
+Homepage = "https://openkannada.org/editor/"
+Repository = "https://github.com/openkannada/kannadi"
+Issues = "https://github.com/openkannada/kannadi/issues"
+
+[tool.maturin]
+features = ["pyo3/extension-module"]
+module-name = "kannadi"
