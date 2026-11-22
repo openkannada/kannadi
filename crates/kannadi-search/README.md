@@ -62,7 +62,7 @@ Reproduce the table with the steps in [eval/README.md](eval/README.md).
 The stemmer knows no dictionary. It runs kannada-morph's noun paradigms backwards and is careful in 4 ways:
 
 - A stem keeps at least 2 aksharas: in shorter words an ending is most often part of the word.
-- 1,277 words that end like an inflected noun but are stems of their own stay whole, such as ಮೆರವಣಿಗೆ ("procession"), which is not ಮೆರವಣಿ with a dative ending. A word is on this list when Kannada Wikipedia has at least 2 forms built on it whose stemming passes through it, those forms are together at least 1 tenth as frequent as the word, and the shorter stem is rarer as a word.
+- 1,278 words that end like an inflected noun but are stems of their own stay whole, such as ಮೆರವಣಿಗೆ ("procession"), which is not ಮೆರವಣಿ with a dative ending. A word is on this list when Kannada Wikipedia has at least 2 forms built on it whose stemming passes through it, those forms are together at least 1 tenth as frequent as the word, and the shorter stem is rarer as a word.
 - When endings give more than 1 stem, the stem Kannada Wikipedia uses most as a word wins: ವ್ಯಕ್ತಿಗೆ ("to the person") reads as ವ್ಯಕ್ತಿ + ಗೆ, as ಕಾಡಿಗೆ reads as ಕಾಡು + ಇಗೆ. 3,781 stems carry the counts for this.
 - Otherwise the longest ending wins, and when it leaves 2 different stems, the word stays whole.
 
@@ -75,7 +75,7 @@ Use the same analyzer for documents and queries. `Analyzer::new().stemming(false
 | File | What | From |
 |---|---|---|
 | `data/suffixes.tsv` | 1,521 noun endings: stem final, characters to strip, characters to add | kannada-morph's paradigms ([kannada-spell](https://github.com/openkannada/kannada-spell) at 9366c23), by `eval` |
-| `data/protected.txt` | 1,277 words the stemmer keeps whole | Kannada Wikipedia word counts of the training articles, by `eval` |
+| `data/protected.txt` | 1,278 words the stemmer keeps whole | Kannada Wikipedia word counts of the training articles, by `eval` |
 | `data/preferred.tsv` | 3,781 stems with their Wikipedia counts | the same counts, by `eval` |
 | `eval/data/` | the Wikipedia development and test sets: sentences, variant sentences, queries and relevant documents | held-out Kannada Wikipedia articles |
 
