@@ -25,18 +25,18 @@ Each cell is recall / precision, in percent. Queries are 1,000 nouns per set; a 
 
 | Analyzer | Wikipedia | Wikipedia, variant spellings | Government PDFs, legacy text | Government lines in Unicode |
 |---|---:|---:|---:|---:|
-| Whitespace split | 41.7 / 100.0 | 28.3 / 100.0 | 0.0 / n/a | 50.4 / 100.0 |
-| Tantivy default (`SimpleTokenizer`, `LowerCaser`) | 50.4 / 70.8 | 42.3 / 63.5 | 0.0 / n/a | 63.1 / 75.7 |
-| ICU (ICU4X word segmenter, NFKC_Casefold) | 47.7 / 100.0 | 41.9 / 100.0 | 0.0 / n/a | 61.2 / 100.0 |
-| Meilisearch default (charabia 0.10.0) | 48.5 / 99.2 | 40.6 / 98.2 | 0.0 / n/a | 62.0 / 99.9 |
-| kannadi-search, spelling only | 47.7 / 100.0 | 47.7 / 100.0 | 61.0 / 100.0 | 62.0 / 100.0 |
-| **kannadi-search** | **97.8 / 98.5** | **97.8 / 98.5** | **95.9 / 97.4** | **97.4 / 97.3** |
+| Whitespace split | 41.1 / 100.0 | 28.0 / 100.0 | 0.0 / n/a | 50.4 / 100.0 |
+| Tantivy default (`SimpleTokenizer`, `LowerCaser`) | 50.0 / 58.5 | 42.0 / 53.4 | 0.0 / n/a | 63.1 / 75.7 |
+| ICU (ICU4X word segmenter, NFKC_Casefold) | 46.8 / 100.0 | 41.0 / 100.0 | 0.0 / n/a | 61.2 / 100.0 |
+| Meilisearch default (charabia 0.10.0) | 47.8 / 99.1 | 39.6 / 98.3 | 0.0 / n/a | 62.0 / 99.9 |
+| kannadi-search, spelling only | 47.0 / 100.0 | 47.0 / 100.0 | 61.0 / 100.0 | 62.0 / 100.0 |
+| **kannadi-search** | **98.5 / 98.6** | **98.5 / 98.6** | **95.9 / 97.4** | **97.4 / 97.3** |
 
 What the numbers show:
 
 - **Endings are most of the gap.** A Kannada noun takes case, plural and clitic endings, and Kannada writes "is" and "become" (ಇದೆ, ಆಗಿ) joined to the noun: ಮರ appears as ಮರದ, ಮರಗಳಲ್ಲಿ, ಮರವಾಗಿದೆ. Without stemming, a search finds about half of the documents that use the word.
 - **Spelling variants cost the other analyzers 6 to 13 points of recall.** ICU removes joiners through NFKC_Casefold but keeps the nukta, ೦ and Old Kannada letters apart. charabia keeps joiners in tokens and splits words at a ZWNJ (ಕನ್‌ನಡ becomes ಕನ್ and ನಡ).
-- **Tantivy's default tokenizer splits words at the virama.** `SimpleTokenizer` keeps runs of alphanumeric characters, and the virama is not alphanumeric, so ಕನ್ನಡ becomes ಕನ and ನಡ. Its recall looks higher because such fragments match many words; its precision is 64% to 76%.
+- **Tantivy's default tokenizer splits words at the virama.** `SimpleTokenizer` keeps runs of alphanumeric characters, and the virama is not alphanumeric, so ಕನ್ನಡ becomes ಕನ and ನಡ. Its recall looks higher because such fragments match many words; its precision is 53% to 76%.
 - **Legacy text is invisible to every other analyzer.** On text extracted from legacy-font PDFs they find nothing. kannadi-search converts legacy words with kannadi's converter and loses 1.5 points against the same lines in Unicode.
 - **Precision stays near 98%.** Many of the remaining false matches are not wrong: the reference lexicon has no entry for some forms (ಚರ್ಚ್ and ಚರ್ಚು are the same "church"), and it files adverbs such as ಪ್ರಮುಖವಾಗಿ under adjectives, which are no query. Others are real conflations, such as ಹಿಂದು ("Hindu") with ಹಿಂದಕ್ಕೆ ("backwards").
 
@@ -44,7 +44,7 @@ Limits of the measurement:
 
 - Relevance comes from kannada-morph's analyzer with its full lexicon (Alar and Kannada Wikipedia), and the stemmer uses the same analyzer's endings without the lexicon. The baselines do no stemming at all, so their order does not depend on this, but the stemmer's recall is measured against the paradigms it was built from: endings kannada-morph lacks are missing from both.
 - The variant set holds the variants kannadi-search was built to fold, so its equal score on clean and variant text shows that the folding works, and says nothing of variants it does not know.
-- The stemmer's rules and data were refined while reading errors on a separate development set of 3,000 sentences; the Wikipedia columns come from a test set that was only scored. I also read errors on the government set while building the first version, so its numbers are less strict.
+- The stemmer's rules and data were refined while reading errors on a separate development set of 3,000 sentences; the Wikipedia columns come from a test set that was only scored. The 2 sets share no sentence: repeated sentences were dropped before sampling. The query filters described in eval/README.md help a stemmer slightly. I also read errors on the government set while building the first version, so its numbers are less strict.
 - Queries are nouns. Verbs are out of scope: ಮಾಡಿದರು does not find ಮಾಡು.
 - The government lines' Unicode text is the benchmark's expected text, mostly confirmed by OCR and not yet checked by a reader. That set lives in a private repository, so it is not in this repository and CI does not run it; the Wikipedia sets are in `eval/data` and CI checks their numbers.
 
@@ -54,7 +54,7 @@ Reproduce the table with the steps in [eval/README.md](eval/README.md).
 
 [`Analyzer::analyze`](src/lib.rs) runs 4 steps.
 
-1. **Legacy text** ([`legacy`](src/legacy.rs)). Words with Windows-1252 characters above ASCII (quotes and dashes aside) are read as legacy font codes when those characters are at least 40% of the words, there are at least 2, and the words convert cleanly in the best layout (Nudi and Baraha, Akruti, Shree-Lipi, Nudi B-Akshara or Kan-Eng): accented European words, such as Ñúñez, do not. A line that is mostly legacy words converts whole; in a line that mixes them with English, only the legacy words convert. Words convert 1 at a time, so each token keeps the place of its legacy word.
+1. **Legacy text** ([`legacy`](src/legacy.rs)). A line is read as legacy font codes when it has at least 3 Windows-1252 characters above ASCII (quotes and dashes aside), they are at least 40% of the line or 2 of its words have 2 each, and the words that have them convert cleanly in the best layout (Nudi and Baraha, Akruti, Shree-Lipi, Nudi B-Akshara or Kan-Eng). Accented European words, such as Ñúñez, do not convert cleanly, and French guillemets or N° alone are too few. A line that is mostly legacy words converts whole; in a line that mixes them with English, only the legacy words convert. Words convert 1 at a time, so each token keeps the place of its legacy word.
 2. **Words**. Text splits at Unicode word boundaries ([UAX #29](https://www.unicode.org/reports/tr29/)), which never fall inside an akshara: vowel signs, the virama, the nukta and joiners stay with their letter. A property test checks that every token starts and ends at an akshara boundary. Kannada written straight after a number or a word in another script is its case ending and is dropped: ೨೦೨೬ರಲ್ಲಿ ("in 2026") gives 2026, and Facebookನಲ್ಲಿ gives facebook. A zero width space inside a Kannada word does not split it.
 3. **Spelling** ([`fold`](src/fold.rs)). Each word becomes its search key: the search form of kannadi's [normalization profile](../../NORMALIZATION.md#search-form) (joiners, the nukta, Old Kannada letters, ೦ typed for ಂ, vowel signs in 2 parts, and the other canonical rules), then a nasal with virama before a consonant of its own group becomes ಂ (ಸಮ್ಬನ್ಧ, ಸಂಬಂಧ), Kannada digits become ASCII digits, and other letters are lowercased.
 4. **Endings** ([`stem`](src/stem.rs)). Case, plural and clitic endings, and ಆಗು and ಇರು written joined to a noun, are removed: ಮರಗಳಲ್ಲಿ, ಮರವನ್ನು and ಮರವಾಗಿದೆ all give ಮರ.
@@ -110,4 +110,4 @@ Meilisearch tokenizes with [charabia](https://github.com/meilisearch/charabia). 
 
 ## Speed
 
-1 pass over all 102,111 held-out Wikipedia sentences (30 MB), each analyzer starting cold, on an Apple M1 Pro that was also running other work: kannadi-search 20.4 MB/s without stemming and 13.4 MB/s with it; ICU4X 24.7 MB/s, charabia 22.0 MB/s, Tantivy's default 13.4 MB/s. Most of kannadi-search's time goes to normalization and stemming; each thread keeps the keys of up to 65,536 words and empties the store when it is full, which helps on text that repeats words. Lines in legacy fonts run at about 0.8 MB/s, because choosing the layout converts them in every layout.
+1 pass over all 99,579 distinct held-out Wikipedia sentences (30 MB), each analyzer on its own thread after a warm-up, on an Apple M1 Pro that was also running other work: kannadi-search 17.5 MB/s without stemming and 10.8 MB/s with it; ICU4X 20.4 MB/s, charabia 19.0 MB/s, Tantivy's default 12.0 MB/s. Most of kannadi-search's time goes to normalization and stemming; each thread keeps the keys of up to 65,536 words and empties the store when it is full, which helps on text that repeats words. Lines in legacy fonts run at about 0.8 MB/s, because choosing the layout converts them in every layout.

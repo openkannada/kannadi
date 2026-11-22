@@ -52,10 +52,14 @@ fn main() {
         }
         Some("wiki") => {
             let n: usize = arg(1).parse().unwrap_or_else(|_| fail());
-            let all = wiki::held_out_sentences(BufReader::new(io::stdin().lock()));
-            eprintln!("{} held-out sentences", all.len());
-            // 2 disjoint samples: a development set for looking at errors, and a test set
-            // that is only scored.
+            let mut seen = std::collections::HashSet::new();
+            let all: Vec<String> = wiki::held_out_sentences(BufReader::new(io::stdin().lock()))
+                .into_iter()
+                .filter(|s| seen.insert(s.clone()))
+                .collect();
+            eprintln!("{} distinct held-out sentences", all.len());
+            // 2 samples with no sentence in common (duplicates are dropped first): a
+            // development set for looking at errors, and a test set that is only scored.
             let step = (all.len() / n).max(2);
             for (name, offset, prefix, seed) in [
                 ("wiki-dev", 0, "d", SEED),
@@ -176,6 +180,8 @@ fn main() {
                 let docs = docs.clone();
                 let (name, secs, tokens) = std::thread::spawn(move || {
                     let system = systems::all().swap_remove(i);
+                    // Load built-in tables before the clock starts.
+                    (system.tokens)("ಕನ್ನಡ ಮರಗಳಲ್ಲಿ PÀ£ÀßqÀ");
                     let start = std::time::Instant::now();
                     let tokens: usize = docs.iter().map(|(_, t)| (system.tokens)(t).len()).sum();
                     (system.name, start.elapsed().as_secs_f64(), tokens)

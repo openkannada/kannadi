@@ -47,8 +47,9 @@ pub fn fold(word: &str) -> String {
     let mut i = 0;
     while i < chars.len() {
         let c = chars[i];
-        // ಂ needs a letter before it: ಞ್ಚ at the start of a word stays.
-        if i > 0
+        // ಂ needs a Kannada letter or sign before it: ಞ್ಚ at the start of a word stays.
+        if i.checked_sub(1)
+            .is_some_and(|p| kannadi::chars::is_kannada(chars[p]) && !chars[p].is_ascii_digit())
             && chars.get(i + 1) == Some(&VIRAMA)
             && chars.get(i + 2).is_some_and(|&next| is_homorganic(c, next))
         {
@@ -175,6 +176,7 @@ mod tests {
         }
         assert_eq!(fold("ನ್ಕ"), "ನ್ಕ");
         assert_eq!(fold("ಞ್ಚ"), "ಞ್ಚ");
+        assert_eq!(fold("o'ಞ್ಚ"), "o'ಞ್ಚ");
     }
 
     #[test]

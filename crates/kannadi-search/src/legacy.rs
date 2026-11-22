@@ -31,12 +31,14 @@ pub fn detect(line: &str) -> Option<Layout> {
         .map(|r| &line[r])
         .filter(|w| w.chars().any(is_glyph_code))
         .collect();
-    let (mut codes, mut chars) = (0, 0);
-    for c in coded.iter().flat_map(|w| w.chars()) {
-        chars += 1;
-        codes += usize::from(is_glyph_code(c));
-    }
-    if codes < MIN_CODES || codes * 10 < chars * 4 {
+    let codes_in = |w: &str| w.chars().filter(|&c| is_glyph_code(c)).count();
+    let codes: usize = coded.iter().map(|w| codes_in(w)).sum();
+    let non_space = line.chars().filter(|c| !c.is_whitespace()).count();
+    // Evidence: codes are 40% of the line, or 2 words have 2 codes each. A lone « or °
+    // in a French line (« oui », N° 3) is neither.
+    let dense = codes * 10 >= non_space * 4;
+    let legacy_words = coded.iter().filter(|w| codes_in(w) >= 2).count();
+    if codes < MIN_CODES || !(dense || legacy_words >= 2) {
         return None;
     }
     let text = coded.join(" ");
@@ -62,9 +64,11 @@ fn options() -> Options {
     }
 }
 
-/// Windows-1252 characters above ASCII where legacy layouts draw their glyphs. Quotes,
-/// dashes and other punctuation in U+2010 to U+2027 pass through a legacy run as
-/// themselves, as kannadi's converter treats them.
+/// Windows-1252 characters above ASCII where legacy layouts draw their glyphs, as
+/// evidence that a word is legacy text. Quotes, dashes and other punctuation in U+2010
+/// to U+2027 are left out because English text uses them; some layouts (Akruti,
+/// Kan-Eng, Nudi B-Akshara) draw glyphs there, and words converted as legacy still
+/// convert them, but a word with no other code in a mixed line stays as it is.
 fn is_glyph_code(c: char) -> bool {
     ('\u{A1}'..='\u{FF}').contains(&c)
         || matches!(
@@ -161,6 +165,9 @@ mod tests {
             "Größe",
             "¿Qué?",
             "— “No.”",
+            "« Bonjour » « Salut »",
+            "N° 1 N° 2 N° 3",
+            "Il a dit « oui » et « non »",
             "",
             "ಕನ್ನಡ",
             "Bengaluru 2026",

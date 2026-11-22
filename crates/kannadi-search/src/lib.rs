@@ -181,10 +181,11 @@ fn words_with_offsets(text: &str) -> Vec<(usize, &str)> {
     let mut words: Vec<(usize, &str)> = Vec::new();
     let mut joining = false;
     for (start, segment) in text.split_word_bound_indices() {
-        if segment == "\u{200B}" {
-            joining = words.last().is_some_and(|&(s, w)| {
-                s + w.len() == start && w.chars().last().is_some_and(is_kannada_or_joiner)
-            });
+        if is_zwsp_run(segment) {
+            joining = joining
+                || words.last().is_some_and(|&(s, w)| {
+                    s + w.len() == start && w.chars().last().is_some_and(is_kannada_or_joiner)
+                });
             continue;
         }
         let is_word = segment.chars().any(char::is_alphanumeric);
@@ -199,12 +200,62 @@ fn words_with_offsets(text: &str) -> Vec<(usize, &str)> {
     words
 }
 
+/// A zero width space, alone or with more of them or joiners after it: UAX #29 keeps
+/// the joiners with the space.
+fn is_zwsp_run(segment: &str) -> bool {
+    segment.starts_with('\u{200B}')
+        && segment
+            .chars()
+            .all(|c| matches!(c, '\u{200B}' | '\u{200C}' | '\u{200D}'))
+}
+
 fn is_kannada_or_joiner(c: char) -> bool {
     kannadi::chars::is_kannada(c) || matches!(c, '\u{200C}' | '\u{200D}')
 }
 
 fn words(text: &str) -> impl Iterator<Item = &str> {
     words_with_offsets(text).into_iter().map(|(_, w)| w)
+}
+
+/// Punctuation UAX #29 allows inside a word (MidLetter, MidNum, MidNumLet and
+/// ExtendNumLet).
+fn is_word_punctuation(c: char) -> bool {
+    matches!(
+        c,
+        '\'' | '.'
+            | ':'
+            | ','
+            | ';'
+            | '_'
+            | '\u{00B7}'
+            | '\u{0387}'
+            | '\u{055F}'
+            | '\u{05F4}'
+            | '\u{2018}'
+            | '\u{2019}'
+            | '\u{2024}'
+            | '\u{2027}'
+            | '\u{203F}'
+            | '\u{2040}'
+            | '\u{2054}'
+            | '\u{FE10}'
+            | '\u{FE13}'
+            | '\u{FE14}'
+            | '\u{FE33}'
+            | '\u{FE34}'
+            | '\u{FE4D}'
+            ..='\u{FE4F}'
+                | '\u{FE50}'
+                | '\u{FE52}'
+                | '\u{FE54}'
+                | '\u{FE55}'
+                | '\u{FF07}'
+                | '\u{FF0C}'
+                | '\u{FF0E}'
+                | '\u{FF1A}'
+                | '\u{FF1B}'
+                | '\u{FF3F}'
+    )
 }
 
 /// The searchable parts of a folded word: runs of Kannada and runs of other letters
@@ -229,12 +280,14 @@ fn script_runs(word: &str) -> Vec<&str> {
     let mut after_other_script = false;
     for run in runs {
         let kannada = run.chars().next().is_some_and(kannadi::chars::is_kannada);
-        // Punctuation inside a word, as in O'ಕ್ಲಾಕ್, stays out of the tokens.
-        let trimmed =
-            run.trim_matches(|c: char| !c.is_alphanumeric() && !kannadi::chars::is_kannada(c));
+        // Punctuation UAX #29 keeps inside a word, as in O'ಕ್ಲಾಕ್, stays out of the
+        // tokens; marks such as a Tamil virama stay in.
+        let trimmed = run.trim_matches(is_word_punctuation);
         if !(kannada && after_other_script) && trimmed.chars().any(char::is_alphanumeric) {
             kept.push(trimmed);
         }
+        // Facebookನಲ್ಲಿ is 1 word with an ending; after an apostrophe (O'ಕ್ಲಾಕ್) the
+        // Kannada is a word of its own.
         after_other_script = !kannada && run.chars().last().is_some_and(char::is_alphanumeric);
     }
     kept
@@ -292,6 +345,8 @@ mod tests {
         let analyzer = Analyzer::new().stemming(false);
         assert_eq!(analyzer.keys("ಕನ್\u{200B}ನಡ"), ["ಕನ್ನಡ"]);
         assert_eq!(analyzer.keys("ಕನ್\u{200C}\u{200B}ನಡ"), ["ಕನ್ನಡ"]);
+        assert_eq!(analyzer.keys("ಕನ್\u{200B}\u{200B}ನಡ"), ["ಕನ್ನಡ"]);
+        assert_eq!(analyzer.keys("ಕನ್\u{200B}\u{200C}ನಡ"), ["ಕನ್ನಡ"]);
         assert_eq!(analyzer.keys("ಕನ್ನಡ\u{200B}word"), ["ಕನ್ನಡ", "word"]);
         assert_eq!(analyzer.keys("ಕನ್ನಡ \u{200B}ನಾಡು"), ["ಕನ್ನಡ", "ನಾಡು"]);
     }
@@ -304,6 +359,8 @@ mod tests {
         assert_eq!(script_runs("covid19ರಿಂದ"), ["covid19"]);
         assert_eq!(script_runs("facebookನಲ್ಲಿ"), ["facebook"]);
         assert_eq!(script_runs("o'ಕ್ಲಾಕ್"), ["o", "ಕ್ಲಾಕ್"]);
+        assert_eq!(script_runs("தமிழ்"), ["தமிழ்"]);
+        assert_eq!(script_runs("नमस्"), ["नमस्"]);
         assert_eq!(script_runs("१ರಲ್ಲಿ"), ["१"]);
         assert_eq!(script_runs("ಹೊಂದಿದೆ"), ["ಹೊಂದಿದೆ"]);
     }

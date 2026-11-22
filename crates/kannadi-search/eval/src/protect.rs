@@ -32,7 +32,8 @@ pub fn protected(counts: &HashMap<String, u64>) -> Vec<String> {
             let s = rounds(w).into_iter().next()?;
             // A shorter stem that is a common word in its own right (ಅಂಶ for ಅಂಶವಾಗಿದ್ದ,
             // ಉಡುಗೊರೆ for ಉಡುಗೊರೆಯನ್ನು) is the right reading.
-            if counts.get(&s).copied().unwrap_or(0) >= n {
+            let w_count = counts.get(&w_key).copied().unwrap_or(n).max(n);
+            if counts.get(&s).copied().unwrap_or(0) >= w_count {
                 return None;
             }
             let evidence: Vec<u64> = forms(w)

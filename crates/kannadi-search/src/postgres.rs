@@ -6,7 +6,8 @@
 //! the nukta, Old Kannada letters, vowel signs typed in 2 parts, a nasal with virama
 //! before its own consonant group, and Kannada digits. Replacements are not combined
 //! beyond the cases written out (ಸನ್‌ತೋಷ is), so rarer mixes stay apart, such as a
-//! nukta inside a 2-part vowel sign. Rules that depend on context (೦ typed for ಂ),
+//! nukta inside a 2-part vowel sign. A nasal cluster at the start of a word folds
+//! too, where [`crate::fold`] keeps it. Rules that depend on context (೦ typed for ಂ),
 //! stemming and legacy text need keys from [`crate::Analyzer`].
 
 use std::fmt::Write;
@@ -76,8 +77,17 @@ pub fn unaccent_rules() -> String {
             }
         }
     }
-    // Rule C4 for the anusvara, as typed.
+    // Rule C4 for the anusvara, as typed, and next to a folded nasal (ಕಂಞ್ಚ).
     rule("\u{0C82}\u{0C82}", "\u{0C82}");
+    rule("\u{0C82}\u{0C82}\u{0C82}", "\u{0C82}");
+    for (nasal, first, last) in NASAL_GROUPS {
+        for stop in first..=last {
+            rule(
+                &format!("{ANUSVARA}{nasal}{VIRAMA}{stop}"),
+                &format!("{ANUSVARA}{stop}"),
+            );
+        }
+    }
     for (i, digit) in ('೦'..='೯').enumerate() {
         rule(&digit.to_string(), &i.to_string());
     }
@@ -133,6 +143,8 @@ mod tests {
             "ಸಮ್\u{00AD}ಬಂಧ",
             "ಸನ಼್ತೋಷ",
             "ಕಂಂಡ",
+            "ಕಂಂಂಡ",
+            "ಕಂಞ್ಚ",
         ] {
             assert_eq!(apply(&rules, word), fold(word), "{word}");
         }
