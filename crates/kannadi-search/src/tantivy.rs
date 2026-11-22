@@ -40,17 +40,18 @@ pub struct KannadaTokenizer {
 
 impl Default for KannadaTokenizer {
     fn default() -> Self {
-        Self::new(true)
+        Self {
+            analyzer: Analyzer::new().stemming(false),
+            tokens: Vec::new(),
+        }
     }
 }
 
 impl KannadaTokenizer {
-    /// A tokenizer that converts legacy font lines when `legacy` is true.
-    pub fn new(legacy: bool) -> Self {
-        Self {
-            analyzer: Analyzer::new().stemming(false).legacy(legacy),
-            tokens: Vec::new(),
-        }
+    /// Turns conversion of legacy font lines on (the default) or off.
+    pub fn legacy(mut self, on: bool) -> Self {
+        self.analyzer = self.analyzer.legacy(on);
+        self
     }
 }
 
@@ -181,7 +182,7 @@ mod tests {
     fn the_tokenizer_alone_keeps_endings() {
         let mut plain = TextAnalyzer::from(KannadaTokenizer::default());
         assert_eq!(tokens(&mut plain, "ಮರಗಳಲ್ಲಿ")[0].0, "ಮರಗಳಲ್ಲಿ");
-        let mut no_legacy = TextAnalyzer::from(KannadaTokenizer::new(false));
+        let mut no_legacy = TextAnalyzer::from(KannadaTokenizer::default().legacy(false));
         assert!(tokens(&mut no_legacy, "PÀ£ÀßqÀ")
             .iter()
             .all(|t| t.0 != "ಕನ್ನಡ"));

@@ -119,16 +119,6 @@ impl Analyzer {
         self.analyze(text).into_iter().map(|t| t.text).collect()
     }
 
-    /// The key of 1 word, already split from its text.
-    pub fn key(&self, word: &str) -> String {
-        let folded = fold::fold(word);
-        if self.stem {
-            stem::stem(&folded)
-        } else {
-            folded
-        }
-    }
-
     fn push_word(&self, tokens: &mut Vec<Token>, word: &str, offsets: Range<usize>) {
         let stem = self.stem;
         let push = |keys: &[String], tokens: &mut Vec<Token>| {
@@ -157,6 +147,9 @@ impl Analyzer {
                 })
                 .collect();
             push(&keys, tokens);
+            if word.len() > CACHE_WORD_BYTES {
+                return;
+            }
             let map = &mut cache[usize::from(stem)];
             if map.len() >= CACHE_WORDS {
                 map.clear();
@@ -170,50 +163,79 @@ impl Analyzer {
 /// Text repeats words often, and a word's keys depend only on the word.
 type WordCache = [HashMap<String, Vec<String>>; 2];
 
-/// How many words each cache holds before it starts again.
+/// How many words each cache holds before it is emptied.
 const CACHE_WORDS: usize = 1 << 16;
+
+/// Longer words are not cached: real words are shorter, and a long run of letters
+/// with no space would fill the cache.
+const CACHE_WORD_BYTES: usize = 128;
 
 thread_local! {
     static CACHE: RefCell<WordCache> = RefCell::new([HashMap::new(), HashMap::new()]);
 }
 
-fn words_with_offsets(text: &str) -> impl Iterator<Item = (usize, &str)> {
-    text.split_word_bound_indices()
-        .filter(|(_, w)| w.chars().any(char::is_alphanumeric))
+/// The words of `text` at UAX #29 boundaries, with their byte offsets. A zero width
+/// space between 2 Kannada letters or signs joins them, as the profile's rule S2
+/// deletes it there (UAX #29 breaks at it).
+fn words_with_offsets(text: &str) -> Vec<(usize, &str)> {
+    let mut words: Vec<(usize, &str)> = Vec::new();
+    let mut joining = false;
+    for (start, segment) in text.split_word_bound_indices() {
+        if segment == "\u{200B}" {
+            joining = words.last().is_some_and(|&(s, w)| {
+                s + w.len() == start && w.chars().last().is_some_and(is_kannada_or_joiner)
+            });
+            continue;
+        }
+        let is_word = segment.chars().any(char::is_alphanumeric);
+        if joining && is_word && segment.starts_with(is_kannada_or_joiner) {
+            let (s, _) = words.pop().expect("joining follows a word");
+            words.push((s, &text[s..start + segment.len()]));
+        } else if is_word {
+            words.push((start, segment));
+        }
+        joining = false;
+    }
+    words
+}
+
+fn is_kannada_or_joiner(c: char) -> bool {
+    kannadi::chars::is_kannada(c) || matches!(c, '\u{200C}' | '\u{200D}')
 }
 
 fn words(text: &str) -> impl Iterator<Item = &str> {
-    words_with_offsets(text).map(|(_, w)| w)
+    words_with_offsets(text).into_iter().map(|(_, w)| w)
 }
 
 /// The searchable parts of a folded word: runs of Kannada and runs of other letters
-/// and digits. Kannada written straight after a number is a case ending of the
-/// number, as in 2026ರಲ್ಲಿ, and is dropped.
+/// and digits. Kannada written straight after a number or a word in another script
+/// is its case ending, as in 2026ರಲ್ಲಿ or Facebookನಲ್ಲಿ, and is dropped.
 fn script_runs(word: &str) -> Vec<&str> {
-    let mut runs = Vec::new();
+    let mut runs: Vec<&str> = Vec::new();
     let mut start = 0;
     let mut previous: Option<char> = None;
     for (i, c) in word.char_indices() {
-        if let Some(p) = previous {
-            if kannadi::chars::is_kannada(p) != kannadi::chars::is_kannada(c) {
-                runs.push((start, i));
-                start = i;
-            }
+        if previous.is_some_and(|p| kannadi::chars::is_kannada(p) != kannadi::chars::is_kannada(c))
+        {
+            runs.push(&word[start..i]);
+            start = i;
         }
         previous = Some(c);
     }
     if start < word.len() {
-        runs.push((start, word.len()));
+        runs.push(&word[start..]);
     }
     let mut kept = Vec::new();
-    let mut after_number = false;
-    for (s, e) in runs {
-        let run = &word[s..e];
+    let mut after_other_script = false;
+    for run in runs {
         let kannada = run.chars().next().is_some_and(kannadi::chars::is_kannada);
-        if !(kannada && after_number) && run.chars().any(|c| c.is_alphanumeric()) {
-            kept.push(run);
+        // Punctuation inside a word, as in O'ಕ್ಲಾಕ್, stays out of the tokens.
+        let trimmed =
+            run.trim_matches(|c: char| !c.is_alphanumeric() && !kannadi::chars::is_kannada(c));
+        if !(kannada && after_other_script) && trimmed.chars().any(char::is_alphanumeric) {
+            kept.push(trimmed);
         }
-        after_number = run.chars().last().is_some_and(|c| c.is_ascii_digit());
+        after_other_script = !kannada && run.chars().last().is_some_and(char::is_alphanumeric);
     }
     kept
 }
@@ -266,11 +288,23 @@ mod tests {
     }
 
     #[test]
+    fn a_zero_width_space_inside_a_kannada_word_joins_it() {
+        let analyzer = Analyzer::new().stemming(false);
+        assert_eq!(analyzer.keys("ಕನ್\u{200B}ನಡ"), ["ಕನ್ನಡ"]);
+        assert_eq!(analyzer.keys("ಕನ್\u{200C}\u{200B}ನಡ"), ["ಕನ್ನಡ"]);
+        assert_eq!(analyzer.keys("ಕನ್ನಡ\u{200B}word"), ["ಕನ್ನಡ", "word"]);
+        assert_eq!(analyzer.keys("ಕನ್ನಡ \u{200B}ನಾಡು"), ["ಕನ್ನಡ", "ನಾಡು"]);
+    }
+
+    #[test]
     fn numbers_split_from_their_endings() {
         assert_eq!(script_runs("2026ರಲ್ಲಿ"), ["2026"]);
         assert_eq!(script_runs("ಕೊಠಡಿ01"), ["ಕೊಠಡಿ", "01"]);
         assert_eq!(script_runs("ಎಸ್ಎಸ್ಎಲ್ಸಿ"), ["ಎಸ್ಎಸ್ಎಲ್ಸಿ"]);
         assert_eq!(script_runs("covid19ರಿಂದ"), ["covid19"]);
+        assert_eq!(script_runs("facebookನಲ್ಲಿ"), ["facebook"]);
+        assert_eq!(script_runs("o'ಕ್ಲಾಕ್"), ["o", "ಕ್ಲಾಕ್"]);
+        assert_eq!(script_runs("१ರಲ್ಲಿ"), ["१"]);
         assert_eq!(script_runs("ಹೊಂದಿದೆ"), ["ಹೊಂದಿದೆ"]);
     }
 
@@ -278,7 +312,6 @@ mod tests {
     fn stemming_is_optional() {
         assert_eq!(Analyzer::new().keys("ಮರಗಳಲ್ಲಿ"), ["ಮರ"]);
         assert_eq!(Analyzer::new().stemming(false).keys("ಮರಗಳಲ್ಲಿ"), ["ಮರಗಳಲ್ಲಿ"]);
-        assert_eq!(Analyzer::new().key("ಮರಗಳಲ್ಲಿ"), "ಮರ");
     }
 
     #[test]

@@ -11,7 +11,7 @@ assert_eq!(analyzer.keys("ಕನ್\u{200C}ನಡದ"), analyzer.keys("ಕನ್
 assert_eq!(analyzer.keys("PÀ£ÀßqÀ"), ["ಕನ್ನಡ"]);
 ```
 
-It plugs into [Tantivy](#tantivy) as a `TextAnalyzer`, into [Postgres](examples/postgres/README.md) full-text search, and, through a contribution being prepared for Meilisearch's tokenizer, [charabia](#meilisearch).
+It plugs into [Tantivy](#tantivy) as a `TextAnalyzer` and into [Postgres](examples/postgres/README.md) full-text search. For Meilisearch, a contribution to its tokenizer is being prepared ([below](#meilisearch)).
 
 ## Results
 
@@ -21,28 +21,30 @@ Recall and precision when searching for a noun in 1 spelling, measured on 3 docu
 - **Wikipedia, variant spellings**: the same sentences with spelling variants put in at random: joiners after a virama, ೦ for ಂ, a nasal with virama for ಂ (ಸಮ್ಬನ್ಧ), Old Kannada ೞ and ಱ, a nukta on ಜ and ಫ, vowel signs typed in 2 parts, and Kannada digits.
 - **Government PDFs**: the 5,098 lines of the Open Kannada legacy-encodings benchmark, from 275 public Karnataka government PDFs, as text extraction gives them: legacy font codes, such as PÀ£ÀßqÀ for ಕನ್ನಡ. The same lines in Unicode are the last column.
 
-Each cell is recall / precision. Queries are 1,000 nouns per set; a document is relevant when it holds the noun in any form ([how relevance is decided](eval/README.md#relevance)).
+Each cell is recall / precision, in percent. Queries are 1,000 nouns per set; a document is relevant when it holds the noun in any form ([how relevance is decided](eval/README.md#relevance)). n/a: the analyzer found nothing.
 
 | Analyzer | Wikipedia | Wikipedia, variant spellings | Government PDFs, legacy text | Government lines in Unicode |
 |---|---:|---:|---:|---:|
-| Whitespace split | 38.5 / 100.0 | 27.1 / 100.0 | 0.0 / 0.0 | 46.0 / 100.0 |
-| Tantivy default (`SimpleTokenizer`, `LowerCaser`) | 47.0 / 57.6 | 39.7 / 51.1 | 0.0 / 0.0 | 64.7 / 75.9 |
-| ICU (ICU4X word segmenter, NFKC_Casefold) | 44.6 / 100.0 | 39.6 / 100.0 | 0.0 / 0.0 | 56.3 / 100.0 |
-| Meilisearch default (charabia 0.10.0) | 45.3 / 95.7 | 38.1 / 94.5 | 0.0 / 0.0 | 57.2 / 99.8 |
-| kannadi-search, spelling only | 44.7 / 100.0 | 44.7 / 100.0 | 56.7 / 99.9 | 57.2 / 99.9 |
-| **kannadi-search** | **97.6 / 96.8** | **97.6 / 96.8** | **90.8 / 97.1** | **91.3 / 97.1** |
+| Whitespace split | 41.7 / 100.0 | 28.3 / 100.0 | 0.0 / n/a | 50.4 / 100.0 |
+| Tantivy default (`SimpleTokenizer`, `LowerCaser`) | 50.4 / 70.8 | 42.3 / 63.5 | 0.0 / n/a | 63.1 / 75.7 |
+| ICU (ICU4X word segmenter, NFKC_Casefold) | 47.7 / 100.0 | 41.9 / 100.0 | 0.0 / n/a | 61.2 / 100.0 |
+| Meilisearch default (charabia 0.10.0) | 48.5 / 99.2 | 40.6 / 98.2 | 0.0 / n/a | 62.0 / 99.9 |
+| kannadi-search, spelling only | 47.7 / 100.0 | 47.7 / 100.0 | 61.0 / 100.0 | 62.0 / 100.0 |
+| **kannadi-search** | **97.8 / 98.5** | **97.8 / 98.5** | **95.9 / 97.4** | **97.4 / 97.3** |
 
 What the numbers show:
 
-- **Endings are most of the gap.** A Kannada noun takes case, plural and clitic endings, and Kannada writes "is" and "become" (ಇದೆ, ಆಗಿ) joined to the noun: ಮರ appears as ಮರದ, ಮರಗಳಲ್ಲಿ, ಮರವಾಗಿದೆ. Without stemming, a search finds fewer than half of the documents that use the word.
-- **Spelling variants cost the other analyzers 5 to 11 points of recall.** kannadi-search scores the same on the variant text as on the clean text. ICU removes joiners through NFKC_Casefold but keeps the nukta, ೦ and Old Kannada letters apart. charabia keeps joiners in tokens and splits words at a ZWNJ (ಕನ್‌ನಡ becomes ಕನ್ and ನಡ).
-- **Tantivy's default tokenizer splits words at the virama.** `SimpleTokenizer` keeps runs of alphanumeric characters, and the virama is not alphanumeric, so ಕನ್ನಡ becomes ಕನ and ನಡ. Its recall looks higher because such fragments match many words; its precision is 51% to 76%.
-- **Legacy text is invisible to every other analyzer.** On text extracted from legacy-font PDFs they find nothing. kannadi-search converts legacy lines with kannadi's converter and loses half a point against the same lines in Unicode.
-- **Precision stays near 97%.** Most of the remaining false matches on Wikipedia are not wrong: the reference lexicon lists some inflected forms as lemmas of their own (ಪ್ರಕಾರವು beside ಪ್ರಕಾರ, ಅನೇಕರು beside ಅನೇಕ), and it files adverbs such as ಪ್ರಮುಖವಾಗಿ under adjectives, which are no query. About 1 in 20 is a real conflation, such as ಹಿಂದು ("Hindu") with ಹಿಂದಕ್ಕೆ ("backwards").
+- **Endings are most of the gap.** A Kannada noun takes case, plural and clitic endings, and Kannada writes "is" and "become" (ಇದೆ, ಆಗಿ) joined to the noun: ಮರ appears as ಮರದ, ಮರಗಳಲ್ಲಿ, ಮರವಾಗಿದೆ. Without stemming, a search finds about half of the documents that use the word.
+- **Spelling variants cost the other analyzers 6 to 13 points of recall.** ICU removes joiners through NFKC_Casefold but keeps the nukta, ೦ and Old Kannada letters apart. charabia keeps joiners in tokens and splits words at a ZWNJ (ಕನ್‌ನಡ becomes ಕನ್ and ನಡ).
+- **Tantivy's default tokenizer splits words at the virama.** `SimpleTokenizer` keeps runs of alphanumeric characters, and the virama is not alphanumeric, so ಕನ್ನಡ becomes ಕನ and ನಡ. Its recall looks higher because such fragments match many words; its precision is 64% to 76%.
+- **Legacy text is invisible to every other analyzer.** On text extracted from legacy-font PDFs they find nothing. kannadi-search converts legacy words with kannadi's converter and loses 1.5 points against the same lines in Unicode.
+- **Precision stays near 98%.** Many of the remaining false matches are not wrong: the reference lexicon has no entry for some forms (ಚರ್ಚ್ and ಚರ್ಚು are the same "church"), and it files adverbs such as ಪ್ರಮುಖವಾಗಿ under adjectives, which are no query. Others are real conflations, such as ಹಿಂದು ("Hindu") with ಹಿಂದಕ್ಕೆ ("backwards").
 
 Limits of the measurement:
 
 - Relevance comes from kannada-morph's analyzer with its full lexicon (Alar and Kannada Wikipedia), and the stemmer uses the same analyzer's endings without the lexicon. The baselines do no stemming at all, so their order does not depend on this, but the stemmer's recall is measured against the paradigms it was built from: endings kannada-morph lacks are missing from both.
+- The variant set holds the variants kannadi-search was built to fold, so its equal score on clean and variant text shows that the folding works, and says nothing of variants it does not know.
+- The stemmer's rules and data were refined while reading errors on a separate development set of 3,000 sentences; the Wikipedia columns come from a test set that was only scored. I also read errors on the government set while building the first version, so its numbers are less strict.
 - Queries are nouns. Verbs are out of scope: ಮಾಡಿದರು does not find ಮಾಡು.
 - The government lines' Unicode text is the benchmark's expected text, mostly confirmed by OCR and not yet checked by a reader. That set lives in a private repository, so it is not in this repository and CI does not run it; the Wikipedia sets are in `eval/data` and CI checks their numbers.
 
@@ -52,19 +54,19 @@ Reproduce the table with the steps in [eval/README.md](eval/README.md).
 
 [`Analyzer::analyze`](src/lib.rs) runs 4 steps.
 
-1. **Legacy text** ([`legacy`](src/legacy.rs)). A line where at least 40% of the characters, and at least 2, are Windows-1252 characters above ASCII is read as legacy font codes. kannadi picks its layout (Nudi and Baraha, Akruti, Shree-Lipi, Nudi B-Akshara or Kan-Eng) and converts it word by word, so each token keeps the place of its legacy word.
-2. **Words**. Text splits at Unicode word boundaries ([UAX #29](https://www.unicode.org/reports/tr29/)), which never fall inside an akshara: vowel signs, the virama, the nukta and joiners stay with their letter. A property test checks that every token starts and ends at an akshara boundary. A word that mixes a number and Kannada gives the number alone: ೨೦೨೬ರಲ್ಲಿ ("in 2026") gives 2026.
+1. **Legacy text** ([`legacy`](src/legacy.rs)). Words with Windows-1252 characters above ASCII (quotes and dashes aside) are read as legacy font codes when those characters are at least 40% of the words, there are at least 2, and the words convert cleanly in the best layout (Nudi and Baraha, Akruti, Shree-Lipi, Nudi B-Akshara or Kan-Eng): accented European words, such as Ñúñez, do not. A line that is mostly legacy words converts whole; in a line that mixes them with English, only the legacy words convert. Words convert 1 at a time, so each token keeps the place of its legacy word.
+2. **Words**. Text splits at Unicode word boundaries ([UAX #29](https://www.unicode.org/reports/tr29/)), which never fall inside an akshara: vowel signs, the virama, the nukta and joiners stay with their letter. A property test checks that every token starts and ends at an akshara boundary. Kannada written straight after a number or a word in another script is its case ending and is dropped: ೨೦೨೬ರಲ್ಲಿ ("in 2026") gives 2026, and Facebookನಲ್ಲಿ gives facebook. A zero width space inside a Kannada word does not split it.
 3. **Spelling** ([`fold`](src/fold.rs)). Each word becomes its search key: the search form of kannadi's [normalization profile](../../NORMALIZATION.md#search-form) (joiners, the nukta, Old Kannada letters, ೦ typed for ಂ, vowel signs in 2 parts, and the other canonical rules), then a nasal with virama before a consonant of its own group becomes ಂ (ಸಮ್ಬನ್ಧ, ಸಂಬಂಧ), Kannada digits become ASCII digits, and other letters are lowercased.
 4. **Endings** ([`stem`](src/stem.rs)). Case, plural and clitic endings, and ಆಗು and ಇರು written joined to a noun, are removed: ಮರಗಳಲ್ಲಿ, ಮರವನ್ನು and ಮರವಾಗಿದೆ all give ಮರ.
 
 The stemmer knows no dictionary. It runs kannada-morph's noun paradigms backwards and is careful in 4 ways:
 
 - A stem keeps at least 2 aksharas: in shorter words an ending is most often part of the word.
-- 1,940 words that end like an inflected noun but are stems of their own stay whole, such as ಮೆರವಣಿಗೆ ("procession"), which is not ಮೆರವಣಿ with a dative ending. A word is on this list when Kannada Wikipedia has at least 2 other forms built on it that are not forms of the shorter stem, and those forms are together at least a tenth as frequent as the word.
-- When endings give more than 1 stem, the stem Kannada Wikipedia uses most as a word wins: ವ್ಯಕ್ತಿಗೆ ("to the person") reads as ವ್ಯಕ್ತಿ + ಗೆ, as ಕಾಡಿಗೆ reads as ಕಾಡು + ಇಗೆ. 3,785 stems carry the counts for this.
+- 1,277 words that end like an inflected noun but are stems of their own stay whole, such as ಮೆರವಣಿಗೆ ("procession"), which is not ಮೆರವಣಿ with a dative ending. A word is on this list when Kannada Wikipedia has at least 2 forms built on it whose stemming passes through it, those forms are together at least 1 tenth as frequent as the word, and the shorter stem is rarer as a word.
+- When endings give more than 1 stem, the stem Kannada Wikipedia uses most as a word wins: ವ್ಯಕ್ತಿಗೆ ("to the person") reads as ವ್ಯಕ್ತಿ + ಗೆ, as ಕಾಡಿಗೆ reads as ಕಾಡು + ಇಗೆ. 3,781 stems carry the counts for this.
 - Otherwise the longest ending wins, and when it leaves 2 different stems, the word stays whole.
 
-A key is a search key and need not be a dictionary headword. A final ು after a consonant becomes a virama, so a loanword and its ು form fold together (ಬ್ಯಾಂಕ್, ಬ್ಯಾಂಕು) and ಕಾಡು's key is ಕಾಡ್. Analyzing a key again gives the same key, so a query typed in the citation form matches.
+Endings come off 1 at a time, up to 4 (ಮನೆಯನ್ನಾಗಿ, then ಮನೆಯನ್ನು, then ಮನೆ). A key is a search key and need not be a dictionary headword: a final ು after a consonant becomes a virama, so a loanword and its ು form fold together (ಬ್ಯಾಂಕ್, ಬ್ಯಾಂಕು) and ಕಾಡು's key is ಕಾಡ್. Analyzing a key again gives the same key, which a test checks on every word of the test set.
 
 Use the same analyzer for documents and queries. `Analyzer::new().stemming(false)` gives spelling keys alone, for fields where endings matter; `.legacy(false)` skips legacy detection.
 
@@ -73,11 +75,11 @@ Use the same analyzer for documents and queries. `Analyzer::new().stemming(false
 | File | What | From |
 |---|---|---|
 | `data/suffixes.tsv` | 1,521 noun endings: stem final, characters to strip, characters to add | kannada-morph's paradigms ([kannada-spell](https://github.com/openkannada/kannada-spell) at 9366c23), by `eval` |
-| `data/protected.txt` | 1,940 words the stemmer keeps whole | Kannada Wikipedia word counts of the training articles, by `eval` |
-| `data/preferred.tsv` | 3,785 stems with their Wikipedia counts | the same counts, by `eval` |
-| `eval/data/` | the Wikipedia evaluation set: sentences, variant sentences, queries and relevant documents | held-out Kannada Wikipedia articles |
+| `data/protected.txt` | 1,277 words the stemmer keeps whole | Kannada Wikipedia word counts of the training articles, by `eval` |
+| `data/preferred.tsv` | 3,781 stems with their Wikipedia counts | the same counts, by `eval` |
+| `eval/data/` | the Wikipedia development and test sets: sentences, variant sentences, queries and relevant documents | held-out Kannada Wikipedia articles |
 
-The counts come from the Kannada Wikipedia dump of 1 November 2026, split by article as kannada-spell splits it: every 10th article is held out, and the evaluation sentences come only from held-out articles.
+The counts come from the Kannada Wikipedia dump of 1 November 2026, split by article as kannada-spell splits it: every 10th article is held out, and the evaluation sentences come only from held-out articles. The development and test sets are 2 disjoint samples of them.
 
 ## Tantivy
 
@@ -96,7 +98,7 @@ let index = Index::create_in_ram(schema.build());
 index.tokenizers().register("kannada", kannadi_search::tantivy::analyzer());
 ```
 
-Token offsets point at the original word, legacy text included, so highlighting works. A test indexes Kannada, variant and legacy documents and checks what each query finds.
+Token offsets point at the original word, legacy text included, so highlighting works. `KannadaTokenizer::default().legacy(false)` skips legacy detection. A test indexes Kannada, variant and legacy documents and checks what each query finds. Tantivy's `RemoveLongFilter` can follow the stemmer to drop very long tokens.
 
 ## Meilisearch
 
@@ -108,4 +110,4 @@ Meilisearch tokenizes with [charabia](https://github.com/meilisearch/charabia). 
 
 ## Speed
 
-On an Apple M1 Pro, in 1 run over the 3,000 Wikipedia sentences repeated 10 times: kannadi-search 15.6 MB/s with stemming and 13.5 MB/s without, charabia 8.8 MB/s, ICU4X 8.7 MB/s, Tantivy's default 4.9 MB/s. The machine was busy with other work, so the rows compare with each other only. Each thread keeps the keys of the last 65,536 distinct words, which is most of the gain on repeated text. Legacy lines are slower, about 0.7 MB/s, because detecting the layout converts each line in every layout.
+1 pass over all 102,111 held-out Wikipedia sentences (30 MB), each analyzer starting cold, on an Apple M1 Pro that was also running other work: kannadi-search 20.4 MB/s without stemming and 13.4 MB/s with it; ICU4X 24.7 MB/s, charabia 22.0 MB/s, Tantivy's default 13.4 MB/s. Most of kannadi-search's time goes to normalization and stemming; each thread keeps the keys of up to 65,536 words and empties the store when it is full, which helps on text that repeats words. Lines in legacy fonts run at about 0.8 MB/s, because choosing the layout converts them in every layout.

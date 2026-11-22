@@ -4,13 +4,16 @@
 //! `unaccent` replaces fixed strings, longest first, with no context. That covers the
 //! context-free part of [`crate::fold`]: joiners and other invisible characters,
 //! the nukta, Old Kannada letters, vowel signs typed in 2 parts, a nasal with virama
-//! before its own consonant group, and Kannada digits. It cannot do the rules that
-//! depend on context (ೞ is context-free, ೦ for ಂ is not), stemming or legacy text;
-//! for those, store keys from [`crate::Analyzer`].
+//! before its own consonant group, and Kannada digits. Replacements are not combined
+//! beyond the cases written out (ಸನ್‌ತೋಷ is), so rarer mixes stay apart, such as a
+//! nukta inside a 2-part vowel sign. Rules that depend on context (೦ typed for ಂ),
+//! stemming and legacy text need keys from [`crate::Analyzer`].
 
 use std::fmt::Write;
 
 use kannadi::chars::{ANUSVARA, NUKTA, VIRAMA};
+
+use crate::fold::NASAL_GROUPS;
 
 /// The rules, 1 per line: a string and its replacement separated by a tab, or a
 /// string alone to delete it.
@@ -56,20 +59,25 @@ pub fn unaccent_rules() -> String {
     ] {
         rule(parts, sign);
     }
-    for (nasal, group) in [
-        ('ಙ', 'ಕ'..='ಘ'),
-        ('ಞ', 'ಚ'..='ಝ'),
-        ('ಣ', 'ಟ'..='ಢ'),
-        ('ನ', 'ತ'..='ಧ'),
-        ('ಮ', 'ಪ'..='ಭ'),
-    ] {
-        for stop in group {
-            rule(
-                &format!("{nasal}{VIRAMA}{stop}"),
-                &format!("{ANUSVARA}{stop}"),
-            );
+    // A nasal with virama before its group's stop, also with a nukta on the nasal or an
+    // invisible character after the virama: unaccent makes 1 pass, so these come whole.
+    let between = [
+        "", "\u{200C}", "\u{200D}", "\u{200B}", "\u{00AD}", "\u{2060}", "\u{FEFF}",
+    ];
+    for (nasal, first, last) in NASAL_GROUPS {
+        for stop in first..=last {
+            for nukta in ["", "\u{0CBC}"] {
+                for gap in between {
+                    rule(
+                        &format!("{nasal}{nukta}{VIRAMA}{gap}{stop}"),
+                        &format!("{ANUSVARA}{stop}"),
+                    );
+                }
+            }
         }
     }
+    // Rule C4 for the anusvara, as typed.
+    rule("\u{0C82}\u{0C82}", "\u{0C82}");
     for (i, digit) in ('೦'..='೯').enumerate() {
         rule(&digit.to_string(), &i.to_string());
     }
@@ -121,6 +129,10 @@ mod tests {
             "ಗಙ್ಗಾ",
             "೨೦೨೬",
             "ಕನ್ನಡ",
+            "ಸನ್\u{200C}ತೋಷ",
+            "ಸಮ್\u{00AD}ಬಂಧ",
+            "ಸನ಼್ತೋಷ",
+            "ಕಂಂಡ",
         ] {
             assert_eq!(apply(&rules, word), fold(word), "{word}");
         }

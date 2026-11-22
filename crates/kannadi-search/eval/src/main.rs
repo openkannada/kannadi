@@ -15,15 +15,17 @@ const MORPH_REV: &str = "9366c23f32324d0ac631e1c61276d237a4151336";
 const SEED: u64 = 20_261_122;
 
 const USAGE: &str = "usage:
-  kannadi-search-eval rules OUT.tsv
+  kannadi-search-eval rules OUT.tsv [--predicates]
+  kannadi-search-eval prefer WIKI-TRAIN-COUNTS.tsv OUT.tsv
   kannadi-search-eval protect WIKI-TRAIN-COUNTS.tsv OUT.txt
-  kannadi-search-eval wiki N OUT-DIR < knwiki-pages-articles.xml
+  kannadi-search-eval wiki N OUT-DIR [ALL-SENTENCES.tsv] < knwiki-pages-articles.xml
   kannadi-search-eval gov BENCHMARK-LINES-DIR OUT-DIR
   kannadi-search-eval gold LEXICON.tsv CLEAN-DOCS.tsv MAX-QUERIES OUT.tsv WIKI-TRAIN-COUNTS.tsv
   kannadi-search-eval score QUERIES.tsv DOCS.tsv
   kannadi-search-eval errors QUERIES.tsv DOCS.tsv
   kannadi-search-eval why WIKI-TRAIN-COUNTS.tsv WORD...
-  kannadi-search-eval speed DOCS.tsv";
+  kannadi-search-eval speed DOCS.tsv
+  kannadi-search-eval profile DOCS.tsv";
 
 fn main() {
     let args: Vec<String> = std::env::args().skip(1).collect();
@@ -52,24 +54,40 @@ fn main() {
             let n: usize = arg(1).parse().unwrap_or_else(|_| fail());
             let all = wiki::held_out_sentences(BufReader::new(io::stdin().lock()));
             eprintln!("{} held-out sentences", all.len());
-            let step = (all.len() / n).max(1);
-            let docs: Vec<(String, String)> = all
-                .into_iter()
-                .step_by(step)
-                .take(n)
-                .enumerate()
-                .map(|(i, s)| (format!("w{:05}", i + 1), s))
-                .collect();
-            let mut rng = variants::Rng::new(SEED);
-            let varied: Vec<(String, String)> = docs
-                .iter()
-                .map(|(id, t)| (id.clone(), variants::vary(t, &mut rng)))
-                .collect();
-            write(&format!("{}/wiki-docs.tsv", arg(2)), &docs_tsv(&docs));
-            write(
-                &format!("{}/wiki-variant-docs.tsv", arg(2)),
-                &docs_tsv(&varied),
-            );
+            // 2 disjoint samples: a development set for looking at errors, and a test set
+            // that is only scored.
+            let step = (all.len() / n).max(2);
+            for (name, offset, prefix, seed) in [
+                ("wiki-dev", 0, "d", SEED),
+                ("wiki", step / 2, "w", SEED + 1),
+            ] {
+                let docs: Vec<(String, String)> = all
+                    .iter()
+                    .skip(offset)
+                    .step_by(step)
+                    .take(n)
+                    .enumerate()
+                    .map(|(i, s)| (format!("{prefix}{:05}", i + 1), s.clone()))
+                    .collect();
+                let mut rng = variants::Rng::new(seed);
+                let varied: Vec<(String, String)> = docs
+                    .iter()
+                    .map(|(id, t)| (id.clone(), variants::vary(t, &mut rng)))
+                    .collect();
+                write(&format!("{}/{name}-docs.tsv", arg(2)), &docs_tsv(&docs));
+                write(
+                    &format!("{}/{name}-variant-docs.tsv", arg(2)),
+                    &docs_tsv(&varied),
+                );
+            }
+            if let Some(path) = args.get(3) {
+                let every: Vec<(String, String)> = all
+                    .into_iter()
+                    .enumerate()
+                    .map(|(i, s)| (format!("a{i}"), s))
+                    .collect();
+                write(path, &docs_tsv(&every));
+            }
         }
         Some("gov") => {
             let (mut legacy, mut expected) = (Vec::new(), Vec::new());
@@ -120,11 +138,15 @@ fn main() {
             println!("| Analyzer | Recall | Precision |\n|---|---:|---:|");
             for system in systems::all() {
                 let s = score::score(&system, &docs, &queries);
+                let precision = if s.found == 0 {
+                    "n/a".to_string()
+                } else {
+                    format!("{:.1}%", 100.0 * s.precision)
+                };
                 println!(
-                    "| {} | {:.1}% | {:.1}% |",
+                    "| {} | {:.1}% | {precision} |",
                     system.name,
-                    100.0 * s.recall,
-                    100.0 * s.precision
+                    100.0 * s.recall
                 );
                 eprintln!(
                     "{}: found {} of {} relevant",
@@ -146,21 +168,23 @@ fn main() {
             write(arg(2), &out);
         }
         Some("speed") => {
-            let docs = read_docs(arg(1));
+            // 1 pass over text that does not repeat, each analyzer on a new thread, so
+            // kannadi-search starts with an empty word cache.
+            let docs = std::sync::Arc::new(read_docs(arg(1)));
             let bytes: usize = docs.iter().map(|(_, t)| t.len()).sum();
-            for system in systems::all() {
-                let start = std::time::Instant::now();
-                let mut tokens = 0;
-                for _ in 0..10 {
-                    for (_, text) in &docs {
-                        tokens += (system.tokens)(text).len();
-                    }
-                }
-                let secs = start.elapsed().as_secs_f64();
+            for i in 0..systems::all().len() {
+                let docs = docs.clone();
+                let (name, secs, tokens) = std::thread::spawn(move || {
+                    let system = systems::all().swap_remove(i);
+                    let start = std::time::Instant::now();
+                    let tokens: usize = docs.iter().map(|(_, t)| (system.tokens)(t).len()).sum();
+                    (system.name, start.elapsed().as_secs_f64(), tokens)
+                })
+                .join()
+                .expect("speed thread");
                 println!(
-                    "{}: {:.1} MB/s, {:.2} M tokens/s",
-                    system.name,
-                    10.0 * bytes as f64 / secs / 1e6,
+                    "{name}: {:.1} MB/s, {:.2} M tokens/s",
+                    bytes as f64 / secs / 1e6,
                     tokens as f64 / secs / 1e6
                 );
             }
@@ -213,22 +237,19 @@ fn main() {
             println!("detect {:?}", t.elapsed() / 10);
         }
         Some("why") => {
+            use kannadi_search::stem::build::{forms, key, rounds};
             let counts = protect::read_counts(&read(arg(1)));
             for w in &args[2..] {
-                let s = kannadi_search::stem::strip_ending(w);
-                println!("{w}: strips to {s:?}");
-                let of_s: std::collections::HashSet<String> = s
-                    .as_deref()
-                    .map(kannadi_search::stem::forms)
-                    .unwrap_or_default()
-                    .into_iter()
-                    .collect();
-                for f in kannadi_search::stem::forms(w) {
+                println!("{w}: {:?}", rounds(w));
+                for f in forms(w) {
                     if let Some(n) = counts.get(&f) {
-                        println!(
-                            "  {f} {n} {}",
-                            if of_s.contains(&f) { "(also of s)" } else { "" }
-                        );
+                        let r = rounds(&f);
+                        let evidence = if r.contains(&key(w)) {
+                            " (evidence)"
+                        } else {
+                            ""
+                        };
+                        println!("  {f} {n} {r:?}{evidence}");
                     }
                 }
             }

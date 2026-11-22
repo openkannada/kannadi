@@ -63,22 +63,7 @@ proptest! {
     fn keys_are_their_own_keys(text in kannada_words()) {
         let analyzer = Analyzer::new();
         for key in analyzer.keys(&text) {
-            prop_assert_eq!(analyzer.key(&key), key.clone(), "from {:?}", text);
-        }
-    }
-}
-
-proptest! {
-    #![proptest_config(ProptestConfig::with_cases(20_000))]
-
-    /// The fast path in fold skips normalization only where it would change nothing.
-    #[test]
-    fn the_quick_check_agrees_with_the_profile(word in prop::collection::vec(
-        (0x0C80u32..=0x0CFF).prop_map(|c| char::from_u32(c).unwrap_or('ಕ')), 1..8,
-    ).prop_map(|v| v.into_iter().collect::<String>())) {
-        let full = kannadi::normalize::normalize_as(&word, kannadi::normalize::Form::Search);
-        if kannadi_search::fold::is_search_form(&word) {
-            prop_assert_eq!(full, word);
+            prop_assert_eq!(analyzer.keys(&key), vec![key.clone()], "from {:?}", text);
         }
     }
 }

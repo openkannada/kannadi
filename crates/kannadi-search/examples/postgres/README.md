@@ -15,7 +15,7 @@ psql -f setup.sql
 SELECT id FROM documents WHERE body_search @@ plainto_tsquery('kannada', 'ಕನ್ನಡ');
 ```
 
-This finds ಕನ್‌ನಡ for ಕನ್ನಡ and ೨೦೨೬ for 2026. It does not remove endings, read legacy text, or apply the rules that depend on context, such as ೦ typed for ಂ after a letter.
+This finds ಕನ್‌ನಡ for ಕನ್ನಡ and ೨೦೨೬ for 2026. `unaccent` makes 1 pass, so the file writes out the combinations that matter, such as a joiner or nukta inside a nasal cluster (ಸನ್‌ತೋಷ); rarer mixes, such as a nukta inside a 2-part vowel sign, stay apart. It does not remove endings, read legacy text, or apply the rules that depend on context, such as ೦ typed for ಂ after a letter.
 
 The rules file is generated: `cargo run -p kannadi-search --example postgres_rules > kannada.rules`, and a test checks that the committed file matches.
 

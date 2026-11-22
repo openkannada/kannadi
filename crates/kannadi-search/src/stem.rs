@@ -29,7 +29,7 @@ use kannadi::chars::{is_consonant, is_vowel_sign, NUKTA, VIRAMA};
 use kannadi::count_aksharas;
 
 /// The fewest aksharas a stem keeps.
-pub const MIN_STEM_AKSHARAS: usize = 2;
+const MIN_STEM_AKSHARAS: usize = 2;
 
 const SUFFIXES: &str = include_str!("../data/suffixes.tsv");
 const PROTECTED: &str = include_str!("../data/protected.txt");
@@ -51,39 +51,65 @@ pub fn stem(word: &str) -> String {
     if word.is_empty() || !word.chars().all(kannadi::chars::is_kannada) {
         return word.to_string();
     }
-    // A stem can itself end like a form (ಅಂತಾರಾಷ್ಟ್ರೀಯರಿಗೆ, then ಅಂತಾರಾಷ್ಟ್ರೀಯ), so the
-    // rules run until the key stops changing; that makes a key its own stem.
-    let mut current = key(word);
+    reduce(word, true)
+}
+
+/// The key `word` reduces to, removing 1 ending per round. Each round starts from the
+/// stem as the rule spelled it: ಮನೆಯನ್ನಾಗಿ gives ಮನೆಯನ್ನು, then ಮನೆ. Its key, ಮನೆಯನ್ನ್,
+/// would end the search, as no ending ends in a virama.
+fn reduce(word: &str, protect: bool) -> String {
+    rounds(word, protect).pop().unwrap_or_else(|| key(word))
+}
+
+/// The key after each round of [`reduce`].
+fn rounds(word: &str, protect: bool) -> Vec<String> {
     let mut spelled = word.to_string();
+    let mut keys = Vec::new();
     for _ in 0..MAX_ROUNDS {
-        if is_protected(&spelled) {
+        if protect && is_protected(&spelled) {
             break;
         }
         match strip(&spelled) {
-            Some(next) if next != current => {
-                current = next.clone();
+            Some(next) if key(&next) != key(&spelled) => {
+                keys.push(key(&next));
                 spelled = next;
             }
             _ => break,
         }
     }
-    current
+    keys
 }
 
 /// How many times an ending is removed at most: case on plural on a fused ಆಗು is 3.
 const MAX_ROUNDS: usize = 4;
 
-/// The stem the endings and preferred stems give, ignoring the protected words. For
-/// the tool that builds `data/protected.txt`.
-#[doc(hidden)]
-pub fn strip_ending(word: &str) -> Option<String> {
-    strip(word)
+/// The preferred stem with the highest count among the [`candidates`] of `word`; else
+/// the stem the longest ending leaves, if it leaves only 1. The stem is spelled as the
+/// rule leaves it.
+fn strip(word: &str) -> Option<String> {
+    let readings = spelled_readings(word);
+    let preferred = preferred();
+    let mut best: Option<(&String, u64)> = None;
+    for stem in readings.iter().flatten() {
+        // The list holds only stems no ending shortens (see `candidates`).
+        if let Some(&n) = preferred.get(key(stem).as_str()) {
+            if best.is_none_or(|(_, b)| n > b) {
+                best = Some((stem, n));
+            }
+        }
+    }
+    if let Some((stem, _)) = best {
+        return Some(stem.clone());
+    }
+    match readings.first().map(Vec::as_slice) {
+        Some([only]) => Some(only.clone()),
+        _ => None,
+    }
 }
 
-/// Every form the rules make from `stem`, other than `stem` itself. For the tool that
-/// builds `data/protected.txt`.
-#[doc(hidden)]
-pub fn forms(stem: &str) -> Vec<String> {
+#[cfg(feature = "build-data")]
+/// Every form the rules make from `stem`, other than `stem` itself.
+fn forms(stem: &str) -> Vec<String> {
     let mut forms: Vec<String> = rules()
         .by_add
         .iter()
@@ -96,40 +122,17 @@ pub fn forms(stem: &str) -> Vec<String> {
     forms
 }
 
-/// The preferred stem with the highest count among the [`candidates`] of `word`; else
-/// the stem the longest ending leaves, if it leaves only 1.
-fn strip(word: &str) -> Option<String> {
-    let readings = spelled_readings(word);
-    let preferred = preferred();
-    let mut best: Option<(String, u64)> = None;
-    for stem in readings.iter().flatten() {
-        // The list holds only stems no ending shortens (see `candidates`).
-        let key = key(stem);
-        if let Some(&n) = preferred.get(key.as_str()) {
-            if best.as_ref().is_none_or(|(_, b)| n > *b) {
-                best = Some((key, n));
-            }
-        }
-    }
-    if let Some((stem, _)) = best {
-        return Some(stem);
-    }
-    match readings.first().map(Vec::as_slice) {
-        Some([only]) => Some(key(only)),
-        _ => None,
-    }
-}
-
+#[cfg(any(test, feature = "build-data"))]
 /// True when no ending shortens any spelling of `key`.
 fn is_final(key: &str) -> bool {
     spellings(key).all(|s| spelled_readings(&s).is_empty())
 }
 
+#[cfg(any(test, feature = "build-data"))]
 /// The stems of `word` that no ending shortens further in any spelling, as keys,
 /// longest ending first. A plural such as ಅಂಶಗಳು (key ಅಂಶಗಳ್) is not a candidate for
 /// ಅಂಶಗಳನ್ನು: Wikipedia uses it often as a word, but it is itself a form of ಅಂಶ.
-#[doc(hidden)]
-pub fn candidates(word: &str) -> Vec<String> {
+fn candidates(word: &str) -> Vec<String> {
     let mut out: Vec<String> = Vec::new();
     for stem in spelled_readings(word).into_iter().flatten() {
         let key = key(&stem);
@@ -140,9 +143,9 @@ pub fn candidates(word: &str) -> Vec<String> {
     out
 }
 
+#[cfg(any(test, feature = "build-data"))]
 /// The spellings with this key: ಕಾಡ್ and ಕಾಡು for ಕಾಡ್.
-#[doc(hidden)]
-pub fn spellings(key: &str) -> impl Iterator<Item = String> {
+fn spellings(key: &str) -> impl Iterator<Item = String> {
     let u = key
         .strip_suffix(VIRAMA)
         .filter(|body| body.chars().last().is_some_and(is_consonant))
@@ -166,11 +169,11 @@ fn preferred() -> &'static HashMap<&'static str, u64> {
     })
 }
 
+#[cfg(any(test, feature = "build-data"))]
 /// The stems each matching ending leaves, as [`key`]s, longest ending first: 1 list
 /// per ending length, each key once. A reading that gives the word's own key back
 /// (ಕಾಡು as the loanword ಕಾಡ್ with "ು") is not a reading.
-#[doc(hidden)]
-pub fn readings(word: &str) -> Vec<Vec<String>> {
+fn readings(word: &str) -> Vec<Vec<String>> {
     spelled_readings(word)
         .into_iter()
         .map(|stems| stems.iter().map(|s| key(s)).collect())
@@ -197,10 +200,20 @@ fn spelled_readings(word: &str) -> Vec<Vec<String>> {
                 && count_aksharas(&stem) >= MIN_STEM_AKSHARAS
                 && is_spelled_right(&stem)
             {
-                let key = key(&stem);
-                if key != word_key && !keys.contains(&key) {
-                    keys.push(key);
+                let stem_key = key(&stem);
+                if stem_key == word_key {
+                    continue;
+                }
+                if !keys.contains(&stem_key) {
+                    keys.push(stem_key);
                     stems.push(stem);
+                } else if stem.ends_with('ು') {
+                    // Keep the "ು" spelling of a key: endings can still follow it.
+                    for s in out.iter_mut().chain([&mut stems]).flatten() {
+                        if key(s) == stem_key {
+                            *s = stem.clone();
+                        }
+                    }
                 }
             }
         }
@@ -226,11 +239,45 @@ fn is_spelled_right(stem: &str) -> bool {
 /// 1 spelling for stems that Kannada writes 2 ways: a final consonant with "ು"
 /// (ಬ್ಯಾಂಕು, ಕಾಡು) becomes that consonant with a virama (ಬ್ಯಾಂಕ್, ಕಾಡ್), as a
 /// loanword is also written. No ending ends in a virama, so a key is never cut again.
-#[doc(hidden)]
-pub fn key(stem: &str) -> String {
+fn key(stem: &str) -> String {
     match stem.strip_suffix('ು') {
         Some(body) if body.chars().last().is_some_and(is_consonant) => format!("{body}{VIRAMA}"),
         _ => stem.to_string(),
+    }
+}
+
+/// What the tool in `eval/` needs to rebuild `data/preferred.tsv` and
+/// `data/protected.txt`. Not a stable interface.
+#[cfg(feature = "build-data")]
+pub mod build {
+    /// The keys each matching ending leaves, longest ending first.
+    pub fn readings(word: &str) -> Vec<Vec<String>> {
+        super::readings(word)
+    }
+
+    /// The keys of [`readings`] that no ending shortens further.
+    pub fn candidates(word: &str) -> Vec<String> {
+        super::candidates(word)
+    }
+
+    /// Every form the rules make from a stem.
+    pub fn forms(stem: &str) -> Vec<String> {
+        super::forms(stem)
+    }
+
+    /// The spellings with a key: ಕಾಡ್ and ಕಾಡು for ಕಾಡ್.
+    pub fn spellings(key: &str) -> Vec<String> {
+        super::spellings(key).collect()
+    }
+
+    /// A stem's key.
+    pub fn key(stem: &str) -> String {
+        super::key(stem)
+    }
+
+    /// The key after each round of stemming, ignoring the protected words.
+    pub fn rounds(word: &str) -> Vec<String> {
+        super::rounds(word, false)
     }
 }
 
@@ -329,6 +376,21 @@ mod tests {
         assert_eq!(stem("ಅಭಿವೃದ್ಧಿಗೆ"), "ಅಭಿವೃದ್ಧಿ");
         assert_eq!(stem("ಕಾಡಿಗೆ"), "ಕಾಡ್");
         assert!(preferred().len() > 1000);
+    }
+
+    #[test]
+    fn endings_come_off_1_at_a_time_from_the_spelled_stem() {
+        // ಮನೆಯನ್ನಾಗಿ: ಮನೆಯನ್ನು + ಆಗಿ, then ಮನೆ + ಅನ್ನು.
+        assert_eq!(stem("ಮನೆಯನ್ನಾಗಿ"), "ಮನೆ");
+        assert_eq!(stem("ಸಂಸ್ಥೆಯನ್ನಾಗಿ"), stem("ಸಂಸ್ಥೆ"));
+        same_stem(&["ಆಳ್ವಾರರು", "ಆಳ್ವಾರರುಗಳು"]);
+    }
+
+    #[test]
+    fn inflected_forms_are_not_protected() {
+        assert_eq!(stem("ಅಂಶವಾಗಿದ್ದ"), "ಅಂಶ");
+        assert_eq!(stem("ಸಾಧನವನ್ನು"), "ಸಾಧನ");
+        assert_eq!(stem("ಉಡುಗೊರೆಯನ್ನು"), "ಉಡುಗೊರೆ");
     }
 
     #[test]

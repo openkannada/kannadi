@@ -75,14 +75,14 @@ pub fn errors(docs: &[(String, String)], queries: &[(String, Vec<String>)]) -> (
         .iter()
         .map(|(_, t)| {
             kannada_morph::script::words(t)
-                .map(|w| (analyzer.key(&w), w))
+                .map(|w| (analyzer.keys(&w).join(" "), w))
                 .collect()
         })
         .collect();
     let (mut false_hits, mut misses): (HashMap<String, usize>, HashMap<String, usize>) =
         Default::default();
     for (query, gold) in queries {
-        let key = analyzer.key(query);
+        let key = analyzer.keys(query).join(" ");
         let gold: HashSet<usize> = gold
             .iter()
             .filter_map(|id| ids.get(id.as_str()).copied())
@@ -102,7 +102,7 @@ pub fn errors(docs: &[(String, String)], queries: &[(String, Vec<String>)]) -> (
                 let prefix: String = kannadi::split(query).into_iter().take(2).collect();
                 for (_, w) in doc.iter().filter(|(_, w)| w.starts_with(&prefix)) {
                     *misses
-                        .entry(format!("{query} -> {w} [{}]", analyzer.key(w)))
+                        .entry(format!("{query} -> {w} [{}]", analyzer.keys(w).join(" ")))
                         .or_default() += 1;
                 }
             }

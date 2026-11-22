@@ -29,6 +29,14 @@ pub fn fold(word: &str) -> String {
     if word.is_ascii() {
         return word.to_ascii_lowercase();
     }
+    // Lowercase first, so normalization sees any marks lowercasing adds (İ gives i + U+0307).
+    let lowered;
+    let word = if word.chars().any(char::is_uppercase) {
+        lowered = word.to_lowercase();
+        lowered.as_str()
+    } else {
+        word
+    };
     let normalized = if is_search_form(word) {
         word.to_string()
     } else {
@@ -39,7 +47,9 @@ pub fn fold(word: &str) -> String {
     let mut i = 0;
     while i < chars.len() {
         let c = chars[i];
-        if chars.get(i + 1) == Some(&VIRAMA)
+        // ಂ needs a letter before it: ಞ್ಚ at the start of a word stays.
+        if i > 0
+            && chars.get(i + 1) == Some(&VIRAMA)
             && chars.get(i + 2).is_some_and(|&next| is_homorganic(c, next))
         {
             out.push(ANUSVARA);
@@ -48,7 +58,6 @@ pub fn fold(word: &str) -> String {
         }
         match c {
             '\u{0CE6}'..='\u{0CEF}' => out.push(char::from(b'0' + (c as u32 - 0x0CE6) as u8)),
-            c if c.is_uppercase() => out.extend(c.to_lowercase()),
             c => out.push(c),
         }
         i += 1;
@@ -63,8 +72,7 @@ pub fn fold(word: &str) -> String {
 /// True for Kannada text that no rule of the search form changes, checked in 1 pass:
 /// only Kannada letters, signs and digits other than ೦, with none of the characters
 /// or pairs the rules rewrite. Most words pass, which saves the full normalization.
-#[doc(hidden)]
-pub fn is_search_form(word: &str) -> bool {
+fn is_search_form(word: &str) -> bool {
     let mut previous: Option<char> = None;
     word.chars().all(|c| {
         let ok = match c {
@@ -94,23 +102,41 @@ fn is_vowel_letter(c: char) -> bool {
     kannadi::chars::is_vowel(c)
 }
 
-/// True when `nasal` is the nasal of the consonant group (varga) of `next`:
-/// ಙ before ಕ to ಘ, ಞ before ಚ to ಝ, ಣ before ಟ to ಢ, ನ before ತ to ಧ, ಮ before ಪ to ಭ.
-/// A doubled nasal, as in ಕನ್ನಡ, is not in its own group's stops and stays.
+/// Each nasal and the stops of its consonant group (varga). A doubled nasal, as in
+/// ಕನ್ನಡ, is not in its own group's stops and stays.
+pub(crate) const NASAL_GROUPS: [(char, char, char); 5] = [
+    ('ಙ', 'ಕ', 'ಘ'),
+    ('ಞ', 'ಚ', 'ಝ'),
+    ('ಣ', 'ಟ', 'ಢ'),
+    ('ನ', 'ತ', 'ಧ'),
+    ('ಮ', 'ಪ', 'ಭ'),
+];
+
+/// True when `nasal` is the nasal of the consonant group of `next`.
 fn is_homorganic(nasal: char, next: char) -> bool {
-    match nasal {
-        'ಙ' => ('ಕ'..='ಘ').contains(&next),
-        'ಞ' => ('ಚ'..='ಝ').contains(&next),
-        'ಣ' => ('ಟ'..='ಢ').contains(&next),
-        'ನ' => ('ತ'..='ಧ').contains(&next),
-        'ಮ' => ('ಪ'..='ಭ').contains(&next),
-        _ => false,
-    }
+    NASAL_GROUPS
+        .iter()
+        .any(|&(n, first, last)| n == nasal && (first..=last).contains(&next))
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use proptest::prelude::*;
+
+    proptest! {
+        #![proptest_config(ProptestConfig::with_cases(20_000))]
+
+        /// The quick check skips normalization only where it would change nothing.
+        #[test]
+        fn the_quick_check_agrees_with_the_profile(word in prop::collection::vec(
+            (0x0C80u32..=0x0CFF).prop_map(|c| char::from_u32(c).unwrap_or('ಕ')), 1..8,
+        ).prop_map(|v| v.into_iter().collect::<String>())) {
+            if is_search_form(&word) {
+                prop_assert_eq!(normalize_as(&word, Form::Search), word);
+            }
+        }
+    }
 
     #[test]
     fn profile_search_form_applies() {
@@ -148,6 +174,7 @@ mod tests {
             assert_eq!(fold(word), word);
         }
         assert_eq!(fold("ನ್ಕ"), "ನ್ಕ");
+        assert_eq!(fold("ಞ್ಚ"), "ಞ್ಚ");
     }
 
     #[test]
@@ -178,6 +205,8 @@ mod tests {
         assert_eq!(fold("ಕೊಠಡಿ೦೧"), "ಕೊಠಡಿ01");
         assert_eq!(fold("ÉCOLE"), "école");
         assert_eq!(fold("İ"), "i\u{307}");
+        let dotted = "İ\u{0CCD}";
+        assert_eq!(fold(&fold(dotted)), fold(dotted));
     }
 
     #[test]

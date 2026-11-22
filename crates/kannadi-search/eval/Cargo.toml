@@ -13,7 +13,7 @@ publish = false
 [dependencies]
 kannada-morph = { git = "https://github.com/openkannada/kannada-spell", rev = "9366c23f32324d0ac631e1c61276d237a4151336" }
 kannadi = { path = "../../kannadi" }
-kannadi-search = { path = ".." }
+kannadi-search = { path = "..", features = ["build-data"] }
 charabia = { version = "0.10.0", default-features = false }
 icu_segmenter = "2.4.0"
 icu_normalizer = "2.4.0"

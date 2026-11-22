@@ -15,6 +15,8 @@ include = ["src/**/*.rs", "data/*.tsv", "data/*.txt", "README.md"]
 [features]
 # A tantivy TextAnalyzer: the tokenizer and the stemming filter.
 tantivy = ["dep:tantivy"]
+# Functions the tool in eval/ uses to rebuild the data files. Not a stable interface.
+build-data = []
 
 [dependencies]
 kannadi = { path = "../kannadi", version = "0.1.0" }

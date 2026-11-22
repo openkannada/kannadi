@@ -1,5 +1,6 @@
-//! Recall and precision on the Wikipedia evaluation set in eval/data, as the README
-//! reports them. eval/README.md says how the set was made.
+//! Recall and precision on the Wikipedia test set in eval/data, as the README reports
+//! them. eval/README.md says how the set was made; the development set beside it is for
+//! looking at errors.
 
 use std::collections::{HashMap, HashSet};
 use std::fs;
@@ -67,7 +68,7 @@ fn stemming_finds_inflected_forms() {
         let (recall, precision) = score(Analyzer::new(), &docs(set));
         eprintln!("{set}: recall {recall:.4}, precision {precision:.4}");
         assert!(recall >= 0.975, "{set}: recall {recall}");
-        assert!(precision >= 0.965, "{set}: precision {precision}");
+        assert!(precision >= 0.98, "{set}: precision {precision}");
     }
 }
 
@@ -85,7 +86,7 @@ fn every_key_is_its_own_key() {
     let analyzer = Analyzer::new();
     for (_, text) in docs("wiki-variant-docs.tsv") {
         for key in analyzer.keys(&text) {
-            assert_eq!(analyzer.key(&key), key, "in {text}");
+            assert_eq!(analyzer.keys(&key), std::slice::from_ref(&key), "in {text}");
         }
     }
 }

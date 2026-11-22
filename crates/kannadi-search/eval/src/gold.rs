@@ -8,8 +8,10 @@
 //! Queries are noun lemmas of 2 or more aksharas found in 2 or more documents, that
 //! Kannada Wikipedia's training articles have as a word at least 10 times: the lexicon
 //! also holds stems no one types alone, such as ಮತ್ (of ಮತ್ತು). A lemma
-//! that is itself a form of another lemma (the lexicon lists ಮರವು beside ಮರ) is not a
-//! query: the 2 entries split 1 word's documents between them.
+//! that is itself a form of another lemma (the lexicon lists ಮರವು beside ಮರ, and
+//! ಅನೇಕರು beside ಅನೇಕ) is not a query: the 2 entries split 1 word's documents between
+//! them. That is checked by the analyzer and by the paradigms alone, since some such
+//! entries have no analysis as a form.
 
 use std::collections::{BTreeMap, BTreeSet, HashMap};
 
@@ -61,6 +63,11 @@ pub fn build(
         .into_iter()
         .filter(|(lemma, ids)| ids.len() >= 2 && kannadi::count_aksharas(lemma) >= 2)
         .filter(|(lemma, _)| analyzer.analyze(lemma).iter().all(|a| a.lemma == *lemma))
+        .filter(|(lemma, _)| {
+            !analyzer.splits(lemma).any(|(stem, rule)| {
+                !rule.add.is_empty() && stem != *lemma && analyzer.lexicon().contains_stem(&stem)
+            })
+        })
         .filter(|(lemma, _)| counts.get(lemma).is_some_and(|&n| n >= MIN_QUERY_COUNT))
         .map(|(lemma, ids)| (lemma, ids.into_iter().collect()))
         .collect();
