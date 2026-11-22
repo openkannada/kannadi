@@ -13,9 +13,11 @@
 - `kannadi-typing`, a new crate: ranked Kannada words for loosely typed English letters, from a 4-gram model over (letters, Kannada unit) pairs trained on the Aksharantar pairs, a beam search through a lexicon of 232,003 Kannada Wikipedia words, completions, strict Baraha and ITRANS readings, the previous word, and the user's picks. 89.19% top-1 and 96.77% top-5 on the Dakshina Kannada test set; IndicXlit published 77.18% top-1. The first word is what the letters spell: the strict reading for 1 or 2 letters ("ka" gives ಕ), and the best-fitting reading when the letters likely start a longer word ("namas" gives ನಮಸ್, then ನಮಸ್ಕಾರ); the strict reading is always in the first 5. The model (`model/kn.typing`) is under CC BY-SA 4.0.
 - `kannadi-typing-wasm`, WebAssembly bindings for the typing engine, with a smoke test that times every keystroke.
 - `kannadi type`: the ranked Kannada words for words typed in English letters, with `--prev`, `-n` and `--scores`.
+- `kannadi-py`, Python bindings built with PyO3 and maturin, and an npm package of the WebAssembly bindings (`crates/kannadi-wasm/npm`), with CI jobs that build and test both. Neither is published yet.
 
 ### Changed
 
+- The README is shorter: results, the parts of the workspace, supported fonts and install. The library guide moved to `docs/library.md`, the command-line guide to `docs/cli.md` and the editor page guide to `docs/editor.md`. The library guide's examples run as doctests.
 - Breaking: `normalize` now gives the profile's canonical form, so it changes text the 0.1.0 version left alone. Besides NFC, look-alike vowel letters and repeated marks, it builds ಔ from ಒ + ೌ, moves a nukta to its consonant, and settles joiners: ZWJ after a virama becomes ZWNJ, ರ + virama + ZWJ becomes ರ + ZWJ + virama, a joiner between a consonant and its virama goes, and joiners that change nothing are removed.
 
 ## 0.1.0 - 2026-11-18
