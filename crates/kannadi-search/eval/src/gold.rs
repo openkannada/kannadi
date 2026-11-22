@@ -50,7 +50,10 @@ pub fn build(
                 lemmas
             });
             for lemma in lemmas.iter() {
-                relevant.entry(lemma.clone()).or_default().insert(id.clone());
+                relevant
+                    .entry(lemma.clone())
+                    .or_default()
+                    .insert(id.clone());
             }
         }
     }
@@ -69,7 +72,9 @@ pub fn build(
     }
     candidates.truncate(max_queries);
     candidates.sort();
-    Gold { queries: candidates }
+    Gold {
+        queries: candidates,
+    }
 }
 
 pub fn write(gold: &Gold) -> String {

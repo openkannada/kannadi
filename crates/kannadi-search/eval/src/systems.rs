@@ -1,7 +1,5 @@
 //! The analyzers compared: each turns text into the tokens a search index stores.
 
-use std::borrow::Cow;
-
 use charabia::Tokenize;
 use icu_casemap::CaseMapperBorrowed;
 use icu_normalizer::ComposingNormalizerBorrowed;
@@ -10,9 +8,12 @@ use icu_segmenter::WordSegmenter;
 use kannadi_search::Analyzer;
 use tantivy::tokenizer::{LowerCaser, SimpleTokenizer, TextAnalyzer};
 
+/// Text to the tokens an index stores.
+pub type Tokens = Box<dyn Fn(&str) -> Vec<String>>;
+
 pub struct System {
     pub name: &'static str,
-    pub tokens: Box<dyn Fn(&str) -> Vec<String>>,
+    pub tokens: Tokens,
 }
 
 pub fn all() -> Vec<System> {
@@ -77,10 +78,15 @@ fn icu(text: &str) -> Vec<String> {
         .map(|w| &text[w[0]..w[1]])
         .filter(|w| w.chars().any(char::is_alphanumeric))
         .map(|w| {
-            let folded: Cow<str> = case.fold_string(&nfkc.normalize(w)).into_owned().into();
-            let cleaned: String = folded
+            let cleaned: String = case
+                .fold_string(&nfkc.normalize(w))
                 .chars()
-                .filter(|c| !matches!(c, '\u{00AD}' | '\u{200B}'..='\u{200F}' | '\u{2060}' | '\u{FEFF}'))
+                .filter(|c| {
+                    !matches!(
+                        c,
+                        '\u{00AD}' | '\u{200B}'..='\u{200F}' | '\u{2060}' | '\u{FEFF}'
+                    )
+                })
                 .collect();
             nfkc.normalize(&cleaned).into_owned()
         })

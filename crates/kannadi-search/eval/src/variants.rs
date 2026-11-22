@@ -68,7 +68,9 @@ pub fn vary(text: &str, rng: &mut Rng) -> String {
                     out.push(nasal);
                     out.push(VIRAMA);
                 }
-                _ if next.is_some_and(kannadi::chars::is_kannada) && rng.chance(30) => out.push('೦'),
+                _ if next.is_some_and(kannadi::chars::is_kannada) && rng.chance(30) => {
+                    out.push('೦')
+                }
                 _ => out.push(c),
             },
             'ಳ' if rng.chance(5) => out.push('\u{0CDE}'),

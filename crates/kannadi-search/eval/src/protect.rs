@@ -39,7 +39,9 @@ pub fn protected(counts: &HashMap<String, u64>) -> Vec<String> {
 
 /// The forms of every stem with this key: ಕಾಡ್ is the key of ಕಾಡ್ and ಕಾಡು.
 fn forms_of_key(key: &str) -> HashSet<String> {
-    kannadi_search::stem::spellings(key).flat_map(|s| forms(&s)).collect()
+    kannadi_search::stem::spellings(key)
+        .flat_map(|s| forms(&s))
+        .collect()
 }
 
 pub fn read_counts(text: &str) -> HashMap<String, u64> {
@@ -75,7 +77,10 @@ pub fn preferred(counts: &HashMap<String, u64>) -> Vec<(String, u64)> {
         .filter(|(w, &n)| n >= MIN_COUNT && w.chars().all(kannadi::chars::is_kannada))
         .filter_map(|(w, _)| {
             let groups = kannadi_search::stem::readings(w);
-            let default = groups.first().filter(|g| g.len() == 1).map(|g| g[0].clone());
+            let default = groups
+                .first()
+                .filter(|g| g.len() == 1)
+                .map(|g| g[0].clone());
             let cands = kannadi_search::stem::candidates(w);
             if cands.is_empty() || (cands.len() == 1 && default.as_ref() == cands.first()) {
                 return None;

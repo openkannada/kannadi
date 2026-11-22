@@ -26,7 +26,14 @@ use kannadi::normalize::{normalize_as, Form};
 /// assert_eq!(fold("Bengaluru"), "bengaluru");
 /// ```
 pub fn fold(word: &str) -> String {
-    let normalized = normalize_as(word, Form::Search);
+    if word.is_ascii() {
+        return word.to_ascii_lowercase();
+    }
+    let normalized = if is_search_form(word) {
+        word.to_string()
+    } else {
+        normalize_as(word, Form::Search)
+    };
     let chars: Vec<char> = normalized.chars().collect();
     let mut out = String::with_capacity(normalized.len());
     let mut i = 0;
@@ -51,6 +58,40 @@ pub fn fold(word: &str) -> String {
         return normalize_as(&out, Form::Search);
     }
     out
+}
+
+/// True for Kannada text that no rule of the search form changes, checked in 1 pass:
+/// only Kannada letters, signs and digits other than ೦, with none of the characters
+/// or pairs the rules rewrite. Most words pass, which saves the full normalization.
+#[doc(hidden)]
+pub fn is_search_form(word: &str) -> bool {
+    let mut previous: Option<char> = None;
+    word.chars().all(|c| {
+        let ok = match c {
+            // Outside the block, the nukta, Old Kannada letters, ೦, and the length
+            // marks that NFC joins into a vowel sign (rules C1, C3, L1, S1 to S3).
+            c if !('\u{0C80}'..='\u{0CFF}').contains(&c) => false,
+            '\u{0CBC}' | '\u{0CDE}' | '\u{0CB1}' | '\u{0CDD}' | '\u{0CF3}' | '\u{0CDC}' => false,
+            '\u{0CE6}' | '\u{0CD5}' | '\u{0CD6}' => false,
+            c => match previous {
+                // A repeated mark (C4), ೆ + ೂ (C1), a sign on a vowel letter (C2), or a
+                // sign after a virama (L3).
+                Some(p) if is_mark(c) && (p == c || is_vowel_letter(p) || p == VIRAMA) => false,
+                Some('\u{0CC6}') if c == '\u{0CC2}' => false,
+                _ => true,
+            },
+        };
+        previous = Some(c);
+        ok
+    })
+}
+
+fn is_mark(c: char) -> bool {
+    kannadi::chars::class(c).is_mark()
+}
+
+fn is_vowel_letter(c: char) -> bool {
+    kannadi::chars::is_vowel(c)
 }
 
 /// True when `nasal` is the nasal of the consonant group (varga) of `next`:
@@ -102,10 +143,33 @@ mod tests {
 
     #[test]
     fn other_clusters_with_a_nasal_stay() {
-        for word in ["ಕನ್ನಡ", "ಅಮ್ಮ", "ಅಣ್ಣ", "ಜನ್ಮ", "ಬ್ರಹ್ಮ", "ತಾಮ್ರ", "ಅನ್ಯ", "ಮ್ಯೂಸಿಯಂ"] {
+        for word in ["ಕನ್ನಡ", "ಅಮ್ಮ", "ಅಣ್ಣ", "ಜನ್ಮ", "ಬ್ರಹ್ಮ", "ತಾಮ್ರ", "ಅನ್ಯ", "ಮ್ಯೂಸಿಯಂ"]
+        {
             assert_eq!(fold(word), word);
         }
         assert_eq!(fold("ನ್ಕ"), "ನ್ಕ");
+    }
+
+    #[test]
+    fn the_quick_check_passes_only_text_the_profile_keeps() {
+        for word in ["ಕನ್ನಡ", "ಮರಗಳಲ್ಲಿ", "ಕೀರ್ತಿ", "೧೯೯"]
+        {
+            assert!(is_search_form(word), "{word}");
+        }
+        for word in [
+            "ಕನ್\u{200C}ನಡ",
+            "ಜ಼",
+            "ಬಾೞ್",
+            "ಬೆ೦ಗಳೂರು",
+            "ಕಿ\u{0CD5}",
+            "ಕೊ",
+            "ಅಥವಾಾ",
+            "ಉಾರು",
+            "ಸಕರ್ಾರ",
+            "ಕನ್ನಡa",
+        ] {
+            assert!(!is_search_form(word), "{word}");
+        }
     }
 
     #[test]
@@ -119,7 +183,8 @@ mod tests {
     #[test]
     fn folding_is_idempotent() {
         assert_eq!(fold("ಕಂಞ್ಚ"), "ಕಂಚ");
-        for word in ["ಕನ್\u{200C}ನಡ", "ಸಮ್ಬನ್ಧ", "ಬೆ೦ಗಳೂರು", "ಸಕರ್ಾರ", "ÉCOLE", "ಙ್ಙ"] {
+        for word in ["ಕನ್\u{200C}ನಡ", "ಸಮ್ಬನ್ಧ", "ಬೆ೦ಗಳೂರು", "ಸಕರ್ಾರ", "ÉCOLE", "ಙ್ಙ"]
+        {
             let once = fold(word);
             assert_eq!(fold(&once), once, "{word}");
         }

@@ -29,7 +29,9 @@ pub fn unaccent_rules() -> String {
         }
     };
     // ZWNJ, ZWJ, ZWSP, soft hyphen, word joiner and BOM: rule S2 of the profile.
-    for c in ['\u{200C}', '\u{200D}', '\u{200B}', '\u{00AD}', '\u{2060}', '\u{FEFF}'] {
+    for c in [
+        '\u{200C}', '\u{200D}', '\u{200B}', '\u{00AD}', '\u{2060}', '\u{FEFF}',
+    ] {
         rule(&c.to_string(), "");
     }
     rule(&NUKTA.to_string(), "");
@@ -122,6 +124,15 @@ mod tests {
         ] {
             assert_eq!(apply(&rules, word), fold(word), "{word}");
         }
+    }
+
+    #[test]
+    fn the_example_rules_file_is_current() {
+        assert_eq!(
+            include_str!("../examples/postgres/kannada.rules"),
+            unaccent_rules(),
+            "rerun: cargo run -p kannadi-search --example postgres_rules > examples/postgres/kannada.rules"
+        );
     }
 
     #[test]

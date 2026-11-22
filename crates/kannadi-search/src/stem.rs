@@ -17,7 +17,7 @@
 //! - otherwise the longest ending wins, and when it gives more than 1 stem, the word
 //!   is left alone.
 //!
-//! Verbs are out of scope. The result is a search key, not always a dictionary
+//! Verbs are out of scope. The result is a search key and need not be a dictionary
 //! headword: a final "ು" after a consonant becomes a virama, so a loanword and its
 //! "ು" form (ಬ್ಯಾಂಕ್, ಬ್ಯಾಂಕು) fold together, and ಕಾಡು's key is ಕಾಡ್. Stemming a
 //! key again gives the same key.
@@ -48,7 +48,7 @@ const PREFERRED: &str = include_str!("../data/preferred.tsv");
 /// assert_eq!(stem("ಮೆರವಣಿಗೆ"), "ಮೆರವಣಿಗೆ");
 /// ```
 pub fn stem(word: &str) -> String {
-    if !word.chars().all(|c| kannadi::chars::is_kannada(c)) || word.is_empty() {
+    if word.is_empty() || !word.chars().all(kannadi::chars::is_kannada) {
         return word.to_string();
     }
     // A stem can itself end like a form (ಅಂತಾರಾಷ್ಟ್ರೀಯರಿಗೆ, then ಅಂತಾರಾಷ್ಟ್ರೀಯ), so the
@@ -99,20 +99,30 @@ pub fn forms(stem: &str) -> Vec<String> {
 /// The preferred stem with the highest count among the [`candidates`] of `word`; else
 /// the stem the longest ending leaves, if it leaves only 1.
 fn strip(word: &str) -> Option<String> {
+    let readings = spelled_readings(word);
     let preferred = preferred();
     let mut best: Option<(String, u64)> = None;
-    for stem in candidates(word) {
-        if let Some(&n) = preferred.get(stem.as_str()) {
-            if best.as_ref().is_none_or(|(_, b)| n > *b) {
-                best = Some((stem, n));
+    for stem in readings.iter().flatten() {
+        let key = key(stem);
+        // Only listed stems need the costlier check that no ending shortens them.
+        if let Some(&n) = preferred.get(key.as_str()) {
+            if best.as_ref().is_none_or(|(_, b)| n > *b) && is_final(&key) {
+                best = Some((key, n));
             }
         }
     }
     if let Some((stem, _)) = best {
         return Some(stem);
     }
-    let first = readings(word).into_iter().next()?;
-    (first.len() == 1).then(|| first.into_iter().next()).flatten()
+    match readings.first().map(Vec::as_slice) {
+        Some([only]) => Some(key(only)),
+        _ => None,
+    }
+}
+
+/// True when no ending shortens any spelling of `key`.
+fn is_final(key: &str) -> bool {
+    spellings(key).all(|s| spelled_readings(&s).is_empty())
 }
 
 /// The stems of `word` that no ending shortens further in any spelling, as keys,
@@ -123,7 +133,7 @@ pub fn candidates(word: &str) -> Vec<String> {
     let mut out: Vec<String> = Vec::new();
     for stem in spelled_readings(word).into_iter().flatten() {
         let key = key(&stem);
-        if spellings(&key).all(|s| spelled_readings(&s).is_empty()) && !out.contains(&key) {
+        if is_final(&key) && !out.contains(&key) {
             out.push(key);
         }
     }
@@ -147,7 +157,9 @@ fn preferred() -> &'static HashMap<&'static str, u64> {
             .lines()
             .filter(|l| !l.starts_with('#'))
             .map(|l| {
-                let (stem, n) = l.split_once('\t').expect("data/preferred.tsv: stem and count");
+                let (stem, n) = l
+                    .split_once('\t')
+                    .expect("data/preferred.tsv: stem and count");
                 (stem, n.parse().expect("data/preferred.tsv: count"))
             })
             .collect()
@@ -171,7 +183,12 @@ fn spelled_readings(word: &str) -> Vec<Vec<String>> {
     let word_key = key(word);
     let mut keys: Vec<String> = Vec::new();
     let mut out: Vec<Vec<String>> = Vec::new();
-    for (i, _) in word.char_indices().skip(1) {
+    let shortest_head = word.len().saturating_sub(rules.longest_add);
+    for (i, _) in word
+        .char_indices()
+        .skip(1)
+        .filter(|&(i, _)| i >= shortest_head)
+    {
         let (head, add) = word.split_at(i);
         let mut stems: Vec<String> = Vec::new();
         for rule in rules.by_add.get(add).into_iter().flatten() {
@@ -258,6 +275,8 @@ impl Rule {
 
 struct Rules {
     by_add: HashMap<&'static str, Vec<Rule>>,
+    /// The length of the longest ending, in bytes.
+    longest_add: usize,
 }
 
 fn rules() -> &'static Rules {
@@ -277,7 +296,11 @@ fn rules() -> &'static Rules {
             let finals = finals.split(',').map(parse_final).collect();
             by_add.entry(add).or_default().push(Rule { strip, finals });
         }
-        Rules { by_add }
+        let longest_add = by_add.keys().map(|a| a.len()).max().unwrap_or(0);
+        Rules {
+            by_add,
+            longest_add,
+        }
     })
 }
 
@@ -295,7 +318,10 @@ mod tests {
 
     fn same_stem(words: &[&str]) {
         let stems: Vec<String> = words.iter().map(|w| stem(w)).collect();
-        assert!(stems.windows(2).all(|p| p[0] == p[1]), "{words:?} -> {stems:?}");
+        assert!(
+            stems.windows(2).all(|p| p[0] == p[1]),
+            "{words:?} -> {stems:?}"
+        );
     }
 
     #[test]

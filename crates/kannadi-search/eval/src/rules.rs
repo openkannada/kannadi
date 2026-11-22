@@ -4,8 +4,8 @@ use std::collections::BTreeMap;
 use std::fmt::Write;
 
 use kannada_morph::class::{Final, ALL_CLASSES};
-use kannada_morph::rules::rules_for;
 use kannada_morph::noun::Declension;
+use kannada_morph::rules::rules_for;
 use kannada_morph::Class;
 
 /// Classes whose endings the stemmer removes. ಆಕೆ-type pronouns (She) decline like ಮನೆ.
@@ -34,7 +34,9 @@ pub fn table(morph_rev: &str, predicates: bool) -> String {
                     Final::Char(c) => (rule.add.clone(), c.to_string()),
                     Final::Doubled(_) => continue,
                 };
-                let finals = rows.entry((class.flag().to_string(), rule.strip.clone(), add)).or_default();
+                let finals = rows
+                    .entry((class.flag().to_string(), rule.strip.clone(), add))
+                    .or_default();
                 if !finals.contains(&fin) {
                     finals.push(fin);
                 }
@@ -42,10 +44,18 @@ pub fn table(morph_rev: &str, predicates: bool) -> String {
         }
     }
     let mut out = String::new();
-    writeln!(out, "# Noun endings for kannadi-search's stemmer: stem - strip + add = form, for stems").unwrap();
+    writeln!(
+        out,
+        "# Noun endings for kannadi-search's stemmer: stem - strip + add = form, for stems"
+    )
+    .unwrap();
     writeln!(out, "# ending in 1 of `finals` (C: a consonant with its inherent vowel; else the stem's last characters).").unwrap();
     writeln!(out, "# Generated from the noun paradigms of kannada-morph (github.com/openkannada/kannada-spell,").unwrap();
-    writeln!(out, "# commit {morph_rev}) by crates/kannadi-search/eval: case, plural and clitic forms only.").unwrap();
+    writeln!(
+        out,
+        "# commit {morph_rev}) by crates/kannadi-search/eval: case, plural and clitic forms only."
+    )
+    .unwrap();
     writeln!(out, "class\tstrip\tadd\tfinals").unwrap();
     for ((class, strip, add), finals) in rows {
         writeln!(out, "{class}\t{strip}\t{add}\t{}", finals.join(",")).unwrap();
@@ -56,5 +66,7 @@ pub fn table(morph_rev: &str, predicates: bool) -> String {
 /// ಆಗು ("become, be") and ಇರು ("there is") written fused to a noun: ಸ್ಪಷ್ಟವಾಗಿ, ಮರವಾದ,
 /// ಮನೆಯಲ್ಲಿದೆ. The quotative ಎನ್ನು (ಮರವೆಂದು) and ಅಲ್ಲ (ಮರವಲ್ಲ) are left as words.
 fn is_copula(tags: &str) -> bool {
-    tags.split('|').skip(1).all(|p| p.starts_with("ಆಗು+") || p.starts_with("ಇರು+"))
+    tags.split('|')
+        .skip(1)
+        .all(|p| p.starts_with("ಆಗು+") || p.starts_with("ಇರು+"))
 }

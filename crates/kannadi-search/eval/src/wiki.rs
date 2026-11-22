@@ -77,7 +77,10 @@ fn sentences(wikitext: &str) -> Vec<String> {
 /// 6 to 40 words, at least 80% of them Kannada, no markup left.
 fn is_kannada_sentence(s: &str) -> bool {
     let words: Vec<&str> = s.split(' ').collect();
-    let kannada = words.iter().filter(|w| w.chars().any(kannadi::chars::is_kannada)).count();
+    let kannada = words
+        .iter()
+        .filter(|w| w.chars().any(kannadi::chars::is_kannada))
+        .count();
     (6..=40).contains(&words.len())
         && kannada * 5 >= words.len() * 4
         && !s.contains(['[', ']', '{', '}', '|', '=', '\t', '<', '>'])

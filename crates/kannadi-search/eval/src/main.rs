@@ -12,7 +12,7 @@ use std::fs;
 use std::io::{self, BufReader};
 
 const MORPH_REV: &str = "9366c23f32324d0ac631e1c61276d237a4151336";
-const SEED: u64 = 2026_11_22;
+const SEED: u64 = 20_261_122;
 
 const USAGE: &str = "usage:
   kannadi-search-eval rules OUT.tsv
@@ -20,13 +20,19 @@ const USAGE: &str = "usage:
   kannadi-search-eval wiki N OUT-DIR < knwiki-pages-articles.xml
   kannadi-search-eval gov BENCHMARK-LINES-DIR OUT-DIR
   kannadi-search-eval gold LEXICON.tsv CLEAN-DOCS.tsv MAX-QUERIES OUT.tsv WIKI-TRAIN-COUNTS.tsv
-  kannadi-search-eval score QUERIES.tsv DOCS.tsv";
+  kannadi-search-eval score QUERIES.tsv DOCS.tsv
+  kannadi-search-eval errors QUERIES.tsv DOCS.tsv
+  kannadi-search-eval why WIKI-TRAIN-COUNTS.tsv WORD...
+  kannadi-search-eval speed DOCS.tsv";
 
 fn main() {
     let args: Vec<String> = std::env::args().skip(1).collect();
     let arg = |i: usize| args.get(i).unwrap_or_else(|| fail()).as_str();
     match args.first().map(String::as_str) {
-        Some("rules") => write(arg(1), &rules::table(MORPH_REV, args.get(2).is_some_and(|a| a == "--predicates"))),
+        Some("rules") => write(
+            arg(1),
+            &rules::table(MORPH_REV, args.get(2).is_some_and(|a| a == "--predicates")),
+        ),
         Some("protect") => {
             let counts = protect::read_counts(&read(arg(1)));
             let words = protect::protected(&counts);
@@ -60,13 +66,23 @@ fn main() {
                 .map(|(id, t)| (id.clone(), variants::vary(t, &mut rng)))
                 .collect();
             write(&format!("{}/wiki-docs.tsv", arg(2)), &docs_tsv(&docs));
-            write(&format!("{}/wiki-variant-docs.tsv", arg(2)), &docs_tsv(&varied));
+            write(
+                &format!("{}/wiki-variant-docs.tsv", arg(2)),
+                &docs_tsv(&varied),
+            );
         }
         Some("gov") => {
             let (mut legacy, mut expected) = (Vec::new(), Vec::new());
-            let mut paths: Vec<_> = fs::read_dir(arg(1)).expect("read dir").flatten().map(|e| e.path()).collect();
+            let mut paths: Vec<_> = fs::read_dir(arg(1))
+                .expect("read dir")
+                .flatten()
+                .map(|e| e.path())
+                .collect();
             paths.sort();
-            for path in paths.iter().filter(|p| p.extension().is_some_and(|e| e == "tsv")) {
+            for path in paths
+                .iter()
+                .filter(|p| p.extension().is_some_and(|e| e == "tsv"))
+            {
                 let text = read(path.to_str().unwrap());
                 let mut lines = text.lines();
                 let header: Vec<&str> = lines.next().unwrap_or_default().split('\t').collect();
@@ -74,12 +90,21 @@ fn main() {
                 let (id, codes, exp) = (col("id"), col("codes"), col("expected"));
                 for line in lines {
                     let f: Vec<&str> = line.split('\t').collect();
-                    let bytes: Vec<u8> = f[codes].split(' ').filter_map(|h| u8::from_str_radix(h, 16).ok()).collect();
-                    legacy.push((f[id].to_string(), kannadi::legacy::decode_windows_1252(&bytes)));
+                    let bytes: Vec<u8> = f[codes]
+                        .split(' ')
+                        .filter_map(|h| u8::from_str_radix(h, 16).ok())
+                        .collect();
+                    legacy.push((
+                        f[id].to_string(),
+                        kannadi::legacy::decode_windows_1252(&bytes),
+                    ));
                     expected.push((f[id].to_string(), f[exp].to_string()));
                 }
             }
-            write(&format!("{}/gov-legacy-docs.tsv", arg(2)), &docs_tsv(&legacy));
+            write(
+                &format!("{}/gov-legacy-docs.tsv", arg(2)),
+                &docs_tsv(&legacy),
+            );
             write(&format!("{}/gov-docs.tsv", arg(2)), &docs_tsv(&expected));
         }
         Some("gold") => {
@@ -101,7 +126,10 @@ fn main() {
                     100.0 * s.recall,
                     100.0 * s.precision
                 );
-                eprintln!("{}: found {} of {} relevant", system.name, s.found, s.relevant);
+                eprintln!(
+                    "{}: found {} of {} relevant",
+                    system.name, s.found, s.relevant
+                );
             }
         }
         Some("prefer") => {
@@ -117,16 +145,90 @@ fn main() {
             }
             write(arg(2), &out);
         }
+        Some("speed") => {
+            let docs = read_docs(arg(1));
+            let bytes: usize = docs.iter().map(|(_, t)| t.len()).sum();
+            for system in systems::all() {
+                let start = std::time::Instant::now();
+                let mut tokens = 0;
+                for _ in 0..10 {
+                    for (_, text) in &docs {
+                        tokens += (system.tokens)(text).len();
+                    }
+                }
+                let secs = start.elapsed().as_secs_f64();
+                println!(
+                    "{}: {:.1} MB/s, {:.2} M tokens/s",
+                    system.name,
+                    10.0 * bytes as f64 / secs / 1e6,
+                    tokens as f64 / secs / 1e6
+                );
+            }
+        }
+        Some("profile") => {
+            use unicode_segmentation::UnicodeSegmentation;
+            let docs = read_docs(arg(1));
+            let words: Vec<&str> = docs.iter().flat_map(|(_, t)| t.unicode_words()).collect();
+            let t = std::time::Instant::now();
+            for _ in 0..10 {
+                for (_, d) in &docs {
+                    std::hint::black_box(d.split_word_bound_indices().count());
+                }
+            }
+            println!("segment {:?}", t.elapsed() / 10);
+            let t = std::time::Instant::now();
+            for _ in 0..10 {
+                for w in &words {
+                    std::hint::black_box(kannadi::normalize::normalize_as(
+                        w,
+                        kannadi::normalize::Form::Search,
+                    ));
+                }
+            }
+            println!("normalize_as {:?}", t.elapsed() / 10);
+            let t = std::time::Instant::now();
+            for _ in 0..10 {
+                for w in &words {
+                    std::hint::black_box(kannadi::normalize::normalize(w));
+                }
+            }
+            println!("normalize canonical {:?}", t.elapsed() / 10);
+            let folded: Vec<String> = words
+                .iter()
+                .map(|w| kannadi_search::fold::fold(w))
+                .collect();
+            let t = std::time::Instant::now();
+            for _ in 0..10 {
+                for w in &folded {
+                    std::hint::black_box(kannadi_search::stem::stem(w));
+                }
+            }
+            println!("stem {:?}", t.elapsed() / 10);
+            let t = std::time::Instant::now();
+            for _ in 0..10 {
+                for (_, d) in &docs {
+                    std::hint::black_box(kannadi_search::legacy::detect(d));
+                }
+            }
+            println!("detect {:?}", t.elapsed() / 10);
+        }
         Some("why") => {
             let counts = protect::read_counts(&read(arg(1)));
             for w in &args[2..] {
                 let s = kannadi_search::stem::strip_ending(w);
                 println!("{w}: strips to {s:?}");
-                let of_s: std::collections::HashSet<String> =
-                    s.as_deref().map(kannadi_search::stem::forms).unwrap_or_default().into_iter().collect();
+                let of_s: std::collections::HashSet<String> = s
+                    .as_deref()
+                    .map(kannadi_search::stem::forms)
+                    .unwrap_or_default()
+                    .into_iter()
+                    .collect();
                 for f in kannadi_search::stem::forms(w) {
                     if let Some(n) = counts.get(&f) {
-                        println!("  {f} {n} {}", if of_s.contains(&f) { "(also of s)" } else { "" });
+                        println!(
+                            "  {f} {n} {}",
+                            if of_s.contains(&f) { "(also of s)" } else { "" }
+                        );
                     }
                 }
             }
@@ -135,7 +237,10 @@ fn main() {
             let queries = gold::read(&read(arg(1)));
             let docs = read_docs(arg(2));
             let (false_hits, misses) = score::errors(&docs, &queries);
-            println!("# false matches: {}", false_hits.iter().map(|x| x.1).sum::<usize>());
+            println!(
+                "# false matches: {}",
+                false_hits.iter().map(|x| x.1).sum::<usize>()
+            );
             for (e, n) in false_hits.iter().take(150) {
                 println!("{n}\t{e}");
             }
@@ -173,6 +278,9 @@ fn read_docs(path: &str) -> Vec<(String, String)> {
     read(path)
         .lines()
         .skip(1)
-        .filter_map(|l| l.split_once('\t').map(|(a, b)| (a.to_string(), b.to_string())))
+        .filter_map(|l| {
+            l.split_once('\t')
+                .map(|(a, b)| (a.to_string(), b.to_string()))
+        })
         .collect()
 }

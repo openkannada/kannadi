@@ -27,3 +27,7 @@ proptest = "1.12"
 [[example]]
 name = "postgres_rules"
 path = "examples/postgres/rules.rs"
+
+[[example]]
+name = "postgres_keys"
+path = "examples/postgres/keys.rs"

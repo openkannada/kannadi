@@ -35,6 +35,8 @@ pub mod stem;
 #[cfg(feature = "tantivy")]
 pub mod tantivy;
 
+use std::cell::RefCell;
+use std::collections::HashMap;
 use std::ops::Range;
 
 use unicode_segmentation::UnicodeSegmentation;
@@ -128,20 +130,51 @@ impl Analyzer {
     }
 
     fn push_word(&self, tokens: &mut Vec<Token>, word: &str, offsets: Range<usize>) {
-        let folded = fold::fold(word);
-        for part in script_runs(&folded) {
-            let text = if self.stem {
-                stem::stem(part)
-            } else {
-                part.to_string()
-            };
-            tokens.push(Token {
-                text,
-                offsets: offsets.clone(),
-                position: tokens.len(),
-            });
-        }
+        let stem = self.stem;
+        let push = |keys: &[String], tokens: &mut Vec<Token>| {
+            for text in keys {
+                tokens.push(Token {
+                    text: text.clone(),
+                    offsets: offsets.clone(),
+                    position: tokens.len(),
+                });
+            }
+        };
+        CACHE.with_borrow_mut(|cache| {
+            if let Some(keys) = cache[usize::from(stem)].get(word) {
+                push(keys, tokens);
+                return;
+            }
+            let folded = fold::fold(word);
+            let keys: Vec<String> = script_runs(&folded)
+                .into_iter()
+                .map(|part| {
+                    if stem {
+                        stem::stem(part)
+                    } else {
+                        part.to_string()
+                    }
+                })
+                .collect();
+            push(&keys, tokens);
+            let map = &mut cache[usize::from(stem)];
+            if map.len() >= CACHE_WORDS {
+                map.clear();
+            }
+            map.insert(word.to_string(), keys);
+        });
     }
+}
+
+/// Words seen most recently by this thread and their keys, without and with stemming.
+/// Text repeats words often, and a word's keys depend only on the word.
+type WordCache = [HashMap<String, Vec<String>>; 2];
+
+/// How many words each cache holds before it starts again.
+const CACHE_WORDS: usize = 1 << 16;
+
+thread_local! {
+    static CACHE: RefCell<WordCache> = RefCell::new([HashMap::new(), HashMap::new()]);
 }
 
 fn words_with_offsets(text: &str) -> impl Iterator<Item = (usize, &str)> {
@@ -195,7 +228,10 @@ mod tests {
         let tokens = Analyzer::new().analyze(text);
         let words: Vec<&str> = tokens.iter().map(|t| &text[t.offsets.clone()]).collect();
         assert_eq!(words, ["ಹಳೆಯ", "ಮರಗಳಲ್ಲಿ", "ಹಕ್ಕಿ"]);
-        assert_eq!(tokens.iter().map(|t| t.position).collect::<Vec<_>>(), [0, 1, 2]);
+        assert_eq!(
+            tokens.iter().map(|t| t.position).collect::<Vec<_>>(),
+            [0, 1, 2]
+        );
     }
 
     #[test]
@@ -223,7 +259,9 @@ mod tests {
 
     #[test]
     fn joiners_and_signs_stay_inside_words() {
-        let keys = Analyzer::new().stemming(false).keys("ಕನ್\u{200C}ನಡ ರಾಜ್\u{200D}ಕುಮಾರ್ ಕಿ\u{0CD5}ರ್ತಿ");
+        let keys = Analyzer::new()
+            .stemming(false)
+            .keys("ಕನ್\u{200C}ನಡ ರಾಜ್\u{200D}ಕುಮಾರ್ ಕಿ\u{0CD5}ರ್ತಿ");
         assert_eq!(keys, ["ಕನ್ನಡ", "ರಾಜ್ಕುಮಾರ್", "ಕೀರ್ತಿ"]);
     }
 

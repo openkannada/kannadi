@@ -648,6 +648,7 @@ dependencies = [
  "kannadi",
  "kannadi-search",
  "tantivy",
+ "unicode-segmentation",
 ]
 
 [[package]]

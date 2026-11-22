@@ -51,7 +51,10 @@ fn score(analyzer: Analyzer, docs: &[(String, String)]) -> (f64, f64) {
             });
         }
         let result = result.unwrap_or_default();
-        hits += gold.iter().filter(|id| result.contains(id.as_str())).count();
+        hits += gold
+            .iter()
+            .filter(|id| result.contains(id.as_str()))
+            .count();
         found += result.len();
         relevant += gold.len();
     }

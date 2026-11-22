@@ -182,7 +182,9 @@ mod tests {
         let mut plain = TextAnalyzer::from(KannadaTokenizer::default());
         assert_eq!(tokens(&mut plain, "ಮರಗಳಲ್ಲಿ")[0].0, "ಮರಗಳಲ್ಲಿ");
         let mut no_legacy = TextAnalyzer::from(KannadaTokenizer::new(false));
-        assert!(tokens(&mut no_legacy, "PÀ£ÀßqÀ").iter().all(|t| t.0 != "ಕನ್ನಡ"));
+        assert!(tokens(&mut no_legacy, "PÀ£ÀßqÀ")
+            .iter()
+            .all(|t| t.0 != "ಕನ್ನಡ"));
     }
 
     #[test]

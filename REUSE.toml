@@ -75,3 +75,17 @@ SPDX-License-Identifier = "CC-BY-SA-4.0"
 path = "crates/kannadi-typing/eval/dakshina-kn-*.tsv"
 SPDX-FileCopyrightText = "Google LLC"
 SPDX-License-Identifier = "CC-BY-SA-4.0"
+
+# The search stemmer's word lists: single words and counts from Kannada Wikipedia,
+# with no sentences, as kannada-spell's Wikipedia word list is licensed.
+[[annotations]]
+path = ["crates/kannadi-search/data/protected.txt", "crates/kannadi-search/data/preferred.tsv"]
+SPDX-FileCopyrightText = ["2026 The Open Kannada Authors", "Kannada Wikipedia contributors"]
+SPDX-License-Identifier = "CC-BY-4.0"
+
+# The search evaluation set: sentences of Kannada Wikipedia articles, and query lists made
+# with kannada-morph's lexicon, which contains information from Alar (ODbL 1.0).
+[[annotations]]
+path = "crates/kannadi-search/eval/data/**"
+SPDX-FileCopyrightText = ["2026 The Open Kannada Authors", "Kannada Wikipedia contributors"]
+SPDX-License-Identifier = "CC-BY-SA-4.0"
