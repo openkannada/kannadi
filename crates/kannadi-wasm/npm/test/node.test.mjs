@@ -21,6 +21,11 @@ test("the package name resolves to the Node entry", () => {
   assert.equal(viaName, "nudi");
 });
 
+test("the browser pattern, await init(), also works in Node", async () => {
+  await kannadi.default();
+  assert.equal(kannadi.toUnicode("PÀ£ÀßqÀ", "nudi", new kannadi.NudiOptions()).text, "ಕನ್ನಡ");
+});
+
 test("converts a real Nudi line and back", () => {
   const c = kannadi.toUnicode(NUDI, "nudi", new kannadi.NudiOptions());
   assert.equal(c.text, UNICODE);

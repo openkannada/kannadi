@@ -7,21 +7,21 @@ use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
 use pyo3::types::PyString;
 
-/// Code-point index of each byte offset in `text`, for offsets in increasing order.
-fn indices(text: &str, offsets: impl IntoIterator<Item = usize>) -> Vec<usize> {
-    let (mut byte, mut index) = (0, 0);
-    offsets
-        .into_iter()
-        .map(|offset| {
-            index += text[byte..offset].chars().count();
-            byte = offset;
-            index
-        })
-        .collect()
-}
+/// Maps byte offsets in a string to Python string indices, in any order.
+struct CharIndex(Vec<usize>);
 
-fn index(text: &str, offset: usize) -> usize {
-    text[..offset].chars().count()
+impl CharIndex {
+    fn new(text: &str) -> Self {
+        CharIndex(text.char_indices().map(|(byte, _)| byte).collect())
+    }
+
+    fn at(&self, offset: usize) -> usize {
+        self.0.partition_point(|&byte| byte < offset)
+    }
+
+    fn range(&self, range: &std::ops::Range<usize>) -> (usize, usize) {
+        (self.at(range.start), self.at(range.end))
+    }
 }
 
 fn layout(name: &str) -> PyResult<Layout> {
@@ -108,17 +108,14 @@ fn to_unicode(
         zero_as_anusvara,
     };
     let c = legacy::to_unicode(text, self::layout(layout)?, &options);
-    let at = indices(text, c.unknown.iter().map(|u| u.offset));
+    let (input, output) = (CharIndex::new(text), CharIndex::new(&c.text));
     Ok(Conversion {
-        unknown: at
-            .into_iter()
-            .zip(c.unknown.iter().map(|u| u.glyph))
-            .collect(),
-        malformed: c
-            .malformed
+        unknown: c
+            .unknown
             .iter()
-            .map(|r| (index(&c.text, r.start), index(&c.text, r.end)))
+            .map(|u| (input.at(u.offset), u.glyph))
             .collect(),
+        malformed: c.malformed.iter().map(|r| output.range(r)).collect(),
         text: c.text,
     })
 }
@@ -128,17 +125,14 @@ fn to_unicode(
 #[pyo3(signature = (text, layout = "nudi"))]
 fn from_unicode(text: &str, layout: &str) -> PyResult<Encoding> {
     let e = legacy::from_unicode(text, self::layout(layout)?);
-    let at = indices(text, e.unencodable.iter().map(|u| u.offset));
+    let input = CharIndex::new(text);
     Ok(Encoding {
-        unencodable: at
-            .into_iter()
-            .zip(e.unencodable.iter().map(|u| u.character))
-            .collect(),
-        malformed: e
-            .malformed
+        unencodable: e
+            .unencodable
             .iter()
-            .map(|r| (index(text, r.start), index(text, r.end)))
+            .map(|u| (input.at(u.offset), u.character))
             .collect(),
+        malformed: e.malformed.iter().map(|r| input.range(r)).collect(),
         text: e.text,
     })
 }
@@ -198,6 +192,7 @@ fn modernize(text: &str) -> String {
     kannadi::modernize(text)
 }
 
+/// Kannada text tools: legacy font text to and from Unicode, aksharas, normalization and transliteration.
 #[pymodule]
 #[pyo3(name = "kannadi")]
 fn kannadi_module(m: &Bound<'_, PyModule>) -> PyResult<()> {

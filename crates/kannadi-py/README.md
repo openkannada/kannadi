@@ -20,7 +20,7 @@ kannadi.transliterate("ಕನ್ನಡ", "kannada", "iso15919")  # 'kannaḍa'
 kannadi.normalize("ಕೊ")                    # the canonical form, so text that renders the same compares equal
 ```
 
-`to_unicode` takes the layout as its second argument (`"nudi"`, `"akruti"`, `"shree-lipi"`, `"nudi-b"` or `"kan-eng"`; `"baraha"` is the Nudi layout). Glyphs it cannot place stay in the text and are listed in `unknown` as `(index, glyph)`, with the index into the input. `malformed` lists `(start, end)` ranges of the output that are not valid syllables. Wheels are built for CPython 3.10 and later (abi3).
+`to_unicode` takes the layout as its second argument (`"nudi"`, `"akruti"`, `"shree-lipi"`, `"nudi-b"` or `"kan-eng"`; `"baraha"` is the Nudi layout). Glyphs it cannot place stay in the text and are listed in `unknown` as `(index, glyph)`, with the index into the input. `malformed` lists `(start, end)` ranges of the output that are not valid syllables. 1 abi3 wheel per platform covers CPython 3.10 and later. Where no wheel fits, pip builds from source, which needs Rust 1.85 or later.
 
 The library, its tables and the evidence for every glyph are in the [kannadi repository](https://github.com/openkannada/kannadi). Licensed under MIT or Apache-2.0, at your option.
 

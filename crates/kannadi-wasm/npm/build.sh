@@ -5,6 +5,8 @@ set -eu
 here=$(cd "$(dirname "$0")" && pwd)
 root=$(cd "$here/../../.." && pwd)
 target=${CARGO_TARGET_DIR:-$root/target}
+mkdir -p "$target"
+target=$(cd "$target" && pwd)
 out="$target/npm/kannadi"
 
 want=$("$root/web/wasm-bindgen-version.sh")
@@ -16,7 +18,7 @@ if [ "$have" != "$want" ]; then
 fi
 
 version=$(awk -F'"' '/^version = / { print $2; exit }' "$root/Cargo.toml")
-if [ "$version" != "$(node -p "require('$here/package.json').version")" ]; then
+if [ "$version" != "$(node -p 'require(process.argv[1]).version' "$here/package.json")" ]; then
   echo "package.json must have the workspace version $version." >&2
   exit 1
 fi

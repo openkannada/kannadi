@@ -1,3 +1,5 @@
+from importlib.metadata import version
+
 import kannadi
 import pytest
 
@@ -38,11 +40,16 @@ def test_reprs_read_as_python():
     assert repr(kannadi.from_unicode("ಕ")) == "Encoding(text='PÀ', unencodable=[], malformed=[])"
 
 
-def test_unencodable_characters_are_reported_at_python_indices():
-    text = "ಕನ್ನಡ 😀 ಕ"
-    e = kannadi.from_unicode(text)
-    for at, ch in e.unencodable:
-        assert text[at] == ch
+@pytest.mark.parametrize("text", ["ಕನ್ನಡ 😀 ಕ", "ಕ಼ೢ", "ಕ್\u200dಷೢ", "ಱ಼ೣ", "ಞ಼ುೲ"])
+def test_unencodable_characters_are_reported_at_python_indices(text):
+    # The library reports joiners and nuktas at the end of their akshara, so offsets can go backwards.
+    for layout in ["nudi", "akruti", "shree-lipi", "nudi-b", "kan-eng"]:
+        e = kannadi.from_unicode(text, layout)
+        assert e.unencodable or e.malformed
+        for at, ch in e.unencodable:
+            assert text[at] == ch
+        for start, end in e.malformed:
+            assert 0 <= start < end <= len(text)
 
 
 def test_layouts_fonts_and_options():
@@ -69,5 +76,5 @@ def test_text_tools():
         kannadi.transliterate("x", "kannada", "hunterian")
 
 
-def test_version():
-    assert kannadi.__version__ == "0.1.0"
+def test_version_matches_the_distribution():
+    assert kannadi.__version__ == version("kannadi")

@@ -5,3 +5,4 @@ import { initSync } from "./kannadi_wasm.js";
 initSync({ module: readFileSync(new URL("./kannadi_wasm_bg.wasm", import.meta.url)) });
 
 export * from "./kannadi_wasm.js";
+export { default } from "./kannadi_wasm.js";

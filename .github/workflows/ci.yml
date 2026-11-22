@@ -127,7 +127,12 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: clippy, rustfmt
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: crates/kannadi-py
       - uses: astral-sh/setup-uv@v10.3.3
+      - name: The bindings have the workspace version
+        run: test "$(awk -F'"' '/^version = / { print $2; exit }' Cargo.toml)" = "$(awk -F'"' '/^version = / { print $2; exit }' ../../Cargo.toml)"
       - run: cargo fmt --check
       - run: cargo clippy --locked -- -D warnings
       - run: uvx maturin@1.16.0 build --release --locked --out dist
