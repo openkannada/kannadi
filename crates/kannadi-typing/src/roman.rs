@@ -46,6 +46,11 @@ pub fn letters(text: &str) -> Option<Vec<u8>> {
     Some(out)
 }
 
+/// How many letters were typed, before x becomes ks.
+pub fn typed_letters(text: &str) -> usize {
+    text.bytes().filter(u8::is_ascii_alphabetic).count()
+}
+
 /// Whether `text` is typed precisely in Baraha or ITRANS: it has capitals
 /// inside the word (kannaDa), or a mark such as the dot in `gaa.ndhii`.
 pub fn is_precise(text: &str) -> bool {
@@ -78,6 +83,8 @@ mod tests {
         assert_eq!(letters("a-b"), None);
         assert_eq!(letters("gaa.ndhii").unwrap(), b"gaandhii");
         assert_eq!(letters("j~naana").unwrap(), b"jnaana");
+        assert_eq!(typed_letters("xa"), 2);
+        assert_eq!(typed_letters("gaa.n"), 4);
     }
 
     #[test]

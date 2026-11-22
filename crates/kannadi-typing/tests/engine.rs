@@ -55,6 +55,8 @@ fn word_starts_show_what_the_letters_spell() {
     // The commonest whole word stays next to it.
     assert_eq!(top("a", 2), ["ಅ", "ಆ"]);
     assert!(top("ka", 5).contains(&"ಕೆ".to_string()));
+    // x counts as 1 typed letter.
+    assert_eq!(top("xa", 1), ["ಕ್ಸ"]);
     // 5 letters that start ನಮಸ್ಕಾರ: the letters as typed, then the word they start.
     let namas = top("namas", 5);
     assert_eq!(namas[0], "ನಮಸ್");
