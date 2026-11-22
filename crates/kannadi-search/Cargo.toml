@@ -1,0 +1,29 @@
+[package]
+name = "kannadi-search"
+description = "Search analysis for Kannada: spelling-variant folding, akshara-aware tokens, light case and plural stemming, and legacy font text, with Tantivy and Postgres integrations"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+rust-version = "1.88"
+readme = "README.md"
+keywords = ["kannada", "search", "tokenizer", "stemmer", "tantivy"]
+categories = ["text-processing", "internationalization"]
+include = ["src/**/*.rs", "data/*.tsv", "data/*.txt", "README.md"]
+
+[features]
+# A tantivy TextAnalyzer: the tokenizer and the stemming filter.
+tantivy = ["dep:tantivy"]
+
+[dependencies]
+kannadi = { path = "../kannadi", version = "0.1.0" }
+tantivy = { version = "0.27.0", default-features = false, optional = true }
+unicode-segmentation = "1.13.3"
+
+[dev-dependencies]
+proptest = "1.12"
+
+[[example]]
+name = "postgres_rules"
+path = "examples/postgres/rules.rs"
