@@ -344,15 +344,20 @@ fn show(a: &Args) -> Result<(), String> {
         let t = std::time::Instant::now();
         let c = engine.candidates(input, a.get("prev"));
         let took = t.elapsed();
+        let n: usize = a.num("n", 6)?;
         let top: Vec<String> = c
             .iter()
-            .take(6)
+            .take(n)
             .map(|c| {
                 format!(
-                    "{}{} {:.1}",
+                    "{}{} {:.1} (lm {:.1} freq {:.1}{}{})",
                     c.word,
                     if c.extra > 0 { "+" } else { "" },
-                    c.score(&w)
+                    c.score(&w),
+                    c.lm,
+                    c.freq,
+                    if c.known { " known" } else { "" },
+                    if c.rule { " rule" } else { "" },
                 )
             })
             .collect();
