@@ -1,9 +1,9 @@
 //! Building, evaluating and tuning a model. Needs the `train` feature.
 
-pub mod align;
+mod align;
 pub mod data;
 pub mod eval;
-pub mod kn;
+mod kn;
 
 use crate::lm::Quant;
 use crate::model::{freq_class, Graphone, Model, Pairs, Weights};
@@ -15,7 +15,7 @@ use std::collections::{BTreeMap, HashMap};
 /// What to build a model from.
 pub struct Inputs {
     /// Latin letters and units of each training pair.
-    pub pairs: Vec<Pair>,
+    pub pairs: Vec<(Vec<u8>, Vec<Unit>)>,
     /// Lexicon words as units, with their corpus counts.
     pub lexicon: BTreeMap<Vec<Unit>, u64>,
     /// Sentences of Kannada words, for the word pairs.
@@ -37,7 +37,7 @@ pub struct Settings {
 }
 
 /// Aligns the pairs and returns each pair's graphone sequence.
-pub fn align(pairs: &[Pair], settings: &Settings) -> Vec<Vec<Graphone>> {
+fn align(pairs: &[Pair], settings: &Settings) -> Vec<Vec<Graphone>> {
     let aligner = Aligner::train(pairs, settings.em_iterations, settings.threads);
     pairs
         .iter()
@@ -114,7 +114,7 @@ pub fn build(inputs: &Inputs, settings: &Settings) -> Model {
 }
 
 /// Word pairs that occur together more than chance, with their lift.
-pub fn word_pairs(sentences: &[Vec<String>], settings: &Settings) -> Pairs {
+fn word_pairs(sentences: &[Vec<String>], settings: &Settings) -> Pairs {
     let mut uni: HashMap<&str, u64> = HashMap::new();
     let mut bi: HashMap<(&str, &str), u32> = HashMap::new();
     let mut total = 0u64;

@@ -16,7 +16,7 @@ pub fn run(
     scores: bool,
     out: &mut dyn Write,
 ) -> Result<()> {
-    let weights = engine.model().weights;
+    let weights = engine.model().weights();
     for input in inputs {
         let candidates = engine.candidates(input, prev);
         let best = candidates.iter().take(n);

@@ -106,10 +106,15 @@ impl<D: AsRef<[u8]>> Search<'_, D> {
 }
 
 /// Keeps the best `beam` hypotheses, and of those with the same future only the best.
+/// Lexicon states are shared by words that end alike, so the output so far,
+/// which decides the word's frequency, is part of the future.
 fn prune(hyps: &mut Vec<Hyp>, beam: usize) {
     hyps.sort_unstable_by(|a, b| b.score.total_cmp(&a.score));
     let mut seen = HashMap::with_capacity(hyps.len());
-    hyps.retain(|h| seen.insert((h.hist, h.hlen, h.last, h.node), ()).is_none());
+    hyps.retain(|h| {
+        seen.insert((h.hist, h.hlen, h.last, h.node, h.out), ())
+            .is_none()
+    });
     hyps.truncate(beam);
 }
 
@@ -236,4 +241,19 @@ pub fn search<D: AsRef<[u8]>>(
     let mut out: Vec<Found> = best.into_values().collect();
     out.sort_by(|a, b| b.lm.total_cmp(&a.lm).then_with(|| a.units.cmp(&b.units)));
     out
+}
+
+#[cfg(all(test, feature = "bundled"))]
+mod tests {
+    use super::*;
+    use crate::units::text;
+
+    #[test]
+    fn letters_never_vanish_twice_in_a_row() {
+        // ಕಂ from "k" would need both the inherent a and the anusvara to take no letters.
+        let e = crate::Engine::bundled();
+        let found = search::<Vec<u8>>(e.model(), b"k", None, None, 64);
+        assert!(!found.is_empty());
+        assert!(found.iter().all(|f| text(&f.units) != "ಕಂ"));
+    }
 }

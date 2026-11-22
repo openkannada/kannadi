@@ -32,11 +32,13 @@ impl User {
         if self.picks.len() > MAX_PICKS {
             self.picks.remove(0);
         }
-        *self.counts.entry(word.clone()).or_default() += 1;
+        let count = self.counts.entry(word.clone()).or_default();
+        *count = count.saturating_add(1);
         if self.counts.len() > MAX_WORDS {
             if let Some(least) = self
                 .counts
                 .iter()
+                .filter(|(w, _)| **w != word)
                 .min_by(|a, b| a.1.cmp(b.1).then(b.0.cmp(a.0)))
                 .map(|(w, _)| w.clone())
             {
@@ -137,5 +139,42 @@ impl User {
         }
         user.rebuild();
         Some(user)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn a_full_store_keeps_the_word_just_learned() {
+        let mut u = User::default();
+        let consonants = [
+            "ಕ", "ಗ", "ಚ", "ಜ", "ಟ", "ಡ", "ತ", "ದ", "ನ", "ಪ", "ಬ", "ಮ", "ಯ", "ರ", "ಲ", "ವ", "ಸ",
+            "ಹ",
+        ];
+        let mut n = 0;
+        'fill: for a in consonants {
+            for b in consonants {
+                for c in consonants {
+                    if n == MAX_WORDS {
+                        break 'fill;
+                    }
+                    assert!(u.learn("abc", &format!("{a}{b}{c}"), true));
+                    n += 1;
+                }
+            }
+        }
+        assert!(u.learn("hahaha", "ೞೞ", false));
+        assert_eq!(u.count("ೞೞ"), 1);
+        assert!(u.extra().is_some());
+        assert_eq!(u.counts.len(), MAX_WORDS);
+    }
+
+    #[test]
+    fn counts_stop_at_the_largest_value() {
+        let mut u = User::import(&format!("{HEADER}\nc\tಕನ್ನಡ\t{}\n", u32::MAX)).unwrap();
+        assert!(u.learn("kannada", "ಕನ್ನಡ", true));
+        assert_eq!(u.count("ಕನ್ನಡ"), u32::MAX);
     }
 }

@@ -138,7 +138,7 @@ pub fn score(engine: &Engine, items: &[Item], lists: &[Vec<Candidate>], w: &Weig
 
 /// Coordinate ascent on the ranking weights, maximizing accuracy at 1, then at 5.
 pub fn tune(engine: &Engine, items: &[Item], lists: &[Vec<Candidate>]) -> Weights {
-    let mut best = engine.model().weights;
+    let mut best = engine.model().weights();
     let value = |w: &Weights| {
         let r = score(engine, items, lists, w);
         r.top1 * 10_000 + r.top5

@@ -33,13 +33,13 @@ pub struct Weights {
     pub pair: f32,
     /// Added when the strict Baraha reading of the input gives this word.
     pub rule: f32,
-    /// Added to the rule reading when the input uses Baraha capitals, such as kannaDa.
-    pub capitals: f32,
+    /// Added to the rule readings when the input is typed precisely, as in kannaDa or gaa.ndhii.
+    pub precise: f32,
     /// Per natural-log unit of how often the user picked the word.
     pub user: f32,
     /// Added for each unit a completion adds after the letters run out.
     pub extend: f32,
-    /// Beam width of the search through the lexicon.
+    /// Beam width of the search through the lexicon; 0 turns that search off.
     pub beam: f32,
     /// Beam width of the search outside the lexicon.
     pub open_beam: f32,
@@ -47,6 +47,17 @@ pub struct Weights {
 
 impl Weights {
     const FIELDS: usize = 9;
+    /// The widest beam allowed; wider ones only cost time.
+    pub const MAX_BEAM: f32 = 256.0;
+
+    /// Whether every weight is finite, the lexicon beam is between 0 (no
+    /// lexicon search) and [`Weights::MAX_BEAM`], and the open beam between 1 and that.
+    pub fn is_valid(&self) -> bool {
+        let finite = self.to_array().iter().all(|x| x.is_finite());
+        finite
+            && (0.0..=Self::MAX_BEAM).contains(&self.beam)
+            && (1.0..=Self::MAX_BEAM).contains(&self.open_beam)
+    }
 
     fn to_array(self) -> [f32; Self::FIELDS] {
         [
@@ -54,7 +65,7 @@ impl Weights {
             self.known,
             self.pair,
             self.rule,
-            self.capitals,
+            self.precise,
             self.user,
             self.extend,
             self.beam,
@@ -68,7 +79,7 @@ impl Weights {
             known: a[1],
             pair: a[2],
             rule: a[3],
-            capitals: a[4],
+            precise: a[4],
             user: a[5],
             extend: a[6],
             beam: a[7],
@@ -84,7 +95,7 @@ impl Default for Weights {
             known: 4.0,
             pair: 0.5,
             rule: 1.0,
-            capitals: 40.0,
+            precise: 40.0,
             user: 3.0,
             extend: -4.0,
             beam: 32.0,
@@ -124,15 +135,15 @@ impl Pairs {
 
 /// The trained model.
 pub struct Model {
-    pub graphones: Vec<Graphone>,
-    pub lm: Lm,
-    pub lexicon: Fst<Vec<u8>>,
-    pub pairs: Pairs,
-    pub weights: Weights,
+    pub(crate) graphones: Vec<Graphone>,
+    pub(crate) lm: Lm,
+    pub(crate) lexicon: Fst<Vec<u8>>,
+    pub(crate) pairs: Pairs,
+    pub(crate) weights: Weights,
     /// Graphone ids for each chunk code, built on load.
     by_chunk: Vec<Vec<u16>>,
     /// The best completion from each lexicon state, built on load.
-    pub completions: Completions,
+    pub(crate) completions: Completions,
 }
 
 /// Why a model file could not be read.
@@ -150,7 +161,7 @@ impl std::error::Error for BadModel {}
 impl Model {
     /// Puts a model together from its parts. Graphone 0 is the word boundary,
     /// so `graphones[0]` is a placeholder.
-    pub fn new(
+    pub(crate) fn new(
         graphones: Vec<Graphone>,
         lm: Lm,
         lexicon: Fst<Vec<u8>>,
@@ -173,9 +184,34 @@ impl Model {
         }
     }
 
-    /// The graphones whose chunk is `chunk`.
-    pub fn graphones_for(&self, chunk: &[u8]) -> &[u16] {
+    /// The graphones whose chunk is `chunk`, 0 to 3 lowercase ASCII letters.
+    pub(crate) fn graphones_for(&self, chunk: &[u8]) -> &[u16] {
         &self.by_chunk[chunk_code(chunk) as usize]
+    }
+
+    /// The ranking weights.
+    pub fn weights(&self) -> Weights {
+        self.weights
+    }
+
+    /// Whether the lexicon has `word`.
+    pub fn has_word(&self, word: &str) -> bool {
+        crate::units::units(word).is_some_and(|u| self.lexicon.get(u).is_some())
+    }
+
+    /// How many words the lexicon holds.
+    pub fn lexicon_len(&self) -> usize {
+        self.lexicon.len()
+    }
+
+    /// How many word pairs the model knows.
+    pub fn word_pairs(&self) -> usize {
+        self.pairs.keys.len()
+    }
+
+    /// How much likelier `word` is after `prev` than on its own, as a natural log; 0 when unknown.
+    pub fn lift(&self, prev: &str, word: &str) -> f32 {
+        self.pairs.lift(prev, word)
     }
 
     /// The model as bytes.
@@ -238,6 +274,8 @@ impl Model {
         }
         let lexicon =
             Fst::new(r.bytes().ok_or(short.clone())?.to_vec()).map_err(|_| BadModel("lexicon"))?;
+        // The checksum catches a damaged automaton before anything walks it.
+        lexicon.verify().map_err(|_| BadModel("lexicon checksum"))?;
         let keys = r.u32s().ok_or(short.clone())?;
         let values = r.bytes().ok_or(short.clone())?.to_vec();
         let (min, step) = (r.f32().ok_or(short.clone())?, r.f32().ok_or(short.clone())?);
@@ -256,12 +294,16 @@ impl Model {
         if !r.is_empty() {
             return Err(BadModel("trailing bytes"));
         }
+        let weights = Weights::from_array(a);
+        if !weights.is_valid() {
+            return Err(BadModel("weights out of range"));
+        }
         Ok(Model::new(
             graphones,
             lm,
             lexicon,
             Pairs { keys, values, q },
-            Weights::from_array(a),
+            weights,
         ))
     }
 }

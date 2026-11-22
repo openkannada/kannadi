@@ -59,16 +59,6 @@ impl Completions {
         }
     }
 
-    /// The number of states.
-    pub fn len(&self) -> usize {
-        self.addrs.len()
-    }
-
-    /// Whether the automaton has no states, which never happens for a built one.
-    pub fn is_empty(&self) -> bool {
-        self.addrs.is_empty()
-    }
-
     /// The units that complete the best word from state `addr`, and the sum of
     /// outputs along them, including the final output.
     pub fn best<D: AsRef<[u8]>>(

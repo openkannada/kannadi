@@ -35,11 +35,11 @@ Top-1 and top-5 accuracy for English letters to Kannada on the [Dakshina](https:
 | Dakshina test sentences, each word after the word before it | 52,328 | 86.94% | 91.74% | 0.80 ms | 2.09 ms |
 | The same sentences, without the previous word | 52,328 | 86.90% | 91.72% | 0.81 ms | 2.70 ms |
 
-In the browser, as WebAssembly in Node 24 on the same machine, every keystroke of every test word (49,676 calls) took 1.28 ms at the median, 2.84 ms at the 95th percentile and 3.51 ms at the 99th. Loading the model takes 75 ms.
+In the browser, as WebAssembly in Node 24 on the same machine, every keystroke of every test word (49,676 calls) took 1.27 ms at the median, 2.88 ms at the 95th percentile and 3.67 ms at the 99th. Loading the model takes 75 ms.
 
 | File | Size | Gzipped |
 |---|---:|---:|
-| `kannadi_typing_wasm_bg.wasm` | 451,564 bytes | 165,730 bytes |
+| `kannadi_typing_wasm_bg.wasm` | 449,367 bytes | 165,362 bytes |
 | `model/kn.typing` | 2,673,232 bytes | 1,612,760 bytes |
 
 What the numbers mean:

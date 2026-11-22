@@ -13,7 +13,7 @@ pub type Unit = u8;
 
 /// What kind of sound a unit is, which decides what may follow it.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum Kind {
+pub(crate) enum Kind {
     /// An independent vowel letter, such as ಅ.
     Vowel,
     /// A consonant followed by a vowel sign or the inherent a.
@@ -29,7 +29,7 @@ pub enum Kind {
 }
 
 /// The inherent a.
-pub const INHERENT: Unit = 1;
+pub(crate) const INHERENT: Unit = 1;
 const VOWELS: [char; 16] = [
     'ಅ', 'ಆ', 'ಇ', 'ಈ', 'ಉ', 'ಊ', 'ಋ', 'ೠ', 'ಌ', 'ೡ', 'ಎ', 'ಏ', 'ಐ', 'ಒ', 'ಓ', 'ಔ',
 ];
@@ -49,7 +49,7 @@ const MARK0: Unit = SIGN0 + SIGNS.len() as Unit;
 const FULL0: Unit = MARK0 + MARKS.len() as Unit;
 const DEAD0: Unit = FULL0 + CONSONANTS.len() as Unit;
 /// One more than the largest unit id.
-pub const COUNT: usize = DEAD0 as usize + CONSONANTS.len();
+pub(crate) const COUNT: usize = DEAD0 as usize + CONSONANTS.len();
 const _: () = assert!(COUNT <= 128, "unit ids must fit in 7 bits");
 
 const VIRAMA: char = '\u{0CCD}';
@@ -58,7 +58,7 @@ const ZWNJ: char = '\u{200C}';
 const ZWJ: char = '\u{200D}';
 
 /// The kind of `unit`. Panics on 0 or an id of `COUNT` or more.
-pub fn kind(unit: Unit) -> Kind {
+pub(crate) fn kind(unit: Unit) -> Kind {
     match unit {
         INHERENT => Kind::Inherent,
         u if u < VOWEL0 => panic!("unit 0 is not a unit"),
@@ -72,7 +72,7 @@ pub fn kind(unit: Unit) -> Kind {
 }
 
 /// Whether `next` may follow `prev` (`None` at the start of a word).
-pub fn may_follow(prev: Option<Unit>, next: Unit) -> bool {
+pub(crate) fn may_follow(prev: Option<Unit>, next: Unit) -> bool {
     let next = kind(next);
     match prev.map(kind) {
         None => matches!(next, Kind::Vowel | Kind::Full | Kind::Dead),
@@ -86,7 +86,7 @@ pub fn may_follow(prev: Option<Unit>, next: Unit) -> bool {
 }
 
 /// Whether a word may end after `last`.
-pub fn may_end(last: Unit) -> bool {
+pub(crate) fn may_end(last: Unit) -> bool {
     kind(last) != Kind::Full
 }
 
@@ -149,17 +149,17 @@ pub fn units(word: &str) -> Option<Vec<Unit>> {
     valid.then_some(out)
 }
 
-/// Writes units back as Kannada text.
+/// Writes units back as Kannada text. Ids that are not units are skipped.
 pub fn text(units: &[Unit]) -> String {
     let mut s = String::with_capacity(units.len() * 3);
-    for &u in units {
+    for &u in units.iter().filter(|&&u| u != 0 && (u as usize) < COUNT) {
         push(&mut s, u);
     }
     s
 }
 
 /// Appends the text of 1 unit.
-pub fn push(s: &mut String, u: Unit) {
+pub(crate) fn push(s: &mut String, u: Unit) {
     match kind(u) {
         Kind::Inherent => {}
         Kind::Vowel => s.push(VOWELS[(u - VOWEL0) as usize]),
@@ -222,6 +222,11 @@ mod tests {
         assert!(!may_follow(Some(dead), sign) && !may_follow(Some(dead), INHERENT));
         assert!(!may_follow(None, sign) && !may_follow(None, INHERENT));
         assert!(!may_end(full) && may_end(dead) && may_end(INHERENT));
+    }
+
+    #[test]
+    fn text_skips_ids_that_are_not_units() {
+        assert_eq!(text(&[0, 200]), "");
     }
 
     #[test]

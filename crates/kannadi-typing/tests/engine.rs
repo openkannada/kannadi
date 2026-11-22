@@ -1,7 +1,7 @@
 //! The engine with the bundled model.
 
 use kannadi_typing::units::{text, units};
-use kannadi_typing::{Engine, Model};
+use kannadi_typing::{Engine, Model, Weights};
 use proptest::prelude::*;
 use std::sync::OnceLock;
 
@@ -26,10 +26,12 @@ fn loose_spellings_find_the_word() {
 }
 
 #[test]
-fn capitals_inside_a_word_are_read_as_baraha_or_itrans() {
+fn precise_input_is_read_as_baraha_or_itrans() {
     assert_eq!(top("kannaDa", 1), ["ಕನ್ನಡ"]);
     assert_eq!(top("kRRiShNa", 1), ["ಕೃಷ್ಣ"]);
     assert_eq!(top("SaaLe", 1), ["ಶಾಳೆ"]);
+    assert_eq!(top("gaa.ndhii", 1), ["ಗಾಂಧೀ"]);
+    assert_eq!(top("j~naana", 1), ["ಜ್ಞಾನ"]);
 }
 
 #[test]
@@ -58,19 +60,8 @@ fn every_suggestion_is_a_well_formed_word() {
 }
 
 #[test]
-fn letters_never_vanish_twice_in_a_row() {
-    // ಕಂ from "k" would need both the inherent a and the anusvara to take no letters.
-    let m = engine().model();
-    let found = kannadi_typing::decode::search::<Vec<u8>>(m, b"k", None, None, 64);
-    assert!(!found.is_empty());
-    for f in &found {
-        assert!(text(&f.units) != "ಕಂ", "{}", text(&f.units));
-    }
-}
-
-#[test]
 fn other_input_gives_nothing() {
-    for input in ["", "kan nada", "a1", "ಕನ್ನಡ", "é"] {
+    for input in ["", "kan nada", "a1", "ಕನ್ನಡ", "é", "~", "a-b"] {
         assert!(top(input, 5).is_empty(), "{input}");
     }
 }
@@ -103,7 +94,7 @@ fn learning_puts_the_pick_first_and_survives_export() {
 #[test]
 fn a_learned_word_the_lexicon_lacks_is_offered_for_similar_letters() {
     let word = "ಜಗಲಿಕಟ್ಟೆಯಲ್ಲಿದ್ದಾಗ";
-    assert!(engine().model().lexicon.get(units(word).unwrap()).is_none());
+    assert!(!engine().model().has_word(word));
     let mut e = Engine::bundled();
     assert!(!e
         .suggest("jagalikatteyalliddaga", None, 5)
@@ -117,11 +108,46 @@ fn a_learned_word_the_lexicon_lacks_is_offered_for_similar_letters() {
 
 #[test]
 fn the_previous_word_counts() {
-    let pairs = &engine().model().pairs;
-    assert!(!pairs.keys.is_empty());
-    assert_eq!(pairs.lift("ಇಲ್ಲದ", "ಇಲ್ಲದ"), 0.0);
+    let m = engine().model();
+    assert!(m.word_pairs() > 0);
+    assert_eq!(m.lift("ಇಲ್ಲದ", "ಇಲ್ಲದ"), 0.0);
     let c = engine().candidates("aagide", Some("ಮಾಡಲಾಗಿದೆ"));
     assert!(c.iter().all(|c| c.lift >= 0.0));
+}
+
+#[test]
+fn weights_out_of_range_are_refused() {
+    let mut e = Engine::bundled();
+    let w = e.model().weights();
+    for bad in [
+        Weights { beam: 1e9, ..w },
+        Weights { beam: -1.0, ..w },
+        Weights {
+            open_beam: 0.0,
+            ..w
+        },
+        Weights {
+            freq: f32::NAN,
+            ..w
+        },
+    ] {
+        assert!(!e.set_weights(bad));
+        assert_eq!(e.model().weights(), w);
+    }
+    assert!(e.set_weights(Weights { beam: 8.0, ..w }));
+}
+
+#[test]
+fn a_damaged_model_is_rejected_without_a_panic() {
+    let bytes = engine().model().to_bytes();
+    // Flip 1 bit at a time across the whole file, in steps that cover every section.
+    for at in (8..bytes.len()).step_by(bytes.len() / 50) {
+        for bit in [0, 3, 7] {
+            let mut b = bytes.clone();
+            b[at] ^= 1 << bit;
+            let _ = Model::from_bytes(&b);
+        }
+    }
 }
 
 #[test]

@@ -1,15 +1,19 @@
 //! Type Kannada in English letters.
 //!
 //! [`Engine::suggest`] turns loosely typed Latin letters into ranked Kannada
-//! words: "kannada", "kannda" and "kanada" all give ಕನ್ನಡ first. Candidates
+//! words: "kannada", "kannda" and "Kannada" all give ಕನ್ನಡ first. Candidates
 //! come from 3 places:
 //!
-//! - a beam search through a lexicon of about 1 million Kannada words, scored by
+//! - a beam search through a lexicon of 232,003 Kannada words, scored by
 //!   an n-gram model over (letters, Kannada unit) pairs trained on the
 //!   Aksharantar transliteration pairs;
 //! - the same search with no lexicon, for words the lexicon lacks;
 //! - the strict Baraha and ITRANS readings of the input, which win when the
-//!   input uses capitals inside a word, such as `kannaDa`.
+//!   input is typed precisely: capitals inside a word, such as `kannaDa`, or a
+//!   mark, such as the dot in `gaa.ndhii`.
+//!
+//! Load only model files you trust: a damaged file is rejected, but a file
+//! crafted to break the lexicon automaton can still make the engine panic.
 //!
 //! The ranking adds the word's frequency in Kannada Wikipedia, how often it
 //! follows the previous word, and what the user picked before.
@@ -22,11 +26,11 @@
 //! ```
 
 mod bytes;
-pub mod complete;
-pub mod decode;
-pub mod lm;
-pub mod model;
-pub mod roman;
+mod complete;
+mod decode;
+mod lm;
+mod model;
+mod roman;
 mod rules;
 #[cfg(feature = "train")]
 pub mod train;
@@ -54,8 +58,8 @@ pub struct Candidate {
     pub lift: f32,
     /// Whether the strict Baraha reading of the input gives this word.
     pub rule: bool,
-    /// Whether the input uses Baraha capitals (kannaDa).
-    pub capitals: bool,
+    /// Whether the input is typed precisely: capitals inside the word (kannaDa) or a Baraha or ITRANS mark.
+    pub precise: bool,
     /// Natural log of 1 plus how often the user picked the word.
     pub user: f32,
     /// For a word picked before for exactly these letters, how recent the pick is (higher is newer).
@@ -77,8 +81,8 @@ impl Candidate {
         }
         if self.rule {
             s += w.rule;
-            if self.capitals {
-                s += w.capitals;
+            if self.precise {
+                s += w.precise;
             }
         }
         s
@@ -137,9 +141,13 @@ impl Engine {
         &self.model
     }
 
-    /// Replaces the ranking weights.
-    pub fn set_weights(&mut self, weights: Weights) {
-        self.model.weights = weights;
+    /// Replaces the ranking weights. Returns false, and keeps the old ones, if
+    /// they are not [valid](Weights::is_valid).
+    pub fn set_weights(&mut self, weights: Weights) -> bool {
+        weights.is_valid() && {
+            self.model.weights = weights;
+            true
+        }
     }
 
     fn lexicon_class(&self, units: &[u8]) -> Option<u64> {
@@ -148,7 +156,7 @@ impl Engine {
 
     /// Every candidate for `input` with its evidence, best first. `prev` is the
     /// Kannada word before the cursor, if any. Input with anything other than
-    /// ASCII letters gives no candidates.
+    /// ASCII letters and the marks `.`, `~` and `^` gives no candidates.
     pub fn candidates(&self, input: &str, prev: Option<&str>) -> Vec<Candidate> {
         let Some(letters) = roman::letters(input) else {
             return Vec::new();
@@ -157,7 +165,7 @@ impl Engine {
             return Vec::new();
         }
         let w = &self.model.weights;
-        let capitals = roman::has_inner_capitals(input);
+        let precise = roman::is_precise(input);
         // Per word: model score, lexicon class, units added by completion.
         let mut found: HashMap<Vec<u8>, (f32, Option<u64>, usize)> = HashMap::new();
         let mut add = |units: Vec<u8>, lm: f32, class: Option<u64>, extra: usize| {
@@ -222,7 +230,7 @@ impl Engine {
                     lm,
                     freq: class.map_or(0.0, class_ln),
                     known: class.is_some() || picks > 0,
-                    capitals,
+                    precise,
                     extra,
                 }
             })

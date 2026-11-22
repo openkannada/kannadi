@@ -227,14 +227,19 @@ fn test_items(a: &Args, flag: &str) -> Result<Vec<eval::Item>, String> {
 fn tune(a: &Args) -> Result<(), String> {
     let mut engine = load(a)?;
     let items = test_items(a, "dev")?;
-    let mut w = engine.model().weights;
+    let mut w = engine.model().weights();
     if let Some(b) = a.get("beam") {
         w.beam = b.parse().map_err(|_| "--beam")?;
     }
     if let Some(b) = a.get("open-beam") {
         w.open_beam = b.parse().map_err(|_| "--open-beam")?;
     }
-    engine.set_weights(w);
+    if !engine.set_weights(w) {
+        return Err(format!(
+            "beams must be at most {}",
+            kannadi_typing::Weights::MAX_BEAM
+        ));
+    }
     let (lists, _) = eval::candidates(&engine, &items);
     let before = eval::score(&engine, &items, &lists, &w);
     let tuned = eval::tune(&engine, &items, &lists);
@@ -255,9 +260,11 @@ fn tune(a: &Args) -> Result<(), String> {
         eval::Report::pct(after.top5, after.items),
     );
     if let Some(out) = a.get("out") {
-        let mut model = Model::from_bytes(&engine.model().to_bytes()).map_err(|e| e.to_string())?;
-        model.weights = tuned;
-        io(std::fs::write(out, model.to_bytes()), "writing the model")?;
+        engine.set_weights(tuned);
+        io(
+            std::fs::write(out, engine.model().to_bytes()),
+            "writing the model",
+        )?;
     }
     Ok(())
 }
@@ -265,7 +272,7 @@ fn tune(a: &Args) -> Result<(), String> {
 fn evaluate(a: &Args) -> Result<(), String> {
     let engine = load(a)?;
     let items = test_items(a, "test")?;
-    let mut w = engine.model().weights;
+    let mut w = engine.model().weights();
     if let Some(p) = a.get("pair") {
         w.pair = p.parse().map_err(|_| "--pair")?;
     }
@@ -273,7 +280,12 @@ fn evaluate(a: &Args) -> Result<(), String> {
         w.beam = b.parse().map_err(|_| "--beam")?;
     }
     let mut engine = engine;
-    engine.set_weights(w);
+    if !engine.set_weights(w) {
+        return Err(format!(
+            "beams must be at most {}",
+            kannadi_typing::Weights::MAX_BEAM
+        ));
+    }
     let (lists, times) = eval::candidates(&engine, &items);
     let mut r = eval::score(&engine, &items, &lists, &w);
     r.times = times;
@@ -327,7 +339,7 @@ fn evaluate(a: &Args) -> Result<(), String> {
 
 fn show(a: &Args) -> Result<(), String> {
     let engine = load(a)?;
-    let w = engine.model().weights;
+    let w = engine.model().weights();
     for input in a.all("input") {
         let t = std::time::Instant::now();
         let c = engine.candidates(input, a.get("prev"));

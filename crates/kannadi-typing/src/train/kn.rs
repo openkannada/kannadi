@@ -70,9 +70,10 @@ pub fn estimate(seqs: &[Vec<u16>], vocab: usize, settings: &Settings) -> Lm {
         for &k in longer.keys() {
             *cont.entry(k << 16).or_default() += 1;
         }
-        // An n-gram that starts at the boundary has nothing before it: keep its own count.
+        // An n-gram that starts at the word start has nothing before it: keep its own count.
+        // Token 0 alone is the word end, which takes a continuation count like any other.
         for (&k, &c) in &raw[n] {
-            if slot(k, 0) == 0 {
+            if n > 1 && slot(k, 0) == 0 {
                 cont.insert(k, c);
             }
         }
@@ -244,6 +245,21 @@ mod tests {
                 assert!((s - 1.0).abs() < 0.08, "history {history:?} sums to {s}");
             }
         }
+    }
+
+    #[test]
+    fn the_word_end_gets_a_continuation_count() {
+        let seqs: Vec<Vec<u16>> = (0..50).map(|_| vec![1, 2]).collect();
+        let lm = estimate(
+            &seqs,
+            3,
+            &Settings {
+                order: 2,
+                min_count: vec![1, 1],
+            },
+        );
+        let end = (lm.logp(&[], 0) as f64).exp();
+        assert!(end < 0.5, "P(end) = {end}");
     }
 
     #[test]

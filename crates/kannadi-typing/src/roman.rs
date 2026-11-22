@@ -15,7 +15,8 @@ pub fn chunk_code(chunk: &[u8]) -> u16 {
 }
 
 /// The letters of a chunk code.
-pub fn chunk_text(mut code: u16) -> String {
+#[cfg(test)]
+pub(crate) fn chunk_text(mut code: u16) -> String {
     let mut out = Vec::new();
     while code > 0 {
         out.push(b'a' - 1 + (code % 27) as u8);
@@ -25,9 +26,12 @@ pub fn chunk_text(mut code: u16) -> String {
     String::from_utf8(out).expect("ASCII letters")
 }
 
+/// The marks Baraha and ITRANS use besides letters, as in `gaa.ndhii` or `j~naana`.
+const MARKS: &[u8] = b".~^";
+
 /// The letters the model reads: lowercase a to z. x reads as ks and q as k,
-/// the way most people use them for Kannada. Returns `None` if `text` has any
-/// character other than an ASCII letter.
+/// the way most people use them for Kannada, and Baraha and ITRANS marks are
+/// skipped. Returns `None` if `text` has any other character.
 pub fn letters(text: &str) -> Option<Vec<u8>> {
     let mut out = Vec::with_capacity(text.len() + 2);
     for b in text.bytes() {
@@ -35,10 +39,17 @@ pub fn letters(text: &str) -> Option<Vec<u8>> {
             b'x' => out.extend_from_slice(b"ks"),
             b'q' => out.push(b'k'),
             c @ b'a'..=b'z' => out.push(c),
+            c if MARKS.contains(&c) => {}
             _ => return None,
         }
     }
     Some(out)
+}
+
+/// Whether `text` is typed precisely in Baraha or ITRANS: it has capitals
+/// inside the word (kannaDa), or a mark such as the dot in `gaa.ndhii`.
+pub fn is_precise(text: &str) -> bool {
+    has_inner_capitals(text) || text.bytes().any(|b| MARKS.contains(&b))
 }
 
 /// Whether `text` uses capitals as Baraha does (kannaDa), rather than only at
@@ -65,6 +76,14 @@ mod tests {
         assert_eq!(letters("Taxi").unwrap(), b"taksi");
         assert_eq!(letters("quran").unwrap(), b"kuran");
         assert_eq!(letters("a-b"), None);
+        assert_eq!(letters("gaa.ndhii").unwrap(), b"gaandhii");
+        assert_eq!(letters("j~naana").unwrap(), b"jnaana");
+    }
+
+    #[test]
+    fn marks_and_inner_capitals_are_precise() {
+        assert!(is_precise("gaa.ndhii") && is_precise("j~naana") && is_precise("kannaDa"));
+        assert!(!is_precise("Kannada") && !is_precise("kannada"));
     }
 
     #[test]
