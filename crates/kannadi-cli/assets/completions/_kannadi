@@ -42,7 +42,7 @@ _arguments "${_arguments_options[@]}" : \
 '--help[Print help (see more with '\''--help'\'')]' \
 '-V[Print version]' \
 '--version[Print version]' \
-'*::inputs -- Files and folders to convert. Folders are searched for .txt, .htm, .html, .docx and .pdf files:_files' \
+'*::inputs -- Files and folders to convert. Folders are searched for .txt, .htm, .html, .docx, .doc, .rtf and .pdf files:_files' \
 && ret=0
 ;;
 (to-nudi)
@@ -56,7 +56,7 @@ _arguments "${_arguments_options[@]}" : \
 '--help[Print help (see more with '\''--help'\'')]' \
 '-V[Print version]' \
 '--version[Print version]' \
-'*::inputs -- Files and folders to convert. Folders are searched for .txt, .htm, .html, .docx and .pdf files:_files' \
+'*::inputs -- Files and folders to convert. Folders are searched for .txt, .htm, .html, .docx, .doc, .rtf and .pdf files:_files' \
 && ret=0
 ;;
 (normalize)

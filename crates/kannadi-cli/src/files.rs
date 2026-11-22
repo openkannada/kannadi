@@ -11,6 +11,9 @@ pub enum Format {
     Html,
     Docx,
     Pdf,
+    /// Word 97 to 2003.
+    Doc,
+    Rtf,
 }
 
 impl Format {
@@ -21,14 +24,17 @@ impl Format {
             "htm" | "html" => Some(Format::Html),
             "docx" => Some(Format::Docx),
             "pdf" => Some(Format::Pdf),
+            "doc" => Some(Format::Doc),
+            "rtf" => Some(Format::Rtf),
             _ => None,
         }
     }
 
-    /// Where a converted file goes. PDF text is written as `NAME.pdf.txt`.
+    /// Where a converted file goes. The text of PDF, DOC and RTF files is written
+    /// as `NAME.pdf.txt`, `NAME.doc.txt` and `NAME.rtf.txt`.
     fn output(self, path: PathBuf) -> PathBuf {
         match self {
-            Format::Pdf => {
+            Format::Pdf | Format::Doc | Format::Rtf => {
                 let mut name = path.into_os_string();
                 name.push(".txt");
                 PathBuf::from(name)

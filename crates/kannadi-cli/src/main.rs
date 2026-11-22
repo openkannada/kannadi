@@ -1,14 +1,20 @@
 //! `kannadi`: converts folders of documents between legacy Kannada fonts and Unicode.
 
 mod convert;
+mod doc;
 mod docx;
 mod edits;
 mod files;
+mod flow;
+#[cfg(test)]
+mod flow_props;
+mod flow_writer;
 mod fonts;
 mod html;
 mod normalize;
 mod pdf;
 mod report;
+mod rtf;
 mod txt;
 mod typing;
 
@@ -62,7 +68,7 @@ Examples:
     propagate_version = true,
     long_about = "Convert Kannada documents between legacy fonts and Unicode.\n\n\
         to-unicode reads text typed in Nudi, Baraha ANSI, Nudi B-Akshara, Kan-Eng, Akruti and \
-        Shree-Lipi fonts in TXT, HTML, DOCX and PDF files. to-nudi writes Unicode Kannada as \
+        Shree-Lipi fonts in TXT, HTML, DOCX, DOC, RTF and PDF files. to-nudi writes Unicode Kannada as \
         Nudi glyph codes.\n\n\
         Each converted file gets a report next to it, FILE.report.tsv, when anything could not \
         be converted cleanly or the result has likely typos.",
@@ -77,9 +83,10 @@ struct Cli {
 enum Command {
     /// Convert documents in legacy Kannada fonts to Unicode
     ///
-    /// Reads TXT, HTML, DOCX and PDF files. Text in HTML, DOCX and PDF files is
-    /// converted only where it is set in a legacy font. The text of a PDF goes to
-    /// NAME.pdf.txt.
+    /// Reads TXT, HTML, DOCX, DOC (Word 97 to 2003), RTF and PDF files. Text in
+    /// HTML, DOCX, DOC, RTF and PDF files is converted only where it is set in a
+    /// legacy font. The text of a PDF, DOC or RTF file goes to NAME.pdf.txt,
+    /// NAME.doc.txt or NAME.rtf.txt.
     #[command(after_help = EXIT_STATUS, after_long_help = format!("{TO_UNICODE_EXAMPLES}\n\n{EXIT_STATUS}"))]
     ToUnicode {
         #[command(flatten)]
@@ -106,7 +113,7 @@ enum Command {
     /// Convert Unicode Kannada documents to Nudi glyph codes
     ///
     /// Writes TXT, HTML and DOCX files. Text files are written in Windows-1252.
-    /// A PDF cannot be written back, so each PDF counts as an error.
+    /// PDF, DOC and RTF files cannot be written back, so each counts as an error.
     #[command(after_help = EXIT_STATUS, after_long_help = format!("{TO_NUDI_EXAMPLES}\n\n{EXIT_STATUS}"))]
     ToNudi {
         #[command(flatten)]
@@ -182,7 +189,7 @@ enum Command {
 #[derive(Args)]
 struct Files {
     /// Files and folders to convert. Folders are searched for .txt, .htm, .html,
-    /// .docx and .pdf files
+    /// .docx, .doc, .rtf and .pdf files
     #[arg(required = true)]
     inputs: Vec<PathBuf>,
     /// Folder to write the converted files and reports to
@@ -409,6 +416,8 @@ fn convert_job(job: &Job, settings: &Settings) -> Result<Report> {
         Format::Html => html::convert_file(&bytes, settings)?,
         Format::Docx => docx::convert_file(&bytes, settings)?,
         Format::Pdf => pdf::convert_file(&bytes, settings)?,
+        Format::Doc => flow_writer::write(&doc::read(&bytes)?, settings, "Word .doc")?,
+        Format::Rtf => flow_writer::write(&rtf::read(&bytes)?, settings, "RTF")?,
     };
     if let Some(dir) = job.output.parent() {
         std::fs::create_dir_all(dir).with_context(|| format!("creating {}", dir.display()))?;

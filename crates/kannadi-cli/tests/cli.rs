@@ -237,6 +237,54 @@ fn type_shows_kannada_words_for_english_letters() {
     assert_eq!(run.status.code(), Some(2));
 }
 
+#[test]
+fn word_and_rtf_files_saved_by_libreoffice_read_as_the_fixture_lines() {
+    let fixtures = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/fixtures");
+    let expected = std::fs::read_to_string(format!("{fixtures}/legacy.expected.txt")).unwrap();
+    let tmp = tempfile::tempdir().unwrap();
+    for name in ["legacy.doc", "legacy.rtf"] {
+        let run = kannadi(
+            &[
+                "to-unicode",
+                &format!("{fixtures}/{name}"),
+                "--out",
+                "out",
+                "--strict",
+            ],
+            tmp.path(),
+        );
+        assert_eq!(run.status.code(), Some(0), "{name}: {run:?}");
+        let text = std::fs::read_to_string(tmp.path().join(format!("out/{name}.txt"))).unwrap();
+        assert_eq!(text, expected, "{name}");
+    }
+}
+
+#[test]
+fn folders_pick_up_doc_and_rtf_files_and_to_nudi_refuses_them() {
+    let fixtures = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/fixtures");
+    let tmp = tempfile::tempdir().unwrap();
+    let docs = tmp.path().join("docs");
+    std::fs::create_dir(&docs).unwrap();
+    std::fs::copy(format!("{fixtures}/legacy.doc"), docs.join("a.DOC")).unwrap();
+    std::fs::copy(format!("{fixtures}/legacy.rtf"), docs.join("b.rtf")).unwrap();
+    std::fs::write(docs.join("c.doc"), "not a Word file").unwrap();
+    let run = kannadi(&["to-unicode", "docs", "--out", "out"], tmp.path());
+    assert_eq!(run.status.code(), Some(2), "{run:?}");
+    assert!(tmp.path().join("out/docs/a.DOC.txt").exists());
+    assert!(tmp.path().join("out/docs/b.rtf.txt").exists());
+    let stderr = String::from_utf8_lossy(&run.stderr);
+    assert!(stderr.contains("c.doc: not a Word document"), "{stderr}");
+    assert!(
+        stderr.contains("converted 2 files, 0 with issues, 1 failed"),
+        "{stderr}"
+    );
+
+    let back = kannadi(&["to-nudi", "docs/b.rtf", "--out", "nudi"], tmp.path());
+    assert_eq!(back.status.code(), Some(2), "{back:?}");
+    assert!(String::from_utf8_lossy(&back.stderr)
+        .contains("RTF files can only be converted to Unicode"));
+}
+
 const ASSETS: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/assets");
 const REGENERATE: &str = "run the tests with KANNADI_BLESS=1 to rewrite crates/kannadi-cli/assets";
 
