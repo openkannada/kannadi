@@ -56,6 +56,13 @@ pub struct Doc {
     pub ccp: [u32; 7],
     pub n_fib: Option<u16>,
     pub encrypted: bool,
+    /// Property modifiers after the style of each paragraph, in order; paragraphs
+    /// past the end have none.
+    pub paragraphs: Vec<Vec<u8>>,
+    /// Bytes in each style's Stdf: 10, or 18 as Word 2000 and later write.
+    pub std_base_size: Option<u16>,
+    /// The PlcfHdd: where each header part starts in the header story.
+    pub hdd: Vec<u32>,
 }
 
 fn put16(b: &mut [u8], at: usize, v: u16) {
@@ -79,6 +86,7 @@ impl Doc {
         let mut pcds = Vec::new();
         let mut prcs = Vec::new();
         let mut cp = 0u32;
+        let mut marks = Vec::new();
         for piece in &self.pieces {
             let offset = word.len() as u32;
             for (grpprl, text) in &piece.runs {
@@ -93,6 +101,9 @@ impl Doc {
                         }
                     }
                     cp += c.len_utf16() as u32;
+                    if c == '\r' || c == '\u{07}' {
+                        marks.push(word.len() as u32);
+                    }
                 }
                 runs.push((start, word.len() as u32, grpprl.clone()));
             }
@@ -141,15 +152,8 @@ impl Doc {
         }
         chpx_plc_fcs.push(text.1);
 
-        let mut page = vec![0u8; 512];
-        put32(&mut page, 0, text.0);
-        put32(&mut page, 4, text.1);
-        page[8] = 200;
-        page[400] = 2;
-        put16(&mut page, 401, self.paragraph_style);
-        page[511] = 1;
         let papx_pn = (word.len() / 512) as u32;
-        word.extend(page);
+        word.extend(self.paragraph_page(text, &marks));
 
         let place = |table: &mut Vec<u8>, data: &[u8]| {
             let at = table.len() as u32;
@@ -194,23 +198,66 @@ impl Doc {
             put32(&mut word, 64 + index * 4, ccp[i]);
         }
         put16(&mut word, 152, 93);
-        for (i, (fc, lcb)) in [(1, stsh), (12, chpx), (13, papx), (15, fonts), (33, clx)] {
+        let hdd: Vec<u8> = self.hdd.iter().flat_map(|c| c.to_le_bytes()).collect();
+        let hdd = place(&mut table, &hdd);
+        let pairs = [
+            (1, stsh),
+            (11, hdd),
+            (12, chpx),
+            (13, papx),
+            (15, fonts),
+            (33, clx),
+        ];
+        for (i, (fc, lcb)) in pairs {
             put32(&mut word, 154 + i * 8, fc);
             put32(&mut word, 154 + i * 8 + 4, lcb);
         }
         compound(&[("/WordDocument", &word), ("/1Table", &table)])
     }
 
+    /// 1 PapxFkp page: a paragraph ends after each mark in `marks`, and its
+    /// GrpPrlAndIstd is stored in the short form when its length is odd and in
+    /// the long form when it is even, as Word does.
+    fn paragraph_page(&self, text: (u32, u32), marks: &[u32]) -> Vec<u8> {
+        let mut ends = marks.to_vec();
+        if ends.last() != Some(&text.1) {
+            ends.push(text.1);
+        }
+        let n = ends.len();
+        let mut page = vec![0u8; 512];
+        let mut start = text.0;
+        let mut free = 511;
+        for (i, &end) in ends.iter().enumerate() {
+            put32(&mut page, i * 4, start);
+            put32(&mut page, i * 4 + 4, end);
+            start = end;
+            let mut papx = self.paragraph_style.to_le_bytes().to_vec();
+            papx.extend(self.paragraphs.get(i).cloned().unwrap_or_default());
+            let stored = if papx.len() % 2 == 1 {
+                [vec![papx.len().div_ceil(2) as u8], papx].concat()
+            } else {
+                [vec![0, (papx.len() / 2) as u8], papx].concat()
+            };
+            let at = (free - stored.len()) & !1;
+            page[at..at + stored.len()].copy_from_slice(&stored);
+            page[4 * (n + 1) + i * 13] = (at / 2) as u8;
+            free = at;
+        }
+        page[511] = n as u8;
+        page
+    }
+
     fn stylesheet(&self) -> Vec<u8> {
+        let base = self.std_base_size.unwrap_or(10);
         let mut stshi = vec![0u8; 18];
         put16(&mut stshi, 0, self.styles.len() as u16);
-        put16(&mut stshi, 2, 10);
+        put16(&mut stshi, 2, base);
         put16(&mut stshi, 12, self.default_fonts.0);
         put16(&mut stshi, 16, self.default_fonts.1);
         let mut out = (stshi.len() as u16).to_le_bytes().to_vec();
         out.extend(stshi);
         for style in &self.styles {
-            let mut std = vec![0u8; 10];
+            let mut std = vec![0u8; usize::from(base)];
             put16(&mut std, 2, style.kind | (style.base << 4));
             let upx = if style.kind == 1 { 2 } else { 1 };
             put16(&mut std, 4, upx);

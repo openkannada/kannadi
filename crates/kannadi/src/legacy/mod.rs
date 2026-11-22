@@ -133,7 +133,7 @@ impl FromStr for Layout {
 /// assert_eq!(kannadi::legacy::decode_windows_1252(&[0x50, 0xC0, 0x86]), "PÀ†");
 /// ```
 pub fn decode_windows_1252(bytes: &[u8]) -> String {
-    bytes.iter().map(|&b| windows_1252(b)).collect()
+    bytes.iter().map(|&b| windows_1252_char(b)).collect()
 }
 
 /// The Windows-1252 byte for `c`, the inverse of [`decode_windows_1252`].
@@ -159,7 +159,16 @@ const HIGH: [char; 32] = [
     '\u{90}', '‘', '’', '“', '”', '•', '–', '—', '˜', '™', 'š', '›', 'œ', '\u{9D}', 'ž', 'Ÿ',
 ];
 
-fn windows_1252(b: u8) -> char {
+/// The character of 1 Windows-1252 byte; the 5 bytes Windows-1252 leaves
+/// undefined map to the C1 control characters, as in [`decode_windows_1252`].
+///
+/// ```
+/// use kannadi::legacy::windows_1252_char;
+///
+/// assert_eq!(windows_1252_char(0xC0), 'À');
+/// assert_eq!(windows_1252_char(0x86), '†');
+/// ```
+pub fn windows_1252_char(b: u8) -> char {
     match b {
         0x80..=0x9F => HIGH[usize::from(b - 0x80)],
         _ => char::from(b),
@@ -255,7 +264,7 @@ mod tests {
     #[test]
     fn windows_1252_roundtrips_every_byte() {
         for b in 0..=255u8 {
-            let c = windows_1252(b);
+            let c = windows_1252_char(b);
             assert_eq!(windows_1252_byte(c), Some(b), "{b:02X}");
         }
         assert_eq!(windows_1252_byte('\u{0080}'), None);

@@ -173,6 +173,136 @@ fn field_instructions_are_hidden_and_results_kept() {
 }
 
 #[test]
+fn tracked_deletions_are_left_out() {
+    let doc = Doc {
+        fonts: fonts(),
+        styles: vec![normal(font(1))],
+        pieces: vec![Piece::new(
+            true,
+            vec![
+                (Vec::new(), "PÀ"),
+                (vec![0x00, 0x08, 0x01], "old "),
+                (Vec::new(), "PÀ\r"),
+            ],
+        )],
+        ..Doc::default()
+    };
+    assert_eq!(
+        runs(&read(&doc.bytes()).unwrap(), 0),
+        [vec![(Some("Nudi 01 e"), "PÀPÀ")]]
+    );
+}
+
+fn texts(doc: &Document, story: usize) -> Vec<String> {
+    doc.stories[story]
+        .paragraphs
+        .iter()
+        .map(|p| p.iter().map(|r| r.text.as_str()).collect())
+        .collect()
+}
+
+#[test]
+fn row_end_marks_add_no_line_in_either_form() {
+    // An inner table's row ends with a paragraph mark and sprmPFInnerTtp; with
+    // sprmPFInTable its properties take an even length, the long PapxInFkp form.
+    let doc = Doc {
+        fonts: fonts(),
+        styles: vec![normal(font(0))],
+        pieces: vec![Piece::new(
+            true,
+            vec![(Vec::new(), "a\rb\rc\u{07}\u{07}d\r")],
+        )],
+        paragraphs: vec![
+            Vec::new(),
+            vec![0x16, 0x24, 0x01, 0x4C, 0x24, 0x01],
+            Vec::new(),
+            vec![0x17, 0x24, 0x01],
+        ],
+        ..Doc::default()
+    };
+    assert_eq!(texts(&read(&doc.bytes()).unwrap(), 0), ["a", "bc", "d"]);
+}
+
+#[test]
+fn styles_read_the_same_with_the_longer_stdf_of_word_2000() {
+    let doc = Doc {
+        fonts: fonts(),
+        styles: vec![
+            normal(font(1)),
+            Style {
+                kind: 2,
+                base: 0x0FFF,
+                grpprl: font(0),
+            },
+        ],
+        std_base_size: Some(18),
+        pieces: vec![Piece::new(
+            true,
+            vec![(Vec::new(), "PÀ"), (char_style(1), "A\r")],
+        )],
+        ..Doc::default()
+    };
+    assert_eq!(
+        runs(&read(&doc.bytes()).unwrap(), 0),
+        [vec![
+            (Some("Nudi 01 e"), "PÀ"),
+            (Some("Times New Roman"), "A")
+        ]]
+    );
+}
+
+#[test]
+fn header_parts_are_split_by_the_plcfhdd_and_repeats_dropped() {
+    let doc = Doc {
+        fonts: fonts(),
+        styles: vec![normal(font(1))],
+        pieces: vec![Piece::new(true, vec![(Vec::new(), "PÀ\rA\rB\rA\rC\rZ\r")])],
+        ccp: [3, 0, 8, 0, 0, 2, 0],
+        // The last part's end lies past the story, and stops at it.
+        hdd: vec![0, 2, 4, 6, 99],
+        ..Doc::default()
+    };
+    let read = read(&doc.bytes()).unwrap();
+    assert_eq!(read.stories[1].name, "headers and footers");
+    assert_eq!(texts(&read, 1), ["A", "B", "C"]);
+    assert_eq!(texts(&read, 2), ["Z"]);
+}
+
+#[test]
+fn an_inserted_symbol_reads_as_its_character_in_its_font() {
+    let symbol = vec![0x09, 0x6A, 0x02, 0x00, 0x50, 0xF0];
+    let doc = Doc {
+        fonts: fonts(),
+        styles: vec![normal(font(0))],
+        pieces: vec![Piece::new(
+            true,
+            vec![(Vec::new(), "a"), (symbol, "("), (Vec::new(), "\r")],
+        )],
+        ..Doc::default()
+    };
+    assert_eq!(
+        runs(&read(&doc.bytes()).unwrap(), 0),
+        [vec![
+            (Some("Times New Roman"), "a"),
+            (Some("BRH Kannada"), "\u{F050}")
+        ]]
+    );
+}
+
+#[test]
+fn more_characters_than_the_text_stream_holds_are_refused() {
+    let doc = Doc {
+        fonts: fonts(),
+        styles: vec![normal(Vec::new())],
+        pieces: vec![Piece::new(true, vec![(Vec::new(), "a\r")])],
+        ccp: [1 << 20, 0, 0, 0, 0, 0, 0],
+        ..Doc::default()
+    };
+    let err = read(&doc.bytes()).unwrap_err().to_string();
+    assert!(err.contains("more than its text can"), "{err}");
+}
+
+#[test]
 fn breaks_start_lines_and_marks_and_pictures_are_dropped() {
     let doc = Doc {
         fonts: fonts(),

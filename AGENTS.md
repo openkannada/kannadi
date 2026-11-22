@@ -20,7 +20,7 @@ node --test web/test/units.mjs                          # page modules
 python3 web/serve.py 8000                               # serve web/dist locally
 cargo run --example nudi -- file.txt                    # convert a legacy text file
 cargo run -p kannadi-cli -- to-unicode docs/ --out out/ # batch convert
-cd crates/kannadi-cli/fuzz && cargo +nightly fuzz run doc -- -max_total_time=60  # or rtf
+cd crates/kannadi-cli/fuzz && cargo +nightly fuzz run doc corpus/doc ../tests/fixtures -- -max_total_time=60 -rss_limit_mb=2048 -timeout=10  # or rtf
 python3 crates/kannadi-cli/tests/fixtures/make-word.py PATH/TO/soffice  # DOC and RTF fixtures
 cd tools/fontqa && uv run pytest && uv run ruff check . ../glyphdraft # font shaping tests (Python)
 ```
@@ -71,6 +71,7 @@ crates/kannadi-cli/   the `kannadi` binary: batch conversion of files and folder
                       maps and Differences lists
   src/flow.rs         text read from DOC and RTF files: stories, paragraphs, runs
   src/flow_writer.rs  writes that text, converting runs in legacy fonts
+  src/flow_props.rs   property tests: DOC and RTF runs read back as written
   src/doc/            Word 97 to 2003 DOC ([MS-DOC]): FIB, piece table, property
                       pages, stylesheet, font table; build.rs writes test files
   src/rtf.rs          RTF: tokenizer, groups, font table, destinations

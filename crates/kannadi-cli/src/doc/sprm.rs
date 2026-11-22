@@ -4,6 +4,8 @@
 use super::bytes::{u16_at, u8_at};
 
 const CHAR_STYLE: u16 = 0x4A30;
+const DELETED: u16 = 0x0800;
+const SYMBOL: u16 = 0x6A09;
 const FONT_ASCII: u16 = 0x4A4F;
 const FONT_OTHER: u16 = 0x4A51;
 const TABLE_DEFINITION: u16 = 0xD608;
@@ -17,6 +19,10 @@ pub struct CharProps {
     /// For other characters that are not East Asian.
     pub other: Option<u16>,
     pub style: Option<u16>,
+    /// A tracked deletion (sprmCFRMarkDel), which is not part of the text.
+    pub deleted: Option<bool>,
+    /// A symbol inserted from a font (sprmCSymbol): the font and the character.
+    pub symbol: Option<(u16, u16)>,
 }
 
 impl CharProps {
@@ -29,6 +35,8 @@ impl CharProps {
                 FONT_ASCII => props.ascii = value.or(props.ascii),
                 FONT_OTHER => props.other = value.or(props.other),
                 CHAR_STYLE => props.style = value.or(props.style),
+                DELETED => props.deleted = operand.first().map(|&b| b == 1),
+                SYMBOL => props.symbol = value.zip(u16_at(operand, 2)).or(props.symbol),
                 _ => {}
             }
         }
@@ -41,6 +49,8 @@ impl CharProps {
             ascii: over.ascii.or(self.ascii),
             other: over.other.or(self.other),
             style: over.style.or(self.style),
+            deleted: over.deleted.or(self.deleted),
+            symbol: over.symbol.or(self.symbol),
         }
     }
 
@@ -117,7 +127,8 @@ mod tests {
             CharProps {
                 ascii: Some(3),
                 other: Some(4),
-                style: Some(10)
+                style: Some(10),
+                ..CharProps::default()
             }
         );
     }
@@ -128,6 +139,18 @@ mod tests {
         grpprl.extend([0u8; 256]);
         grpprl.extend([0x4F, 0x4A, 0x07, 0x00]);
         assert_eq!(CharProps::parse(&grpprl).ascii, Some(7));
+    }
+
+    #[test]
+    fn inserted_symbols_give_their_font_and_character() {
+        let p = CharProps::parse(&[0x09, 0x6A, 0x02, 0x00, 0xB7, 0xF0]);
+        assert_eq!(p.symbol, Some((2, 0xF0B7)));
+    }
+
+    #[test]
+    fn tracked_deletions_are_marked() {
+        assert_eq!(CharProps::parse(&[0x00, 0x08, 0x01]).deleted, Some(true));
+        assert_eq!(CharProps::parse(&[0x00, 0x08, 0x00]).deleted, Some(false));
     }
 
     #[test]
@@ -152,7 +175,7 @@ mod tests {
         let p = CharProps {
             ascii: Some(1),
             other: Some(2),
-            style: None,
+            ..CharProps::default()
         };
         assert_eq!(p.font_for('P'), Some(1));
         assert_eq!(p.font_for('À'), Some(2));

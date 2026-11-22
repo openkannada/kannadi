@@ -8,7 +8,7 @@
 use std::collections::HashMap;
 
 use anyhow::{bail, Result};
-use kannadi::legacy::decode_windows_1252;
+use kannadi::legacy::windows_1252_char;
 
 use crate::flow::{Document, Font, Story};
 
@@ -116,6 +116,8 @@ struct State {
     font: Option<i32>,
     /// Characters to skip after `\uN`.
     uc: u32,
+    /// Inside a tracked deletion (`\deleted`), which is not part of the text.
+    deleted: bool,
 }
 
 const STORIES: [&str; 5] = [
@@ -154,6 +156,9 @@ const SKIPPED: &[&str] = &[
     "mmathPr",
     "pntxta",
     "pntxtb",
+    // List numbers and bullets, which a .doc file does not hold as text either.
+    "listtext",
+    "pntext",
     "falt",
     "panose",
     "objdata",
@@ -180,6 +185,8 @@ struct Parser {
     /// Where a `\*\ud` group opening now reads to: the `\upr` it is in.
     ud: Option<Dest>,
     skip: u32,
+    /// A UTF-16 high surrogate from `\uN`, waiting for its low half.
+    high: Option<u16>,
 }
 
 /// Reads the stories of an RTF file.
@@ -199,11 +206,13 @@ pub fn read(bytes: &[u8]) -> Result<Document> {
             dest: Dest::Text(0),
             font: None,
             uc: 1,
+            deleted: false,
         },
         fresh: false,
         starred: false,
         ud: None,
         skip: 0,
+        high: None,
     };
     for token in (Lexer { bytes, at: 0 }) {
         p.token(token);
@@ -249,19 +258,14 @@ impl Parser {
                 self.word(word, param);
             }
             Token::Symbol(s) => self.symbol(s),
-            Token::Hex(b) | Token::Text(b) => {
-                let c = decode_windows_1252(&[b])
-                    .chars()
-                    .next()
-                    .unwrap_or('\u{FFFD}');
-                self.char(c);
-            }
+            Token::Hex(b) | Token::Text(b) => self.char(windows_1252_char(b)),
             Token::Open | Token::Close => {}
         }
     }
 
     fn open(&mut self) {
         self.skip = 0;
+        self.lone_surrogate();
         if self.too_deep > 0 || self.stack.len() >= MAX_DEPTH {
             self.too_deep += 1;
             return;
@@ -278,6 +282,7 @@ impl Parser {
 
     fn close(&mut self) {
         self.skip = 0;
+        self.lone_surrogate();
         self.fresh = false;
         if self.too_deep > 0 {
             self.too_deep -= 1;
@@ -296,9 +301,6 @@ impl Parser {
                 story.end_paragraph();
             }
         }
-        if self.state.dest == Dest::FontTable && parent.dest != Dest::FontTable {
-            self.entry = None;
-        }
         self.state = parent;
     }
 
@@ -313,7 +315,10 @@ impl Parser {
         let dest = match (word, story, ud) {
             ("ud", _, Some(dest)) => dest,
             _ if self.state.dest == Dest::Skip => return false,
-            ("fonttbl", ..) => Dest::FontTable,
+            ("fonttbl", ..) => {
+                self.entry = None;
+                Dest::FontTable
+            }
             ("upr", ..) if matches!(self.state.dest, Dest::Text(_) | Dest::FontTable) => {
                 Dest::Upr(story)
             }
@@ -326,7 +331,7 @@ impl Parser {
             ) => Dest::Text(2),
             ("annotation", Some(_), _) => Dest::Text(3),
             ("shptxt", Some(_), _) => Dest::Text(4),
-            ("shpinst" | "fldrslt", Some(story), _) => Dest::Text(story),
+            ("shpinst", Some(story), _) => Dest::Text(story),
             _ if SKIPPED.contains(&word) || starred => Dest::Skip,
             _ => return false,
         };
@@ -346,12 +351,21 @@ impl Parser {
                 self.entry = Some((index, false));
             }
             (Dest::Text(_), "f") => self.state.font = param,
-            (Dest::Text(_), "plain") => self.state.font = None,
+            (Dest::Text(_), "plain") => {
+                self.state.font = None;
+                self.state.deleted = false;
+            }
+            (Dest::Text(_), "deleted") => self.state.deleted = param != Some(0),
             (_, "u") => {
-                let code = param.unwrap_or(0);
-                let code = if code < 0 { code + 65536 } else { code };
-                self.char(char::from_u32(code as u32).unwrap_or('\u{FFFD}'));
-                self.skip = self.state.uc;
+                // A negative N is a UTF-16 unit written as a signed 16-bit number.
+                if let Some(unit) =
+                    param.and_then(|n| u16::try_from(if n < 0 { n + 65536 } else { n }).ok())
+                {
+                    self.unit(unit);
+                }
+                if param.is_some() {
+                    self.skip = self.state.uc;
+                }
             }
             (Dest::Text(_), "par" | "sect" | "line" | "page" | "cell" | "nestcell") => {
                 self.end_paragraph()
@@ -394,10 +408,41 @@ impl Parser {
         }
     }
 
+    /// 1 UTF-16 unit from `\uN`; a surrogate pair gives 1 character.
+    fn unit(&mut self, unit: u16) {
+        match (self.high.take(), unit) {
+            (Some(high), 0xDC00..=0xDFFF) => {
+                let code =
+                    0x10000 + ((u32::from(high) - 0xD800) << 10) + (u32::from(unit) - 0xDC00);
+                self.char(char::from_u32(code).unwrap_or('\u{FFFD}'));
+            }
+            (high, 0xD800..=0xDBFF) => {
+                if high.is_some() {
+                    self.char('\u{FFFD}');
+                }
+                self.high = Some(unit);
+            }
+            (high, _) => {
+                if high.is_some() {
+                    self.char('\u{FFFD}');
+                }
+                self.char(char::from_u32(unit.into()).unwrap_or('\u{FFFD}'));
+            }
+        }
+    }
+
+    /// Writes a high surrogate left without its low half as U+FFFD.
+    fn lone_surrogate(&mut self) {
+        if self.high.take().is_some() {
+            self.char('\u{FFFD}');
+        }
+    }
+
     fn char(&mut self, c: char) {
+        self.lone_surrogate();
         match self.state.dest {
             Dest::Text(story) => {
-                if c == '\r' || c == '\n' {
+                if c == '\r' || c == '\n' || self.state.deleted {
                     return;
                 }
                 let number = self.state.font.or(self.default_font);
@@ -546,6 +591,41 @@ mod tests {
                 (None, "x")
             ]]
         );
+    }
+
+    fn texts(doc: &Document, story: usize) -> Vec<String> {
+        doc.stories[story]
+            .paragraphs
+            .iter()
+            .map(|p| p.iter().map(|r| r.text.as_str()).collect())
+            .collect()
+    }
+
+    #[test]
+    fn each_footnote_is_its_own_paragraph() {
+        let doc = rtf("a{\\footnote N1}b{\\footnote N2}c\\\npar d\\par");
+        assert_eq!(texts(&doc, 0), ["abc", "par d"]);
+        assert_eq!(texts(&doc, 1), ["N1", "N2"]);
+    }
+
+    #[test]
+    fn a_group_ends_the_unicode_fallback() {
+        let doc = rtf("\\u3221{a}b\\u3221 c\\par");
+        assert_eq!(texts(&doc, 0), ["ಕabಕ"]);
+    }
+
+    #[test]
+    fn surrogate_pairs_join_and_lone_halves_become_replacement_characters() {
+        let doc = rtf("\\u-10179?\\u-8704?x\\u-10179?y\\u-8704?\\u x\\par");
+        assert_eq!(texts(&doc, 0), ["\u{1F600}x\u{FFFD}y\u{FFFD}x"]);
+    }
+
+    #[test]
+    fn tracked_deletions_and_list_numbers_are_left_out() {
+        let doc = rtf(
+            "{\\listtext 1.\\tab}a{\\deleted b}c\\deleted d\\deleted0 e\\deleted f\\plain g\\par",
+        );
+        assert_eq!(texts(&doc, 0), ["aceg"]);
     }
 
     #[test]

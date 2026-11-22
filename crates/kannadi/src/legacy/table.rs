@@ -34,7 +34,7 @@ use std::sync::OnceLock;
 
 use crate::chars::{class, Class, VIRAMA};
 
-use super::{windows_1252, Layout};
+use super::{windows_1252_char, Layout};
 
 /// What a glyph, or a glyph sequence, means.
 #[derive(Debug)]
@@ -130,7 +130,9 @@ fn parse(source: &str, file: &str) -> Vec<Row> {
             .split_whitespace()
             .map(|h| {
                 let code = u8::from_str_radix(h, 16);
-                windows_1252(code.unwrap_or_else(|_| panic!("{file}: {h:?} is not a hex code")))
+                windows_1252_char(
+                    code.unwrap_or_else(|_| panic!("{file}: {h:?} is not a hex code")),
+                )
             })
             .collect();
         let first = value.chars().next();

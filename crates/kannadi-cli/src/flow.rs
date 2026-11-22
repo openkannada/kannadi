@@ -8,7 +8,7 @@ pub struct Font {
     pub name: String,
 }
 
-#[derive(Clone, Debug, Default, PartialEq, Eq)]
+#[derive(Clone, Debug, Default, PartialEq, Eq, Hash)]
 pub struct Run {
     /// Index into [`Document::fonts`], or `None` when the file names no font.
     pub font: Option<usize>,
@@ -74,10 +74,7 @@ pub fn glyph_code(c: char) -> char {
     match u32::from(c) {
         code @ 0xF020..=0xF0FF => {
             let byte = (code - 0xF000) as u8;
-            kannadi::legacy::decode_windows_1252(&[byte])
-                .chars()
-                .next()
-                .unwrap_or(c)
+            kannadi::legacy::windows_1252_char(byte)
         }
         _ => c,
     }

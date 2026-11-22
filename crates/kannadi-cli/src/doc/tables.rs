@@ -202,7 +202,7 @@ impl Styles {
         let defaults = CharProps {
             ascii: u16_at(stshi, 12),
             other: u16_at(stshi, 16),
-            style: None,
+            ..CharProps::default()
         };
         let mut own = Vec::new();
         let mut at = 2 + cb_stshi;

@@ -5,7 +5,7 @@
 //! characters, `c<n>` names give code n, other names are read by lopdf where it
 //! can, and the rest keep their code's Windows-1252 character.
 
-use kannadi::legacy::decode_windows_1252;
+use kannadi::legacy::{decode_windows_1252, windows_1252_char};
 use lopdf::{Dictionary, Document, Object};
 
 use super::resolve;
@@ -345,7 +345,7 @@ fn glyph(name: &[u8]) -> Option<char> {
     }
     // Ghostscript names a glyph with no standard name `c` and its code in decimal.
     if let Some(code) = numbered(name.as_bytes(), b"c") {
-        return decode_windows_1252(&[code]).chars().next();
+        return Some(windows_1252_char(code));
     }
     let hex = name.strip_prefix("uni").filter(|h| h.len() == 4)?;
     char::from_u32(u32::from_str_radix(hex, 16).ok()?)

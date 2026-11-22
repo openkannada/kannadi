@@ -10,6 +10,7 @@ mod fib;
 mod sprm;
 mod tables;
 
+use std::collections::HashSet;
 use std::io::{Cursor, Read};
 
 use anyhow::{bail, Context, Result};
@@ -43,8 +44,10 @@ pub fn read(bytes: &[u8]) -> Result<Document> {
         styles: Styles::parse(part(fib.stsh)),
     };
     let total: u64 = fib.ccp.iter().map(|&n| u64::from(n)).sum();
-    if total > MAX_CHARS {
-        bail!("the document says it holds {total} characters, more than this tool reads");
+    // Each character takes at least 1 byte of the text stream, so a larger count
+    // can only come from pieces that repeat the same bytes.
+    if total > MAX_CHARS || total > word.len() as u64 {
+        bail!("the document says it holds {total} characters, more than its text can");
     }
     let mut doc = Document {
         fonts: tables::fonts(part(fib.fonts)),
@@ -120,7 +123,7 @@ impl Reader<'_> {
                     fields.retain(|&f| f == Field::Result);
                     let paragraph = self.paragraphs.at(fc);
                     self.close(&mut story, &mut pending, paragraph.style);
-                    if !(c == '\u{07}' && paragraph.row_end) {
+                    if !paragraph.row_end {
                         story.end_paragraph();
                     }
                 }
@@ -155,7 +158,7 @@ impl Reader<'_> {
         }
         let mut out = Story::new(name);
         out.paragraphs.clear();
-        let mut seen = Vec::new();
+        let mut seen = HashSet::new();
         let mut done = start;
         for pair in bounds.windows(2) {
             let from = start.saturating_add(pair[0]).max(done);
@@ -169,7 +172,7 @@ impl Reader<'_> {
                 continue;
             }
             out.paragraphs.extend(part.paragraphs.iter().cloned());
-            seen.push(part.paragraphs);
+            seen.insert(part.paragraphs);
         }
         if out.paragraphs.is_empty() {
             out.paragraphs.push(Vec::new());
@@ -186,7 +189,15 @@ impl Reader<'_> {
                 Item::Char(c, direct) => {
                     let character = direct.style.map(|s| self.styles.props(s));
                     let props = paragraph.and(character.unwrap_or_default()).and(direct);
-                    story.push(props.font_for(c).map(usize::from), c);
+                    if props.deleted == Some(true) {
+                        continue;
+                    }
+                    // An inserted symbol stands in the text as a placeholder.
+                    let (font, c) = match props.symbol {
+                        Some((ftc, code)) => (Some(ftc), char::from_u32(code.into()).unwrap_or(c)),
+                        None => (props.font_for(c), c),
+                    };
+                    story.push(font.map(usize::from), c);
                 }
             }
         }
@@ -239,14 +250,7 @@ fn decode(units: Vec<(u32, u16)>, compressed: bool) -> Vec<(char, u32)> {
     if compressed {
         return units
             .into_iter()
-            .map(|(fc, u)| {
-                let byte = [u as u8];
-                let c = kannadi::legacy::decode_windows_1252(&byte)
-                    .chars()
-                    .next()
-                    .unwrap_or('\u{FFFD}');
-                (c, fc)
-            })
+            .map(|(fc, u)| (kannadi::legacy::windows_1252_char(u as u8), fc))
             .collect();
     }
     let offsets: Vec<u32> = units.iter().map(|&(fc, _)| fc).collect();
