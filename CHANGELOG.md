@@ -8,6 +8,8 @@
 - `normalize::normalize_as`, `normalize_counted`, `is_normalized`, `Form`, `Rule` and `Counts`.
 - `kannadi normalize`: normalize text files or standard input to a form, with `--stats` (changes per rule) and `--check` (exit 1 if not normalized).
 - Tests that clean converter output is canonical, on every fixture line and on random glyph sequences.
+- `kannadi to-unicode` reads Word 97 to 2003 `.doc` files and `.rtf` files, and folders pick them up. Their text goes to `NAME.doc.txt` and `NAME.rtf.txt`, with runs in legacy fonts converted in their layout and other runs kept, and report rows give the output line. The `.doc` reader follows [MS-DOC] (piece table, character and paragraph properties, stylesheet, font table) and reads the compound file with the `cfb` crate; the RTF reader handles the font table, `\f`, `\'hh`, `\u` with `\uc`, `\upr`, fields and destinations. Footnotes, headers and footers, comments, endnotes and text boxes follow the body. Golden tests use files LibreOffice saved from a DOCX of fixture lines, property tests check that legacy runs convert and Unicode runs survive in both formats, and `crates/kannadi-cli/fuzz` has `cargo fuzz` targets for both readers.
+- `legacy::windows_1252_char`: the character of 1 Windows-1252 byte.
 
 ### Changed
 

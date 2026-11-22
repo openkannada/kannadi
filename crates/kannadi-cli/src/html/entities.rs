@@ -1,7 +1,7 @@
 //! Character references in HTML text: legacy glyph codes are often written as
 //! `&Agrave;` or `&#192;`.
 
-use kannadi::legacy::decode_windows_1252;
+use kannadi::legacy::windows_1252_char;
 
 /// HTML 4 names for U+00A0 to U+00FF, in order.
 const LATIN_1: [&str; 96] = [
@@ -115,7 +115,7 @@ fn lookup(name: &str) -> Option<char> {
             None => number.parse().ok()?,
         };
         return match u8::try_from(code) {
-            Ok(b @ 0x80..=0x9F) => decode_windows_1252(&[b]).chars().next(),
+            Ok(b @ 0x80..=0x9F) => Some(windows_1252_char(b)),
             _ => char::from_u32(code),
         };
     }
