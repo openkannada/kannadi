@@ -346,7 +346,7 @@ mod tests {
 
     #[test]
     fn listed_stems_are_final() {
-        for (stem, _) in preferred() {
+        for stem in preferred().keys() {
             assert!(is_final(stem), "{stem}");
         }
     }
