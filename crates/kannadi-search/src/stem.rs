@@ -103,10 +103,10 @@ fn strip(word: &str) -> Option<String> {
     let preferred = preferred();
     let mut best: Option<(String, u64)> = None;
     for stem in readings.iter().flatten() {
+        // The list holds only stems no ending shortens (see `candidates`).
         let key = key(stem);
-        // Only listed stems need the costlier check that no ending shortens them.
         if let Some(&n) = preferred.get(key.as_str()) {
-            if best.as_ref().is_none_or(|(_, b)| n > *b) && is_final(&key) {
+            if best.as_ref().is_none_or(|(_, b)| n > *b) {
                 best = Some((key, n));
             }
         }
@@ -329,6 +329,26 @@ mod tests {
         assert_eq!(stem("ಅಭಿವೃದ್ಧಿಗೆ"), "ಅಭಿವೃದ್ಧಿ");
         assert_eq!(stem("ಕಾಡಿಗೆ"), "ಕಾಡ್");
         assert!(preferred().len() > 1000);
+    }
+
+    #[test]
+    fn a_word_with_2_readings_of_its_longest_ending_stays_whole() {
+        // ವೃಕೋದ + ರ (plural genitive) or ವೃಕೋದು + ರ (genitive of ಇದು-type words).
+        assert_eq!(readings("ವೃಕೋದರ")[0].len(), 2);
+        assert_eq!(stem("ವೃಕೋದರ"), "ವೃಕೋದರ");
+    }
+
+    #[test]
+    fn a_word_is_not_its_own_reading() {
+        assert!(readings("ಕಾಡು").is_empty());
+        assert!(candidates("ಕಾಡಿಗೆ").contains(&"ಕಾಡ್".to_string()));
+    }
+
+    #[test]
+    fn listed_stems_are_final() {
+        for (stem, _) in preferred() {
+            assert!(is_final(stem), "{stem}");
+        }
     }
 
     #[test]
