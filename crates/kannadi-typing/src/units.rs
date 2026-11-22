@@ -207,6 +207,24 @@ mod tests {
     }
 
     #[test]
+    fn a_consonant_carries_a_vowel_or_a_virama() {
+        let [ka, ki, inh, kdead, a] =
+            ["ಕ", "ಕಿ", "", "ಕ್", "ಅ"].map(|w| units(w).unwrap_or_default());
+        let (full, sign, dead, vowel) = (ka[0], ki[1], kdead[0], a[0]);
+        assert!(inh.is_empty());
+        assert!(may_follow(Some(full), sign) && may_follow(Some(full), INHERENT));
+        assert!(
+            !may_follow(Some(full), full)
+                && !may_follow(Some(full), dead)
+                && !may_follow(Some(full), vowel)
+        );
+        assert!(may_follow(Some(dead), full) && may_follow(Some(dead), dead));
+        assert!(!may_follow(Some(dead), sign) && !may_follow(Some(dead), INHERENT));
+        assert!(!may_follow(None, sign) && !may_follow(None, INHERENT));
+        assert!(!may_end(full) && may_end(dead) && may_end(INHERENT));
+    }
+
+    #[test]
     fn drops_joiners_and_rejects_other_text() {
         assert_eq!(text(&units("ಕನ್\u{200C}ನಡ").unwrap()), "ಕನ್ನಡ");
         for w in ["", "abc", "ಕ1", "ಂಕ", "ಾ", "ಕ಼"] {

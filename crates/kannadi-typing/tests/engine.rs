@@ -58,6 +58,17 @@ fn every_suggestion_is_a_well_formed_word() {
 }
 
 #[test]
+fn letters_never_vanish_twice_in_a_row() {
+    // ಕಂ from "k" would need both the inherent a and the anusvara to take no letters.
+    let m = engine().model();
+    let found = kannadi_typing::decode::search::<Vec<u8>>(m, b"k", None, None, 64);
+    assert!(!found.is_empty());
+    for f in &found {
+        assert!(text(&f.units) != "ಕಂ", "{}", text(&f.units));
+    }
+}
+
+#[test]
 fn other_input_gives_nothing() {
     for input in ["", "kan nada", "a1", "ಕನ್ನಡ", "é"] {
         assert!(top(input, 5).is_empty(), "{input}");

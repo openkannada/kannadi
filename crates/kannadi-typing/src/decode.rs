@@ -37,7 +37,6 @@ struct Hyp {
     hist: [u16; HIST],
     hlen: u8,
     last: Unit,
-    eps: bool,
     node: CompiledAddr,
     out: u64,
     back: u32,
@@ -60,8 +59,7 @@ struct Search<'a, D> {
 impl<D: AsRef<[u8]>> Search<'_, D> {
     fn extend(&mut self, h: &Hyp, id: u16) -> Option<Hyp> {
         let g = self.model.graphones[id as usize];
-        let epsilon = g.chunk == 0;
-        if (epsilon && h.eps) || !may_follow((h.last != 0).then_some(h.last), g.unit) {
+        if !may_follow((h.last != 0).then_some(h.last), g.unit) {
             return None;
         }
         let (mut node, mut out) = (h.node, h.out);
@@ -78,7 +76,6 @@ impl<D: AsRef<[u8]>> Search<'_, D> {
         let mut next = Hyp {
             score,
             last: g.unit,
-            eps: epsilon,
             node,
             out,
             back: self.steps.len() as u32,
@@ -112,10 +109,7 @@ impl<D: AsRef<[u8]>> Search<'_, D> {
 fn prune(hyps: &mut Vec<Hyp>, beam: usize) {
     hyps.sort_unstable_by(|a, b| b.score.total_cmp(&a.score));
     let mut seen = HashMap::with_capacity(hyps.len());
-    hyps.retain(|h| {
-        seen.insert((h.hist, h.hlen, h.last, h.eps, h.node), ())
-            .is_none()
-    });
+    hyps.retain(|h| seen.insert((h.hist, h.hlen, h.last, h.node), ()).is_none());
     hyps.truncate(beam);
 }
 
@@ -146,7 +140,6 @@ pub fn search<D: AsRef<[u8]>>(
         hist: [0; HIST],
         hlen: u8::from(keep > 0),
         last: 0,
-        eps: false,
         node: lexicon.map_or(NO_NODE, |f| f.root().addr()),
         out: 0,
         back: u32::MAX,
@@ -157,6 +150,7 @@ pub fn search<D: AsRef<[u8]>>(
     for i in 0..=n {
         let mut here = std::mem::take(&mut beams[i]);
         prune(&mut here, beam);
+        // 1 round only, so at most 1 unit in a row takes no letters.
         let mut added = Vec::new();
         for h in &here {
             added.extend(empty.iter().filter_map(|&id| s.extend(h, id)));
