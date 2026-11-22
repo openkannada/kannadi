@@ -1,0 +1,18 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>kannadi npm package</title>
+<!-- Serve a directory holding node_modules/kannadi and open this page; it prints PASS or FAIL. -->
+<pre id="out">running</pre>
+<script type="module">
+  import init, { toUnicode, unicodeToNudi, NudiOptions } from "./node_modules/kannadi/kannadi_wasm.js";
+  const out = document.getElementById("out");
+  try {
+    await init();
+    const c = toUnicode("¸ÀPÁðj ¥ÁæxÀ«ÄPÀ ±Á¯ÉUÀ¼À°è", "nudi", new NudiOptions());
+    const back = unicodeToNudi(c.text).text;
+    const ok = c.text === "ಸರ್ಕಾರಿ ಪ್ರಾಥಮಿಕ ಶಾಲೆಗಳಲ್ಲಿ" && c.isClean && back === "¸ÀPÁðj ¥ÁæxÀ«ÄPÀ ±Á¯ÉUÀ¼À°è";
+    out.textContent = `${ok ? "PASS" : "FAIL"} ${c.text}`;
+  } catch (e) {
+    out.textContent = `FAIL ${e}`;
+  }
+</script>

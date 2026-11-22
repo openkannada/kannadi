@@ -1,0 +1,39 @@
+{
+  "name": "kannadi",
+  "version": "0.1.0",
+  "description": "Convert Kannada text typed in legacy Nudi, Baraha, Akruti, Shree-Lipi, Nudi B-Akshara and Kan-Eng fonts to Unicode and back, in Node and the browser (WebAssembly)",
+  "license": "MIT OR Apache-2.0",
+  "author": "The Open Kannada Authors",
+  "homepage": "https://openkannada.org/editor/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/openkannada/kannadi.git",
+    "directory": "crates/kannadi-wasm/npm"
+  },
+  "bugs": "https://github.com/openkannada/kannadi/issues",
+  "keywords": ["kannada", "unicode", "nudi", "baraha", "legacy-fonts", "wasm"],
+  "type": "module",
+  "main": "./node.mjs",
+  "types": "./kannadi_wasm.d.ts",
+  "exports": {
+    ".": {
+      "types": "./kannadi_wasm.d.ts",
+      "node": "./node.mjs",
+      "default": "./kannadi_wasm.js"
+    },
+    "./kannadi_wasm_bg.wasm": "./kannadi_wasm_bg.wasm",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "kannadi_wasm.js",
+    "kannadi_wasm.d.ts",
+    "kannadi_wasm_bg.wasm",
+    "kannadi_wasm_bg.wasm.d.ts",
+    "node.mjs",
+    "LICENSE-MIT",
+    "LICENSE-APACHE"
+  ],
+  "engines": {
+    "node": ">=18"
+  }
+}
