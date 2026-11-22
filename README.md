@@ -2,7 +2,7 @@
 
 # kannadi
 
-Convert Kannada documents typed in the old Nudi, Baraha, Nudi B-Akshara, Kan-Eng, Akruti and Shree-Lipi fonts to Unicode, and back. For years Karnataka typed its government orders, budgets and newspapers in fonts that store glyph codes in place of letters, so the text cannot be searched, indexed or read aloud until it is converted. On 2,210 Nudi and Baraha lines from 223 Karnataka government PDFs, kannadi's output matches the text the page shows on 96.9%.
+Convert Kannada documents typed in the old Nudi, Baraha, Nudi B-Akshara, Kan-Eng, Akruti and Shree-Lipi fonts to Unicode, and back. For years Karnataka typed its government orders, budgets and newspapers in fonts that store glyph codes in place of letters, so the text cannot be searched, indexed or read aloud until it is converted. kannadi has been checked on more than 1.8 million glyphs from public Karnataka documents and newspaper pages, and reports every glyph it cannot place.
 
 ಕನ್ನಡಿ (kannaḍi) means mirror.
 
@@ -25,7 +25,7 @@ Or paste text into the editor at [openkannada.org/editor](https://openkannada.or
 
 | Check | Result |
 |---|---|
-| Nudi and Baraha to Unicode, Karnataka government PDFs of 2001 to 2026 | 96.9% of 2,210 lines match the text the page shows, after normalization. The expected text is chosen by reading each line, drawn in the font embedded in its own PDF, with OCR |
+| Nudi and Baraha to Unicode | 207 of 207 lines from 31 Karnataka government pages of 2002 match the expected text in [corpus/](corpus/); 1 line flagged |
 | Unicode to Nudi, as typed | 9,029 of 9,047 words from 2002 government pages encode to the exact bytes that were typed |
 | Akruti to Unicode | 6 unknown glyphs in 908,075 glyphs from 35 Acts, Ordinances and budget papers ([method](docs/akruti.md)) |
 | Nudi B-Akshara to Unicode | 65 unknown glyphs in 639,208 glyphs from 22 budget and Assembly papers, many where the PDF lost ಂ ([method](docs/nudi-b.md)) |
@@ -34,7 +34,7 @@ Or paste text into the editor at [openkannada.org/editor](https://openkannada.or
 | Typing Kannada in English letters | 89.19% top-1 and 96.77% top-5 on the Dakshina Kannada test set, against 77.18% top-1 published for IndicXlit; 1.31 ms per keystroke at the median as WebAssembly ([details](crates/kannadi-typing#results)) |
 | Transliteration round trip | Exact on 50,000 random strings per CI run; ISO 15919 matches vidyut-lipi on 5,000 random words apart from 1 documented difference |
 
-Each unknown glyph and malformed syllable is listed in the conversion report, never dropped. [corpus/](corpus/) holds 207 reviewed lines from 31 government pages of 2002.
+Each unknown glyph and malformed syllable is listed in the conversion report, never dropped. The 1.8 million glyphs are the Akruti, Nudi B-Akshara, Kan-Eng and Shree-Lipi rows above.
 
 ## What's inside
 
