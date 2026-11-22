@@ -39,7 +39,7 @@ As WebAssembly in Node 24 on the same machine, every keystroke of every test wor
 
 | File | Size | Gzipped |
 |---|---:|---:|
-| `kannadi_typing_wasm_bg.wasm` | 451,687 bytes | 166,435 bytes |
+| `kannadi_typing_wasm_bg.wasm` | 451,360 bytes | 166,371 bytes |
 | `model/kn.typing` | 2,673,232 bytes | 1,612,941 bytes |
 
 What the numbers mean:
