@@ -16,6 +16,7 @@ mod pdf;
 mod report;
 mod rtf;
 mod txt;
+mod typing;
 
 use std::path::PathBuf;
 use std::process::ExitCode;
@@ -146,6 +147,31 @@ enum Command {
         #[arg(long)]
         check: bool,
     },
+    /// Show the Kannada words for words typed in English letters, best first
+    ///
+    /// Spellings may be loose: kannada, kannda and Kannada all give ಕನ್ನಡ.
+    /// Capitals inside a word follow Baraha, as in kannaDa, and ITRANS marks
+    /// work too, as in gaa.ndhii.
+    /// The first word is what the letters spell; later ones may be longer words
+    /// the letters only start.
+    #[command(
+        after_help = "Examples:\n  kannadi type kannada\n  kannadi type --prev ನನ್ನ hesaru\n  kannadi type --scores -n 10 til"
+    )]
+    Type {
+        /// Words in English letters
+        #[arg(required = true)]
+        words: Vec<String>,
+        /// How many words to show for each
+        #[arg(short, default_value_t = 5)]
+        n: usize,
+        /// The Kannada word before, which can change the order
+        #[arg(long, value_name = "WORD")]
+        prev: Option<String>,
+        /// Show 1 word per line, with its score and kind: word, spelling (not in
+        /// the word list) or completion
+        #[arg(long)]
+        scores: bool,
+    },
     /// Print a shell completion script to standard output
     #[command(after_help = "Example:\n  kannadi completions zsh > ~/.zfunc/_kannadi")]
     Completions {
@@ -210,6 +236,23 @@ fn main() -> ExitCode {
             stats,
             check,
         } => return run_normalize(&inputs, form, stats, check),
+        Command::Type {
+            words,
+            n,
+            prev,
+            scores,
+        } => {
+            let engine = kannadi_typing::Engine::bundled();
+            let mut out = std::io::stdout().lock();
+            return match typing::run(&engine, &words, prev.as_deref(), n, scores, &mut out) {
+                Ok(()) => ExitCode::SUCCESS,
+                Err(e) if normalize::is_broken_pipe(&e) => ExitCode::SUCCESS,
+                Err(e) => {
+                    eprintln!("error: {e:#}");
+                    ExitCode::from(2)
+                }
+            };
+        }
         Command::Completions { shell } => {
             clap_complete::generate(
                 shell,

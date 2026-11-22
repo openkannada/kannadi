@@ -28,6 +28,7 @@ Register-ArgumentCompleter -Native -CommandName 'kannadi' -ScriptBlock {
             [CompletionResult]::new('to-unicode', 'to-unicode', [CompletionResultType]::ParameterValue, 'Convert documents in legacy Kannada fonts to Unicode')
             [CompletionResult]::new('to-nudi', 'to-nudi', [CompletionResultType]::ParameterValue, 'Convert Unicode Kannada documents to Nudi glyph codes')
             [CompletionResult]::new('normalize', 'normalize', [CompletionResultType]::ParameterValue, 'Normalize Unicode Kannada text, following the Kannada text normalization profile')
+            [CompletionResult]::new('type', 'type', [CompletionResultType]::ParameterValue, 'Show the Kannada words for words typed in English letters, best first')
             [CompletionResult]::new('completions', 'completions', [CompletionResultType]::ParameterValue, 'Print a shell completion script to standard output')
             [CompletionResult]::new('manpages', 'manpages', [CompletionResultType]::ParameterValue, 'Write the man pages to a folder')
             [CompletionResult]::new('help', 'help', [CompletionResultType]::ParameterValue, 'Print this message or the help of the given subcommand(s)')
@@ -70,6 +71,16 @@ Register-ArgumentCompleter -Native -CommandName 'kannadi' -ScriptBlock {
             [CompletionResult]::new('--version', '--version', [CompletionResultType]::ParameterName, 'Print version')
             break
         }
+        'kannadi;type' {
+            [CompletionResult]::new('-n', '-n', [CompletionResultType]::ParameterName, 'How many words to show for each')
+            [CompletionResult]::new('--prev', '--prev', [CompletionResultType]::ParameterName, 'The Kannada word before, which can change the order')
+            [CompletionResult]::new('--scores', '--scores', [CompletionResultType]::ParameterName, 'Show 1 word per line, with its score and kind: word, spelling (not in the word list) or completion')
+            [CompletionResult]::new('-h', '-h', [CompletionResultType]::ParameterName, 'Print help (see more with ''--help'')')
+            [CompletionResult]::new('--help', '--help', [CompletionResultType]::ParameterName, 'Print help (see more with ''--help'')')
+            [CompletionResult]::new('-V', '-V ', [CompletionResultType]::ParameterName, 'Print version')
+            [CompletionResult]::new('--version', '--version', [CompletionResultType]::ParameterName, 'Print version')
+            break
+        }
         'kannadi;completions' {
             [CompletionResult]::new('-h', '-h', [CompletionResultType]::ParameterName, 'Print help')
             [CompletionResult]::new('--help', '--help', [CompletionResultType]::ParameterName, 'Print help')
@@ -88,6 +99,7 @@ Register-ArgumentCompleter -Native -CommandName 'kannadi' -ScriptBlock {
             [CompletionResult]::new('to-unicode', 'to-unicode', [CompletionResultType]::ParameterValue, 'Convert documents in legacy Kannada fonts to Unicode')
             [CompletionResult]::new('to-nudi', 'to-nudi', [CompletionResultType]::ParameterValue, 'Convert Unicode Kannada documents to Nudi glyph codes')
             [CompletionResult]::new('normalize', 'normalize', [CompletionResultType]::ParameterValue, 'Normalize Unicode Kannada text, following the Kannada text normalization profile')
+            [CompletionResult]::new('type', 'type', [CompletionResultType]::ParameterValue, 'Show the Kannada words for words typed in English letters, best first')
             [CompletionResult]::new('completions', 'completions', [CompletionResultType]::ParameterValue, 'Print a shell completion script to standard output')
             [CompletionResult]::new('manpages', 'manpages', [CompletionResultType]::ParameterValue, 'Write the man pages to a folder')
             [CompletionResult]::new('help', 'help', [CompletionResultType]::ParameterValue, 'Print this message or the help of the given subcommand(s)')
@@ -100,6 +112,9 @@ Register-ArgumentCompleter -Native -CommandName 'kannadi' -ScriptBlock {
             break
         }
         'kannadi;help;normalize' {
+            break
+        }
+        'kannadi;help;type' {
             break
         }
         'kannadi;help;completions' {

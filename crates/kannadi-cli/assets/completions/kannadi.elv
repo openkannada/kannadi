@@ -25,6 +25,7 @@ set edit:completion:arg-completer[kannadi] = {|@words|
             cand to-unicode 'Convert documents in legacy Kannada fonts to Unicode'
             cand to-nudi 'Convert Unicode Kannada documents to Nudi glyph codes'
             cand normalize 'Normalize Unicode Kannada text, following the Kannada text normalization profile'
+            cand type 'Show the Kannada words for words typed in English letters, best first'
             cand completions 'Print a shell completion script to standard output'
             cand manpages 'Write the man pages to a folder'
             cand help 'Print this message or the help of the given subcommand(s)'
@@ -63,6 +64,15 @@ set edit:completion:arg-completer[kannadi] = {|@words|
             cand -V 'Print version'
             cand --version 'Print version'
         }
+        &'kannadi;type'= {
+            cand -n 'How many words to show for each'
+            cand --prev 'The Kannada word before, which can change the order'
+            cand --scores 'Show 1 word per line, with its score and kind: word, spelling (not in the word list) or completion'
+            cand -h 'Print help (see more with ''--help'')'
+            cand --help 'Print help (see more with ''--help'')'
+            cand -V 'Print version'
+            cand --version 'Print version'
+        }
         &'kannadi;completions'= {
             cand -h 'Print help'
             cand --help 'Print help'
@@ -79,6 +89,7 @@ set edit:completion:arg-completer[kannadi] = {|@words|
             cand to-unicode 'Convert documents in legacy Kannada fonts to Unicode'
             cand to-nudi 'Convert Unicode Kannada documents to Nudi glyph codes'
             cand normalize 'Normalize Unicode Kannada text, following the Kannada text normalization profile'
+            cand type 'Show the Kannada words for words typed in English letters, best first'
             cand completions 'Print a shell completion script to standard output'
             cand manpages 'Write the man pages to a folder'
             cand help 'Print this message or the help of the given subcommand(s)'
@@ -88,6 +99,8 @@ set edit:completion:arg-completer[kannadi] = {|@words|
         &'kannadi;help;to-nudi'= {
         }
         &'kannadi;help;normalize'= {
+        }
+        &'kannadi;help;type'= {
         }
         &'kannadi;help;completions'= {
         }

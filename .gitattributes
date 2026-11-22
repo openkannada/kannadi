@@ -4,3 +4,6 @@ crates/kannadi-cli/assets/** text eol=lf
 normalization/** text eol=lf
 # Word and RTF fixtures and the text expected from them, read byte for byte.
 crates/kannadi-cli/tests/fixtures/legacy.* -text
+# The typing model is binary; the test sets are read byte for byte.
+crates/kannadi-typing/model/*.typing binary
+crates/kannadi-typing/eval/*.tsv text eol=lf

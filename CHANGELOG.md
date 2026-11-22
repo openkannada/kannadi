@@ -10,6 +10,9 @@
 - Tests that clean converter output is canonical, on every fixture line and on random glyph sequences.
 - `kannadi to-unicode` reads Word 97 to 2003 `.doc` files and `.rtf` files, and folders pick them up. Their text goes to `NAME.doc.txt` and `NAME.rtf.txt`, with runs in legacy fonts converted in their layout and other runs kept, and report rows give the output line. The `.doc` reader follows [MS-DOC] (piece table, character and paragraph properties, stylesheet, font table) and reads the compound file with the `cfb` crate; the RTF reader handles the font table, `\f`, `\'hh`, `\u` with `\uc`, `\upr`, fields and destinations. Footnotes, headers and footers, comments, endnotes and text boxes follow the body. Golden tests use files LibreOffice saved from a DOCX of fixture lines, property tests check that legacy runs convert and Unicode runs survive in both formats, and `crates/kannadi-cli/fuzz` has `cargo fuzz` targets for both readers.
 - `legacy::windows_1252_char`: the character of 1 Windows-1252 byte.
+- `kannadi-typing`, a new crate: ranked Kannada words for loosely typed English letters, from a 4-gram model over (letters, Kannada unit) pairs trained on the Aksharantar pairs, a beam search through a lexicon of 232,003 Kannada Wikipedia words, completions, strict Baraha and ITRANS readings, the previous word, and the user's picks. 89.21% top-1 and 96.77% top-5 on the Dakshina Kannada test set; IndicXlit published 77.18% top-1. The model (`model/kn.typing`) is under CC BY-SA 4.0.
+- `kannadi-typing-wasm`, WebAssembly bindings for the typing engine, with a smoke test that times every keystroke.
+- `kannadi type`: the ranked Kannada words for words typed in English letters, with `--prev`, `-n` and `--scores`.
 
 ### Changed
 

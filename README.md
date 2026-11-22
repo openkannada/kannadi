@@ -61,6 +61,7 @@ The editor page is not hosted yet. To run it locally, see [Editor page](#editor-
 | Shree-Lipi to Unicode | 0 unknown glyphs and 20 malformed syllables in 233,346 glyphs, each read against the text rendered in the font: ಆ್ಯ for the English vowel, and errors in the source | 1,660 lines from 173 Udayavani newspaper pages of 2003 and 2004. See [docs/shree-lipi.md](https://github.com/openkannada/kannadi/blob/main/docs/shree-lipi.md#the-shree-lipi-table). |
 | Transliteration round trip | Exact on every generated string | Property tests: 2,000 random strings per run, 50,000 in CI |
 | ISO 15919 against vidyut-lipi | Same output on 5,000 random words per run, apart from 1 documented difference | `tests/differential.rs` |
+| Typing Kannada in English letters | 89.21% top-1 and 96.77% top-5 on the Dakshina Kannada test set; IndicXlit published 77.18% top-1. 1.30 ms per keystroke at the median as WebAssembly | [crates/kannadi-typing](https://github.com/openkannada/kannadi/tree/main/crates/kannadi-typing#results) |
 
 Not measured yet: a comparison with the other open converters on the same verified lines. It needs the reader check first.
 
@@ -188,14 +189,25 @@ python3 web/serve.py 8000
 
 `web/dist` is a plain folder of static files that any static host can serve. `web/serve.py` is only for local testing: the standard `python3 -m http.server` drops some of the page's parallel requests. `node --test web/test/units.mjs` tests the page modules, and `node web/test/smoke.mjs` checks the built package.
 
+## Typing in English letters
+
+[crates/kannadi-typing](https://github.com/openkannada/kannadi/tree/main/crates/kannadi-typing) turns loosely typed English letters into ranked Kannada words, learns from the user's picks, and runs in the browser as WebAssembly through [crates/kannadi-typing-wasm](https://github.com/openkannada/kannadi/tree/main/crates/kannadi-typing-wasm). Its README has the method, the training data and the results.
+
+```sh
+$ kannadi type kannada til
+kannada	ಕನ್ನಡ	ಕನ್ನಡಿ	ಕಣ್ಣದಾಸನ್	ಕಣ್ಣದ	ಕನ್ನಡಕ
+til	ಟಿಲ್	ತಿಳಿ	ತಿಳಿದು	ಟೈಲ್	ತಿಲೈ
+```
+
 ## Command-line tool
 
-The `kannadi` binary in `crates/kannadi-cli` converts files and folders in both directions, and normalizes Unicode text (see [Normalization](#normalization)):
+The `kannadi` binary in `crates/kannadi-cli` converts files and folders in both directions, normalizes Unicode text (see [Normalization](#normalization)), and shows Kannada words for words typed in English letters (`kannadi type`):
 
 ```sh
 cargo install --path crates/kannadi-cli
 kannadi to-unicode old-orders/ --out converted/
 kannadi to-nudi letter.txt --out for-printing/ --strict
+kannadi type namaskara
 ```
 
 - A file goes to `OUT/<file name>`. A folder goes to `OUT/<folder name>/`, with its subfolders kept. Hidden files, files already under `OUT`, and symbolic links to folders are skipped. The tool stops before writing anything if an output would overwrite any input or 2 inputs would share an output; paths are compared with links and `..` resolved, ignoring case.
@@ -308,6 +320,7 @@ The minimum supported Rust version is 1.75 for the `kannadi` library and 1.89 fo
 kannadi is free and open source. The code and the glyph tables are under the MIT license or the Apache License 2.0, at your choice: see [LICENSE-MIT](https://github.com/openkannada/kannadi/blob/main/LICENSE-MIT) and [LICENSE-APACHE](https://github.com/openkannada/kannadi/blob/main/LICENSE-APACHE). The docs are under [CC BY 4.0](https://github.com/openkannada/kannadi/blob/main/LICENSES/CC-BY-4.0.txt), and code examples in them may also be used under MIT or Apache 2.0. [REUSE.toml](https://github.com/openkannada/kannadi/blob/main/REUSE.toml) gives the license of every file, and [NOTICE.md](https://github.com/openkannada/kannadi/blob/main/NOTICE.md) lists the third-party material with its credit.
 
 Not covered by these licenses:
+- the typing model `crates/kannadi-typing/model/kn.typing` and the Dakshina test sets in `crates/kannadi-typing/eval/`, which are under [CC BY-SA 4.0](https://github.com/openkannada/kannadi/blob/main/LICENSES/CC-BY-SA-4.0.txt) because they come from Dakshina and Kannada Wikipedia (see the [typing README](https://github.com/openkannada/kannadi/tree/main/crates/kannadi-typing#training-data));
 - the excerpts of Karnataka government documents in `corpus/` and in the test fixtures, which are kept as short excerpts for testing, with their sources (see the [corpus data card](https://github.com/openkannada/kannadi/blob/main/corpus/README.md) and the [fixtures README](https://github.com/openkannada/kannadi/blob/main/crates/kannadi/tests/fixtures/README.md));
 - the font names and copyright strings recorded in `tools/fontqa/results/`, which belong to their owners;
 - the Noto fonts in `web/src/fonts/`, which are under the SIL Open Font License (`web/src/fonts/OFL.txt`).

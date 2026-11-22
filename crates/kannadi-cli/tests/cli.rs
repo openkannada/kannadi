@@ -223,6 +223,21 @@ fn unicode_pdfs_from_chrome_read_whole() {
 }
 
 #[test]
+fn type_shows_kannada_words_for_english_letters() {
+    let tmp = tempfile::tempdir().unwrap();
+    let run = kannadi(&["type", "-n", "2", "kannada", "kannda"], tmp.path());
+    assert_eq!(run.status.code(), Some(0), "{run:?}");
+    let out = String::from_utf8(run.stdout).unwrap();
+    let lines: Vec<Vec<&str>> = out.lines().map(|l| l.split('\t').collect()).collect();
+    assert_eq!(lines.len(), 2);
+    assert_eq!(lines[0][..2], ["kannada", "ಕನ್ನಡ"]);
+    assert_eq!(lines[1][..2], ["kannda", "ಕನ್ನಡ"]);
+    assert_eq!(lines[0].len(), 3);
+    let run = kannadi(&["type"], tmp.path());
+    assert_eq!(run.status.code(), Some(2));
+}
+
+#[test]
 fn word_and_rtf_files_saved_by_libreoffice_read_as_the_fixture_lines() {
     let fixtures = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/fixtures");
     let expected = std::fs::read_to_string(format!("{fixtures}/legacy.expected.txt")).unwrap();
@@ -303,6 +318,7 @@ fn committed_man_pages_match_the_cli() {
             "kannadi-normalize.1",
             "kannadi-to-nudi.1",
             "kannadi-to-unicode.1",
+            "kannadi-type.1",
             "kannadi.1"
         ]
     );

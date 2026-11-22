@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["crates/kannadi", "crates/kannadi-cli", "crates/kannadi-wasm"]
+members = ["crates/kannadi", "crates/kannadi-cli", "crates/kannadi-typing", "crates/kannadi-typing-wasm", "crates/kannadi-wasm"]
 # The Python bindings, built by maturin with their own lock file.
 exclude = ["crates/kannadi-py"]
 
