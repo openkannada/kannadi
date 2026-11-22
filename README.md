@@ -61,7 +61,7 @@ The editor page is not hosted yet. To run it locally, see [Editor page](#editor-
 | Shree-Lipi to Unicode | 0 unknown glyphs and 20 malformed syllables in 233,346 glyphs, each read against the text rendered in the font: ಆ್ಯ for the English vowel, and errors in the source | 1,660 lines from 173 Udayavani newspaper pages of 2003 and 2004. See [docs/shree-lipi.md](https://github.com/openkannada/kannadi/blob/main/docs/shree-lipi.md#the-shree-lipi-table). |
 | Transliteration round trip | Exact on every generated string | Property tests: 2,000 random strings per run, 50,000 in CI |
 | ISO 15919 against vidyut-lipi | Same output on 5,000 random words per run, apart from 1 documented difference | `tests/differential.rs` |
-| Typing Kannada in English letters | 88.09% top-1 and 94.65% top-5 on the Dakshina Kannada test set; IndicXlit published 77.18% top-1. 1.27 ms per keystroke at the median as WebAssembly | [crates/kannadi-typing](https://github.com/openkannada/kannadi/tree/main/crates/kannadi-typing#results) |
+| Typing Kannada in English letters | 89.21% top-1 and 96.77% top-5 on the Dakshina Kannada test set; IndicXlit published 77.18% top-1. 1.30 ms per keystroke at the median as WebAssembly | [crates/kannadi-typing](https://github.com/openkannada/kannadi/tree/main/crates/kannadi-typing#results) |
 
 Not measured yet: a comparison with the other open converters on the same verified lines. It needs the reader check first.
 
@@ -195,7 +195,7 @@ python3 web/serve.py 8000
 
 ```sh
 $ kannadi type kannada til
-kannada	ಕನ್ನಡ	ಕನ್ನಡದ	ಕನ್ನಡಿ	ಕಣ್ಣದ	ಕನ್ನಡ್
+kannada	ಕನ್ನಡ	ಕನ್ನಡಿ	ಕಣ್ಣದಾಸನ್	ಕಣ್ಣದ	ಕನ್ನಡಕ
 til	ಟಿಲ್	ತಿಳಿ	ತಿಳಿದು	ಟೈಲ್	ತಿಲೈ
 ```
 

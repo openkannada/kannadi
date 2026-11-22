@@ -142,8 +142,9 @@ enum Command {
     },
     /// Show the Kannada words for words typed in English letters, best first
     ///
-    /// Spellings may be loose: kannada, kannda and kanada all give ಕನ್ನಡ.
-    /// Capitals follow Baraha when they appear inside a word, as in kannaDa.
+    /// Spellings may be loose: kannada, kannda and Kannada all give ಕನ್ನಡ.
+    /// Capitals inside a word follow Baraha, as in kannaDa, and ITRANS marks
+    /// work too, as in gaa.ndhii.
     /// The first word is what the letters spell; later ones may be longer words
     /// the letters only start.
     #[command(

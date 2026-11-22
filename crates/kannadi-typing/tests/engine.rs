@@ -140,9 +140,15 @@ fn weights_out_of_range_are_refused() {
 #[test]
 fn a_damaged_model_is_rejected_without_a_panic() {
     let bytes = engine().model().to_bytes();
-    // Flip 1 bit at a time across the whole file, in steps that cover every section.
-    for at in (8..bytes.len()).step_by(bytes.len() / 50) {
-        for bit in [0, 3, 7] {
+    // Flip 1 bit at a time across the whole file, in steps that cover every
+    // section. Each load takes about 1 second unoptimized, so debug builds try fewer.
+    let (steps, bits): (usize, &[u8]) = if cfg!(debug_assertions) {
+        (12, &[3])
+    } else {
+        (50, &[0, 3, 7])
+    };
+    for at in (8..bytes.len()).step_by(bytes.len() / steps) {
+        for &bit in bits {
             let mut b = bytes.clone();
             b[at] ^= 1 << bit;
             let _ = Model::from_bytes(&b);

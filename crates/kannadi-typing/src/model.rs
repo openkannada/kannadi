@@ -309,6 +309,7 @@ impl Model {
 }
 
 /// The frequency class stored in the lexicon for a word seen `count` times.
+#[cfg(feature = "train")]
 pub fn freq_class(count: u64) -> u64 {
     ((count as f64 + 1.0).log2() * 4.0).round() as u64
 }

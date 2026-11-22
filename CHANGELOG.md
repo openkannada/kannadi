@@ -8,7 +8,7 @@
 - `normalize::normalize_as`, `normalize_counted`, `is_normalized`, `Form`, `Rule` and `Counts`.
 - `kannadi normalize`: normalize text files or standard input to a form, with `--stats` (changes per rule) and `--check` (exit 1 if not normalized).
 - Tests that clean converter output is canonical, on every fixture line and on random glyph sequences.
-- `kannadi-typing`, a new crate: ranked Kannada words for loosely typed English letters, from a 4-gram model over (letters, Kannada unit) pairs trained on the Aksharantar pairs, a beam search through a lexicon of 232,003 Kannada Wikipedia words, completions, strict Baraha and ITRANS readings, the previous word, and the user's picks. 88.09% top-1 and 94.65% top-5 on the Dakshina Kannada test set. The model (`model/kn.typing`) is under CC BY-SA 4.0.
+- `kannadi-typing`, a new crate: ranked Kannada words for loosely typed English letters, from a 4-gram model over (letters, Kannada unit) pairs trained on the Aksharantar pairs, a beam search through a lexicon of 232,003 Kannada Wikipedia words, completions, strict Baraha and ITRANS readings, the previous word, and the user's picks. 89.21% top-1 and 96.77% top-5 on the Dakshina Kannada test set; IndicXlit published 77.18% top-1. The model (`model/kn.typing`) is under CC BY-SA 4.0.
 - `kannadi-typing-wasm`, WebAssembly bindings for the typing engine, with a smoke test that times every keystroke.
 - `kannadi type`: the ranked Kannada words for words typed in English letters, with `--prev`, `-n` and `--scores`.
 

@@ -4,8 +4,8 @@ Type Kannada in English letters. `kannadi-typing` turns loosely typed Latin lett
 
 ```sh
 $ kannadi type kannada kannda til
-kannada	ಕನ್ನಡ	ಕನ್ನಡದ	ಕನ್ನಡಿ	ಕಣ್ಣದ	ಕನ್ನಡ್
-kannda	ಕನ್ನಡ	ಕನ್ಯಾ	ಕನ್ನಡಿ	ಕ್ಯಾನಡ	ಕಣ್ಣದಾಸನ್
+kannada	ಕನ್ನಡ	ಕನ್ನಡಿ	ಕಣ್ಣದಾಸನ್	ಕಣ್ಣದ	ಕನ್ನಡಕ
+kannda	ಕನ್ನಡ	ಕನ್ಯಾ	ಕಣ್ಣಾರೆ	ಕನ್ಯಾರ್	ಕನ್ಯೆ
 til	ಟಿಲ್	ತಿಳಿ	ತಿಳಿದು	ಟೈಲ್	ತಿಲೈ
 ```
 
@@ -23,31 +23,31 @@ Top-1 and top-5 accuracy for English letters to Kannada on the [Dakshina](https:
 | System | Top-1 | Top-5 |
 |---|---:|---:|
 | IndicXlit, as published | 77.18% | not published |
-| kannadi-typing | **88.09%** | **94.65%** |
-| kannadi-typing, letters model only (no lexicon) | 70.84% | 73.75% |
-| kannadi-typing, with the 2,500 test words removed from the lexicon | 60.48% | 72.07% |
+| kannadi-typing | **89.21%** | **96.77%** |
+| kannadi-typing, letters model only (no lexicon) | 71.25% | 74.09% |
+| kannadi-typing, with the 2,500 test words removed from the lexicon | 60.66% | 72.67% |
 
 5,013 items. Times are for 1 call on an Apple M1 Pro.
 
 | Test | Items | Top-1 | Top-5 | Median | 99th percentile |
 |---|---:|---:|---:|---:|---:|
-| Dakshina test words | 5,013 | 88.09% | 94.65% | 0.87 ms | 1.73 ms |
-| Dakshina test sentences, each word after the word before it | 52,328 | 86.94% | 91.74% | 0.80 ms | 2.09 ms |
-| The same sentences, without the previous word | 52,328 | 86.90% | 91.72% | 0.81 ms | 2.70 ms |
+| Dakshina test words | 5,013 | 89.21% | 96.77% | 0.89 ms | 1.74 ms |
+| Dakshina test sentences, each word after the word before it | 52,328 | 87.22% | 92.24% | 0.80 ms | 1.76 ms |
+| The same sentences, without the previous word | 52,328 | 87.18% | 92.22% | 0.80 ms | 1.77 ms |
 
-In the browser, as WebAssembly in Node 24 on the same machine, every keystroke of every test word (49,676 calls) took 1.27 ms at the median, 2.88 ms at the 95th percentile and 3.67 ms at the 99th. Loading the model takes 75 ms.
+As WebAssembly in Node 24 on the same machine, every keystroke of every test word (49,676 calls) took 1.30 ms at the median, 2.85 ms at the 95th percentile and 3.52 ms at the 99th. Loading the model takes 76 ms. Node runs WebAssembly on V8, the engine in Chrome and Edge; other browsers were not timed.
 
 | File | Size | Gzipped |
 |---|---:|---:|
-| `kannadi_typing_wasm_bg.wasm` | 449,367 bytes | 165,362 bytes |
-| `model/kn.typing` | 2,673,232 bytes | 1,612,760 bytes |
+| `kannadi_typing_wasm_bg.wasm` | 450,559 bytes | 166,023 bytes |
+| `model/kn.typing` | 2,673,232 bytes | 1,612,941 bytes |
 
 What the numbers mean:
 
 - The Dakshina test words were sampled from Kannada Wikipedia, and the lexicon is the list of Kannada Wikipedia words seen at least 5 times, so it holds 98.8% of them. IndicXlit's own evaluation script also has an option to rerank its candidates by corpus word frequency. The row with the test words removed from the lexicon shows what happens to words the lexicon lacks: the letters model still finds 60% of them, but lexicon words that look alike take the first place more often.
-- No Dakshina dev or test word is in the training pairs. The ranking weights were tuned on the dev set only.
+- No word of the Dakshina dev or test lexicons is in the training pairs, and the ranking weights were tuned on dev data only. The test sentences were not filtered this way, and the Wikipedia dump behind the lexicon and its counts very likely contains them, so the sentence rows are less strict than the word rows.
 - The previous word adds 0.04 points. Most remaining errors are spellings the test set itself gives inconsistently (ಆದರ್ಶ and ಆದರ್ಶ್, ಐದನೆ and ಐದನೇ) and names and English words missing from the lexicon.
-- A completion never takes the first place, so the first word is always what the letters spell. With 2 letters still to type, the intended word is in the first 5 for 64% of the dev words.
+- A completion never takes the first place, unless the user picked it before for the same letters, so the first word is what the letters spell. With 2 letters still to type, the intended word is in the first 5 for 67.36% of the test words.
 
 Reproduce the tables with `DATA=... crates/kannadi-typing/train.sh` after fetching the training data, below. CI checks the shipped model against the test set on every change.
 
@@ -57,7 +57,7 @@ Reproduce the tables with `DATA=... crates/kannadi-typing/train.sh` after fetchi
 2. **Alignment.** EM (forward-backward) learns which runs of 0 to 3 Latin letters pair with each unit, from 2.9 million transliteration pairs. Only the inherent a and the anusvara, visarga and candrabindu may take no letters.
 3. **Letters model.** A 4-gram Kneser-Ney model over (letters, unit) pairs, pruned to 184,000 n-grams and stored as a trie with 8-bit log probabilities.
 4. **Search.** A beam search reads the letters left to right. 1 pass follows a lexicon automaton (an [`fst`](https://crates.io/crates/fst) of 232,003 words with their frequency class), so only known words come out; another pass has no lexicon, for words it lacks. The best partial readings in the lexicon are also completed to the commonest word they start, and to every word 1 unit longer.
-5. **Rules.** The strict Baraha and ITRANS readings of the input are always candidates. Capitals inside a word, as in `kannaDa` or `kRRiShNa`, say exactly which letter is meant, so these readings come first then.
+5. **Rules.** The strict Baraha and ITRANS readings of the input are always candidates. Capitals inside a word, as in `kannaDa` or `kRRiShNa`, and the marks `.`, `~` and `^`, as in `gaa.ndhii`, say exactly which letter is meant, so these readings come first then.
 6. **Ranking.** A candidate's score adds the letters model's log probability, its frequency in Kannada Wikipedia, whether the lexicon has it, how much likelier the previous word makes it, whether a rule reading gives it, and how often the user picked it. The weights are tuned by coordinate ascent on the Dakshina dev words and the first 10,000 words of the dev sentences.
 7. **Learning.** `learn(input, word)` puts the word first for the same letters from then on, newest pick first, and ranks the word higher for other letters. A picked word the lexicon lacks joins a small lexicon of the user's own. Up to 2,000 picks and 5,000 words are kept in memory; `export_user` and `import_user` move them to and from the app's own storage as text. Nothing is sent anywhere.
 
@@ -78,6 +78,8 @@ engine.importUser(localStorage.getItem("kannadi-typing") ?? "");
 ```
 
 `node crates/kannadi-typing-wasm/test/smoke.mjs` checks the package and times every keystroke of the test words.
+
+Load only model files you trust. A damaged file is rejected, since the lexicon automaton carries a checksum, but a file crafted to break the automaton can still stop the engine.
 
 ## Training data
 

@@ -19,10 +19,12 @@ pub struct Quant {
 
 impl Quant {
     /// A quantizer covering `min..=max`.
+    #[cfg(any(test, feature = "train"))]
     pub fn new(min: f32, max: f32) -> Quant {
         let step = ((max - min) / 255.0).max(f32::EPSILON);
         Quant { min, step }
     }
+    #[cfg(any(test, feature = "train"))]
     pub fn encode(&self, x: f32) -> u8 {
         ((x - self.min) / self.step).round().clamp(0.0, 255.0) as u8
     }
