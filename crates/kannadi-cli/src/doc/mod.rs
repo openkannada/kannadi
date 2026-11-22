@@ -20,8 +20,8 @@ use fib::{Fib, HEADERS, STORIES};
 use sprm::CharProps;
 use tables::{ParagraphProps, Piece, Spans, Styles};
 
-/// The most text a document may hold, in characters, and the most a stream may hold.
-const MAX_CHARS: u64 = 1 << 26;
+/// The most a stream may hold, in bytes; it also bounds the characters, as each
+/// takes at least 1 byte.
 const MAX_STREAM: u64 = 1 << 26;
 
 /// Reads the stories of a `.doc` file. Fails on files that are not Word 97 or
@@ -46,7 +46,7 @@ pub fn read(bytes: &[u8]) -> Result<Document> {
     let total: u64 = fib.ccp.iter().map(|&n| u64::from(n)).sum();
     // Each character takes at least 1 byte of the text stream, so a larger count
     // can only come from pieces that repeat the same bytes.
-    if total > MAX_CHARS || total > word.len() as u64 {
+    if total > word.len() as u64 {
         bail!("the document says it holds {total} characters, more than its text can");
     }
     let mut doc = Document {
