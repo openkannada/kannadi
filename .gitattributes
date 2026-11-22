@@ -2,3 +2,6 @@
 crates/kannadi-cli/assets/** text eol=lf
 # Test vectors, compared byte for byte with what tests/normalization.rs writes.
 normalization/** text eol=lf
+# The typing model is binary; the test sets are read byte for byte.
+crates/kannadi-typing/model/*.typing binary
+crates/kannadi-typing/eval/*.tsv text eol=lf

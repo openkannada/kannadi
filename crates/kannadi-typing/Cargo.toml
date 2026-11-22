@@ -1,0 +1,33 @@
+[package]
+name = "kannadi-typing"
+description = "Type Kannada in English letters: ranked Kannada words for loosely typed Latin input, learning from the user's picks"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+rust-version = "1.89"
+readme = "README.md"
+keywords = ["kannada", "transliteration", "input-method", "ime", "indic"]
+categories = ["text-processing", "internationalization"]
+include = ["src/**/*.rs", "model/kn.typing", "README.md"]
+
+[features]
+default = ["bundled"]
+# The trained model, compiled into the library (about the size of model/kn.typing).
+bundled = []
+# Training, evaluation and tuning tools; they need the datasets named in the README.
+train = []
+
+[dependencies]
+fst = { version = "0.4.7", default-features = false }
+kannadi = { path = "../kannadi", version = "0.1.0" }
+unicode-normalization = "0.1.26"
+
+[dev-dependencies]
+proptest = "1.12"
+
+[[bin]]
+name = "kannadi-typing-train"
+path = "src/bin/train.rs"
+required-features = ["train"]

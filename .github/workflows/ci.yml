@@ -117,6 +117,36 @@ jobs:
           path: web/dist
           retention-days: 14
 
+  typing:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+          components: clippy
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo clippy -p kannadi-typing --all-targets --features train --locked
+      - run: cargo clippy -p kannadi-typing-wasm --locked --target wasm32-unknown-unknown
+      - name: Accuracy of the shipped model on the Dakshina Kannada test words
+        run: >-
+          cargo run --release --locked -p kannadi-typing --features train --bin kannadi-typing-train --
+          eval --model crates/kannadi-typing/model/kn.typing
+          --test crates/kannadi-typing/eval/dakshina-kn-test.tsv --min-top1 88
+      - id: wasm-bindgen
+        run: echo "version=$(web/wasm-bindgen-version.sh)" >> "$GITHUB_OUTPUT"
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: wasm-bindgen@${{ steps.wasm-bindgen.outputs.version }}
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+      - run: crates/kannadi-typing-wasm/build.sh
+      # Runners are slower than a laptop; the README gives the measured times.
+      - run: node crates/kannadi-typing-wasm/test/smoke.mjs
+        env:
+          KEYSTROKE_MS_LIMIT: "10"
+
   python-package:
     runs-on: ubuntu-latest
     defaults:

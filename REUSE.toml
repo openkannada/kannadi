@@ -56,3 +56,16 @@ SPDX-License-Identifier = "LicenseRef-Excerpts"
 path = "crates/kannadi-cli/tests/fixtures/unicode-*.pdf"
 SPDX-FileCopyrightText = ["2026 The Open Kannada Authors", "2022 The Noto Project Authors (https://github.com/notofonts/kannada)"]
 SPDX-License-Identifier = "(MIT OR Apache-2.0) AND OFL-1.1"
+
+# The typing model, trained on Aksharantar (CC0 and CC BY 4.0), Dakshina (CC BY-SA 4.0)
+# and Kannada Wikipedia word counts (CC BY-SA 4.0).
+[[annotations]]
+path = "crates/kannadi-typing/model/kn.typing"
+SPDX-FileCopyrightText = ["2026 The Open Kannada Authors", "AI4Bharat", "Google LLC", "Kannada Wikipedia contributors"]
+SPDX-License-Identifier = "CC-BY-SA-4.0"
+
+# The Dakshina Kannada dev and test lexicons, unchanged.
+[[annotations]]
+path = "crates/kannadi-typing/eval/dakshina-kn-*.tsv"
+SPDX-FileCopyrightText = "Google LLC"
+SPDX-License-Identifier = "CC-BY-SA-4.0"

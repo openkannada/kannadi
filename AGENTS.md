@@ -16,6 +16,9 @@ cargo clippy --all-targets -- -D warnings
 RUSTDOCFLAGS="-D warnings" cargo doc --no-deps
 cargo +1.75 check -p kannadi --lib                      # minimum supported Rust
 web/build.sh && node web/test/smoke.mjs                 # WebAssembly build and editor page
+crates/kannadi-typing-wasm/build.sh && node crates/kannadi-typing-wasm/test/smoke.mjs  # typing engine in WebAssembly
+cargo run --release -p kannadi-typing --features train --bin kannadi-typing-train -- \
+  eval --model crates/kannadi-typing/model/kn.typing --test crates/kannadi-typing/eval/dakshina-kn-test.tsv
 node --test web/test/units.mjs                          # page modules
 python3 web/serve.py 8000                               # serve web/dist locally
 cargo run --example nudi -- file.txt                    # convert a legacy text file
@@ -67,6 +70,21 @@ crates/kannadi-cli/   the `kannadi` binary: batch conversion of files and folder
   src/docx/           DOCX: styles, and paragraphs, runs and text found by position
   src/pdf/            PDF text: a page reader, font judging, widths, ToUnicode
                       maps and Differences lists
+crates/kannadi-typing/  typing Kannada in English letters: ranked words, learning from picks
+  src/units.rs        Kannada words as sound units (the inherent a is a unit)
+  src/roman.rs        the Latin letters the model reads, and letter chunks
+  src/lm.rs           the n-gram model over (letters, unit) pairs, as a trie
+  src/decode.rs       beam search, through the lexicon automaton or without it
+  src/complete.rs     the commonest lexicon word that starts with a prefix
+  src/rules.rs        strict Baraha and ITRANS readings
+  src/user.rs         the user's picks, in memory, exported as text
+  src/model.rs        the model file format and the ranking weights
+  src/train/          alignment (EM), Kneser-Ney estimation, data readers,
+                      evaluation and tuning; behind the `train` feature
+  model/kn.typing     the trained model (CC BY-SA 4.0); train.sh rebuilds it
+  eval/               the Dakshina Kannada dev and test lexicons (CC BY-SA 4.0)
+crates/kannadi-typing-wasm/  wasm-bindgen bindings for the typing engine; build.sh,
+                      test/smoke.mjs (checks and per-keystroke timing)
 crates/kannadi-wasm/  wasm-bindgen bindings for the page; offsets in UTF-16 code units
 web/
   src/                the static editor page: HTML, CSS, fonts (OFL), JavaScript

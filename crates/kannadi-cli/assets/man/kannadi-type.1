@@ -1,0 +1,37 @@
+.ie \n(.g .ds Aq \(aq
+.el .ds Aq '
+.TH kannadi-type 1  "type 0.1.0" 
+.SH NAME
+kannadi\-type \- Show the Kannada words for words typed in English letters, best first
+.SH SYNOPSIS
+\fBkannadi type\fR [\fB\-n \fR] [\fB\-\-prev\fR] [\fB\-\-scores\fR] [\fB\-h\fR|\fB\-\-help\fR] [\fB\-V\fR|\fB\-\-version\fR] <\fIWORDS\fR> 
+.SH DESCRIPTION
+Show the Kannada words for words typed in English letters, best first
+.PP
+Spellings may be loose: kannada, kannda and kanada all give ಕನ್ನಡ. Capitals follow Baraha when they appear inside a word, as in kannaDa. The first word is what the letters spell; later ones may be longer words the letters only start.
+.SH OPTIONS
+.TP
+\fB\-n\fR \fI<N>\fR [default: 5]
+How many words to show for each
+.TP
+\fB\-\-prev\fR \fI<WORD>\fR
+The Kannada word before, which can change the order
+.TP
+\fB\-\-scores\fR
+Show 1 word per line, with its score and kind: word, spelling (not in the word list) or completion
+.TP
+\fB\-h\fR, \fB\-\-help\fR
+Print help (see a summary with \*(Aq\-h\*(Aq)
+.TP
+\fB\-V\fR, \fB\-\-version\fR
+Print version
+.TP
+<\fIWORDS\fR>
+Words in English letters
+.SH EXTRA
+Examples:
+  kannadi type kannada
+  kannadi type \-\-prev ನನ್ನ hesaru
+  kannadi type \-\-scores \-n 10 til
+.SH VERSION
+v0.1.0

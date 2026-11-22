@@ -1,6 +1,6 @@
 [package]
 name = "kannadi-cli"
-description = "Convert Kannada documents (TXT, HTML, DOCX, PDF) typed in Nudi, Baraha ANSI, Nudi B-Akshara, Kan-Eng, Akruti and Shree-Lipi fonts to Unicode, and Unicode to Nudi"
+description = "Convert Kannada documents (TXT, HTML, DOCX, PDF) typed in Nudi, Baraha ANSI, Nudi B-Akshara, Kan-Eng, Akruti and Shree-Lipi fonts to Unicode, and Unicode to Nudi; type Kannada in English letters"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -25,6 +25,7 @@ clap_complete = "4.6.12"
 clap_mangen = "0.3.4"
 quick-xml = "0.42.0"
 kannadi = { path = "../kannadi", version = "0.1.0" }
+kannadi-typing = { path = "../kannadi-typing", version = "0.1.0" }
 lopdf = { version = "0.47.0", default-features = false }
 zip = { version = "9.6.0", default-features = false, features = ["deflate"] }
 
