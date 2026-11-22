@@ -1,8 +1,6 @@
 # The editor page in this repository
 
-The editor at [openkannada.org/editor](https://openkannada.org/editor/) runs this library as WebAssembly. `web/` is a standalone build of the editor page that any static host can serve.
-
-[web/](../web) is a static Kannada editor that runs in the browser. The crate runs as WebAssembly through the bindings in [crates/kannadi-wasm](../crates/kannadi-wasm), so text never leaves the device.
+[web/](../web) is a static Kannada editor that runs in the browser, a standalone version of the editor at [openkannada.org/editor](https://openkannada.org/editor/). The crate runs as WebAssembly through the bindings in [crates/kannadi-wasm](../crates/kannadi-wasm), so text never leaves the device.
 
 - Paste text, or open a TXT, DOCX or HTML file. Nudi, Baraha, Nudi B-Akshara, Kan-Eng, Akruti and Shree-Lipi text is converted to Unicode. In DOCX files, only text set in one of their fonts is converted; in HTML files, also text with no font that looks like legacy codes.
 - Unknown glyphs and malformed syllables are marked in the text and listed beside it. Selecting one offers checked fixes, or a replacement typed in Baraha letters.
