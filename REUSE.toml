@@ -56,3 +56,9 @@ SPDX-License-Identifier = "LicenseRef-Excerpts"
 path = "crates/kannadi-cli/tests/fixtures/unicode-*.pdf"
 SPDX-FileCopyrightText = ["2026 The Open Kannada Authors", "2022 The Noto Project Authors (https://github.com/notofonts/kannada)"]
 SPDX-License-Identifier = "(MIT OR Apache-2.0) AND OFL-1.1"
+
+# Word and RTF files built from lines of the glyph fixtures above, and the text expected from them.
+[[annotations]]
+path = ["crates/kannadi-cli/tests/fixtures/legacy.*"]
+SPDX-FileCopyrightText = ["2026 The Open Kannada Authors", "Government of Karnataka"]
+SPDX-License-Identifier = "(MIT OR Apache-2.0) AND LicenseRef-Excerpts"

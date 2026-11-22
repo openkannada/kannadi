@@ -8,7 +8,7 @@ kannadi\-to\-nudi \- Convert Unicode Kannada documents to Nudi glyph codes
 .SH DESCRIPTION
 Convert Unicode Kannada documents to Nudi glyph codes
 .PP
-Writes TXT, HTML and DOCX files. Text files are written in Windows\-1252. A PDF cannot be written back, so each PDF counts as an error.
+Writes TXT, HTML and DOCX files. Text files are written in Windows\-1252. PDF, DOC and RTF files cannot be written back, so each counts as an error.
 .SH OPTIONS
 .TP
 \fB\-o\fR, \fB\-\-out\fR \fI<DIR>\fR
@@ -30,7 +30,7 @@ Print help (see a summary with \*(Aq\-h\*(Aq)
 Print version
 .TP
 <\fIINPUTS\fR>
-Files and folders to convert. Folders are searched for .txt, .htm, .html, .docx and .pdf files
+Files and folders to convert. Folders are searched for .txt, .htm, .html, .docx, .doc, .rtf and .pdf files
 .SH EXTRA
 Examples:
   kannadi to\-nudi letter.txt \-\-out for\-printing/ \-\-strict

@@ -8,7 +8,7 @@ kannadi\-to\-unicode \- Convert documents in legacy Kannada fonts to Unicode
 .SH DESCRIPTION
 Convert documents in legacy Kannada fonts to Unicode
 .PP
-Reads TXT, HTML, DOCX and PDF files. Text in HTML, DOCX and PDF files is converted only where it is set in a legacy font. The text of a PDF goes to NAME.pdf.txt.
+Reads TXT, HTML, DOCX, DOC (Word 97 to 2003), RTF and PDF files. Text in HTML, DOCX, DOC, RTF and PDF files is converted only where it is set in a legacy font. The text of a PDF, DOC or RTF file goes to NAME.pdf.txt, NAME.doc.txt or NAME.rtf.txt.
 .SH OPTIONS
 .TP
 \fB\-o\fR, \fB\-\-out\fR \fI<DIR>\fR
@@ -55,7 +55,7 @@ Print help (see a summary with \*(Aq\-h\*(Aq)
 Print version
 .TP
 <\fIINPUTS\fR>
-Files and folders to convert. Folders are searched for .txt, .htm, .html, .docx and .pdf files
+Files and folders to convert. Folders are searched for .txt, .htm, .html, .docx, .doc, .rtf and .pdf files
 .SH EXTRA
 Examples:
   kannadi to\-unicode old\-orders/ \-\-out converted/

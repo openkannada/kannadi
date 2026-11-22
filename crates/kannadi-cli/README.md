@@ -1,6 +1,6 @@
 # kannadi-cli
 
-The `kannadi` command converts Kannada documents typed in the legacy Nudi, Baraha ANSI, Nudi B-Akshara, Kan-Eng, Akruti and Shree-Lipi fonts to Unicode, and Unicode back to Nudi. It converts single files or whole folders of TXT, HTML, DOCX and PDF files, and writes a report of anything it could not convert cleanly next to each file.
+The `kannadi` command converts Kannada documents typed in the legacy Nudi, Baraha ANSI, Nudi B-Akshara, Kan-Eng, Akruti and Shree-Lipi fonts to Unicode, and Unicode back to Nudi. It converts single files or whole folders of TXT, HTML, DOCX, DOC (Word 97 to 2003), RTF and PDF files, and writes a report of anything it could not convert cleanly next to each file.
 
 ```sh
 cargo install --locked kannadi-cli

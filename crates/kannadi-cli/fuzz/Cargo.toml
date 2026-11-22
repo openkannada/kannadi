@@ -1,0 +1,32 @@
+[package]
+name = "kannadi-cli-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2021"
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+anyhow = "1.0.104"
+cfb = "0.16.0"
+kannadi = { path = "../../kannadi" }
+libfuzzer-sys = "0.4"
+
+# Not part of the main workspace; built with cargo fuzz on a nightly toolchain.
+[workspace]
+members = ["."]
+
+[[bin]]
+name = "doc"
+path = "fuzz_targets/doc.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "rtf"
+path = "fuzz_targets/rtf.rs"
+test = false
+doc = false
+bench = false
