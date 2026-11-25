@@ -14,6 +14,7 @@
 - `kannadi-typing-wasm`, WebAssembly bindings for the typing engine, with a smoke test that times every keystroke.
 - `kannadi type`: the ranked Kannada words for words typed in English letters, with `--prev`, `-n` and `--scores`.
 - `kannadi-py`, Python bindings built with PyO3 and maturin, and an npm package of the WebAssembly bindings (`crates/kannadi-wasm/npm`), with CI jobs that build and test both. Neither is published yet.
+- `kannadi-search`, a new crate: search tokens for Kannada text. Legacy font lines are converted, words split at Unicode word boundaries without breaking an akshara, spelling variants fold to 1 key (the profile's search form, a nasal with virama for ಂ, digits, case), and noun endings are removed with kannada-morph's paradigms, guarded by Wikipedia word counts. A Tantivy `TextAnalyzer` behind the `tantivy` feature, and a Postgres `unaccent` rules file with an example setup. On 1,000 noun queries over held-out Kannada Wikipedia sentences: 98.5% recall and 98.6% precision, against 47.8% and 99.1% for charabia 0.10.0 and 46.8% and 100% for ICU; on Karnataka government PDF text in legacy fonts, 95.9% and 97.4%, where the others find nothing.
 
 ### Changed
 

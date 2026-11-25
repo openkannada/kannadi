@@ -17,6 +17,7 @@ RUSTDOCFLAGS="-D warnings" cargo doc --no-deps
 cargo +1.75 check -p kannadi --lib                      # minimum supported Rust
 web/build.sh && node web/test/smoke.mjs                 # WebAssembly build and editor page
 crates/kannadi-typing-wasm/build.sh && node crates/kannadi-typing-wasm/test/smoke.mjs  # typing engine in WebAssembly
+cargo test -p kannadi-search --features tantivy          # search analyzer, Tantivy, recall checks
 cargo run --release -p kannadi-typing --features train --bin kannadi-typing-train -- \
   eval --model crates/kannadi-typing/model/kn.typing --test crates/kannadi-typing/eval/dakshina-kn-test.tsv
 node --test web/test/units.mjs                          # page modules
@@ -92,6 +93,19 @@ crates/kannadi-typing/  typing Kannada in English letters: ranked words, learnin
                       evaluation and tuning; behind the `train` feature
   model/kn.typing     the trained model (CC BY-SA 4.0); train.sh rebuilds it
   eval/               the Dakshina Kannada dev and test lexicons (CC BY-SA 4.0)
+crates/kannadi-search/  search analysis: tokens a word matches in all its spellings and forms
+  src/lib.rs          the Analyzer: legacy lines, UAX #29 words, keys, positions
+  src/fold.rs         a word's spelling key: the profile's search form, nasal + virama
+                      for ಂ, digits, case; a 1-pass check skips the profile for most words
+  src/stem.rs         noun endings removed by kannada-morph's rules, run backwards
+  src/legacy.rs       finds lines in legacy fonts and converts them word by word
+  src/tantivy.rs      KannadaTokenizer and KannadaStemmer for Tantivy (`tantivy` feature)
+  src/postgres.rs     the rules file for Postgres unaccent
+  data/               endings (generated), protected words and preferred stems (from
+                      Kannada Wikipedia counts, CC BY 4.0); eval/ rebuilds all 3
+  eval/               a separate crate, outside the workspace: builds the data and scores
+                      analyzers; eval/data is the Wikipedia test set (CC BY-SA 4.0)
+  examples/postgres/  setup.sql, demo.sql, kannada.rules
 crates/kannadi-typing-wasm/  wasm-bindgen bindings for the typing engine; build.sh,
                       test/smoke.mjs (checks and per-keystroke timing)
 crates/kannadi-wasm/  wasm-bindgen bindings for the page; offsets in UTF-16 code units

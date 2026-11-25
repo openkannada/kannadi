@@ -29,6 +29,7 @@ Or paste text into the editor at [openkannada.org/editor](https://openkannada.or
 | Nudi B-Akshara to Unicode | 65 unknown glyphs and 113 malformed syllables in 639,208 glyphs from 22 budget and Assembly papers, many where the PDF lost ಂ ([method](https://github.com/openkannada/kannadi/blob/main/docs/nudi-b.md)) |
 | Kan-Eng to Unicode | 1 unknown glyph and 11 malformed syllables in 21,455 glyphs from 45 budget papers ([method](https://github.com/openkannada/kannadi/blob/main/docs/kan-eng.md)) |
 | Shree-Lipi to Unicode | 0 unknown glyphs and 20 malformed syllables in 233,346 glyphs from 173 Udayavani pages ([method](https://github.com/openkannada/kannadi/blob/main/docs/shree-lipi.md#the-shree-lipi-table)) |
+| Searching Kannada text | 98.5% recall and 98.6% precision for nouns in held-out Kannada Wikipedia sentences, against 47.8% and 99.1% for charabia 0.10.0; 95.9% and 97.4% on text from legacy-font government PDFs, where other analyzers find nothing ([details](https://github.com/openkannada/kannadi/tree/main/crates/kannadi-search#results)) |
 | Typing Kannada in English letters | 89.19% top-1 and 96.77% top-5 on the Dakshina Kannada test set, against 77.18% top-1 published for IndicXlit; 1.31 ms per keystroke at the median as WebAssembly ([details](https://github.com/openkannada/kannadi/tree/main/crates/kannadi-typing#results)) |
 | Transliteration round trip | Exact on 50,000 random strings per CI run; ISO 15919 matches vidyut-lipi on 5,000 random words apart from 1 documented difference |
 
@@ -41,6 +42,7 @@ Each unknown glyph and malformed syllable is kept in the text and listed in the 
 | [`kannadi`](https://github.com/openkannada/kannadi/tree/main/crates/kannadi) | The Rust library: legacy font conversion both ways, akshara segmentation, the [Kannada text normalization profile](https://github.com/openkannada/kannadi/blob/main/NORMALIZATION.md), transliteration (ISO 15919, IAST, Baraha), numerals, Old Kannada |
 | [`kannadi-cli`](https://github.com/openkannada/kannadi/tree/main/crates/kannadi-cli) | The `kannadi` command: converts files and folders, normalizes text, and types Kannada from English letters ([guide](https://github.com/openkannada/kannadi/blob/main/docs/cli.md)). DOC and RTF input, `normalize` and `type` are on `main` and come in the next release; install from source to use them now |
 | [`kannadi-typing`](https://github.com/openkannada/kannadi/tree/main/crates/kannadi-typing) | Ranked Kannada words for loosely typed English letters, learning from the user's picks |
+| [`kannadi-search`](https://github.com/openkannada/kannadi/tree/main/crates/kannadi-search) | Search tokens for Kannada text, so a word is found in all its spellings and forms, and legacy-font PDF text by a Unicode query; standalone, in Tantivy and in Postgres |
 | [`kannadi-wasm`](https://github.com/openkannada/kannadi/tree/main/crates/kannadi-wasm), [`kannadi-typing-wasm`](https://github.com/openkannada/kannadi/tree/main/crates/kannadi-typing-wasm) | WebAssembly bindings for the browser |
 | [`kannadi-py`](https://github.com/openkannada/kannadi/tree/main/crates/kannadi-py) | Python bindings |
 | [`tools/fontqa`](https://github.com/openkannada/kannadi/tree/main/tools/fontqa) | 2,146 shaping tests for Kannada fonts, with results for 41 fonts |
@@ -116,6 +118,7 @@ The code and the glyph tables are under the MIT license or the Apache License 2.
 Not covered by these licenses:
 
 - the typing model `crates/kannadi-typing/model/kn.typing` and the Dakshina test sets in `crates/kannadi-typing/eval/`, under [CC BY-SA 4.0](https://github.com/openkannada/kannadi/blob/main/LICENSES/CC-BY-SA-4.0.txt) because they come from Dakshina and Kannada Wikipedia (see the [typing README](https://github.com/openkannada/kannadi/tree/main/crates/kannadi-typing#training-data));
+- the search word lists `crates/kannadi-search/data/protected.txt` and `preferred.tsv`, single words and counts from Kannada Wikipedia, under [CC BY 4.0](https://github.com/openkannada/kannadi/blob/main/LICENSES/CC-BY-4.0.txt) with credit to Kannada Wikipedia's contributors, and the search test set `crates/kannadi-search/eval/data/`, Wikipedia sentences under CC BY-SA 4.0;
 - the excerpts of Karnataka government documents in `corpus/` and in the test fixtures, kept as short excerpts for testing, with their sources (see the [corpus data card](https://github.com/openkannada/kannadi/blob/main/corpus/README.md) and the [fixtures README](https://github.com/openkannada/kannadi/blob/main/crates/kannadi/tests/fixtures/README.md));
 - the font names and copyright strings recorded in `tools/fontqa/results/`, which belong to their owners;
 - the Noto fonts in `web/src/fonts/`, under the SIL Open Font License (`web/src/fonts/OFL.txt`).

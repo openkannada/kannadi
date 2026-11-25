@@ -1,0 +1,22 @@
+[package]
+name = "kannadi-search-eval"
+description = "Builds kannadi-search's suffix table and protected words, and scores search analyzers on Kannada recall and precision"
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+publish = false
+
+# Not in the workspace: kannada-morph lives in a private repository, and the
+# baselines (charabia, ICU4X) are needed only to score. Run locally; see README.
+[workspace]
+
+[dependencies]
+kannada-morph = { git = "https://github.com/openkannada/kannada-spell", rev = "9366c23f32324d0ac631e1c61276d237a4151336" }
+kannadi = { path = "../../kannadi" }
+kannadi-search = { path = "..", features = ["build-data"] }
+charabia = { version = "0.10.0", default-features = false }
+icu_segmenter = "2.4.0"
+icu_normalizer = "2.4.0"
+icu_casemap = "2.4.0"
+unicode-segmentation = "1.13.3"
+tantivy = { version = "0.27.0", default-features = false }
