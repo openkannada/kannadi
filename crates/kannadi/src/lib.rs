@@ -40,3 +40,8 @@ pub use translit::{from_latin, to_latin, transliterate, Scheme, UnknownScheme};
 #[cfg(doctest)]
 #[doc = include_str!("../../../README.md")]
 struct ReadmeDoctests;
+
+/// Runs the library guide's examples as doctests.
+#[cfg(doctest)]
+#[doc = include_str!("../../../docs/library.md")]
+struct LibraryGuideDoctests;
