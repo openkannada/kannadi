@@ -1,0 +1,223 @@
+//! The search key of 1 word: spellings a reader treats as the same word become 1 string.
+//!
+//! [`fold`] applies the search form of the normalization profile (`NORMALIZATION.md`
+//! in kannadi): canonical joiners and vowel signs, legacy repairs such as ೦ typed
+//! for ಂ, Old Kannada letters, joiners and the nukta. It then folds what the
+//! profile leaves to search tools:
+//!
+//! - a nasal consonant and virama before a consonant of its own group becomes the
+//!   anusvara, which is how Kannada usually spells it: ಸಮ್ಬನ್ಧ becomes ಸಂಬಂಧ;
+//! - Kannada digits become ASCII digits: ೨೦೨೬ becomes 2026;
+//! - letters of other scripts are lowercased.
+
+use kannadi::chars::{ANUSVARA, VIRAMA};
+use kannadi::normalize::{normalize_as, Form};
+
+/// The search key of `word`. Folding a key again changes nothing.
+///
+/// ```
+/// use kannadi_search::fold::fold;
+///
+/// assert_eq!(fold("ಕನ್\u{200C}ನಡ"), "ಕನ್ನಡ");
+/// assert_eq!(fold("ಬಾೞ್"), "ಬಾಳ್");
+/// assert_eq!(fold("ಬೆ೦ಗಳೂರು"), "ಬೆಂಗಳೂರು");
+/// assert_eq!(fold("ಸಮ್ಬನ್ಧ"), "ಸಂಬಂಧ");
+/// assert_eq!(fold("೨೦೨೬"), "2026");
+/// assert_eq!(fold("Bengaluru"), "bengaluru");
+/// ```
+pub fn fold(word: &str) -> String {
+    if word.is_ascii() {
+        return word.to_ascii_lowercase();
+    }
+    // Lowercase first, so normalization sees any marks lowercasing adds (İ gives i + U+0307).
+    let lowered;
+    let word = if word.chars().any(char::is_uppercase) {
+        lowered = word.to_lowercase();
+        lowered.as_str()
+    } else {
+        word
+    };
+    let normalized = if is_search_form(word) {
+        word.to_string()
+    } else {
+        normalize_as(word, Form::Search)
+    };
+    let chars: Vec<char> = normalized.chars().collect();
+    let mut out = String::with_capacity(normalized.len());
+    let mut i = 0;
+    while i < chars.len() {
+        let c = chars[i];
+        // ಂ needs a Kannada letter or sign before it: ಞ್ಚ at the start of a word stays.
+        if i.checked_sub(1)
+            .is_some_and(|p| kannadi::chars::is_kannada(chars[p]) && !chars[p].is_ascii_digit())
+            && chars.get(i + 1) == Some(&VIRAMA)
+            && chars.get(i + 2).is_some_and(|&next| is_homorganic(c, next))
+        {
+            out.push(ANUSVARA);
+            i += 2;
+            continue;
+        }
+        match c {
+            '\u{0CE6}'..='\u{0CEF}' => out.push(char::from(b'0' + (c as u32 - 0x0CE6) as u8)),
+            c => out.push(c),
+        }
+        i += 1;
+    }
+    if out.contains("\u{0C82}\u{0C82}") {
+        // ಂ next to a folded nasal (ಕಂಞ್ಚ): the profile keeps a repeated mark once.
+        return normalize_as(&out, Form::Search);
+    }
+    out
+}
+
+/// True for Kannada text that no rule of the search form changes, checked in 1 pass:
+/// only Kannada letters, signs and digits other than ೦, with none of the characters
+/// or pairs the rules rewrite. Most words pass, which saves the full normalization.
+fn is_search_form(word: &str) -> bool {
+    let mut previous: Option<char> = None;
+    word.chars().all(|c| {
+        let ok = match c {
+            // Outside the block, the nukta, Old Kannada letters, ೦, and the length
+            // marks that NFC joins into a vowel sign (rules C1, C3, L1, S1 to S3).
+            c if !('\u{0C80}'..='\u{0CFF}').contains(&c) => false,
+            '\u{0CBC}' | '\u{0CDE}' | '\u{0CB1}' | '\u{0CDD}' | '\u{0CF3}' | '\u{0CDC}' => false,
+            '\u{0CE6}' | '\u{0CD5}' | '\u{0CD6}' => false,
+            c => match previous {
+                // A repeated mark (C4), ೆ + ೂ (C1), a sign on a vowel letter (C2), or a
+                // sign after a virama (L3).
+                Some(p) if is_mark(c) && (p == c || is_vowel_letter(p) || p == VIRAMA) => false,
+                Some('\u{0CC6}') if c == '\u{0CC2}' => false,
+                _ => true,
+            },
+        };
+        previous = Some(c);
+        ok
+    })
+}
+
+fn is_mark(c: char) -> bool {
+    kannadi::chars::class(c).is_mark()
+}
+
+fn is_vowel_letter(c: char) -> bool {
+    kannadi::chars::is_vowel(c)
+}
+
+/// Each nasal and the stops of its consonant group (varga). A doubled nasal, as in
+/// ಕನ್ನಡ, is not in its own group's stops and stays.
+pub(crate) const NASAL_GROUPS: [(char, char, char); 5] = [
+    ('ಙ', 'ಕ', 'ಘ'),
+    ('ಞ', 'ಚ', 'ಝ'),
+    ('ಣ', 'ಟ', 'ಢ'),
+    ('ನ', 'ತ', 'ಧ'),
+    ('ಮ', 'ಪ', 'ಭ'),
+];
+
+/// True when `nasal` is the nasal of the consonant group of `next`.
+fn is_homorganic(nasal: char, next: char) -> bool {
+    NASAL_GROUPS
+        .iter()
+        .any(|&(n, first, last)| n == nasal && (first..=last).contains(&next))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use proptest::prelude::*;
+
+    proptest! {
+        #![proptest_config(ProptestConfig::with_cases(20_000))]
+
+        /// The quick check skips normalization only where it would change nothing.
+        #[test]
+        fn the_quick_check_agrees_with_the_profile(word in prop::collection::vec(
+            (0x0C80u32..=0x0CFF).prop_map(|c| char::from_u32(c).unwrap_or('ಕ')), 1..8,
+        ).prop_map(|v| v.into_iter().collect::<String>())) {
+            if is_search_form(&word) {
+                prop_assert_eq!(normalize_as(&word, Form::Search), word);
+            }
+        }
+    }
+
+    #[test]
+    fn profile_search_form_applies() {
+        assert_eq!(fold("ಆಫ್\u{200C}"), "ಆಫ್");
+        assert_eq!(fold("ರಾಜ್\u{200D}ಕುಮಾರ್"), fold("ರಾಜ್\u{200C}ಕುಮಾರ್"));
+        assert_eq!(fold("ರಾಜ್\u{200D}ಕುಮಾರ್"), "ರಾಜ್ಕುಮಾರ್");
+        assert_eq!(fold("ಜ಼ೀರೋ"), "ಜೀರೋ");
+        assert_eq!(fold("ಕಿ\u{0CD5}ರ್ತಿ"), "ಕೀರ್ತಿ");
+        assert_eq!(fold("ಸಕರ್ಾರ"), "ಸರ್ಕಾರ");
+        assert_eq!(fold("ಹೊoದಿದೆ"), "ಹೊಂದಿದೆ");
+    }
+
+    #[test]
+    fn nasal_and_virama_before_its_group_is_the_anusvara() {
+        for (nasal, group) in [
+            ('ಙ', 'ಕ'..='ಘ'),
+            ('ಞ', 'ಚ'..='ಝ'),
+            ('ಣ', 'ಟ'..='ಢ'),
+            ('ನ', 'ತ'..='ಧ'),
+            ('ಮ', 'ಪ'..='ಭ'),
+        ] {
+            for stop in group {
+                let word = format!("ಅ{nasal}{VIRAMA}{stop}");
+                assert_eq!(fold(&word), format!("ಅಂ{stop}"), "{word}");
+            }
+        }
+        assert_eq!(fold("ಸನ್ತೋಷ"), fold("ಸಂತೋಷ"));
+        assert_eq!(fold("ಗಙ್ಗಾ"), "ಗಂಗಾ");
+    }
+
+    #[test]
+    fn other_clusters_with_a_nasal_stay() {
+        for word in ["ಕನ್ನಡ", "ಅಮ್ಮ", "ಅಣ್ಣ", "ಜನ್ಮ", "ಬ್ರಹ್ಮ", "ತಾಮ್ರ", "ಅನ್ಯ", "ಮ್ಯೂಸಿಯಂ"]
+        {
+            assert_eq!(fold(word), word);
+        }
+        assert_eq!(fold("ನ್ಕ"), "ನ್ಕ");
+        assert_eq!(fold("ಞ್ಚ"), "ಞ್ಚ");
+        assert_eq!(fold("o'ಞ್ಚ"), "o'ಞ್ಚ");
+    }
+
+    #[test]
+    fn the_quick_check_passes_only_text_the_profile_keeps() {
+        for word in ["ಕನ್ನಡ", "ಮರಗಳಲ್ಲಿ", "ಕೀರ್ತಿ", "೧೯೯"]
+        {
+            assert!(is_search_form(word), "{word}");
+        }
+        for word in [
+            "ಕನ್\u{200C}ನಡ",
+            "ಜ಼",
+            "ಬಾೞ್",
+            "ಬೆ೦ಗಳೂರು",
+            "ಕಿ\u{0CD5}",
+            "ಕೊ",
+            "ಅಥವಾಾ",
+            "ಉಾರು",
+            "ಸಕರ್ಾರ",
+            "ಕನ್ನಡa",
+        ] {
+            assert!(!is_search_form(word), "{word}");
+        }
+    }
+
+    #[test]
+    fn digits_and_case() {
+        assert_eq!(fold("೧೯೯೦ರಲ್ಲಿ"), "1990ರಲ್ಲಿ");
+        assert_eq!(fold("ಕೊಠಡಿ೦೧"), "ಕೊಠಡಿ01");
+        assert_eq!(fold("ÉCOLE"), "école");
+        assert_eq!(fold("İ"), "i\u{307}");
+        let dotted = "İ\u{0CCD}";
+        assert_eq!(fold(&fold(dotted)), fold(dotted));
+    }
+
+    #[test]
+    fn folding_is_idempotent() {
+        assert_eq!(fold("ಕಂಞ್ಚ"), "ಕಂಚ");
+        for word in ["ಕನ್\u{200C}ನಡ", "ಸಮ್ಬನ್ಧ", "ಬೆ೦ಗಳೂರು", "ಸಕರ್ಾರ", "ÉCOLE", "ಙ್ಙ"]
+        {
+            let once = fold(word);
+            assert_eq!(fold(&once), once, "{word}");
+        }
+    }
+}

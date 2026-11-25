@@ -61,6 +61,7 @@ The editor page is not hosted yet. To run it locally, see [Editor page](#editor-
 | Shree-Lipi to Unicode | 0 unknown glyphs and 20 malformed syllables in 233,346 glyphs, each read against the text rendered in the font: ಆ್ಯ for the English vowel, and errors in the source | 1,660 lines from 173 Udayavani newspaper pages of 2003 and 2004. See [docs/shree-lipi.md](https://github.com/openkannada/kannadi/blob/main/docs/shree-lipi.md#the-shree-lipi-table). |
 | Transliteration round trip | Exact on every generated string | Property tests: 2,000 random strings per run, 50,000 in CI |
 | ISO 15919 against vidyut-lipi | Same output on 5,000 random words per run, apart from 1 documented difference | `tests/differential.rs` |
+| Searching Kannada text | 98.5% recall and 98.6% precision for nouns in held-out Kannada Wikipedia sentences (charabia 0.10.0: 47.8% and 99.1%); 95.9% and 97.4% on text extracted from legacy-font government PDFs, where other analyzers find nothing | [crates/kannadi-search](https://github.com/openkannada/kannadi/tree/main/crates/kannadi-search#results) |
 | Typing Kannada in English letters | 89.19% top-1 and 96.77% top-5 on the Dakshina Kannada test set; IndicXlit published 77.18% top-1. 1.31 ms per keystroke at the median as WebAssembly | [crates/kannadi-typing](https://github.com/openkannada/kannadi/tree/main/crates/kannadi-typing#results) |
 
 Not measured yet: a comparison with the other open converters on the same verified lines. It needs the reader check first.
@@ -199,6 +200,10 @@ kannada	ಕನ್ನಡ	ಕನ್ನಡಿ	ಕಣ್ಣದ	ಕನ್ನಡ್	�
 til	ಟಿಲ್	ತಿಳಿ	ತಿಳಿದು	ಟೈಲ್	ತಿಲ್
 ```
 
+## Search
+
+[crates/kannadi-search](https://github.com/openkannada/kannadi/tree/main/crates/kannadi-search) turns Kannada text into search tokens, so a word is found in all its spellings and its case and plural forms, and text from legacy-font PDFs is found by a Unicode query. It works on its own, in Tantivy as a `TextAnalyzer`, and in Postgres full-text search. Its README has the method and the measured recall and precision against ICU, Meilisearch's tokenizer and Tantivy's default.
+
 ## Command-line tool
 
 The `kannadi` binary in `crates/kannadi-cli` converts files and folders in both directions, normalizes Unicode text (see [Normalization](#normalization)), and shows Kannada words for words typed in English letters (`kannadi type`):
@@ -321,6 +326,7 @@ kannadi is free and open source. The code and the glyph tables are under the MIT
 
 Not covered by these licenses:
 - the typing model `crates/kannadi-typing/model/kn.typing` and the Dakshina test sets in `crates/kannadi-typing/eval/`, which are under [CC BY-SA 4.0](https://github.com/openkannada/kannadi/blob/main/LICENSES/CC-BY-SA-4.0.txt) because they come from Dakshina and Kannada Wikipedia (see the [typing README](https://github.com/openkannada/kannadi/tree/main/crates/kannadi-typing#training-data));
+- the search word lists `crates/kannadi-search/data/protected.txt` and `preferred.tsv`, single words and counts from Kannada Wikipedia, under [CC BY 4.0](https://github.com/openkannada/kannadi/blob/main/LICENSES/CC-BY-4.0.txt) with credit to Kannada Wikipedia's contributors, and the search test set `crates/kannadi-search/eval/data/`, Wikipedia sentences under CC BY-SA 4.0;
 - the excerpts of Karnataka government documents in `corpus/` and in the test fixtures, which are kept as short excerpts for testing, with their sources (see the [corpus data card](https://github.com/openkannada/kannadi/blob/main/corpus/README.md) and the [fixtures README](https://github.com/openkannada/kannadi/blob/main/crates/kannadi/tests/fixtures/README.md));
 - the font names and copyright strings recorded in `tools/fontqa/results/`, which belong to their owners;
 - the Noto fonts in `web/src/fonts/`, which are under the SIL Open Font License (`web/src/fonts/OFL.txt`).

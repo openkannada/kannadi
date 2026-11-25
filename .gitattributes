@@ -7,3 +7,7 @@ crates/kannadi-cli/tests/fixtures/legacy.* -text
 # The typing model is binary; the test sets are read byte for byte.
 crates/kannadi-typing/model/*.typing binary
 crates/kannadi-typing/eval/*.tsv text eol=lf
+# Search data, evaluation sets and the Postgres rules, read or compared byte for byte.
+crates/kannadi-search/data/** text eol=lf
+crates/kannadi-search/eval/data/** text eol=lf
+crates/kannadi-search/examples/postgres/kannada.rules text eol=lf

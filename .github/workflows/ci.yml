@@ -148,6 +148,20 @@ jobs:
         env:
           KEYSTROKE_MS_LIMIT: "10"
 
+  search:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo clippy -p kannadi-search --all-targets --features tantivy --locked
+      # Includes the Tantivy index test and the recall and precision checks on eval/data.
+      - run: cargo test --release --locked -p kannadi-search --features tantivy
+        env:
+          PROPTEST_CASES: "50000"
+
   python-package:
     runs-on: ubuntu-latest
     defaults:
